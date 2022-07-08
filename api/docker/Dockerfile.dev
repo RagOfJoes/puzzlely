@@ -1,0 +1,23 @@
+FROM golang:1.17.8-alpine
+
+# Alpine images doesn't include base tools
+# so install necessary tools
+RUN apk update && apk upgrade \
+  && apk add --no-cache make
+
+WORKDIR $GOPATH/src/github.com/RagOfJoes/puzzlely/
+
+# Copy go modules
+COPY go.mod go.sum reflex.conf ./
+
+# Download project deps
+# Add reflex for hot reload
+RUN go mod download \
+  && go get -u -v github.com/cespare/reflex
+
+# Copy the rest of the app to container
+COPY . .
+
+EXPOSE 8080
+
+ENTRYPOINT [ "reflex", "-c", "reflex.conf" ]

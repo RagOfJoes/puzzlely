@@ -1,0 +1,28 @@
+import { ParsedUrlQuery } from 'querystring';
+
+import { GetServerSidePropsContext, PreviewData } from 'next';
+
+import { Response } from '@/types/api';
+import { PuzzleConnection } from '@/types/puzzle';
+
+/**
+ * Searches for puzzles that have similar name and/or description. Will be called in server side
+ */
+const search = async (
+  ctx: GetServerSidePropsContext<ParsedUrlQuery, PreviewData>
+) => {
+  const term = ctx.query.term;
+  const request = await fetch(
+    `${process.env.API_URL}/puzzles/search?term=${term}`,
+    {
+      credentials: 'include',
+      headers: {
+        cookie: ctx.req.headers.cookie || '',
+      },
+    }
+  );
+  const json: Response<PuzzleConnection> = await request.json();
+  return json;
+};
+
+export default search;

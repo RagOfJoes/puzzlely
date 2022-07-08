@@ -1,0 +1,10 @@
+docs
+.releaser
+.github
+.circleci
+tmp
+scripts
+.idea
+.git/
+.bin/
+test/
