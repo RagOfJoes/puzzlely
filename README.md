@@ -18,10 +18,10 @@ These are the prerequisites for local development:
 - Go 1.7 or later
 - MySQL (You can choose to host your own or set one up with PlanetScale)
 - Docker
-
-- Discord OAuth2 credentials
-- GitHub OAuth2 credentials
-- Google OAuth2 credentials
+- OAuth2 credentials:
+  - Discord
+  - GitHub
+  - Google
 
 These are the prerequisites for production:
 
