@@ -26,6 +26,7 @@ func New() *validator.Validate {
 	if validate != nil {
 		return validate
 	}
+
 	validate = validator.New()
 	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
 		name := strings.SplitN(field.Tag.Get("json"), ",", 2)[0]
@@ -36,6 +37,8 @@ func New() *validator.Validate {
 	})
 	validate.RegisterValidation("notblank", NotBlank)
 	validate.RegisterValidation("alphanumspace", AlphanumSpace)
+	validate.RegisterValidation("printasciiextra", PrintASCIIExtra)
+
 	return validate
 }
 
@@ -70,4 +73,18 @@ func Var(o interface{}, tag string) error {
 	}
 
 	return nil
+}
+
+func getError(err error, nsKey, structNsKey string) validator.FieldError {
+	errs := err.(validator.ValidationErrors)
+
+	var fe validator.FieldError
+	for i := 0; i < len(errs); i++ {
+		if errs[i].Namespace() == nsKey && errs[i].StructNamespace() == structNsKey {
+			fe = errs[i]
+			break
+		}
+	}
+
+	return fe
 }

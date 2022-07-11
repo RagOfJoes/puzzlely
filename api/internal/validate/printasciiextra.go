@@ -7,8 +7,8 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func AlphanumSpace(fl validator.FieldLevel) bool {
-	reg := regexp.MustCompile(`^[\w\-\s]+$`)
+func PrintASCIIExtra(fl validator.FieldLevel) bool {
+	reg := regexp.MustCompile("^[\x20-\x7E\r\n]*$")
 
 	field := fl.Field()
 	if field.Kind() != reflect.String {

@@ -48,7 +48,7 @@ const GameGuessCard = (props: GameGuessCardProps) => {
         <Text fontSize="sm" fontWeight="medium" color="text.secondary">
           Description
         </Text>
-        <Text fontSize="sm" fontWeight="medium">
+        <Text fontSize="sm" whiteSpace="pre" fontWeight="medium">
           {description}
         </Text>
       </VStack>
