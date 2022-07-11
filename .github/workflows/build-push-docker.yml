@@ -7,7 +7,7 @@ on:
       - api/**
       - web/**
 jobs:
-  build-and-push-api:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -32,7 +32,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./api
-        file: "{context}/docker/Dockerfile"
+        file: ./api/docker/Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/puzzlely:api
     # Only run if Web files were changed
