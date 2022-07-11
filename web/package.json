@@ -29,7 +29,7 @@
     "framer-motion": "^6.3.10",
     "he": "^1.2.0",
     "lodash.shuffle": "^4.2.0",
-    "next": "^12.2.0",
+    "next": "^12.2.2",
     "next-seo": "^5.4.0",
     "passport": "^0.6.0",
     "passport-discord": "^0.1.4",
