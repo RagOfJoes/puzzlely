@@ -9,7 +9,7 @@ import (
 var (
 	tagTypes map[string][]string = map[string][]string{
 		// Format tags
-		"format": {"cidr", "cidrv4", "cidrv6", "datauri", "fqdn", "hostname", "hostname_port", "hostname_rfc1123", "tcp_addr", "tcp4_addr", "tcp6_addr", "udp_addr", "udp4_addr", "udp6_addr", "ip_addr", "ip4_addr", "ip6_addr", "ip", "ipv4", "ipv6", "unix_addr", "mac", "uri", "url", "url_encoded", "urn_rfc2141", "alpha", "alphanum", "alphaunicode", "alphanumunicode", "ascii", "lowercase", "multibyte", "number", "numeric", "printascii", "uppercase", "base64", "base64url", "btc_addr", "btc_addr_bech32", "datetime", "e164", "email", "eth_addr", "hexadecimal", "hexcolor", "hsl", "hsla", "html", "html_encoded", "isbn", "isbn10", "isbn13", "json", "latitude", "longitude", "rgb", "rgba", "ssn", "uuid", "uuid_rfc4122", "uuid3", "uuid3_rfc4122", "uuid4", "uuid4_rfc4122", "uuid5", "uuid5_rfc4122", "dir", "file", "isdefault", "unique"},
+		"format": {"cidr", "cidrv4", "cidrv6", "datauri", "fqdn", "hostname", "hostname_port", "hostname_rfc1123", "tcp_addr", "tcp4_addr", "tcp6_addr", "udp_addr", "udp4_addr", "udp6_addr", "ip_addr", "ip4_addr", "ip6_addr", "ip", "ipv4", "ipv6", "unix_addr", "mac", "uri", "url", "url_encoded", "urn_rfc2141", "alpha", "alphanum", "alphanumspace", "alphaunicode", "alphanumunicode", "ascii", "lowercase", "multibyte", "number", "numeric", "printascii", "printasciiextra", "uppercase", "base64", "base64url", "btc_addr", "btc_addr_bech32", "datetime", "e164", "email", "eth_addr", "hexadecimal", "hexcolor", "hsl", "hsla", "html", "html_encoded", "isbn", "isbn10", "isbn13", "json", "latitude", "longitude", "rgb", "rgba", "ssn", "uuid", "uuid_rfc4122", "uuid3", "uuid3_rfc4122", "uuid4", "uuid4_rfc4122", "uuid5", "uuid5_rfc4122", "dir", "file", "isdefault", "unique"},
 		// Comparison tags
 		"comparison": {"eqcsfield", "eqfield", "containsfield", "excludesfield", "gtcsfield", "gtecsfield", "gtefield", "gtfield", "ltcsfield", "ltecsfield", "ltefield", "ltfield", "necsfield", "nefield", "eq", "gt", "gte", "lt", "lte", "ne", "len", "min", "max", "oneof", "excludes", "excludesall", "excludesrune", "contains", "containsany", "containsrune", "startswith", "endswith"},
 	}
@@ -87,6 +87,7 @@ var (
 		"number":          "must contain numbers only",
 		"numeric":         "must contain numeric values only",
 		"printascii":      "must contain printable ASCII characters only",
+		"printasciiextra": "must contain printable ASCII, carriage return, and newline characters only",
 		"startswith":      "must start with:",
 		"uppercase":       "must contain uppercase characters only",
 		// Format

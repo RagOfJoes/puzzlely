@@ -14,7 +14,7 @@ type Node struct {
 	// Name
 	Name string `json:"name" validate:"required,notblank,alphanumspace,min=1,max=64"`
 	// Description
-	Description string `json:"description,omitempty" validate:"printascii,max=512"`
+	Description string `json:"description,omitempty" validate:"printasciiextra,max=512"`
 	// Difficulty
 	Difficulty Difficulty `json:"difficulty" validate:"required,oneof='Easy' 'Medium' 'Hard'"`
 	// MaxAttempts
