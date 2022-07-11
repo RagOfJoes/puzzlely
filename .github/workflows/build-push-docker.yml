@@ -26,6 +26,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        
     # Only run if API files were changed
     - if: steps.filter.outputs.api == 'true'
       name: Build and push API to Docker
@@ -36,6 +37,17 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/puzzlely:api
     # Only run if Web files were changed
+    - if: steps.filter.outputs.web == 'true'
+      name: Add .env.production.local file
+      working-directory: web
+      run: |
+        touch .env.production.local
+        echo API_URL=${{ secrets.API_URL }} >> .env.production.local
+        echo HOST_URL=${{ secrets.HOST_URL }} >> .env.production.local
+        
+        echo NEXT_PUBLIC_API_URL=$API_URL >> .env.production.local
+        echo NEXT_PUBLIC_HOST_URL=$HOST_URL >> .env.production.local
+        echo NEXT_PUBLIC_PANELBEAR_ID=${{ secrets.PANELBEAR_ID }} >> .env.production.local
     - if: steps.filter.outputs.web == 'true'
       name: Build and push Web to Docker
       uses: docker/build-push-action@v3
