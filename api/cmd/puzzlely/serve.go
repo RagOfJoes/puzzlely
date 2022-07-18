@@ -52,6 +52,7 @@ func serve() {
 
 	// Register endpoints
 	apis.User(cfg, userService, sessionAPI, router)
+	apis.Auth(cfg, sessionAPI, userService, router)
 
 	var routes []string
 	for _, r := range router.Routes() {
