@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// TODO: Remove these once everything has been refactored
 const (
 	// Puzzle related tables
 	PuzzlesTable            string = "puzzles"

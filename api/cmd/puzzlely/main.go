@@ -25,7 +25,8 @@ var (
 		Use:   "start",
 		Short: "Start starts puzzlely's API web server ",
 		Run: func(cmd *cobra.Command, args []string) {
-			Start()
+			// Start()
+			serve()
 		},
 	}
 )
