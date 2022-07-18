@@ -30,9 +30,9 @@ type Session struct {
 	// CreatedAt defines when the session was created
 	CreatedAt time.Time `json:"createdAt" validate:"required"`
 	// ExpiresAt defines the expiration of the session. This'll only be applicable when `State` is `Authenticated`
-	ExpiresAt *time.Time `json:"expiresAt" validate:"required_if=State Authenticated,gtfield=CreatedAt"`
+	ExpiresAt *time.Time `json:"expiresAt" validate:"required_if=State Authenticated,omitempty,gt,gtfield=CreatedAt"`
 	// AuthenticatedAt defines the time when user was successfully logged in
-	AuthenticatedAt *time.Time `json:"authenticatedAt" validate:"required_if=State Authenticated,gtfield=CreatedAt,ltfield=ExpiresAt"`
+	AuthenticatedAt *time.Time `json:"authenticatedAt" validate:"required_if=State Authenticated,lt,ltfield=ExpiresAt"`
 
 	// User is the user, if any, that the session belongs to
 	User *User `json:"user" validate:"required_if=State Authenticated,omitempty,dive"`

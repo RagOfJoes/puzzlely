@@ -83,13 +83,12 @@ func (s *session) SetCookie(w http.ResponseWriter, r *http.Request, session enti
 
 // Get retrieves a session from either the request header or a cookie
 func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticated bool) (*entities.Session, error) {
-	ctx := r.Context()
-
 	token, err := s.getToken(w, r)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrSessionNotFound)
 	}
 
+	ctx := r.Context()
 	session, err := s.service.FindByToken(ctx, token)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrSessionNotFound)
@@ -99,21 +98,6 @@ func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticate
 	}
 
 	return session, nil
-}
-
-// GetOrNew attempts to retrieve a session and if it fails then it will create a new one instead
-func (s *session) GetOrNew(w http.ResponseWriter, r *http.Request) (*entities.Session, error) {
-	existing, _ := s.Get(w, r, false)
-	if existing != nil {
-		return existing, nil
-	}
-
-	newSession, err := s.New(w, r)
-	if err != nil {
-		return nil, err
-	}
-
-	return newSession, nil
 }
 
 // Upsert will either update an existing session or create a new one based on the one that is passed
@@ -130,7 +114,7 @@ func (s *session) Upsert(w http.ResponseWriter, r *http.Request, upsertSession e
 		return updated, nil
 	}
 
-	created, err := s.New(w, r)
+	created, err := s.service.New(ctx, upsertSession)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +165,7 @@ func (s *session) getToken(w http.ResponseWriter, r *http.Request) (string, erro
 		return "", err
 	}
 
-	token, ok := cookie.Values["session"].(string)
+	token, ok := cookie.Values[tokenStoreKey].(string)
 	if !ok {
 		return "", ErrSessionInvalidToken
 	}
