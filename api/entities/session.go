@@ -65,7 +65,7 @@ func (s *Session) Authenticate(lifetime time.Duration, user User) error {
 
 // IsAuthenticated checks whether the session is propery authenticated and not expired
 func (s *Session) IsAuthenticated() bool {
-	if s.State == Authenticated && !s.IsExpired() && s.User != nil {
+	if s.State == Authenticated && s.AuthenticatedAt != nil && !s.IsExpired() && s.User != nil {
 		return true
 	}
 

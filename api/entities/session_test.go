@@ -45,7 +45,8 @@ func TestSessionAuthenticate(t *testing.T) {
 }
 
 func TestSessionIsAuthenticated(t *testing.T) {
-	expire := time.Now().Add(1 * time.Minute)
+	authenticatedAt := time.Now()
+	expire := authenticatedAt.Add(1 * time.Minute)
 	user := entities.User{}
 
 	tests := []struct {
@@ -71,9 +72,10 @@ func TestSessionIsAuthenticated(t *testing.T) {
 		},
 		{
 			session: entities.Session{
-				State:     entities.Authenticated,
-				ExpiresAt: &expire,
-				User:      &user,
+				State:           entities.Authenticated,
+				ExpiresAt:       &expire,
+				AuthenticatedAt: &authenticatedAt,
+				User:            &user,
 			},
 			expected: true,
 		},
