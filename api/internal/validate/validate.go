@@ -56,6 +56,23 @@ func Check(o interface{}) error {
 	return nil
 }
 
+// CheckPartial validates the fields passed in only, ignoring all others.
+// Fields may be provided in a namespaced fashion relative to the  struct provided
+// eg. NestedStruct.Field or NestedArrayField[0].Struct.Name
+//
+// It returns InvalidValidationError for bad values passed in and nil or ValidationErrors as error otherwise.
+// You will need to assert the error if it's not nil eg. err.(validator.ValidationErrors) to access the array of errors.
+func CheckPartial(o interface{}, fields ...string) error {
+	err := validate.StructPartial(o, fields...)
+	if err != nil {
+		for _, ev := range err.(validator.ValidationErrors) {
+			field := strings.Join(strings.Split(ev.Namespace(), ".")[1:], ".")
+			return NewFormatError(ev.Kind(), field, ev.Tag(), ev.Param())
+		}
+	}
+	return nil
+}
+
 // Var validates a single variable using tag style validation. eg. var i int validate.Var(i, "gt=1,lt=10")
 //
 // WARNING: a struct can be passed for validation eg. time.Time is a struct or if you have a custom type and have registered a custom type handler, so must allow it; however unforeseen validations will occur if trying to validate a struct that is meant to be passed to 'validate.Struct'
