@@ -58,7 +58,7 @@ func (u *User) Complete() {
 
 // IsComplete checks whether the user has completed profile setup
 func (u *User) IsComplete() bool {
-	return u.State == Complete
+	return u.UpdatedAt != nil && u.State == Complete
 }
 
 func (u *User) Validate() error {
