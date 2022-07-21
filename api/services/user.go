@@ -10,11 +10,13 @@ import (
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 // Errors
 var (
 	ErrUserDelete       = errors.New("Failed to delete user.")
+	ErrUserConnection   = errors.New("Invalid connection provided.")
 	ErrUserNew          = errors.New("Failed to create user.")
 	ErrUserUpdate       = errors.New("Failed to update user.")
 	ErrUserDoesNotExist = errors.New("User does not exist.")
@@ -28,6 +30,8 @@ type User struct {
 
 // NewUser instantiates a user service
 func NewUser(config config.Configuration, repository repositories.User) User {
+	logrus.Print("Created User Service")
+
 	return User{
 		config:     config,
 		repository: repository,
@@ -54,7 +58,7 @@ func (u *User) New(ctx context.Context, newConnection entities.Connection, newUs
 // Find retrieves a user with their id or username. If strict is set to true then only completed users will be returned
 func (u *User) Find(ctx context.Context, search string, strict bool) (*entities.User, error) {
 	_, uuidErr := uuid.Parse(search)
-	usernameErr := validate.Var(search, "required,notblank,alphanum,min=4,max=24")
+	usernameErr := validate.CheckPartial(entities.User{Username: search}, "Username")
 	if uuidErr != nil && usernameErr != nil {
 		err := uuidErr
 		if uuidErr == nil {
@@ -65,7 +69,7 @@ func (u *User) Find(ctx context.Context, search string, strict bool) (*entities.
 
 	user, err := u.repository.Get(ctx, search)
 	if err != nil {
-		return nil, err
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
 	}
 	if err := user.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
@@ -79,6 +83,11 @@ func (u *User) Find(ctx context.Context, search string, strict bool) (*entities.
 
 // FindWithConnection retrieves a user with one of their connection
 func (u *User) FindWithConnection(ctx context.Context, provider, sub string) (*entities.User, error) {
+	connection := entities.Connection{Provider: provider, Sub: sub}
+	if err := validate.CheckPartial(connection, "Provider", "Sub"); err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserConnection)
+	}
+
 	user, err := u.repository.GetWithConnection(ctx, provider, sub)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
