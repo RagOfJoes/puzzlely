@@ -18,8 +18,8 @@ func TestNewUser(t *testing.T) {
 	repository := &mocks.User{}
 
 	service := services.NewUser(cfg, repository)
-	expect := services.User{}
 
+	expect := services.User{}
 	assert.NotEqual(t, expect, service, "Expected initialized service, got %v", service)
 }
 
