@@ -1,6 +1,7 @@
 package entities_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -100,4 +101,29 @@ func TestUserValidate(t *testing.T) {
 	user.Username = "Test"
 	err = user.Validate()
 	assert.NoError(t, err, "Expected nil, got error %s", err)
+}
+
+func TestUserNewContext(t *testing.T) {
+	user := entities.NewUser()
+
+	ctx := context.Background()
+	ctx = entities.UserNewContext(ctx, user)
+
+	value := ctx.Value("_user").(*entities.User)
+	assert.Equal(t, &user, value, "Expected %v, got %v", &user, value)
+}
+
+func TestUserFromContext(t *testing.T) {
+	user := entities.NewUser()
+
+	ctx := context.Background()
+
+	retrieved, err := entities.UserFromContext(ctx)
+	assert.Nil(t, retrieved, "Expected nil, got %v", retrieved)
+	assert.Error(t, err, "Expected error, got nil")
+
+	ctx = entities.UserNewContext(ctx, user)
+	retrieved, err = entities.UserFromContext(ctx)
+	assert.Equal(t, &user, retrieved, "Expected %v, got %v", &user, retrieved)
+	assert.NoError(t, err, "Expected nil, got %s", err)
 }

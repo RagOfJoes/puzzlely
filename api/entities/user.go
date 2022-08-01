@@ -1,12 +1,16 @@
 package entities
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/google/uuid"
 	"github.com/rs/xid"
 )
+
+const userCtxKey = "_user"
 
 var _ Entity = (*User)(nil)
 
@@ -63,4 +67,19 @@ func (u *User) IsComplete() bool {
 
 func (u *User) Validate() error {
 	return validate.Check(u)
+}
+
+// UserNewContext creates a new context that carries user
+func UserNewContext(ctx context.Context, user User) context.Context {
+	return context.WithValue(ctx, userCtxKey, &user)
+}
+
+// UserFromContext attempts to retrieve user stored in context
+func UserFromContext(ctx context.Context) (*User, error) {
+	value, ok := ctx.Value(userCtxKey).(*User)
+	if !ok || value == nil {
+		return nil, errors.New("user is not in context")
+	}
+
+	return value, nil
 }
