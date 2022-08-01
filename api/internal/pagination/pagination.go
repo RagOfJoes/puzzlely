@@ -30,7 +30,7 @@ func (p *Params) Validate(sortKeyMap map[string]string) error {
 		if err != nil {
 			return internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrInvalidCursor)
 		}
-		p.Cursor = *decoded
+		p.Cursor = decoded
 	}
 	// Validate sort key
 	if sortKeyMap[sortKey] == "" {
