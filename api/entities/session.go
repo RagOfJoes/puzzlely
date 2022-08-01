@@ -10,11 +10,14 @@ import (
 
 var _ Entity = (*Session)(nil)
 
+// SessionState defines the current state of the session
 type SessionState string
 
 const (
+	// Unauthenticated occurs when the session has just been created
 	Unauthenticated SessionState = "Unauthenticated"
-	Authenticated   SessionState = "Authenticated"
+	// Authenticated occurs when the user has successfully logged in
+	Authenticated SessionState = "Authenticated"
 )
 
 // Session defines a user session
