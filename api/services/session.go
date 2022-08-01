@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
@@ -13,12 +14,12 @@ import (
 
 // Errors
 var (
-	ErrSessionCreate       = "Failed to create session."
-	ErrSessionDelete       = "Failed to delete session."
-	ErrSessionInvalid      = "Invalid session provided."
-	ErrSessionInvalidID    = "Invalid session id provided."
-	ErrSessionInvalidToken = "Invalid session token provided."
-	ErrSessionUpdate       = "Failed to update session."
+	ErrSessionCreate       = errors.New("Failed to create session.")
+	ErrSessionDelete       = errors.New("Failed to delete session.")
+	ErrSessionInvalid      = errors.New("Invalid session provided.")
+	ErrSessionInvalidID    = errors.New("Invalid session id provided.")
+	ErrSessionInvalidToken = errors.New("Invalid session token provided.")
+	ErrSessionUpdate       = errors.New("Failed to update session.")
 )
 
 // Session defines the session service
