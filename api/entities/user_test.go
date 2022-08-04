@@ -118,12 +118,10 @@ func TestUserFromContext(t *testing.T) {
 
 	ctx := context.Background()
 
-	retrieved, err := entities.UserFromContext(ctx)
+	retrieved := entities.UserFromContext(ctx)
 	assert.Nil(t, retrieved, "Expected nil, got %v", retrieved)
-	assert.Error(t, err, "Expected error, got nil")
 
 	ctx = entities.UserNewContext(ctx, user)
-	retrieved, err = entities.UserFromContext(ctx)
+	retrieved = entities.UserFromContext(ctx)
 	assert.Equal(t, &user, retrieved, "Expected %v, got %v", &user, retrieved)
-	assert.NoError(t, err, "Expected nil, got %s", err)
 }

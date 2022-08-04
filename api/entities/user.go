@@ -2,7 +2,6 @@ package entities
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/internal/validate"
@@ -75,11 +74,11 @@ func UserNewContext(ctx context.Context, user User) context.Context {
 }
 
 // UserFromContext attempts to retrieve user stored in context
-func UserFromContext(ctx context.Context) (*User, error) {
+func UserFromContext(ctx context.Context) *User {
 	value, ok := ctx.Value(userCtxKey).(*User)
 	if !ok || value == nil {
-		return nil, errors.New("user is not in context")
+		return nil
 	}
 
-	return value, nil
+	return value
 }
