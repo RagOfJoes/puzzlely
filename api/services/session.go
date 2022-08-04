@@ -10,6 +10,7 @@ import (
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 // Errors
@@ -30,6 +31,8 @@ type Session struct {
 
 // NewSession instantiates a session service
 func NewSession(config config.Configuration, repositry repositories.Session) Session {
+	logrus.Print("Created Session Service")
+
 	return Session{
 		config:     config,
 		repository: repositry,
