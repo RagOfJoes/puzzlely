@@ -81,7 +81,7 @@ func (s *session) SetCookie(w http.ResponseWriter, r *http.Request, session enti
 	return nil
 }
 
-// Get retrieves a session from either the request header or a cookie
+// Get retrieves a session from either the request header or a cookie. If an authenticated session is found then it will be added to request's context
 func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticated bool) (*entities.Session, error) {
 	token, err := s.getToken(w, r)
 	if err != nil {
@@ -95,6 +95,12 @@ func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticate
 	}
 	if mustBeAuthenticated && !session.IsAuthenticated() {
 		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrSessionNotFound)
+	}
+
+	if session.IsAuthenticated() {
+		ctx = entities.UserNewContext(ctx, *session.User)
+		// Update request with updated context
+		*r = *r.WithContext(ctx)
 	}
 
 	return session, nil
