@@ -110,34 +110,34 @@ func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticate
 func (s *session) Upsert(w http.ResponseWriter, r *http.Request, upsertSession entities.Session) (*entities.Session, error) {
 	ctx := r.Context()
 
-	existing, _ := s.service.FindByID(ctx, upsertSession.ID)
-	if existing != nil {
-		updated, err := s.service.Update(ctx, upsertSession)
+	oldSession, _ := s.service.FindByID(ctx, upsertSession.ID)
+	if oldSession != nil {
+		session, err := s.service.Update(ctx, upsertSession)
 		if err != nil {
 			return nil, err
 		}
 
-		return updated, nil
+		return session, nil
 	}
 
-	created, err := s.service.New(ctx, upsertSession)
+	session, err := s.service.New(ctx, upsertSession)
 	if err != nil {
 		return nil, err
 	}
 
-	return created, nil
+	return session, nil
 }
 
 // Destroy removes a session from repository layer and the cookie store
 func (s *session) Destroy(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
-	existing, err := s.Get(w, r, false)
+	oldSession, err := s.Get(w, r, false)
 	if err != nil {
 		return err
 	}
 
-	if err := s.service.Delete(ctx, existing.ID); err != nil {
+	if err := s.service.Delete(ctx, oldSession.ID); err != nil {
 		return err
 	}
 

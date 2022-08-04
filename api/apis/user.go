@@ -55,20 +55,19 @@ func (u *user) get(w http.ResponseWriter, r *http.Request) {
 func (u *user) getStats(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	id := chi.URLParam(r, "id")
-	userID, err := uuid.Parse(id)
+	userID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "Invalid id provided."))
 		return
 	}
 
-	found, err := u.service.FindStats(ctx, userID)
+	user, err := u.service.FindStats(ctx, userID)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Ok("", found))
+	render.Render(w, r, Ok("", user))
 }
 
 func (u *user) me(w http.ResponseWriter, r *http.Request) {
@@ -107,13 +106,13 @@ func (u *user) update(w http.ResponseWriter, r *http.Request) {
 
 	updateUser := *session.User
 	updateUser.Username = payload.Username
-	updated, err := u.service.Update(ctx, updateUser)
+	user, err := u.service.Update(ctx, updateUser)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Ok("", updated))
+	render.Render(w, r, Ok("", user))
 }
 
 func (u *user) delete(w http.ResponseWriter, r *http.Request) {

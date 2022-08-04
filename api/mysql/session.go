@@ -81,9 +81,7 @@ func (s *session) Update(ctx context.Context, updateSession entities.Session) (*
 }
 
 func (s *session) Delete(ctx context.Context, id uuid.UUID) error {
-	var model models.Session
-
-	query, args, err := squirrel.Delete(model.TableName()).Where("id = ?", id).ToSql()
+	query, args, err := squirrel.Delete(new(models.Session).TableName()).Where("id = ?", id).ToSql()
 	if err != nil {
 		return err
 	}

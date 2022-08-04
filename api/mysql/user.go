@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -12,6 +13,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+)
+
+// Errors
+var (
+	ErrUserNotFound = errors.New("user was not found in context")
 )
 
 type user struct {
@@ -110,11 +116,11 @@ func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, err
 }
 
 func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*entities.User, error) {
-	var user models.User
-	var connection models.Connection
+	var userModel models.User
+	var connectionModel models.Connection
 
 	connectionQuery, connectionArgs, err := squirrel.Select("user_id").
-		From(connection.TableName()).
+		From(connectionModel.TableName()).
 		Where("provider = ? AND sub = ?", provider, sub).
 		ToSql()
 	if err != nil {
@@ -123,7 +129,7 @@ func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*en
 
 	connectionRow := u.db.QueryRowContext(ctx, connectionQuery, connectionArgs...)
 
-	if err := connectionRow.Scan(&connection.UserID); err != nil {
+	if err := connectionRow.Scan(&connectionModel.UserID); err != nil {
 		return nil, err
 	}
 
@@ -134,8 +140,8 @@ func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*en
 		"created_at",
 		"updated_at",
 	).
-		From(user.TableName()).
-		Where("id = ? AND deleted_at IS NULL", connection.UserID).
+		From(userModel.TableName()).
+		Where("id = ? AND deleted_at IS NULL", connectionModel.UserID).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -144,18 +150,18 @@ func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*en
 	userRow := u.db.QueryRowContext(ctx, userQuery, userArgs...)
 
 	if err := userRow.Scan(
-		&user.ID,
-		&user.State,
-		&user.Username,
-		&user.CreatedAt,
-		&user.UpdatedAt,
+		&userModel.ID,
+		&userModel.State,
+		&userModel.Username,
+		&userModel.CreatedAt,
+		&userModel.UpdatedAt,
 	); err != nil {
 		return nil, err
 	}
 
-	entity := dtos.User().ToEntity(user)
+	user := dtos.User().ToEntity(userModel)
 
-	return &entity, nil
+	return &user, nil
 }
 
 func (u *user) Update(ctx context.Context, updateUser entities.User) (*entities.User, error) {

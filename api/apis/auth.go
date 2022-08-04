@@ -103,22 +103,22 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status := http.StatusOK
-	found, _ := a.user.FindWithConnection(ctx, provider, id)
-	if found == nil {
+	user, _ := a.user.FindWithConnection(ctx, provider, id)
+	if user == nil {
 		newUser := entities.NewUser()
 		newConnection := entities.NewConnection(provider, id, newUser.ID)
 
-		user, err := a.user.New(ctx, newConnection, newUser)
+		createdUser, err := a.user.New(ctx, newConnection, newUser)
 		if err != nil {
 			render.Respond(w, r, err)
 			return
 		}
 
-		found = user
+		user = createdUser
 		status = http.StatusCreated
 	}
 
-	if err := session.Authenticate(a.config.Session.Lifetime, *found); err != nil {
+	if err := session.Authenticate(a.config.Session.Lifetime, *user); err != nil {
 		render.Respond(w, r, err)
 		return
 	}
@@ -132,7 +132,7 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session.User = found
+	session.User = user
 	if status == http.StatusCreated {
 		render.Render(w, r, Created("", session))
 		return
