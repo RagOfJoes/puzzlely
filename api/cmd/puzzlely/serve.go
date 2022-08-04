@@ -36,12 +36,14 @@ func serve() {
 	logrus.Info("Setting up Repositories...")
 	sessionMySQL := mysql.NewSession(mySQL)
 	userMySQL := mysql.NewUser(mySQL)
+	puzzleMySQL := mysql.NewPuzzle(mySQL)
 	logrus.Info("Successfully setup Repositories...\n\n")
 
 	// Setup Services
 	logrus.Info("Setting up Services...")
 	sessionService := services.NewSession(cfg, sessionMySQL)
 	userService := services.NewUser(cfg, userMySQL)
+	puzzleService := services.NewPuzzle(cfg, puzzleMySQL)
 	logrus.Info("Successfully setup Services\n\n")
 
 	// Setup Session API handlers
@@ -53,6 +55,7 @@ func serve() {
 	// Register endpoints
 	apis.User(cfg, userService, sessionAPI, router)
 	apis.Auth(cfg, sessionAPI, userService, router)
+	apis.Puzzle(cfg, puzzleService, sessionAPI, userService, router)
 
 	var routes []string
 	for _, r := range router.Routes() {
