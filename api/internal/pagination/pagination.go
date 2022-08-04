@@ -97,14 +97,26 @@ func (p *Params) Vally(node interface{}) error {
 func isValidSortKey(sortKey string, node interface{}) bool {
 	reflectValue := unwrapReflectValue(reflect.ValueOf(node))
 	reflectType := unwrapReflectType(reflectValue.Type())
+
 	if reflectType.Kind() != reflect.Struct {
 		return false
 	}
+
 	for i := 0; i < reflectType.NumField(); i++ {
-		reflectField := reflectType.Field(i)
-		tag := strings.Split(reflectField.Tag.Get("json"), ",")[0]
-		if strings.EqualFold(tag, sortKey) || strings.EqualFold(tag, internal.ToCamel(sortKey, true)) {
-			return true
+		structField := unwrapReflectType(reflectValue.Type()).Field(i)
+		field := unwrapReflectValue(reflect.Indirect(reflectValue.Field(i)))
+
+		if field.Kind() != reflect.Struct || structField.Type == TimeReflectType {
+			tag := strings.Split(structField.Tag.Get("json"), ",")[0]
+			if strings.EqualFold(tag, sortKey) || strings.EqualFold(tag, internal.ToCamel(sortKey, true)) {
+				return true
+			}
+
+			continue
+		}
+
+		if isValid := isValidSortKey(sortKey, field.Interface()); isValid {
+			return isValid
 		}
 	}
 
