@@ -58,6 +58,7 @@ func (p *puzzle) ToModel(entity entities.Puzzle) models.Puzzle {
 	}
 }
 
+// ToNode transforms puzzle model to a puzzle node entity
 func (p *puzzle) ToNode(model models.Puzzle) entities.PuzzleNode {
 	return entities.PuzzleNode{
 		Base: entities.Base{

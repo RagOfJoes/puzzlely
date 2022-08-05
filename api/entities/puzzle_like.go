@@ -7,10 +7,10 @@ import (
 	"github.com/google/uuid"
 )
 
-var _ Entity = (*Like)(nil)
+var _ Entity = (*PuzzleLike)(nil)
 
-// Like defines the metadata for a user's puzzle like
-type Like struct {
+// PuzzleLike defines the metadata for a user's puzzle like
+type PuzzleLike struct {
 	// ID is the unique identifier
 	ID uuid.UUID `json:"id" validate:"required"`
 	// Active is self-explanatory
@@ -22,11 +22,11 @@ type Like struct {
 }
 
 // Toggle toggles the active field and updates the updatedAt field
-func (l *Like) Toggle() {
+func (l *PuzzleLike) Toggle() {
 	l.Active = !l.Active
 	l.UpdatedAt = time.Now()
 }
 
-func (l *Like) Validate() error {
+func (l *PuzzleLike) Validate() error {
 	return validate.Check(l)
 }

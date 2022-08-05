@@ -27,7 +27,7 @@ type Puzzle interface {
 	// Search searches for puzzles with a similar name or description as search term
 	Search(ctx context.Context, params pagination.Params, search string) ([]entities.PuzzleNode, error)
 	// ToggleLike toggles a user's like status on a puzzle
-	ToggleLike(ctx context.Context, id uuid.UUID) (*entities.Like, error)
+	ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error)
 	// Update updates a puzzle
 	Update(ctx context.Context, updatePuzzle entities.Puzzle) (*entities.Puzzle, error)
 	// Delete deletes a puzzle

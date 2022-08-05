@@ -2,15 +2,15 @@ package models
 
 import "github.com/google/uuid"
 
-var _ Model = (*Block)(nil)
+var _ Model = (*PuzzleBlock)(nil)
 
-type Block struct {
+type PuzzleBlock struct {
 	Bare
 
 	Value   string    `db:"value"`
 	GroupID uuid.UUID `db:"puzzle_group_id"`
 }
 
-func (b *Block) TableName() string {
+func (b *PuzzleBlock) TableName() string {
 	return "puzzle_blocks"
 }

@@ -212,7 +212,7 @@ func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleCon
 }
 
 // ToggleLike toggles a user's like status on a puzzle
-func (p *Puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.Like, error) {
+func (p *Puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error) {
 	puzzle, err := p.repository.Get(ctx, id)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
@@ -257,7 +257,7 @@ func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Pu
 	updatePuzzle.CreatedAt = oldPuzzle.CreatedAt
 	updatePuzzle.CreatedBy = oldPuzzle.CreatedBy
 
-	groups := []entities.Group{}
+	groups := []entities.PuzzleGroup{}
 	for idx, group := range oldPuzzle.Groups {
 		updated := updatePuzzle.Groups[idx]
 		updated.ID = group.ID

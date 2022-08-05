@@ -5,9 +5,10 @@ import (
 	"github.com/google/uuid"
 )
 
-var _ Entity = (*Group)(nil)
+var _ Entity = (*PuzzleGroup)(nil)
 
-type Group struct {
+// PuzzleGroup defines a puzzle group
+type PuzzleGroup struct {
 	// ID is the unique identifier
 	ID uuid.UUID `json:"id" validate:"required"`
 	// Description for the group, this can explain the connection further, fun facts, etc.
@@ -15,14 +16,14 @@ type Group struct {
 	// Answers is an array of string fragments that will compare user guess to check if it's correct
 	Answers []string `json:"answers" validate:"required,min=1,max=8,dive,required,notblank,alphanum,min=1,max=24"`
 	// Blocks that belong to this group
-	Blocks []Block `json:"blocks" validate:"required,len=4,dive"`
+	Blocks []PuzzleBlock `json:"blocks" validate:"required,len=4,dive"`
 }
 
 // NewGroup creates a new group
-func NewGroup(description string, answers []string, blocks []Block) Group {
+func NewGroup(description string, answers []string, blocks []PuzzleBlock) PuzzleGroup {
 	id := uuid.New()
 
-	newBlocks := make([]Block, 0, len(blocks))
+	newBlocks := make([]PuzzleBlock, 0, len(blocks))
 	for _, block := range blocks {
 		newBlock := block
 		newBlock.GroupID = id
@@ -30,7 +31,7 @@ func NewGroup(description string, answers []string, blocks []Block) Group {
 		newBlocks = append(newBlocks, newBlock)
 	}
 
-	return Group{
+	return PuzzleGroup{
 		ID:          id,
 		Description: description,
 		Answers:     answers,
@@ -38,6 +39,6 @@ func NewGroup(description string, answers []string, blocks []Block) Group {
 	}
 }
 
-func (g *Group) Validate() error {
+func (g *PuzzleGroup) Validate() error {
 	return validate.Check(g)
 }

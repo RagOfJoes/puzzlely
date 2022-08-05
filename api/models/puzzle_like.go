@@ -6,9 +6,9 @@ import (
 	"github.com/google/uuid"
 )
 
-var _ Model = (*Like)(nil)
+var _ Model = (*PuzzleLike)(nil)
 
-type Like struct {
+type PuzzleLike struct {
 	ID        uuid.UUID `db:"id"`
 	Active    bool      `db:"active"`
 	CreatedAt time.Time `db:"created_at"`
@@ -17,26 +17,26 @@ type Like struct {
 	UserID    uuid.UUID `db:"user_id"`
 }
 
-func (l *Like) HasID() bool {
+func (l *PuzzleLike) HasID() bool {
 	return l.GetID() != uuid.Nil
 }
 
-func (l *Like) GetID() uuid.UUID {
+func (l *PuzzleLike) GetID() uuid.UUID {
 	return l.ID
 }
 
-func (l *Like) GetCreated() time.Time {
+func (l *PuzzleLike) GetCreated() time.Time {
 	return l.CreatedAt
 }
 
-func (l *Like) GetUpdated() time.Time {
+func (l *PuzzleLike) GetUpdated() time.Time {
 	return l.UpdatedAt
 }
 
-func (l *Like) RefreshUpdated() {
+func (l *PuzzleLike) RefreshUpdated() {
 	l.UpdatedAt = time.Now()
 }
 
-func (l *Like) TableName() string {
+func (l *PuzzleLike) TableName() string {
 	return "puzzle_likes"
 }

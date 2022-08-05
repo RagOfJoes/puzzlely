@@ -52,18 +52,18 @@ func (c *CreatePuzzle) ToEntity() entities.Puzzle {
 	id := uuid.New()
 	now := time.Now()
 
-	groups := []entities.Group{}
+	groups := []entities.PuzzleGroup{}
 	for _, group := range c.Groups {
 		groupID := uuid.New()
-		blocks := []entities.Block{}
+		blocks := []entities.PuzzleBlock{}
 		for _, block := range group.Blocks {
-			blocks = append(blocks, entities.Block{
+			blocks = append(blocks, entities.PuzzleBlock{
 				ID:      uuid.New(),
 				Value:   block.Value,
 				GroupID: groupID,
 			})
 		}
-		groups = append(groups, entities.Group{
+		groups = append(groups, entities.PuzzleGroup{
 			ID:          groupID,
 			Answers:     group.Answers,
 			Description: sanitize.HTML(group.Description),
@@ -135,7 +135,7 @@ func (u *UpdatePuzzle) ToEntity(from entities.Puzzle) entities.Puzzle {
 			groupMap[group.ID] = group
 		}
 
-		var groups []entities.Group
+		var groups []entities.PuzzleGroup
 		for _, group := range update.Groups {
 			value, ok := groupMap[group.ID]
 			if !ok {

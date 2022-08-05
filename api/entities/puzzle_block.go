@@ -5,9 +5,10 @@ import (
 	"github.com/google/uuid"
 )
 
-var _ Entity = (*Block)(nil)
+var _ Entity = (*PuzzleBlock)(nil)
 
-type Block struct {
+// PuzzleBlock defines a puzzle block
+type PuzzleBlock struct {
 	// ID is the unique identifier
 	ID uuid.UUID `json:"id" validate:"required"`
 	// Value is the text that will be rendered on the ui
@@ -17,14 +18,14 @@ type Block struct {
 }
 
 // NewBlock creates a new block for a given group
-func NewBlock(value string, groupID uuid.UUID) Block {
-	return Block{
+func NewBlock(value string, groupID uuid.UUID) PuzzleBlock {
+	return PuzzleBlock{
 		ID:      uuid.New(),
 		Value:   value,
 		GroupID: groupID,
 	}
 }
 
-func (b *Block) Validate() error {
+func (b *PuzzleBlock) Validate() error {
 	return validate.Check(b)
 }

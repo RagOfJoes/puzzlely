@@ -41,13 +41,13 @@ type Puzzle struct {
 	// NumOfLikes defines the number of likes of the puzzle
 	NumOfLikes uint `json:"numOfLikes"`
 	// Groups that belong to this puzzle
-	Groups []Group `json:"groups" validate:"required,len=4,dive"`
+	Groups []PuzzleGroup `json:"groups" validate:"required,len=4,dive"`
 	// CreatedBy defines the user that created the puzzle
 	CreatedBy User `json:"createdBy" validate:"required"`
 }
 
 // NewPuzzle creates a new puzzle for a given user
-func NewPuzzle(name, description string, difficulty PuzzleDifficulty, maxAttempts uint16, timeAllowed uint32, groups []Group, createdBy User) Puzzle {
+func NewPuzzle(name, description string, difficulty PuzzleDifficulty, maxAttempts uint16, timeAllowed uint32, groups []PuzzleGroup, createdBy User) Puzzle {
 	return Puzzle{
 		Base: Base{
 			ID:        uuid.New(),

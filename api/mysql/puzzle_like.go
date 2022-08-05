@@ -26,7 +26,7 @@ func LikedAt(db *sqlx.DB, ids []uuid.UUID, userID uuid.UUID) (map[uuid.UUID]*tim
 		"puzzle_like.created_at",
 		"puzzle_like.updated_at",
 		"puzzle_like.puzzle_id",
-	).From(fmt.Sprintf("%s puzzle_like", new(models.Like).TableName())).Where(squirrel.Eq{
+	).From(fmt.Sprintf("%s puzzle_like", new(models.PuzzleLike).TableName())).Where(squirrel.Eq{
 		"puzzle_like.active":    true,
 		"puzzle_like.puzzle_id": ids,
 		"puzzle_like.user_id":   userID,
@@ -43,7 +43,7 @@ func LikedAt(db *sqlx.DB, ids []uuid.UUID, userID uuid.UUID) (map[uuid.UUID]*tim
 
 	likes := map[uuid.UUID]*time.Time{}
 	for rows.Next() {
-		var like models.Like
+		var like models.PuzzleLike
 
 		if err := rows.Scan(
 			&like.Active,
