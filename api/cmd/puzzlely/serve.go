@@ -37,6 +37,7 @@ func serve() {
 	sessionMySQL := mysql.NewSession(mySQL)
 	userMySQL := mysql.NewUser(mySQL)
 	puzzleMySQL := mysql.NewPuzzle(mySQL)
+	gameMySQL := mysql.NewGame(mySQL, puzzleMySQL)
 	logrus.Info("Successfully setup Repositories...\n\n")
 
 	// Setup Services
@@ -44,6 +45,7 @@ func serve() {
 	sessionService := services.NewSession(cfg, sessionMySQL)
 	userService := services.NewUser(cfg, userMySQL)
 	puzzleService := services.NewPuzzle(cfg, puzzleMySQL)
+	gameService := services.NewGame(cfg, gameMySQL)
 	logrus.Info("Successfully setup Services\n\n")
 
 	// Setup Session API handlers
@@ -56,6 +58,7 @@ func serve() {
 	apis.User(cfg, userService, sessionAPI, router)
 	apis.Auth(cfg, sessionAPI, userService, router)
 	apis.Puzzle(cfg, puzzleService, sessionAPI, userService, router)
+	apis.Game(cfg, puzzleService, gameService, sessionAPI, userService, router)
 
 	var routes []string
 	for _, r := range router.Routes() {
