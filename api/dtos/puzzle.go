@@ -58,19 +58,39 @@ func (p *puzzle) ToModel(entity entities.Puzzle) models.Puzzle {
 	}
 }
 
-// ToNode transforms puzzle model to a puzzle node entity
-func (p *puzzle) ToNode(model models.Puzzle) entities.PuzzleNode {
-	return entities.PuzzleNode{
-		Base: entities.Base{
-			ID:        model.ID,
-			CreatedAt: model.CreatedAt,
-			UpdatedAt: model.UpdatedAt,
-		},
+// ToNode transforms puzzle model or entity to a puzzle node
+func (p *puzzle) ToNode(object interface{}) entities.PuzzleNode {
+	switch object.(type) {
+	case entities.Puzzle:
+		entity := object.(entities.Puzzle)
+		return entities.PuzzleNode{
+			Base: entity.Base,
 
-		Name:        model.Name,
-		Difficulty:  entities.PuzzleDifficulty(model.Difficulty),
-		Description: model.Description,
-		MaxAttempts: model.MaxAttempts,
-		TimeAllowed: model.TimeAllowed,
+			Name:        entity.Name,
+			Description: entity.Description,
+			Difficulty:  entity.Difficulty,
+			MaxAttempts: entity.MaxAttempts,
+			TimeAllowed: entity.TimeAllowed,
+			LikedAt:     entity.LikedAt,
+			NumOfLikes:  entity.NumOfLikes,
+			CreatedBy:   entity.CreatedBy,
+		}
+	case models.Puzzle:
+		model := object.(models.Puzzle)
+		return entities.PuzzleNode{
+			Base: entities.Base{
+				ID:        model.ID,
+				CreatedAt: model.CreatedAt,
+				UpdatedAt: model.UpdatedAt,
+			},
+
+			Name:        model.Name,
+			Difficulty:  entities.PuzzleDifficulty(model.Difficulty),
+			Description: model.Description,
+			MaxAttempts: model.MaxAttempts,
+			TimeAllowed: model.TimeAllowed,
+		}
+	default:
+		return entities.PuzzleNode{}
 	}
 }
