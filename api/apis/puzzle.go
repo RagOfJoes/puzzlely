@@ -49,7 +49,7 @@ func Puzzle(cfg config.Configuration, service services.Puzzle, session session, 
 		r.Get("/liked", p.getLiked)
 		r.Get("/mostLiked", p.getMostLiked)
 		// TODO: Implement this when game has been refactored
-		// r.Get("/mostPlayed", p.getMostPlayed)
+		r.Get("/mostPlayed", p.getMostPlayed)
 		r.Get("/recent", p.getRecent)
 		r.Get("/search", p.search)
 		// Update
@@ -186,6 +186,18 @@ func (p *puzzle) getMostLiked(w http.ResponseWriter, r *http.Request) {
 	p.session.Get(w, r, false)
 
 	connection, err := p.service.FindMostLiked(r.Context())
+	if err != nil {
+		render.Respond(w, r, err)
+		return
+	}
+
+	render.Render(w, r, Ok("", connection))
+}
+
+func (p *puzzle) getMostPlayed(w http.ResponseWriter, r *http.Request) {
+	p.session.Get(w, r, false)
+
+	connection, err := p.service.FindMostPlayed(r.Context())
 	if err != nil {
 		render.Respond(w, r, err)
 		return
