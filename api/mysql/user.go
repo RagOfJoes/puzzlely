@@ -110,9 +110,55 @@ func (u *user) Get(ctx context.Context, search string) (*entities.User, error) {
 	return &entity, nil
 }
 
-// TODO: Finish this after Game and Puzzle has been refactored
 func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, error) {
-	return &entities.Stats{}, nil
+	// TODO: There has to be a better way to handle this
+	puzzleQuery, puzzleArgs, err := squirrel.
+		Select("COUNT(id)").
+		From(PuzzlesTable).
+		Where("user_id = ? AND deleted_at IS NULL", id).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+	puzzleLikeQuery, puzzleLikeArgs, err := squirrel.
+		Select("COUNT(puzzle_like.id)").
+		From(fmt.Sprintf("%s puzzle_like", PuzzleLikesTable)).
+		LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = puzzle_like.puzzle_id", PuzzlesTable)).
+		LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id AND user.deleted_at IS NULL", UsersTable)).
+		Where("puzzle_like.user_id = ? AND puzzle_like.active = true AND puzzle.deleted_at IS NULL", id).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+	gamePlayedQuery, gamePlayedArgs, err := squirrel.
+		Select("COUNT(game.id)").
+		From(fmt.Sprintf("%s game", GamesTable)).
+		LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = game.puzzle_id", PuzzlesTable)).
+		LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id AND user.deleted_at IS NULL", UsersTable)).
+		Where("game.user_id = ? AND game.completed_at IS NOT NULL AND puzzle.deleted_at IS NULL AND user.deleted_at IS NULL", id).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var statsModel models.Stats
+
+	puzzleRow := u.db.QueryRowContext(ctx, puzzleQuery, puzzleArgs...)
+	if err := puzzleRow.Scan(&statsModel.PuzzlesCreated); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	puzzleLikeRow := u.db.QueryRowContext(ctx, puzzleLikeQuery, puzzleLikeArgs...)
+	if err := puzzleLikeRow.Scan(&statsModel.PuzzlesLiked); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	gameRow := u.db.QueryRowContext(ctx, gamePlayedQuery, gamePlayedArgs...)
+	if err := gameRow.Scan(&statsModel.GamesPlayed); err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+
+	stats := dtos.Stats().ToEntity(statsModel)
+
+	return &stats, nil
 }
 
 func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*entities.User, error) {
