@@ -10,32 +10,37 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// LikedAt checks whether user likes puzzles
-func LikedAt(db *sqlx.DB, ids []uuid.UUID, userID uuid.UUID) (map[uuid.UUID]*time.Time, error) {
-	if userID == uuid.Nil {
+func (p *puzzle) GetLikedAt(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]*time.Time, error) {
+	user := entities.UserFromContext(ctx)
+
+	if user == nil {
 		likes := map[uuid.UUID]*time.Time{}
-		for _, id := range ids {
-			likes[id] = nil
+		for _, puzzleID := range ids {
+			likes[puzzleID] = nil
 		}
 
 		return likes, nil
 	}
 
-	query, args, err := squirrel.Select(
-		"puzzle_like.active",
-		"puzzle_like.created_at",
-		"puzzle_like.updated_at",
-		"puzzle_like.puzzle_id",
-	).From(fmt.Sprintf("%s puzzle_like", new(models.PuzzleLike).TableName())).Where(squirrel.Eq{
-		"puzzle_like.active":    true,
-		"puzzle_like.puzzle_id": ids,
-		"puzzle_like.user_id":   userID,
-	}).ToSql()
+	query, args, err := squirrel.
+		Select(
+			"puzzle_like.active",
+			"puzzle_like.created_at",
+			"puzzle_like.updated_at",
+			"puzzle_like.puzzle_id",
+		).
+		From(fmt.Sprintf("%s puzzle_like", new(models.PuzzleLike).TableName())).
+		Where(squirrel.Eq{
+			"puzzle_like.active":    true,
+			"puzzle_like.puzzle_id": ids,
+			"puzzle_like.user_id":   user.ID,
+		}).
+		ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	rows, err := db.Query(query, args...)
+	rows, err := p.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +62,6 @@ func LikedAt(db *sqlx.DB, ids []uuid.UUID, userID uuid.UUID) (map[uuid.UUID]*tim
 		if like.PuzzleID == uuid.Nil {
 			continue
 		}
-
 		if !like.Active {
 			likes[like.PuzzleID] = nil
 			continue

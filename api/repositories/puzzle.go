@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"time"
 
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal/pagination"
@@ -18,6 +19,8 @@ type Puzzle interface {
 	GetCreated(ctx context.Context, params pagination.Params, userID uuid.UUID) ([]entities.PuzzleNode, error)
 	// GetLiked retrieves a list of puzzles that the current user has liked
 	GetLiked(ctx context.Context, params pagination.Params) ([]entities.PuzzleNode, error)
+	// GetLikedAt retrieves the current user's like status on the given puzzle ids
+	GetLikedAt(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]*time.Time, error)
 	// GetMostLiked retrieves a list of most liked puzzles
 	GetMostLiked(ctx context.Context, params pagination.Params) ([]entities.PuzzleNode, error)
 	// GetMostPlayed retrieves a list of most played puzzles
