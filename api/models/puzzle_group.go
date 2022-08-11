@@ -10,7 +10,3 @@ type PuzzleGroup struct {
 	Description string    `db:"description"`
 	PuzzleID    uuid.UUID `db:"puzzle_id"`
 }
-
-func (g *PuzzleGroup) TableName() string {
-	return "puzzle_groups"
-}

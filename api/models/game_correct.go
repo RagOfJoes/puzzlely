@@ -10,7 +10,3 @@ type GameCorrect struct {
 	PuzzleGroupID uuid.UUID `db:"puzzle_group_id"`
 	GameID        uuid.UUID `db:"game_id"`
 }
-
-func (g *GameCorrect) TableName() string {
-	return "game_corrects"
-}

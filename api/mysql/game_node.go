@@ -37,11 +37,11 @@ func (g *game) challengedBy(ctx context.Context, game models.Game) (*entities.Ga
 			"user.updated_at",
 			"COUNT(DISTINCT(game_attempt.order))",
 		).
-		From(fmt.Sprintf("%s game", gameModel.TableName()))
+		From(fmt.Sprintf("%s game", GameTable))
 	// Join Game Attempts
-	builder = builder.LeftJoin(fmt.Sprintf("%s game_attempt ON game_attempt.game_id = game.id", new(models.GameAttempt).TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s game_attempt ON game_attempt.game_id = game.id", GameAttemptTable))
 	// Join User
-	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = game.user_id", userModel.TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = game.user_id", UserTable))
 
 	query, args, err := builder.
 		Where("game.id = ? AND user.deleted_at IS NULL", game.ChallengedBy).

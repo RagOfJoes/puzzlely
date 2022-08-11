@@ -16,7 +16,3 @@ type GameResult struct {
 	GameID        uuid.UUID      `db:"game_id"`
 	PuzzleGroupID uuid.UUID      `db:"puzzle_group_id"`
 }
-
-func (g *GameResult) TableName() string {
-	return "game_results"
-}

@@ -36,7 +36,3 @@ func (l *PuzzleLike) GetUpdated() time.Time {
 func (l *PuzzleLike) RefreshUpdated() {
 	l.UpdatedAt = time.Now()
 }
-
-func (l *PuzzleLike) TableName() string {
-	return "puzzle_likes"
-}

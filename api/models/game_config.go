@@ -15,7 +15,3 @@ type GameConfig struct {
 	TimeAllowed sql.NullInt32 `db:"time_allowed"`
 	GameID      uuid.UUID     `db:"game_id"`
 }
-
-func (g *GameConfig) TableName() string {
-	return "game_configs"
-}

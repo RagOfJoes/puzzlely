@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"time"
@@ -31,23 +30,23 @@ func NewPuzzle(db *sqlx.DB) repositories.Puzzle {
 }
 
 func (p *puzzle) Create(ctx context.Context, newPuzzle entities.Puzzle) (*entities.Puzzle, error) {
-	puzzle := dtos.Puzzle().ToModel(newPuzzle)
+	puzzleModel := dtos.Puzzle().ToModel(newPuzzle)
 
-	var groups []models.PuzzleGroup
-	var answers []models.PuzzleGroupAnswer
-	var blocks []models.PuzzleBlock
+	var groupModels []models.PuzzleGroup
+	var answerModels []models.PuzzleGroupAnswer
+	var blockModels []models.PuzzleBlock
 	for _, group := range newPuzzle.Groups {
 		groupModel := dtos.PuzzleGroup().ToModel(group)
-		groupModel.PuzzleID = puzzle.ID
+		groupModel.PuzzleID = puzzleModel.ID
 
-		groups = append(groups, groupModel)
+		groupModels = append(groupModels, groupModel)
 		for _, block := range group.Blocks {
-			blocks = append(blocks, dtos.PuzzleBlock().ToModel(block))
+			blockModels = append(blockModels, dtos.PuzzleBlock().ToModel(block))
 		}
 
 		for _, answer := range group.Answers {
 			answerID := uuid.New()
-			answers = append(answers, models.PuzzleGroupAnswer{
+			answerModels = append(answerModels, models.PuzzleGroupAnswer{
 				Bare: models.Bare{
 					ID: answerID,
 				},
@@ -58,21 +57,54 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle entities.Puzzle) (*entiti
 		}
 	}
 
-	tx, err := p.db.BeginTx(ctx, nil)
+	puzzleQuery, puzzleArgs, err := squirrel.
+		Insert(PuzzleTable).
+		SetMap(map[string]interface{}{
+			"id":           puzzleModel.ID,
+			"name":         puzzleModel.Name,
+			"description":  puzzleModel.Description,
+			"difficulty":   puzzleModel.Difficulty,
+			"max_attempts": puzzleModel.MaxAttempts,
+			"time_allowed": puzzleModel.TimeAllowed,
+			"created_at":   puzzleModel.CreatedAt,
+			"user_id":      puzzleModel.UserID,
+		}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+	groupInsert := squirrel.
+		Insert(PuzzleGroupTable).
+		Columns("id", "description", "puzzle_id")
+	for _, group := range groupModels {
+		groupInsert = groupInsert.Values(group.ID, group.Description, puzzleModel.ID)
+	}
+	groupQuery, groupArgs, err := groupInsert.ToSql()
+	if err != nil {
+		return nil, err
+	}
+	answerInsert := squirrel.
+		Insert(PuzzleGroupAnswerTable).
+		Columns("id", "answer", "puzzle_group_id")
+	for _, answer := range answerModels {
+		answerInsert = answerInsert.Values(answer.ID, answer.Answer, answer.PuzzleGroupID)
+	}
+	answerQuery, answerArgs, err := answerInsert.ToSql()
+	if err != nil {
+		return nil, err
+	}
+	blockInsert := squirrel.
+		Insert(PuzzleBlockTable).
+		Columns("id", "value", "puzzle_group_id")
+	for _, block := range blockModels {
+		blockInsert = blockInsert.Values(block.ID, block.Value, block.GroupID)
+	}
+	blockQuery, blockArgs, err := blockInsert.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	puzzleQuery, puzzleArgs, err := squirrel.Insert(puzzle.TableName()).SetMap(map[string]interface{}{
-		"id":           puzzle.ID,
-		"name":         puzzle.Name,
-		"description":  puzzle.Description,
-		"difficulty":   puzzle.Difficulty,
-		"max_attempts": puzzle.MaxAttempts,
-		"time_allowed": puzzle.TimeAllowed,
-		"created_at":   puzzle.CreatedAt,
-		"user_id":      puzzle.UserID,
-	}).ToSql()
+	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -80,46 +112,14 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle entities.Puzzle) (*entiti
 	if _, err := tx.ExecContext(ctx, puzzleQuery, puzzleArgs...); err != nil {
 		return nil, err
 	}
-
-	groupInsert := squirrel.Insert(new(models.PuzzleGroup).TableName()).Columns("id", "description", "puzzle_id")
-	for _, group := range groups {
-		groupInsert = groupInsert.Values(group.ID, group.Description, puzzle.ID)
-	}
-	groupQuery, groupArgs, err := groupInsert.ToSql()
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
 	if _, err := tx.ExecContext(ctx, groupQuery, groupArgs...); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-
-	answerInsert := squirrel.Insert(new(models.PuzzleGroupAnswer).TableName()).Columns("id", "answer", "puzzle_group_id")
-	for _, answer := range answers {
-		answerInsert = answerInsert.Values(answer.ID, answer.Answer, answer.PuzzleGroupID)
-	}
-	answerQuery, answerArgs, err := answerInsert.ToSql()
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
 	if _, err := tx.ExecContext(ctx, answerQuery, answerArgs...); err != nil {
-		return nil, err
-	}
-
-	blockInsert := squirrel.Insert(new(models.PuzzleBlock).TableName()).Columns("id", "value", "puzzle_group_id")
-	for _, block := range blocks {
-		blockInsert = blockInsert.Values(block.ID, block.Value, block.GroupID)
-	}
-	blockQuery, blockArgs, err := blockInsert.ToSql()
-	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-
 	if _, err := tx.ExecContext(ctx, blockQuery, blockArgs...); err != nil {
 		tx.Rollback()
 		return nil, err
@@ -134,15 +134,6 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle entities.Puzzle) (*entiti
 }
 
 func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error) {
-	var puzzleModel models.Puzzle
-	var userModel models.User
-
-	var numOfLikes uint
-	uuidMap := map[uuid.UUID]bool{}
-	groupsMap := map[uuid.UUID]models.PuzzleGroup{}
-	answersMap := map[uuid.UUID][]models.PuzzleGroupAnswer{}
-	blocksMap := map[uuid.UUID][]models.PuzzleBlock{}
-
 	builder := squirrel.Select(
 		"puzzle.id",
 		"puzzle.name",
@@ -168,26 +159,23 @@ func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error
 		"user.created_at",
 		"user.updated_at",
 		"COUNT(puzzle_like.id) AS num_of_likes",
-	).From(fmt.Sprintf("%s puzzle", puzzleModel.TableName()))
-	// Join PuzzleGroups
-	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_group ON puzzle_group.puzzle_id = puzzle.id", new(models.PuzzleGroup).TableName()))
-	// Join PuzzleGroupAnswers
-	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_group_answer ON puzzle_group_answer.puzzle_group_id = puzzle_group.id", new(models.PuzzleGroupAnswer).TableName()))
-	// Join PuzzleBlocks
-	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_block ON puzzle_block.puzzle_group_id = puzzle_group.id", new(models.PuzzleBlock).TableName()))
-	// Join PuzzleLikes
-	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_like ON puzzle_like.puzzle_id = puzzle.id AND puzzle_like.active = true", new(models.PuzzleLike).TableName()))
+	).From(fmt.Sprintf("%s puzzle", PuzzleTable))
+	// Join Puzzle Group
+	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_group ON puzzle_group.puzzle_id = puzzle.id", PuzzleGroupTable))
+	// Join Puzzle Group Answer
+	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_group_answer ON puzzle_group_answer.puzzle_group_id = puzzle_group.id", PuzzleGroupAnswerTable))
+	// Join Puzzle Block
+	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_block ON puzzle_block.puzzle_group_id = puzzle_group.id", PuzzleBlockTable))
+	// Join Puzzle Like
+	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_like ON puzzle_like.puzzle_id = puzzle.id AND puzzle_like.active = true", PuzzleLikeTable))
 	// Join User
-	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id", userModel.TableName()))
-	// Where and Transform
-	query, args, err := builder.Where("puzzle.id = ? AND puzzle.deleted_at IS NULL AND user.deleted_at IS NULL", id).
-		GroupBy(
-			"puzzle.id",
-			"puzzle_group.id",
-			"puzzle_group_answer.id",
-			"puzzle_block.id",
-			"user.id",
-		).ToSql()
+	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id", UserTable))
+	// Where
+	builder = builder.Where("puzzle.id = ? AND puzzle.deleted_at IS NULL AND user.deleted_at IS NULL", id)
+	// GroupBy
+	builder = builder.GroupBy("puzzle.id", "puzzle_group.id", "puzzle_group_answer.id", "puzzle_block.id", "user.id")
+
+	query, args, err := builder.ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -197,6 +185,15 @@ func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error
 		return nil, err
 	}
 	defer rows.Close()
+
+	var puzzleModel models.Puzzle
+	var userModel models.User
+
+	var numOfLikes uint
+	uuidMap := map[uuid.UUID]bool{}
+	groupMap := map[uuid.UUID]models.PuzzleGroup{}
+	answerMap := map[uuid.UUID][]models.PuzzleGroupAnswer{}
+	blockMap := map[uuid.UUID][]models.PuzzleBlock{}
 
 	for rows.Next() {
 		var groupModel models.PuzzleGroup
@@ -234,14 +231,14 @@ func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error
 
 		if _, ok := uuidMap[blockModel.ID]; !ok {
 			uuidMap[blockModel.ID] = true
-			blocksMap[groupModel.ID] = append(blocksMap[groupModel.ID], blockModel)
+			blockMap[groupModel.ID] = append(blockMap[groupModel.ID], blockModel)
 		}
 		if _, ok := uuidMap[groupAnswerModel.ID]; !ok {
 			uuidMap[groupAnswerModel.ID] = true
-			answersMap[groupModel.ID] = append(answersMap[groupModel.ID], groupAnswerModel)
+			answerMap[groupModel.ID] = append(answerMap[groupModel.ID], groupAnswerModel)
 		}
-		if _, ok := groupsMap[groupModel.ID]; !ok {
-			groupsMap[groupModel.ID] = groupModel
+		if _, ok := groupMap[groupModel.ID]; !ok {
+			groupMap[groupModel.ID] = groupModel
 		}
 	}
 
@@ -249,12 +246,7 @@ func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error
 		return nil, errors.New("puzzle not found")
 	}
 
-	user := entities.UserFromContext(ctx)
-	if user == nil {
-		user = &entities.User{}
-	}
-
-	likedAtMap, err := LikedAt(p.db, []uuid.UUID{puzzleModel.ID}, user.ID)
+	likedAtMap, err := p.GetLikedAt(ctx, []uuid.UUID{puzzleModel.ID})
 	if err != nil {
 		return nil, err
 	}
@@ -263,16 +255,17 @@ func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error
 	puzzle.LikedAt = likedAtMap[puzzleModel.ID]
 	puzzle.NumOfLikes = numOfLikes
 	puzzle.CreatedBy = dtos.User().ToEntity(userModel)
-	for _, group := range groupsMap {
-		g := dtos.PuzzleGroup().ToEntity(group)
-		for _, answer := range answersMap[group.ID] {
-			g.Answers = append(g.Answers, answer.Answer)
+	for _, groupModel := range groupMap {
+		group := dtos.PuzzleGroup().ToEntity(groupModel)
+
+		for _, answer := range answerMap[groupModel.ID] {
+			group.Answers = append(group.Answers, answer.Answer)
 		}
-		for _, block := range blocksMap[group.ID] {
-			g.Blocks = append(g.Blocks, dtos.PuzzleBlock().ToEntity(block))
+		for _, block := range blockMap[groupModel.ID] {
+			group.Blocks = append(group.Blocks, dtos.PuzzleBlock().ToEntity(block))
 		}
 
-		puzzle.Groups = append(puzzle.Groups, g)
+		puzzle.Groups = append(puzzle.Groups, group)
 	}
 
 	return &puzzle, nil
@@ -322,8 +315,8 @@ func (p *puzzle) GetLiked(ctx context.Context, params pagination.Params) ([]enti
 	cursor := params.Cursor
 
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
-	// Join Like
-	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_like ON puzzle_like.puzzle_id = puzzle.id AND puzzle_like.active = true", new(models.PuzzleLike).TableName()))
+	// Join Puzzle Like
+	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_like ON puzzle_like.puzzle_id = puzzle.id AND puzzle_like.active = true", PuzzleLikeTable))
 	// Where
 	where := squirrel.And{
 		squirrel.Eq{
@@ -351,7 +344,6 @@ func (p *puzzle) GetLiked(ctx context.Context, params pagination.Params) ([]enti
 	}
 
 	return nodes, nil
-
 }
 
 func (p *puzzle) GetMostLiked(ctx context.Context, params pagination.Params) ([]entities.PuzzleNode, error) {
@@ -371,9 +363,102 @@ func (p *puzzle) GetMostLiked(ctx context.Context, params pagination.Params) ([]
 	return entities, nil
 }
 
-// TODO: Implemented this when Games has been refactored
 func (p *puzzle) GetMostPlayed(ctx context.Context, params pagination.Params) ([]entities.PuzzleNode, error) {
-	panic("not implemented")
+	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
+	// Select
+	builder = builder.Column("COUNT(game.id) AS num_of_games")
+	// Join Game
+	builder = builder.LeftJoin(fmt.Sprintf("%s game ON game.puzzle_id = puzzle.id AND game.completed_at IS NOT NULL", GameTable))
+	// Having
+	// TODO: Update this when more users join
+	builder = builder.Having("num_of_games >= 1")
+	// OrderBy
+	builder = builder.OrderBy("num_of_games DESC")
+
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := p.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// This array helps maintain order of list
+	ids := []uuid.UUID{}
+
+	puzzleMap := map[uuid.UUID]models.Puzzle{}
+	likes := map[uuid.UUID]uint{}
+	userMap := map[uuid.UUID]models.User{}
+
+	for rows.Next() {
+		var puzzleModel models.Puzzle
+		var numOfGamesModel uint
+		var numOfLikesModel uint
+		var userModel models.User
+
+		if err := rows.Scan(
+			&puzzleModel.ID,
+			&puzzleModel.Name,
+			&puzzleModel.Description,
+			&puzzleModel.Difficulty,
+			&puzzleModel.MaxAttempts,
+			&puzzleModel.TimeAllowed,
+			&puzzleModel.CreatedAt,
+			&puzzleModel.UpdatedAt,
+			&puzzleModel.UserID,
+			&userModel.ID,
+			&userModel.State,
+			&userModel.Username,
+			&userModel.CreatedAt,
+			&userModel.UpdatedAt,
+			&numOfLikesModel,
+			&numOfGamesModel,
+		); err != nil {
+			return nil, err
+		}
+
+		if _, ok := puzzleMap[puzzleModel.ID]; !ok {
+			ids = append(ids, puzzleModel.ID)
+			puzzleMap[puzzleModel.ID] = puzzleModel
+		}
+		if _, ok := likes[puzzleModel.ID]; !ok {
+			likes[puzzleModel.ID] = numOfLikesModel
+		}
+		if _, ok := userMap[puzzleModel.UserID]; !ok {
+			userMap[puzzleModel.UserID] = userModel
+		}
+	}
+
+	likedAtMap, err := p.GetLikedAt(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var nodes []entities.PuzzleNode
+	for _, id := range ids {
+		puzzleModel, ok := puzzleMap[id]
+		if !ok {
+			continue
+		}
+
+		puzzle := dtos.Puzzle().ToNode(puzzleModel)
+		if numsOfLike, ok := likes[puzzleModel.ID]; ok {
+			puzzle.NumOfLikes = numsOfLike
+		}
+		if likedAt, ok := likedAtMap[puzzle.ID]; ok {
+			puzzle.LikedAt = likedAt
+		}
+		if userModel, ok := userMap[puzzleModel.UserID]; ok {
+			puzzle.CreatedBy = dtos.User().ToEntity(userModel)
+		}
+
+		nodes = append(nodes, puzzle)
+	}
+
+	return nodes, err
 }
 
 func (p *puzzle) GetRecent(ctx context.Context, params pagination.Params, filters entities.PuzzleFilters) ([]entities.PuzzleNode, error) {
@@ -396,7 +481,7 @@ func (p *puzzle) GetRecent(ctx context.Context, params pagination.Params, filter
 		where = append(where, condition)
 	}
 	builder = builder.Where(where)
-	// // OrderBy
+	// OrderBy
 	builder = builder.OrderBy(fmt.Sprintf("puzzle.%s %s", sortKey, sortOrder))
 
 	nodes, err := p.listQuery(ctx, builder)
@@ -409,6 +494,7 @@ func (p *puzzle) GetRecent(ctx context.Context, params pagination.Params, filter
 
 func (p *puzzle) Search(ctx context.Context, params pagination.Params, search string) ([]entities.PuzzleNode, error) {
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
+	// Where
 	builder = builder.Where("MATCH (puzzle.name, puzzle.description) AGAINST (? IN BOOLEAN MODE)", fmt.Sprintf("*'%s'*", search))
 
 	nodes, err := p.listQuery(ctx, builder)
@@ -419,108 +505,29 @@ func (p *puzzle) Search(ctx context.Context, params pagination.Params, search st
 	return nodes, nil
 }
 
-func (p *puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error) {
-	user := entities.UserFromContext(ctx)
-	if user == nil {
-		return nil, ErrUserNotFound
-	}
-
-	now := time.Now()
-
-	var model models.PuzzleLike
-
-	existQuery, existArgs, err := squirrel.Select(
-		"id",
-		"active",
-		"created_at",
-		"updated_at",
-	).From(model.TableName()).Where("puzzle_id = ? AND user_id = ?", id, user.ID).ToSql()
-	if err != nil {
-		return nil, err
-	}
-
-	existRow := p.db.QueryRowContext(ctx, existQuery, existArgs...)
-
-	switch err := existRow.Scan(&model.ID, &model.Active, &model.CreatedAt, &model.UpdatedAt); err {
-	case nil:
-		updateQuery, updateArgs, err := squirrel.Update(model.TableName()).Where("puzzle_id = ? AND user_id = ?", id, user.ID).SetMap(map[string]interface{}{
-			"active":     !model.Active,
-			"updated_at": now,
-		}).ToSql()
-		if err != nil {
-			return nil, err
-		}
-
-		if _, err := p.db.ExecContext(ctx, updateQuery, updateArgs...); err != nil {
-			return nil, err
-		}
-
-		entity := dtos.PuzzleLike().ToEntity(model)
-		entity.Active = !model.Active
-		entity.UpdatedAt = now
-
-		return &entity, nil
-	case sql.ErrNoRows:
-		newID := uuid.New()
-		createQuery, createArgs, err := squirrel.Insert(model.TableName()).SetMap(map[string]interface{}{
-			"id":         newID,
-			"active":     true,
-			"created_at": now,
-			"updated_at": now,
-			"puzzle_id":  id,
-			"user_id":    user.ID,
-		}).ToSql()
-		if err != nil {
-			return nil, err
-		}
-
-		if _, err := p.db.ExecContext(ctx, createQuery, createArgs...); err != nil {
-			return nil, err
-		}
-
-		newEntity := entities.PuzzleLike{
-			ID:        newID,
-			Active:    true,
-			CreatedAt: now,
-			UpdatedAt: now,
-		}
-
-		return &newEntity, nil
-	default:
-		return nil, err
-	}
-}
-
 func (p *puzzle) Update(ctx context.Context, updatePuzzle entities.Puzzle) (*entities.Puzzle, error) {
 	puzzleModel := dtos.Puzzle().ToModel(updatePuzzle)
 
-	var groupModel []models.PuzzleGroup
-	for _, group := range updatePuzzle.Groups {
-		groupModel = append(groupModel, dtos.PuzzleGroup().ToModel(group))
-	}
-
-	tx, err := p.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	puzzleQuery, puzzleArgs, err := squirrel.Update(puzzleModel.TableName()).
+	puzzleQuery, puzzleArgs, err := squirrel.
+		Update(PuzzleTable).
 		Where("id = ? AND deleted_at IS NULL", puzzleModel.ID).
 		SetMap(map[string]interface{}{
 			"name":        puzzleModel.Name,
 			"difficulty":  puzzleModel.Difficulty,
 			"description": puzzleModel.Description,
 			"updated_at":  puzzleModel.UpdatedAt,
-		}).ToSql()
+		}).
+		ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	if _, err := tx.ExecContext(ctx, puzzleQuery, puzzleArgs...); err != nil {
-		return nil, err
+	var groupModel []models.PuzzleGroup
+	for _, group := range updatePuzzle.Groups {
+		groupModel = append(groupModel, dtos.PuzzleGroup().ToModel(group))
 	}
 
-	groupBuilder := squirrel.Insert(new(models.PuzzleGroup).TableName()).Columns("id", "description", "puzzle_id")
+	groupBuilder := squirrel.Insert(PuzzleGroupTable).Columns("id", "description", "puzzle_id")
 	for _, group := range groupModel {
 		groupBuilder = groupBuilder.Values(
 			group.ID,
@@ -528,14 +535,21 @@ func (p *puzzle) Update(ctx context.Context, updatePuzzle entities.Puzzle) (*ent
 			group.PuzzleID,
 		)
 	}
-
 	groupQuery, groupArgs, err := groupBuilder.
-		Suffix("ON DUPLICATE KEY UPDATE description=VALUES(`description`)").ToSql()
+		Suffix("ON DUPLICATE KEY UPDATE description=VALUES(`description`)").
+		ToSql()
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := tx.ExecContext(ctx, puzzleQuery, puzzleArgs...); err != nil {
+		return nil, err
+	}
 	if _, err := tx.ExecContext(ctx, groupQuery, groupArgs...); err != nil {
 		tx.Rollback()
 		return nil, err
@@ -555,11 +569,11 @@ func (p *puzzle) Delete(ctx context.Context, id uuid.UUID) error {
 		return ErrUserNotFound
 	}
 
-	query, args, err := squirrel.Update(new(models.Puzzle).TableName()).
+	query, args, err := squirrel.
+		Update(PuzzleTable).
 		Where("id = ? AND user_id = ? AND deleted_at IS NULL", id, user.ID).
-		SetMap(map[string]interface{}{
-			"deleted_at": time.Now(),
-		}).ToSql()
+		SetMap(map[string]interface{}{"deleted_at": time.Now()}).
+		ToSql()
 	if err != nil {
 		return err
 	}

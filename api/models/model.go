@@ -8,7 +8,6 @@ import (
 
 // Model defines the interface with common methods that most db models should have
 type Model interface {
-	TableName() string
 	HasID() bool
 	GetID() uuid.UUID
 	GetCreated() time.Time

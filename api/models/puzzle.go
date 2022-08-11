@@ -16,7 +16,3 @@ type Puzzle struct {
 	TimeAllowed uint32    `db:"time_allowed"`
 	UserID      uuid.UUID `db:"user_id"`
 }
-
-func (p *Puzzle) TableName() string {
-	return "puzzles"
-}

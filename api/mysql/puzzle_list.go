@@ -14,9 +14,6 @@ import (
 
 // Builds base SQL query that fetches a list of puzzle nodes
 func (p *puzzle) listBuilder(ctx context.Context, params pagination.Params, filters entities.PuzzleFilters) squirrel.SelectBuilder {
-	var puzzleModel models.Puzzle
-	var userModel models.User
-
 	limit := params.Limit
 
 	builder := squirrel.Select(
@@ -35,9 +32,9 @@ func (p *puzzle) listBuilder(ctx context.Context, params pagination.Params, filt
 		"user.created_at",
 		"user.updated_at",
 		"(SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle.id AND active = true) AS num_of_likes",
-	).From(fmt.Sprintf("%s puzzle", puzzleModel.TableName()))
+	).From(fmt.Sprintf("%s puzzle", PuzzleTable))
 	// Join User
-	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id", userModel.TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id", UserTable))
 
 	// Apply filters
 	where := squirrel.And{
@@ -135,22 +132,15 @@ func (p *puzzle) listQuery(ctx context.Context, builder squirrel.SelectBuilder) 
 			ids = append(ids, puzzleModel.ID)
 			puzzleMap[puzzleModel.ID] = puzzleModel
 		}
-
 		if _, ok := likes[puzzleModel.ID]; !ok {
 			likes[puzzleModel.ID] = numOfLikesModel
 		}
-
 		if _, ok := userMap[puzzleModel.UserID]; !ok {
 			userMap[puzzleModel.UserID] = userModel
 		}
 	}
 
-	user := entities.UserFromContext(ctx)
-	if user == nil {
-		user = &entities.User{}
-	}
-
-	likedAtMap, err := LikedAt(p.db, ids, user.ID)
+	likedAtMap, err := p.GetLikedAt(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -163,11 +153,11 @@ func (p *puzzle) listQuery(ctx context.Context, builder squirrel.SelectBuilder) 
 		}
 
 		puzzle := dtos.Puzzle().ToNode(puzzleModel)
-		if val, ok := likes[puzzleModel.ID]; ok {
-			puzzle.NumOfLikes = val
+		if numsOfLike, ok := likes[puzzleModel.ID]; ok {
+			puzzle.NumOfLikes = numsOfLike
 		}
-		if val, ok := likedAtMap[puzzle.ID]; ok {
-			puzzle.LikedAt = val
+		if likedAt, ok := likedAtMap[puzzle.ID]; ok {
+			puzzle.LikedAt = likedAt
 		}
 		if userModel, ok := userMap[puzzleModel.UserID]; ok {
 			puzzle.CreatedBy = dtos.User().ToEntity(userModel)

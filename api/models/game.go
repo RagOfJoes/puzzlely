@@ -21,7 +21,3 @@ type Game struct {
 	PuzzleID      uuid.UUID  `db:"puzzle_id"`
 	UserID        *uuid.UUID `db:"user_id"`
 }
-
-func (g *Game) TableName() string {
-	return "games"
-}

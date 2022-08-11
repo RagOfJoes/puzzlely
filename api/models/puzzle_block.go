@@ -10,7 +10,3 @@ type PuzzleBlock struct {
 	Value   string    `db:"value"`
 	GroupID uuid.UUID `db:"puzzle_group_id"`
 }
-
-func (b *PuzzleBlock) TableName() string {
-	return "puzzle_blocks"
-}

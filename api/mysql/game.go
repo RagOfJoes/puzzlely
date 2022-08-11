@@ -32,11 +32,9 @@ func NewGame(db *sqlx.DB, puzzle repositories.Puzzle) repositories.Game {
 
 func (g *game) Create(ctx context.Context, newGame entities.Game) (*entities.Game, error) {
 	gameModel := dtos.Game().ToModel(newGame)
-	configModel := dtos.GameConfig().ToModel(newGame.Config)
-	configModel.GameID = newGame.ID
 
 	gameQuery, gameArgs, err := squirrel.
-		Insert(gameModel.TableName()).
+		Insert(GameTable).
 		SetMap(map[string]interface{}{
 			"id":             gameModel.ID,
 			"challenge_code": gameModel.ChallengeCode,
@@ -49,8 +47,11 @@ func (g *game) Create(ctx context.Context, newGame entities.Game) (*entities.Gam
 		return nil, err
 	}
 
+	configModel := dtos.GameConfig().ToModel(newGame.Config)
+	configModel.GameID = newGame.ID
+
 	configQuery, configArgs, err := squirrel.
-		Insert(configModel.TableName()).
+		Insert(GameConfigTable).
 		SetMap(map[string]interface{}{
 			"id":           configModel.ID,
 			"max_attempts": configModel.MaxAttempts,
@@ -125,17 +126,17 @@ func (g *game) GetPlayed(ctx context.Context, params pagination.Params, user ent
 		"user.updated_at",
 		"COUNT(DISTINCT(game_attempt.order))",
 		"COUNT(puzzle_like.id)",
-	).From(fmt.Sprintf("%s game", new(models.Game).TableName()))
+	).From(fmt.Sprintf("%s game", GameTable))
 	// Join Game Config
-	builder = builder.LeftJoin(fmt.Sprintf("%s game_config ON game_config.game_id = game.id", new(models.GameConfig).TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s game_config ON game_config.game_id = game.id", GameConfigTable))
 	// Join Game Attempt
-	builder = builder.LeftJoin(fmt.Sprintf("%s game_attempt ON game_attempt.game_id = game.id", new(models.GameAttempt).TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s game_attempt ON game_attempt.game_id = game.id", GameAttemptTable))
 	// Join Puzzle
-	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = game.puzzle_id", new(models.Puzzle).TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = game.puzzle_id", PuzzleTable))
 	// Join Puzzle Like
-	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_like ON puzzle_like.puzzle_id = game.puzzle_id AND active = true", new(models.PuzzleLike).TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s puzzle_like ON puzzle_like.puzzle_id = game.puzzle_id AND active = true", PuzzleLikeTable))
 	// Join User
-	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id", new(models.User).TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id", UserTable))
 	// Order
 	builder = builder.OrderByClause(fmt.Sprintf("game.%s %s", sortKey, sortOrder))
 	// Where
@@ -261,11 +262,6 @@ func (g *game) GetPlayed(ctx context.Context, params pagination.Params, user ent
 		}
 	}
 
-	currentUser := entities.UserFromContext(ctx)
-	if currentUser == nil {
-		currentUser = &entities.User{}
-	}
-
 	likedAtMap, err := g.puzzle.GetLikedAt(ctx, puzzleIDs)
 	if err != nil {
 		return nil, err
@@ -355,7 +351,7 @@ func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.
 	}
 
 	gameQuery, gameArgs, err := squirrel.
-		Update(gameModel.TableName()).
+		Update(GameTable).
 		Where("id = ?", gameModel.ID).
 		SetMap(map[string]interface{}{
 			"score":        gameModel.Score,
@@ -369,7 +365,7 @@ func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.
 	}
 
 	configQuery, configArgs, err := squirrel.
-		Insert(configModel.TableName()).
+		Insert(GameConfigTable).
 		SetMap(map[string]interface{}{
 			"id":           configModel.ID,
 			"max_attempts": configModel.MaxAttempts,
@@ -396,7 +392,7 @@ func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.
 	}
 	if len(attemptModels) > 0 {
 		attemptsBuilder := squirrel.
-			Insert(new(models.GameAttempt).TableName()).
+			Insert(GameAttemptTable).
 			Columns(
 				"`id`",
 				"`order`",
@@ -426,7 +422,7 @@ func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.
 	}
 	if len(correctModels) > 0 {
 		correctsBuilder := squirrel.
-			Insert(new(models.GameCorrect).TableName()).
+			Insert(GameCorrectTable).
 			Columns(
 				"`id`",
 				"`puzzle_group_id`",
@@ -454,7 +450,7 @@ func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.
 	}
 	if len(resultModels) > 0 {
 		resultsBuilder := squirrel.
-			Insert(new(models.GameResult).TableName()).
+			Insert(GameResultTable).
 			Columns(
 				"`id`",
 				"`guess`",

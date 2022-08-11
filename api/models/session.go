@@ -19,7 +19,3 @@ type Session struct {
 
 	UserID uuid.NullUUID `db:"user_id"`
 }
-
-func (s *Session) TableName() string {
-	return "sessions"
-}

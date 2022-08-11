@@ -15,7 +15,3 @@ type GameAttempt struct {
 	PuzzleBlockID uuid.UUID     `db:"puzzle_block_id"`
 	GameID        uuid.UUID     `db:"game_id"`
 }
-
-func (g *GameAttempt) TableName() string {
-	return "game_attempts"
-}

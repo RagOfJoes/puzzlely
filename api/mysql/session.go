@@ -28,17 +28,20 @@ func NewSession(db *sqlx.DB) repositories.Session {
 }
 
 func (s *session) Create(ctx context.Context, newSession entities.Session) (*entities.Session, error) {
-	model := dtos.Session().ToModel(newSession)
+	sessionModel := dtos.Session().ToModel(newSession)
 
-	query, args, err := squirrel.Insert(model.TableName()).SetMap(map[string]interface{}{
-		"id":               model.ID,
-		"state":            model.State,
-		"token":            model.Token,
-		"created_at":       model.CreatedAt,
-		"expires_at":       model.ExpiresAt,
-		"authenticated_at": model.AuthenticatedAt,
-		"user_id":          model.UserID,
-	}).ToSql()
+	query, args, err := squirrel.
+		Insert(SessionTable).
+		SetMap(map[string]interface{}{
+			"id":               sessionModel.ID,
+			"state":            sessionModel.State,
+			"token":            sessionModel.Token,
+			"created_at":       sessionModel.CreatedAt,
+			"expires_at":       sessionModel.ExpiresAt,
+			"authenticated_at": sessionModel.AuthenticatedAt,
+			"user_id":          sessionModel.UserID,
+		}).
+		ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -59,16 +62,18 @@ func (s *session) GetWithToken(ctx context.Context, token string) (*entities.Ses
 }
 
 func (s *session) Update(ctx context.Context, updateSession entities.Session) (*entities.Session, error) {
-	model := dtos.Session().ToModel(updateSession)
+	sessionModel := dtos.Session().ToModel(updateSession)
 
-	query, args, err := squirrel.Update(model.TableName()).
-		Where("id = ?", model.ID).
+	query, args, err := squirrel.
+		Update(SessionTable).
+		Where("id = ?", sessionModel.ID).
 		SetMap(map[string]interface{}{
-			"state":            model.State,
-			"expires_at":       model.ExpiresAt,
-			"authenticated_at": model.AuthenticatedAt,
-			"user_id":          model.UserID,
-		}).ToSql()
+			"state":            sessionModel.State,
+			"expires_at":       sessionModel.ExpiresAt,
+			"authenticated_at": sessionModel.AuthenticatedAt,
+			"user_id":          sessionModel.UserID,
+		}).
+		ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +86,7 @@ func (s *session) Update(ctx context.Context, updateSession entities.Session) (*
 }
 
 func (s *session) Delete(ctx context.Context, id uuid.UUID) error {
-	query, args, err := squirrel.Delete(new(models.Session).TableName()).Where("id = ?", id).ToSql()
+	query, args, err := squirrel.Delete(SessionTable).Where("id = ?", id).ToSql()
 	if err != nil {
 		return err
 	}
@@ -94,51 +99,54 @@ func (s *session) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (s *session) find(ctx context.Context, column, value string) (*entities.Session, error) {
-	var user models.User
-	var model models.Session
-	query, args, err := squirrel.Select(
-		"session.id",
-		"session.state",
-		"session.token",
-		"session.created_at",
-		"session.expires_at",
-		"session.authenticated_at",
-		"session.user_id",
-		"user.id",
-		"user.state",
-		"user.username",
-		"user.created_at",
-		"user.updated_at",
-	).From(fmt.Sprintf("%s session", model.TableName())).
-		LeftJoin(fmt.Sprintf("%s user ON user.id = session.user_id", user.TableName())).
+	query, args, err := squirrel.
+		Select(
+			"session.id",
+			"session.state",
+			"session.token",
+			"session.created_at",
+			"session.expires_at",
+			"session.authenticated_at",
+			"session.user_id",
+			"user.id",
+			"user.state",
+			"user.username",
+			"user.created_at",
+			"user.updated_at",
+		).
+		From(fmt.Sprintf("%s session", SessionTable)).
+		LeftJoin(fmt.Sprintf("%s user ON user.id = session.user_id", UserTable)).
 		Where(fmt.Sprintf("session.%s = ? AND user.deleted_at IS NULL", column), value).
 		ToSql()
 	if err != nil {
 		return nil, err
 	}
 
+	var userModel models.User
+	var sessionModel models.Session
+
 	row := s.db.QueryRowContext(ctx, query, args...)
 	if err := row.Scan(
-		&model.ID,
-		&model.State,
-		&model.Token,
-		&model.CreatedAt,
-		&model.ExpiresAt,
-		&model.AuthenticatedAt,
-		&model.UserID,
-		&user.ID,
-		&user.State,
-		&user.Username,
-		&user.CreatedAt,
-		&user.UpdatedAt,
+		&sessionModel.ID,
+		&sessionModel.State,
+		&sessionModel.Token,
+		&sessionModel.CreatedAt,
+		&sessionModel.ExpiresAt,
+		&sessionModel.AuthenticatedAt,
+		&sessionModel.UserID,
+		&userModel.ID,
+		&userModel.State,
+		&userModel.Username,
+		&userModel.CreatedAt,
+		&userModel.UpdatedAt,
 	); err != nil {
 		return nil, err
 	}
 
-	userEntity := dtos.User().ToEntity(user)
+	session := dtos.Session().ToEntity(sessionModel)
 
-	entity := dtos.Session().ToEntity(model)
-	entity.User = &userEntity
+	user := dtos.User().ToEntity(userModel)
+	session.User = &user
 
-	return &entity, nil
+	return &session, nil
 }

@@ -1,13 +1,16 @@
 package mysql
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/RagOfJoes/puzzlely/dtos"
+	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/google/uuid"
-	"github.com/jmoiron/sqlx"
 )
 
 func (p *puzzle) GetLikedAt(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]*time.Time, error) {
@@ -29,7 +32,7 @@ func (p *puzzle) GetLikedAt(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID
 			"puzzle_like.updated_at",
 			"puzzle_like.puzzle_id",
 		).
-		From(fmt.Sprintf("%s puzzle_like", new(models.PuzzleLike).TableName())).
+		From(fmt.Sprintf("%s puzzle_like", PuzzleLikeTable)).
 		Where(squirrel.Eq{
 			"puzzle_like.active":    true,
 			"puzzle_like.puzzle_id": ids,
@@ -71,4 +74,87 @@ func (p *puzzle) GetLikedAt(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID
 	}
 
 	return likes, nil
+}
+
+func (p *puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error) {
+	user := entities.UserFromContext(ctx)
+	if user == nil {
+		return nil, ErrUserNotFound
+	}
+
+	now := time.Now()
+
+	existQuery, existArgs, err := squirrel.
+		Select(
+			"id",
+			"active",
+			"created_at",
+			"updated_at",
+		).
+		From(PuzzleLikeTable).
+		Where("puzzle_id = ? AND user_id = ?", id, user.ID).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	existRow := p.db.QueryRowContext(ctx, existQuery, existArgs...)
+
+	var likeModel models.PuzzleLike
+
+	switch existRow.Scan(&likeModel.ID, &likeModel.Active, &likeModel.CreatedAt, &likeModel.UpdatedAt) {
+	case nil:
+		query, args, err := squirrel.
+			Update(PuzzleLikeTable).
+			Where("puzzle_id = ? AND user_id = ?", id, user.ID).
+			SetMap(map[string]interface{}{
+				"active":     !likeModel.Active,
+				"updated_at": now,
+			}).
+			ToSql()
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := p.db.ExecContext(ctx, query, args...); err != nil {
+			return nil, err
+		}
+
+		like := dtos.PuzzleLike().ToEntity(likeModel)
+		like.Active = !likeModel.Active
+		like.UpdatedAt = now
+
+		return &like, nil
+	case sql.ErrNoRows:
+		newID := uuid.New()
+		query, args, err := squirrel.
+			Insert(PuzzleLikeTable).
+			SetMap(map[string]interface{}{
+				"id":         newID,
+				"active":     true,
+				"created_at": now,
+				"updated_at": now,
+				"puzzle_id":  id,
+				"user_id":    user.ID,
+			}).
+			ToSql()
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := p.db.ExecContext(ctx, query, args...); err != nil {
+			return nil, err
+		}
+
+		newEntity := entities.PuzzleLike{
+			ID:        newID,
+			Active:    true,
+			CreatedAt: now,
+			UpdatedAt: now,
+		}
+
+		return &newEntity, nil
+	default:
+		return nil, err
+	}
 }

@@ -15,17 +15,6 @@ import (
 
 // Helper function that retrieves a detailed game using a specific column and its value
 func (g *game) find(ctx context.Context, column, search string) (*entities.Game, error) {
-	var gameModel models.Game
-	var configModel models.GameConfig
-	var correctModels []models.GameCorrect
-	var resultModels []models.GameResult
-	var userModel models.User
-	var userState sql.NullString
-	var userUsername sql.NullString
-	var userCreatedAt sql.NullTime
-
-	ids := map[uuid.UUID]bool{}
-
 	builder := squirrel.Select(
 		"game.id",
 		"game.score",
@@ -51,15 +40,15 @@ func (g *game) find(ctx context.Context, column, search string) (*entities.Game,
 		"user.username",
 		"user.created_at",
 		"user.updated_at",
-	).From(fmt.Sprintf("%s game", gameModel.TableName()))
+	).From(fmt.Sprintf("%s game", GameTable))
 	// Join Game Config
-	builder = builder.LeftJoin(fmt.Sprintf("%s game_config ON game_config.game_id = game.id", configModel.TableName()))
-	// Join Game Corrects
-	builder = builder.LeftJoin(fmt.Sprintf("%s game_correct ON game_correct.game_id = game.id", new(models.GameCorrect).TableName()))
-	// Join Game Results
-	builder = builder.LeftJoin(fmt.Sprintf("%s game_result ON game_result.game_id = game.id", new(models.GameResult).TableName()))
-	// Join Users
-	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = game.user_id", userModel.TableName()))
+	builder = builder.LeftJoin(fmt.Sprintf("%s game_config ON game_config.game_id = game.id", GameConfigTable))
+	// Join Game Correct
+	builder = builder.LeftJoin(fmt.Sprintf("%s game_correct ON game_correct.game_id = game.id", GameCorrectTable))
+	// Join Game Result
+	builder = builder.LeftJoin(fmt.Sprintf("%s game_result ON game_result.game_id = game.id", GameResultTable))
+	// Join User
+	builder = builder.LeftJoin(fmt.Sprintf("%s user ON user.id = game.user_id", UserTable))
 	// Where
 	builder = builder.Where(
 		squirrel.And{
@@ -86,6 +75,17 @@ func (g *game) find(ctx context.Context, column, search string) (*entities.Game,
 		return nil, err
 	}
 	defer rows.Close()
+
+	var gameModel models.Game
+	var configModel models.GameConfig
+	var correctModels []models.GameCorrect
+	var resultModels []models.GameResult
+	var userModel models.User
+	var userState sql.NullString
+	var userUsername sql.NullString
+	var userCreatedAt sql.NullTime
+
+	ids := map[uuid.UUID]bool{}
 
 	for rows.Next() {
 		var correctModel models.GameCorrect

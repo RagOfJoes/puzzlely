@@ -14,7 +14,7 @@ import (
 func (g *game) attempts(ctx context.Context, game models.Game) ([][]uuid.UUID, error) {
 	query, args, err := squirrel.
 		Select("attempt.order", "attempt.puzzle_block_id").
-		From(fmt.Sprintf("%s attempt", new(models.GameAttempt).TableName())).
+		From(fmt.Sprintf("%s attempt", GameAttemptTable)).
 		Where("attempt.game_id = ?", game.ID).
 		ToSql()
 	if err != nil {

@@ -9,7 +9,3 @@ type User struct {
 	State    string `db:"state"`
 	Username string `db:"username"`
 }
-
-func (u *User) TableName() string {
-	return "users"
-}

@@ -2,7 +2,9 @@ package mysql
 
 import (
 	"context"
+	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -34,19 +36,36 @@ func NewUser(db *sqlx.DB) repositories.User {
 
 func (u *user) Create(ctx context.Context, newConnection entities.Connection, newUser entities.User) (*entities.User, error) {
 	userModel := dtos.User().ToModel(newUser)
-	connectionModel := dtos.Connection().ToModel(newConnection)
 
-	tx, err := u.db.BeginTx(ctx, nil)
+	userQuery, userArgs, err := squirrel.
+		Insert(UserTable).
+		SetMap(map[string]interface{}{
+			"id":         userModel.ID,
+			"state":      userModel.State,
+			"username":   userModel.Username,
+			"created_at": userModel.CreatedAt,
+		}).
+		ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	userQuery, userArgs, err := squirrel.Insert(userModel.TableName()).SetMap(map[string]interface{}{
-		"id":         userModel.ID,
-		"state":      userModel.State,
-		"username":   userModel.Username,
-		"created_at": userModel.CreatedAt,
-	}).ToSql()
+	connectionModel := dtos.Connection().ToModel(newConnection)
+
+	connectionQuery, connectionArgs, err := squirrel.
+		Insert(ConnectionTable).
+		SetMap(map[string]interface{}{
+			"id":       connectionModel.ID,
+			"provider": connectionModel.Provider,
+			"sub":      connectionModel.Sub,
+			"user_id":  connectionModel.UserID,
+		}).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := u.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -54,17 +73,6 @@ func (u *user) Create(ctx context.Context, newConnection entities.Connection, ne
 	if _, err := tx.ExecContext(ctx, userQuery, userArgs...); err != nil {
 		return nil, err
 	}
-
-	connectionQuery, connectionArgs, err := squirrel.Insert(connectionModel.TableName()).SetMap(map[string]interface{}{
-		"id":       connectionModel.ID,
-		"provider": connectionModel.Provider,
-		"sub":      connectionModel.Sub,
-		"user_id":  connectionModel.UserID,
-	}).ToSql()
-	if err != nil {
-		return nil, err
-	}
-
 	if _, err := tx.ExecContext(ctx, connectionQuery, connectionArgs...); err != nil {
 		tx.Rollback()
 		return nil, err
@@ -79,20 +87,20 @@ func (u *user) Create(ctx context.Context, newConnection entities.Connection, ne
 }
 
 func (u *user) Get(ctx context.Context, search string) (*entities.User, error) {
-	var model models.User
-
 	query, args, err := squirrel.Select(
 		"id",
 		"state",
 		"username",
 		"created_at",
 		"updated_at",
-	).From(model.TableName()).
+	).From(UserTable).
 		Where("(id = ? OR username = ?) AND deleted_at IS NULL", search, search).
 		ToSql()
 	if err != nil {
 		return nil, err
 	}
+
+	var model models.User
 
 	row := u.db.QueryRowContext(ctx, query, args...)
 	if err := row.Scan(
@@ -114,7 +122,7 @@ func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, err
 	// TODO: There has to be a better way to handle this
 	puzzleQuery, puzzleArgs, err := squirrel.
 		Select("COUNT(id)").
-		From(PuzzlesTable).
+		From(PuzzleTable).
 		Where("user_id = ? AND deleted_at IS NULL", id).
 		ToSql()
 	if err != nil {
@@ -122,9 +130,9 @@ func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, err
 	}
 	puzzleLikeQuery, puzzleLikeArgs, err := squirrel.
 		Select("COUNT(puzzle_like.id)").
-		From(fmt.Sprintf("%s puzzle_like", PuzzleLikesTable)).
-		LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = puzzle_like.puzzle_id", PuzzlesTable)).
-		LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id AND user.deleted_at IS NULL", UsersTable)).
+		From(fmt.Sprintf("%s puzzle_like", PuzzleLikeTable)).
+		LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = puzzle_like.puzzle_id", PuzzleTable)).
+		LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id AND user.deleted_at IS NULL", UserTable)).
 		Where("puzzle_like.user_id = ? AND puzzle_like.active = true AND puzzle.deleted_at IS NULL", id).
 		ToSql()
 	if err != nil {
@@ -132,9 +140,9 @@ func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, err
 	}
 	gamePlayedQuery, gamePlayedArgs, err := squirrel.
 		Select("COUNT(game.id)").
-		From(fmt.Sprintf("%s game", GamesTable)).
-		LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = game.puzzle_id", PuzzlesTable)).
-		LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id AND user.deleted_at IS NULL", UsersTable)).
+		From(fmt.Sprintf("%s game", GameTable)).
+		LeftJoin(fmt.Sprintf("%s puzzle ON puzzle.id = game.puzzle_id", PuzzleTable)).
+		LeftJoin(fmt.Sprintf("%s user ON user.id = puzzle.user_id AND user.deleted_at IS NULL", UserTable)).
 		Where("game.user_id = ? AND game.completed_at IS NOT NULL AND puzzle.deleted_at IS NULL AND user.deleted_at IS NULL", id).
 		ToSql()
 	if err != nil {
@@ -162,22 +170,22 @@ func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, err
 }
 
 func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*entities.User, error) {
-	var userModel models.User
-	var connectionModel models.Connection
-
 	connectionQuery, connectionArgs, err := squirrel.Select("user_id").
-		From(connectionModel.TableName()).
+		From(ConnectionTable).
 		Where("provider = ? AND sub = ?", provider, sub).
 		ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	connectionRow := u.db.QueryRowContext(ctx, connectionQuery, connectionArgs...)
+	var connectionModel models.Connection
 
+	connectionRow := u.db.QueryRowContext(ctx, connectionQuery, connectionArgs...)
 	if err := connectionRow.Scan(&connectionModel.UserID); err != nil {
 		return nil, err
 	}
+
+	var userModel models.User
 
 	userQuery, userArgs, err := squirrel.Select(
 		"id",
@@ -186,7 +194,7 @@ func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*en
 		"created_at",
 		"updated_at",
 	).
-		From(userModel.TableName()).
+		From(UserTable).
 		Where("id = ? AND deleted_at IS NULL", connectionModel.UserID).
 		ToSql()
 	if err != nil {
@@ -214,7 +222,7 @@ func (u *user) Update(ctx context.Context, updateUser entities.User) (*entities.
 	model := dtos.User().ToModel(updateUser)
 	model.RefreshUpdated()
 
-	query, args, err := squirrel.Update(model.TableName()).
+	query, args, err := squirrel.Update(UserTable).
 		Where("id = ? AND deleted_at IS NULL", model.ID).
 		SetMap(map[string]interface{}{
 			"state":      model.State,
@@ -234,9 +242,8 @@ func (u *user) Update(ctx context.Context, updateUser entities.User) (*entities.
 }
 
 func (u *user) Delete(ctx context.Context, id uuid.UUID) error {
-	var model models.User
-
-	query, args, err := squirrel.Update(model.TableName()).
+	query, args, err := squirrel.
+		Update(UserTable).
 		Where("id = ? AND deleted_at IS NULL").
 		SetMap(map[string]interface{}{
 			"deleted_at": time.Now(),

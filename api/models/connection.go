@@ -12,7 +12,3 @@ type Connection struct {
 	Sub      string    `db:"sub"`
 	UserID   uuid.UUID `db:"user_id"`
 }
-
-func (c *Connection) TableName() string {
-	return "connections"
-}
