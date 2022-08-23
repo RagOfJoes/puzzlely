@@ -2,7 +2,6 @@ package entities
 
 import (
 	"github.com/RagOfJoes/puzzlely/internal"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 )
 
@@ -16,7 +15,7 @@ type GameConnection struct {
 func BuildGameConnection(limit int, sortKey string, nodes []GameNode) (*GameConnection, error) {
 	var edges []GameEdge
 	for _, node := range nodes {
-		cursor, err := pagination.EncodeCursor(internal.ToCamel(sortKey, true), node)
+		cursor, err := NewCursor(internal.ToCamel(sortKey, true), node)
 		if err != nil {
 			return nil, err
 		}

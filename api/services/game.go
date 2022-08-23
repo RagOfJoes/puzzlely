@@ -8,7 +8,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
@@ -126,9 +125,9 @@ func (g *Game) Find(ctx context.Context, id uuid.UUID) (*entities.Game, error) {
 	return game, nil
 }
 
-func (g *Game) FindPlayed(ctx context.Context, params pagination.Params, user entities.User) (*entities.GameConnection, error) {
-	if err := params.Vally(entities.Game{}); err != nil {
-		return nil, err
+func (g *Game) FindPlayed(ctx context.Context, params entities.Pagination, user entities.User) (*entities.GameConnection, error) {
+	if err := params.Validate(entities.GameReflectType); err != nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 	params.Limit = params.Limit + 1
 

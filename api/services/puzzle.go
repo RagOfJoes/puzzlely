@@ -8,7 +8,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
@@ -84,9 +83,9 @@ func (p *Puzzle) Find(ctx context.Context, id uuid.UUID, strict bool) (*entities
 }
 
 // FindCreated finds a list of puzzles that a user has created
-func (p *Puzzle) FindCreated(ctx context.Context, params pagination.Params, user entities.User) (*entities.PuzzleConnection, error) {
-	if err := params.Vally(entities.Puzzle{}); err != nil {
-		return nil, err
+func (p *Puzzle) FindCreated(ctx context.Context, params entities.Pagination, user entities.User) (*entities.PuzzleConnection, error) {
+	if err := params.Validate(entities.PuzzleReflectType); err != nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 	params.Limit = params.Limit + 1
 
@@ -95,7 +94,7 @@ func (p *Puzzle) FindCreated(ctx context.Context, params pagination.Params, user
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
-	connection, err := buildPuzzleConnection(params.Limit, params.SortKey, nodes)
+	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
 	}
@@ -104,9 +103,9 @@ func (p *Puzzle) FindCreated(ctx context.Context, params pagination.Params, user
 }
 
 // FindLiked finds a list of puzzles that the current user has liked
-func (p *Puzzle) FindLiked(ctx context.Context, params pagination.Params) (*entities.PuzzleConnection, error) {
-	if err := params.Vally(entities.Puzzle{}); err != nil {
-		return nil, err
+func (p *Puzzle) FindLiked(ctx context.Context, params entities.Pagination) (*entities.PuzzleConnection, error) {
+	if err := params.Validate(entities.PuzzleReflectType); err != nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 	params.Limit = params.Limit + 1
 
@@ -115,7 +114,7 @@ func (p *Puzzle) FindLiked(ctx context.Context, params pagination.Params) (*enti
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
-	connection, err := buildPuzzleConnection(params.Limit, params.SortKey, nodes)
+	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +124,7 @@ func (p *Puzzle) FindLiked(ctx context.Context, params pagination.Params) (*enti
 
 // FindMostLiked finds a list of most likes puzzles
 func (p *Puzzle) FindMostLiked(ctx context.Context) (*entities.PuzzleConnection, error) {
-	params := pagination.Params{
+	params := entities.Pagination{
 		Cursor:    "",
 		Limit:     20,
 		SortKey:   "created_at",
@@ -137,7 +136,7 @@ func (p *Puzzle) FindMostLiked(ctx context.Context) (*entities.PuzzleConnection,
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
-	connection, err := buildPuzzleConnection(params.Limit, params.SortKey, nodes)
+	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +146,7 @@ func (p *Puzzle) FindMostLiked(ctx context.Context) (*entities.PuzzleConnection,
 
 // FindMostPlayed finds a list of most played puzzles
 func (p *Puzzle) FindMostPlayed(ctx context.Context) (*entities.PuzzleConnection, error) {
-	params := pagination.Params{
+	params := entities.Pagination{
 		Cursor:    "",
 		Limit:     20,
 		SortKey:   "created_at",
@@ -159,7 +158,7 @@ func (p *Puzzle) FindMostPlayed(ctx context.Context) (*entities.PuzzleConnection
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
-	connection, err := buildPuzzleConnection(params.Limit, params.SortKey, nodes)
+	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
 	}
@@ -168,10 +167,10 @@ func (p *Puzzle) FindMostPlayed(ctx context.Context) (*entities.PuzzleConnection
 }
 
 // FindRecent finds a list of puzzles sorted from newest to oldest and filtered with provided filters
-func (p *Puzzle) FindRecent(ctx context.Context, params pagination.Params, filters entities.PuzzleFilters) (*entities.PuzzleConnection, error) {
+func (p *Puzzle) FindRecent(ctx context.Context, params entities.Pagination, filters entities.PuzzleFilters) (*entities.PuzzleConnection, error) {
 	// Validate pagination params
-	if err := params.Vally(entities.Puzzle{}); err != nil {
-		return nil, err
+	if err := params.Validate(entities.PuzzleReflectType); err != nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 	params.Limit = params.Limit + 1
 
@@ -180,7 +179,7 @@ func (p *Puzzle) FindRecent(ctx context.Context, params pagination.Params, filte
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
-	connection, err := buildPuzzleConnection(params.Limit, params.SortKey, nodes)
+	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +190,7 @@ func (p *Puzzle) FindRecent(ctx context.Context, params pagination.Params, filte
 
 // Search searches for puzzles with a similar name or description as search term
 func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleConnection, error) {
-	params := pagination.Params{
+	params := entities.Pagination{
 		Cursor:    "",
 		Limit:     100,
 		SortKey:   "created_at",
@@ -203,7 +202,7 @@ func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleCon
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
-	connection, err := buildPuzzleConnection(params.Limit, params.SortKey, nodes)
+	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
 	}
@@ -287,43 +286,4 @@ func (p *Puzzle) Delete(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return nil
-}
-
-// Creates a puzzle connection from pagination fields and nodes
-func buildPuzzleConnection(limit int, sortKey string, nodes []entities.PuzzleNode) (*entities.PuzzleConnection, error) {
-	var edges []entities.PuzzleEdge
-	for _, node := range nodes {
-		cursor, err := pagination.EncodeCursor(internal.ToCamel(sortKey, true), node)
-		if err != nil {
-			return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-		}
-		edges = append(edges, entities.PuzzleEdge{
-			Cursor: cursor,
-			Node:   node,
-		})
-	}
-
-	hasNextPage := len(edges) > limit-1
-	pageInfo := entities.PageInfo{
-		Cursor:      "",
-		HasNextPage: hasNextPage,
-	}
-	if hasNextPage {
-		pageInfo.Cursor = edges[len(edges)-1].Cursor
-		edges = edges[:len(edges)-1]
-	}
-
-	// If edges was not initialized then do so here to not trigger validation error
-	if edges == nil {
-		edges = []entities.PuzzleEdge{}
-	}
-	connection := entities.PuzzleConnection{
-		Edges:    edges,
-		PageInfo: pageInfo,
-	}
-	if err := validate.Check(connection); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-	}
-
-	return &connection, nil
 }

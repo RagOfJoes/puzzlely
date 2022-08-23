@@ -7,13 +7,12 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/RagOfJoes/puzzlely/dtos"
 	"github.com/RagOfJoes/puzzlely/entities"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/google/uuid"
 )
 
 // Builds base SQL query that fetches a list of puzzle nodes
-func (p *puzzle) listBuilder(ctx context.Context, params pagination.Params, filters entities.PuzzleFilters) squirrel.SelectBuilder {
+func (p *puzzle) listBuilder(ctx context.Context, params entities.Pagination, filters entities.PuzzleFilters) squirrel.SelectBuilder {
 	limit := params.Limit
 
 	builder := squirrel.Select(

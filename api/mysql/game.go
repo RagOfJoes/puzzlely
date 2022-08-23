@@ -8,7 +8,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/RagOfJoes/puzzlely/dtos"
 	"github.com/RagOfJoes/puzzlely/entities"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
@@ -89,8 +88,12 @@ func (g *game) Get(ctx context.Context, id uuid.UUID) (*entities.Game, error) {
 }
 
 // TODO: Bring this out into a general function similar to puzzle
-func (g *game) GetPlayed(ctx context.Context, params pagination.Params, user entities.User) ([]entities.GameNode, error) {
-	cursor := params.Cursor
+func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user entities.User) ([]entities.GameNode, error) {
+	cursor, err := params.Cursor.Decode()
+	if err != nil {
+		return nil, err
+	}
+
 	limit := params.Limit
 	sortKey := params.SortKey
 	sortOrder := params.SortOrder

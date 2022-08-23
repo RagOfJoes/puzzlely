@@ -2,6 +2,7 @@ package apis
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -9,7 +10,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/payloads"
 	"github.com/RagOfJoes/puzzlely/services"
@@ -63,7 +63,7 @@ func Puzzle(cfg config.Configuration, service services.Puzzle, session session, 
 func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
 	var payload payloads.CreatePuzzle
 	if err := render.Bind(r, &payload); err != nil {
-		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidPayload))
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidPayload))
 		return
 	}
 	if err := payload.Validate(); err != nil {
@@ -82,7 +82,7 @@ func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
 	createPuzzle := payload.ToEntity()
 	createPuzzle.CreatedBy = *session.User
 	if err := validate.Check(createPuzzle); err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", err))
+		render.Respond(w, r, err)
 		return
 	}
 
@@ -92,7 +92,7 @@ func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := validate.Check(puzzle); err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", err))
+		render.Respond(w, r, err)
 		return
 	}
 
@@ -123,13 +123,17 @@ func (p *puzzle) get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *puzzle) getCreated(w http.ResponseWriter, r *http.Request) {
-	cursor := r.URL.Query().Get("cursor")
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	cursor, err := entities.CursorFromString(r.URL.Query().Get("cursor"))
 	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", pagination.ErrInvalidLimit))
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrCursorInvalid))
 		return
 	}
-	params := pagination.Params{
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrPaginationInvalidLimit))
+		return
+	}
+	params := entities.Pagination{
 		Cursor:    cursor,
 		SortKey:   "created_at",
 		SortOrder: "DESC",
@@ -155,13 +159,17 @@ func (p *puzzle) getCreated(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *puzzle) getLiked(w http.ResponseWriter, r *http.Request) {
-	cursor := r.URL.Query().Get("cursor")
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	cursor, err := entities.CursorFromString(r.URL.Query().Get("cursor"))
 	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", pagination.ErrInvalidLimit))
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrCursorInvalid))
 		return
 	}
-	params := pagination.Params{
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrPaginationInvalidLimit))
+		return
+	}
+	params := entities.Pagination{
 		Cursor:    cursor,
 		SortKey:   "liked_at",
 		SortOrder: "DESC",
@@ -207,13 +215,17 @@ func (p *puzzle) getMostPlayed(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *puzzle) getRecent(w http.ResponseWriter, r *http.Request) {
-	cursor := r.URL.Query().Get("cursor")
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	cursor, err := entities.CursorFromString(r.URL.Query().Get("cursor"))
 	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", pagination.ErrInvalidLimit))
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrCursorInvalid))
 		return
 	}
-	params := pagination.Params{
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrPaginationInvalidLimit))
+		return
+	}
+	params := entities.Pagination{
 		Cursor:    cursor,
 		SortKey:   "created_at",
 		SortOrder: "DESC",
@@ -230,6 +242,7 @@ func (p *puzzle) getRecent(w http.ResponseWriter, r *http.Request) {
 
 	connection, err := p.service.FindRecent(r.Context(), params, *filters)
 	if err != nil {
+		log.Print(err)
 		render.Respond(w, r, err)
 		return
 	}

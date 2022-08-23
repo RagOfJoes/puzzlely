@@ -8,7 +8,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/payloads"
 	"github.com/RagOfJoes/puzzlely/services"
@@ -114,10 +113,14 @@ func (g *game) get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *game) getPlayed(w http.ResponseWriter, r *http.Request) {
-	cursor := r.URL.Query().Get("cursor")
+	cursor, err := entities.CursorFromString(r.URL.Query().Get("cursor"))
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrCursorInvalid))
+		return
+	}
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
 	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", pagination.ErrInvalidLimit))
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", entities.ErrPaginationInvalidLimit))
 		return
 	}
 
@@ -132,7 +135,7 @@ func (g *game) getPlayed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	params := pagination.Params{
+	params := entities.Pagination{
 		Cursor:    cursor,
 		SortKey:   "created_at",
 		SortOrder: "DESC",

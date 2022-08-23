@@ -9,7 +9,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/RagOfJoes/puzzlely/dtos"
 	"github.com/RagOfJoes/puzzlely/entities"
-	"github.com/RagOfJoes/puzzlely/internal/pagination"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
@@ -271,8 +270,12 @@ func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error
 	return &puzzle, nil
 }
 
-func (p *puzzle) GetCreated(ctx context.Context, params pagination.Params, userID uuid.UUID) ([]entities.PuzzleNode, error) {
-	cursor := params.Cursor
+func (p *puzzle) GetCreated(ctx context.Context, params entities.Pagination, userID uuid.UUID) ([]entities.PuzzleNode, error) {
+	cursor, err := params.Cursor.Decode()
+	if err != nil {
+		return nil, err
+	}
+
 	sortKey := params.SortKey
 	sortOrder := params.SortOrder
 
@@ -306,13 +309,16 @@ func (p *puzzle) GetCreated(ctx context.Context, params pagination.Params, userI
 	return nodes, nil
 }
 
-func (p *puzzle) GetLiked(ctx context.Context, params pagination.Params) ([]entities.PuzzleNode, error) {
+func (p *puzzle) GetLiked(ctx context.Context, params entities.Pagination) ([]entities.PuzzleNode, error) {
 	user := entities.UserFromContext(ctx)
 	if user == nil {
 		return nil, errors.New("user not found in context")
 	}
 
-	cursor := params.Cursor
+	cursor, err := params.Cursor.Decode()
+	if err != nil {
+		return nil, err
+	}
 
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
 	// Join Puzzle Like
@@ -346,7 +352,7 @@ func (p *puzzle) GetLiked(ctx context.Context, params pagination.Params) ([]enti
 	return nodes, nil
 }
 
-func (p *puzzle) GetMostLiked(ctx context.Context, params pagination.Params) ([]entities.PuzzleNode, error) {
+func (p *puzzle) GetMostLiked(ctx context.Context, params entities.Pagination) ([]entities.PuzzleNode, error) {
 	// TODO: Update this when more users join
 	var likesLimit uint16 = 1
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{
@@ -363,7 +369,7 @@ func (p *puzzle) GetMostLiked(ctx context.Context, params pagination.Params) ([]
 	return entities, nil
 }
 
-func (p *puzzle) GetMostPlayed(ctx context.Context, params pagination.Params) ([]entities.PuzzleNode, error) {
+func (p *puzzle) GetMostPlayed(ctx context.Context, params entities.Pagination) ([]entities.PuzzleNode, error) {
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
 	// Select
 	builder = builder.Column("COUNT(game.id) AS num_of_games")
@@ -461,8 +467,12 @@ func (p *puzzle) GetMostPlayed(ctx context.Context, params pagination.Params) ([
 	return nodes, err
 }
 
-func (p *puzzle) GetRecent(ctx context.Context, params pagination.Params, filters entities.PuzzleFilters) ([]entities.PuzzleNode, error) {
-	cursor := params.Cursor
+func (p *puzzle) GetRecent(ctx context.Context, params entities.Pagination, filters entities.PuzzleFilters) ([]entities.PuzzleNode, error) {
+	cursor, err := params.Cursor.Decode()
+	if err != nil {
+		return nil, err
+	}
+
 	sortKey := params.SortKey
 	sortOrder := params.SortOrder
 
@@ -492,7 +502,7 @@ func (p *puzzle) GetRecent(ctx context.Context, params pagination.Params, filter
 	return nodes, nil
 }
 
-func (p *puzzle) Search(ctx context.Context, params pagination.Params, search string) ([]entities.PuzzleNode, error) {
+func (p *puzzle) Search(ctx context.Context, params entities.Pagination, search string) ([]entities.PuzzleNode, error) {
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
 	// Where
 	builder = builder.Where("MATCH (puzzle.name, puzzle.description) AGAINST (? IN BOOLEAN MODE)", fmt.Sprintf("*'%s'*", search))
