@@ -238,6 +238,8 @@ func (u *user) Update(ctx context.Context, updateUser entities.User) (*entities.
 		return nil, err
 	}
 
+	updateUser.UpdatedAt = model.UpdatedAt
+
 	return &updateUser, nil
 }
 
