@@ -1,8 +1,6 @@
 package entities_test
 
 import (
-	"encoding/base64"
-	"fmt"
 	"testing"
 	"time"
 
@@ -11,6 +9,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestCursorFromString(t *testing.T) {
+	tests := []struct {
+		input   string
+		isValid bool
+	}{
+		{
+			input:   "2022-03-01",
+			isValid: false,
+		},
+		{
+			input:   "",
+			isValid: true,
+		},
+		{
+			input:   "Q3Vyc29yOjIwMjItMDgtMDggMDc6Mjg6NDQuMDAwMDAw",
+			isValid: true,
+		},
+	}
+
+	for _, test := range tests {
+		cursor, err := entities.CursorFromString(test.input)
+
+		if !test.isValid {
+			assert.Empty(t, cursor)
+			assert.Error(t, err)
+		} else {
+			assert.NoError(t, err)
+		}
+	}
+}
+
 func TestNewCursor(t *testing.T) {
 	node := entities.Base{
 		ID:        uuid.New(),
@@ -18,36 +47,47 @@ func TestNewCursor(t *testing.T) {
 	}
 
 	tests := []struct {
-		input    string
-		expected entities.Cursor
+		input   string
+		isValid bool
 	}{
 		{
-			input:    "",
-			expected: entities.Cursor(""),
+			input:   "",
+			isValid: false,
 		},
 		{
-			input:    "created_at",
-			expected: entities.Cursor(""),
+			input:   "created_at",
+			isValid: false,
 		},
 		{
-			input:    "id",
-			expected: entities.Cursor(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s%s", "Cursor:", node.ID.String())))),
+			input:   "id",
+			isValid: true,
 		},
 		{
-			input:    "createdAt",
-			expected: entities.Cursor(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s%s", "Cursor:", node.CreatedAt.Format("2006-01-02 15:04:05.000000"))))),
+			input:   "createdAt",
+			isValid: true,
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		cursor, err := entities.NewCursor(test.input, node)
 
-		if test.expected == entities.Cursor("") {
-			assert.Zero(t, cursor, "(%d) Expected empty cursor, got %v", i, cursor)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+		if !test.isValid {
+			assert.Empty(t, cursor)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, cursor, "(%d) Expected %v, got %v", i, test.expected, cursor)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.NotEmpty(t, test.isValid, cursor)
+			switch test.input {
+			case "id":
+				decoded, err := cursor.Decode()
+				assert.Equal(t, node.ID.String(), decoded)
+				assert.NoError(t, err)
+			case "createdAt":
+				decoded, err := cursor.Decode()
+				assert.Equal(t, node.CreatedAt.Format("2006-01-02 15:04:05.000000"), decoded)
+				assert.NoError(t, err)
+			}
+
+			assert.NoError(t, err)
 		}
 	}
 }
