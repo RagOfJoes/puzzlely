@@ -16,7 +16,7 @@ var (
 	ErrPaginationInvalidSortKey     = errors.New("Invalid sort key provided.")
 )
 
-// Reflect values
+// Reflect types
 var (
 	GameReflectType   = reflect.TypeOf(Game{})
 	PuzzleReflectType = reflect.TypeOf(Puzzle{})
@@ -31,41 +31,45 @@ type Pagination struct {
 
 func (p *Pagination) Validate(reflectType reflect.Type) error {
 	unwrappedType := internal.UnwrapReflectType(reflectType)
-	if unwrappedType != GameReflectType && unwrappedType != PuzzleReflectType {
+
+	switch unwrappedType {
+	case GameReflectType:
+		fallthrough
+	case PuzzleReflectType:
+		cursor := p.Cursor
+		limit := p.Limit
+		sortOrder := p.SortOrder
+
+		// Set default value for sort key
+		sortKey := p.SortKey
+		if sortKey == "" {
+			sortKey = "created_at"
+		}
+
+		// Validate cursor
+		if err := cursor.Validate(); err != nil {
+			return err
+		}
+		// Validate sort key
+		if !isValidSortKey(sortKey, unwrappedType) {
+			return ErrPaginationInvalidSortKey
+		}
+
+		// Validate sort order
+		if sortOrder != "ASC" && sortOrder != "DESC" {
+			return ErrPaginationInvalidOrder
+		}
+		if limit < 1 || limit > 100 {
+			return ErrPaginationInvalidLimit
+		}
+
+		p.Limit = limit
+		p.SortOrder = sortOrder
+
+		return nil
+	default:
 		return ErrPaginationInvalidReflectType
 	}
-
-	cursor := p.Cursor
-	limit := p.Limit
-	sortOrder := p.SortOrder
-
-	// Set default value for sort key
-	sortKey := p.SortKey
-	if sortKey == "" {
-		sortKey = "created_at"
-	}
-
-	// Validate cursor
-	if err := cursor.Validate(); err != nil {
-		return err
-	}
-	// Validate sort key
-	if !isValidSortKey(sortKey, unwrappedType) {
-		return ErrPaginationInvalidSortKey
-	}
-
-	// Validate sort order
-	if sortOrder != "ASC" && sortOrder != "DESC" {
-		return ErrPaginationInvalidOrder
-	}
-	if limit < 1 || limit > 100 {
-		return ErrPaginationInvalidLimit
-	}
-
-	p.Limit = limit
-	p.SortOrder = sortOrder
-
-	return nil
 }
 
 func isValidSortKey(sortKey string, reflectType reflect.Type) bool {
