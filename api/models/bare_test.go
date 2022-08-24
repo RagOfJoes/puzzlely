@@ -27,9 +27,9 @@ func TestBareHasID(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		hasID := test.model.HasID()
-		assert.Equal(t, test.expected, hasID, "(%d) Expected %v, got %v", i, test.expected, hasID)
+		assert.Equal(t, test.expected, hasID)
 	}
 }
 
@@ -53,9 +53,9 @@ func TestBareGetID(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		hasID := test.model.GetID()
-		assert.Equal(t, test.expected, hasID, "(%d) Expected %v, got %v", i, test.expected, hasID)
+		assert.Equal(t, test.expected, hasID)
 	}
 }
 
@@ -63,14 +63,14 @@ func TestBareGetCreated(t *testing.T) {
 	model := models.Bare{}
 	created := model.GetCreated()
 
-	assert.Zero(t, created, "Expected zero time, got %v", created)
+	assert.Zero(t, created)
 }
 
 func TestBareGetUpdated(t *testing.T) {
 	model := models.Bare{}
 	updated := model.GetUpdated()
 
-	assert.Zero(t, updated, "Expected zero time, got %v", updated)
+	assert.Zero(t, updated)
 }
 
 func TestBareRefreshUpdated(t *testing.T) {
@@ -78,5 +78,5 @@ func TestBareRefreshUpdated(t *testing.T) {
 	model := models.Bare{}
 	model.RefreshUpdated()
 
-	assert.Equal(t, zero, model, "Expected no change, got %v", model)
+	assert.Equal(t, zero, model)
 }

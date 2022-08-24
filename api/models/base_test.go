@@ -28,9 +28,9 @@ func TestBaseHasID(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		hasID := test.model.HasID()
-		assert.Equal(t, test.expected, hasID, "(%d) Expected %v, got %v", i, test.expected, hasID)
+		assert.Equal(t, test.expected, hasID)
 	}
 }
 
@@ -54,41 +54,41 @@ func TestBaseGetID(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		hasID := test.model.GetID()
-		assert.Equal(t, test.expected, hasID, "(%d) Expected %v, got %v", i, test.expected, hasID)
+		assert.Equal(t, test.expected, hasID)
 	}
 }
 
 func TestBaseGetCreated(t *testing.T) {
 	model := models.Base{}
 	created := model.GetCreated()
-	assert.Zero(t, created, "Expected zero time, got %v", created)
+	assert.Zero(t, created)
 
 	now := time.Now()
 	model.CreatedAt = now
 	created = model.GetCreated()
-	assert.Equal(t, now, created, "Expected %v, got %v", now, created)
+	assert.Equal(t, now, created)
 }
 
 func TestBaseGetUpdated(t *testing.T) {
 	model := models.Base{}
 	updated := model.GetUpdated()
-	assert.Zero(t, updated, "Expected zero time, got %v", updated)
+	assert.Zero(t, updated)
 
 	model.UpdatedAt = nil
 	updated = model.GetUpdated()
-	assert.Zero(t, updated, "Expected zero time, got %v", updated)
+	assert.Zero(t, updated)
 
 	now := time.Now()
 	model.UpdatedAt = &now
 	updated = model.GetUpdated()
-	assert.Equal(t, now, updated, "Expected %v, got %v", now, updated)
+	assert.Equal(t, now, updated)
 }
 
 func TestBaseRefreshUpdated(t *testing.T) {
 	model := models.Base{}
 	model.RefreshUpdated()
 
-	assert.NotZero(t, model.UpdatedAt, "Expected non-zero time, got %v", model.UpdatedAt)
+	assert.NotZero(t, model.UpdatedAt)
 }

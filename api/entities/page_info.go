@@ -1,6 +1,8 @@
 package entities
 
-import "github.com/RagOfJoes/puzzlely/internal/validate"
+import (
+	"github.com/RagOfJoes/puzzlely/internal/validate"
+)
 
 var _ Entity = (*PageInfo)(nil)
 

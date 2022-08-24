@@ -18,10 +18,11 @@ type notBlankTest struct {
 }
 
 func TestNotBlank(t *testing.T) {
-	v := validator.New()
-	err := v.RegisterValidation("notblank", NotBlank)
+	tag := "notblank"
 
-	require.NoError(t, err, "Failed to register notblank validation")
+	v := validator.New()
+	err := v.RegisterValidation(tag, NotBlank)
+	require.NoError(t, err, "Failed to register %s validation", tag)
 
 	// Errors
 	var x *int

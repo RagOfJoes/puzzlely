@@ -26,12 +26,12 @@ func TestUpdateUserValidate(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		err := test.payload.Validate()
 		if test.isValid {
-			assert.NoError(t, err, "(%d) Expected nil, got %v", i, err)
+			assert.NoError(t, err)
 		} else {
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Error(t, err)
 		}
 	}
 }

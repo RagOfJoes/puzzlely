@@ -14,11 +14,11 @@ import (
 func TestNewUser(t *testing.T) {
 	user := entities.NewUser()
 
-	assert.NotZero(t, user.ID, "Expected valid ID, got %v", user.ID)
-	assert.NotZero(t, user.CreatedAt, "Expected a non-zero time, got %v", user.CreatedAt)
-	assert.Nil(t, user.UpdatedAt, "Expected a zero time, got %v", user.UpdatedAt)
-	assert.Equal(t, entities.Pending, user.State, "Expected %v, got %v", entities.Pending, user.State)
-	assert.Len(t, user.Username, 20, "Expected a %d char length string, got %v", 20, user.Username)
+	assert.NotZero(t, user.ID)
+	assert.NotZero(t, user.CreatedAt)
+	assert.Nil(t, user.UpdatedAt)
+	assert.Equal(t, entities.Pending, user.State)
+	assert.Len(t, user.Username, 20)
 }
 
 func TestUserComplete(t *testing.T) {
@@ -33,8 +33,8 @@ func TestUserComplete(t *testing.T) {
 	}
 
 	user.Complete()
-	assert.NotNil(t, user.UpdatedAt, "Expected a non-zero time, got nil")
-	assert.Equal(t, entities.Complete, user.State, "Expected %v, got %v", entities.Complete, user.State)
+	assert.NotNil(t, user.UpdatedAt)
+	assert.Equal(t, entities.Complete, user.State)
 }
 
 func TestUserIsComplete(t *testing.T) {
@@ -49,13 +49,13 @@ func TestUserIsComplete(t *testing.T) {
 	}
 
 	isComplete := user.IsComplete()
-	assert.Equal(t, false, isComplete, "Expected %v, got %v", false, isComplete)
+	assert.Equal(t, false, isComplete)
 
 	later := time.Now().Add(1 * time.Minute)
 	user.UpdatedAt = &later
 	user.State = entities.Complete
 	isComplete = user.IsComplete()
-	assert.Equal(t, true, isComplete, "Expected %v, got %v", true, isComplete)
+	assert.Equal(t, true, isComplete)
 }
 
 func TestUserValidate(t *testing.T) {
@@ -73,34 +73,34 @@ func TestUserValidate(t *testing.T) {
 	}
 
 	err := user.Validate()
-	assert.Error(t, err, "Expected error, got nil")
+	assert.Error(t, err)
 
 	user.UpdatedAt = nil
 	user.State = "Invalid"
 	err = user.Validate()
-	assert.Error(t, err, "Expected error, got nil")
+	assert.Error(t, err)
 
 	user.State = entities.Complete
 
 	user.Username = ""
 	err = user.Validate()
-	assert.Error(t, err, "Expected error, got nil")
+	assert.Error(t, err)
 
 	user.Username = "Te$t$"
 	err = user.Validate()
-	assert.Error(t, err, "Expected error, got nil")
+	assert.Error(t, err)
 
 	user.Username = "AVeryLongUsernameThatIsWrong"
 	err = user.Validate()
-	assert.Error(t, err, "Expected error, got nil")
+	assert.Error(t, err)
 
 	user.Username = "Sp ace"
 	err = user.Validate()
-	assert.Error(t, err, "Expected error, got nil")
+	assert.Error(t, err)
 
 	user.Username = "Test"
 	err = user.Validate()
-	assert.NoError(t, err, "Expected nil, got error %s", err)
+	assert.NoError(t, err)
 }
 
 func TestUserNewContext(t *testing.T) {
@@ -110,7 +110,7 @@ func TestUserNewContext(t *testing.T) {
 	ctx = entities.UserNewContext(ctx, user)
 
 	value := ctx.Value("_user").(*entities.User)
-	assert.Equal(t, &user, value, "Expected %v, got %v", &user, value)
+	assert.Equal(t, &user, value)
 }
 
 func TestUserFromContext(t *testing.T) {
@@ -119,9 +119,9 @@ func TestUserFromContext(t *testing.T) {
 	ctx := context.Background()
 
 	retrieved := entities.UserFromContext(ctx)
-	assert.Nil(t, retrieved, "Expected nil, got %v", retrieved)
+	assert.Nil(t, retrieved)
 
 	ctx = entities.UserNewContext(ctx, user)
 	retrieved = entities.UserFromContext(ctx)
-	assert.Equal(t, &user, retrieved, "Expected %v, got %v", &user, retrieved)
+	assert.Equal(t, &user, retrieved)
 }

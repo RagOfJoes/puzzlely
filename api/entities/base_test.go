@@ -19,13 +19,13 @@ func TestBaseValidate(t *testing.T) {
 	}
 
 	err := entity.Validate()
-	assert.NoError(t, err, "Expected nil, got error %s", err)
+	assert.NoError(t, err)
 
 	entity.UpdatedAt = &now
 	err = entity.Validate()
-	assert.Error(t, err, "Expected error, got nil")
+	assert.Error(t, err)
 
 	entity.UpdatedAt = &later
 	err = entity.Validate()
-	assert.NoError(t, err, "Expected nil, got error %s", err)
+	assert.NoError(t, err)
 }

@@ -9,6 +9,8 @@ import (
 )
 
 func TestPrintASCIIExtra(t *testing.T) {
+	tag := "printasciiextra"
+
 	tests := []struct {
 		param   string
 		isValid bool
@@ -28,18 +30,16 @@ func TestPrintASCIIExtra(t *testing.T) {
 	}
 
 	v := validator.New()
-	err := v.RegisterValidation("printasciiextra", PrintASCIIExtra)
-	require.NoError(t, err, "Failed to register printasciiextra validation")
+	err := v.RegisterValidation(tag, PrintASCIIExtra)
+	require.NoError(t, err, "Failed to register %s validation", tag)
 
-	for i, test := range tests {
-		errs := validate.Var(test.param, "printasciiextra")
+	for _, test := range tests {
+		errs := validate.Var(test.param, tag)
 
-		if !assert.Equal(t, errs == nil, test.isValid, "Index: %d Printable ASCII Extra failed Error: %s", i, errs) {
+		if !assert.Equal(t, errs == nil, test.isValid) {
 			if errs != nil {
 				val := getError(errs, "", "")
-				if val.Tag() != "printasciiextra" {
-					t.Fatalf("Index: %d Printable ASCII failed Error: %s", i, errs)
-				}
+				assert.Equal(t, tag, val.Tag())
 			}
 		}
 	}

@@ -22,7 +22,7 @@ func TestNewSession(t *testing.T) {
 	service := services.NewSession(cfg, repository)
 
 	expect := services.Session{}
-	assert.NotEqual(t, expect, service, "Expected initialized service, got %v", service)
+	assert.NotEqual(t, expect, service)
 }
 
 func TestSessionNew(t *testing.T) {
@@ -57,7 +57,7 @@ func TestSessionNew(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
 			err = errors.New("Failed")
@@ -69,11 +69,11 @@ func TestSessionNew(t *testing.T) {
 
 		session, err := service.New(ctx, test.input)
 		if test.expected == nil {
-			assert.Nil(t, session, "(%d) Expected nil, got %v", i, session)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, session)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, session, "(%d) Expected %v, got %v", i, test.expected, session)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.expected, session)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -123,7 +123,7 @@ func TestSessionFindByID(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
 			err = errors.New("Failed")
@@ -135,11 +135,11 @@ func TestSessionFindByID(t *testing.T) {
 
 		session, err := service.FindByID(ctx, test.input)
 		if test.expected == nil {
-			assert.Nil(t, session, "(%d) Expected nil, got %v", i, session)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, session)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, session, "(%d) Expected %v, got %v", i, test.expected, session)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.expected, session)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -189,7 +189,7 @@ func TestSessionFindByToken(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
 			err = errors.New("Failed")
@@ -201,11 +201,11 @@ func TestSessionFindByToken(t *testing.T) {
 
 		session, err := service.FindByToken(ctx, test.input)
 		if test.expected == nil {
-			assert.Nil(t, session, "(%d) Expected nil, got %v", i, session)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, session)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, session, "(%d) Expected %v, got %v", i, test.expected, session)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.expected, session)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -246,7 +246,7 @@ func TestSessionUpdate(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
 			err = errors.New("Failed")
@@ -258,11 +258,11 @@ func TestSessionUpdate(t *testing.T) {
 
 		session, err := service.Update(ctx, test.input)
 		if test.expected == nil {
-			assert.Nil(t, session, "(%d) Expected nil, got %v", i, session)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, session)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, session, "(%d) Expected %v, got %v", i, test.expected, session)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.expected, session)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -294,16 +294,16 @@ func TestSessionDelete(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		repository.EXPECT().
 			Delete(ctx, test.input).
 			Return(test.expected)
 
 		err := service.Delete(ctx, test.input)
 		if test.expected == nil {
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.NoError(t, err)
 		} else {
-			assert.Error(t, err, "(%d) Expected error, got nil", i, err)
+			assert.Error(t, err)
 		}
 	}
 }

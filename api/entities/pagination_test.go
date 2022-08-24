@@ -25,12 +25,12 @@ func TestPaginationValidate(t *testing.T) {
 	}
 
 	gameCursor, err := entities.NewCursor("createdAt", game)
-	assert.NotEmpty(t, gameCursor, "Expected a non-empty string, got %s", gameCursor)
-	assert.NoError(t, err, "Expected nil, got error %v", err)
+	assert.NotEmpty(t, gameCursor)
+	assert.NoError(t, err)
 
 	puzzleCursor, err := entities.NewCursor("createdAt", puzzle)
-	assert.NotEmpty(t, gameCursor, "Expected a non-empty string, got %s", puzzleCursor)
-	assert.NoError(t, err, "Expected nil, got error %v", err)
+	assert.NotEmpty(t, gameCursor)
+	assert.NoError(t, err)
 
 	tests := []struct {
 		pagination entities.Pagination
@@ -124,12 +124,12 @@ func TestPaginationValidate(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		err := test.pagination.Validate(test.input)
 		if test.isValid {
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.NoError(t, err)
 		} else {
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Error(t, err)
 		}
 	}
 }

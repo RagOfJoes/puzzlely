@@ -10,7 +10,7 @@ import (
 )
 
 func TestStats(t *testing.T) {
-	assert.NotNil(t, dtos.Stats(), "Expected singleton, got nil")
+	assert.NotNil(t, dtos.Stats())
 }
 
 func TestStatsToEntity(t *testing.T) {
@@ -29,7 +29,7 @@ func TestStatsToEntity(t *testing.T) {
 	}
 
 	entity := dtos.Stats().ToEntity(model)
-	assert.Equal(t, expect, entity, "Expected %v, got %v", expect, entity)
+	assert.Equal(t, expect, entity)
 }
 
 func TestStatsToModel(t *testing.T) {
@@ -48,5 +48,5 @@ func TestStatsToModel(t *testing.T) {
 	}
 
 	model := dtos.Stats().ToModel(entity)
-	assert.Equal(t, expect, model, "Expected %v, got %v", expect, model)
+	assert.Equal(t, expect, model)
 }

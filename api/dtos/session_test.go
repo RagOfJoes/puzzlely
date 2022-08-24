@@ -13,7 +13,7 @@ import (
 )
 
 func TestSession(t *testing.T) {
-	assert.NotNil(t, dtos.Session(), "Expected singleton, got nil")
+	assert.NotNil(t, dtos.Session())
 }
 
 func TestSessionToEntity(t *testing.T) {
@@ -39,7 +39,7 @@ func TestSessionToEntity(t *testing.T) {
 	}
 
 	entity := dtos.Session().ToEntity(model)
-	assert.Equal(t, expect, entity, "Expected %v, got %v", expect, entity)
+	assert.Equal(t, expect, entity)
 
 	state = entities.Authenticated
 	expiresAt := createdAt.Add(1 * time.Minute)
@@ -63,7 +63,7 @@ func TestSessionToEntity(t *testing.T) {
 	expect.User = &user
 
 	entity = dtos.Session().ToEntity(model)
-	assert.Equal(t, expect, entity, "Expected %v, got %v", expect, entity)
+	assert.Equal(t, expect, entity)
 }
 
 func TestSessionToModel(t *testing.T) {
@@ -89,7 +89,7 @@ func TestSessionToModel(t *testing.T) {
 	}
 
 	model := dtos.Session().ToModel(entity)
-	assert.Equal(t, expect, model, "Expected %v, got %v", expect, model)
+	assert.Equal(t, expect, model)
 
 	state = entities.Authenticated
 	expiresAt := createdAt.Add(1 * time.Minute)
@@ -113,5 +113,5 @@ func TestSessionToModel(t *testing.T) {
 	}
 
 	model = dtos.Session().ToModel(entity)
-	assert.Equal(t, expect, model, "Expected %v, got %v", expect, model)
+	assert.Equal(t, expect, model)
 }

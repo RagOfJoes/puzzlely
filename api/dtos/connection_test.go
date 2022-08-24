@@ -11,7 +11,7 @@ import (
 )
 
 func TestConnection(t *testing.T) {
-	assert.NotNil(t, dtos.Connection(), "Expected singleton, got nil")
+	assert.NotNil(t, dtos.Connection())
 }
 
 func TestConnectionToEntity(t *testing.T) {
@@ -37,7 +37,7 @@ func TestConnectionToEntity(t *testing.T) {
 	}
 
 	entity := dtos.Connection().ToEntity(model)
-	assert.Equal(t, expect, entity, "Expected %v, got %v", expect, entity)
+	assert.Equal(t, expect, entity)
 }
 
 func TestConnectionToModel(t *testing.T) {
@@ -63,5 +63,5 @@ func TestConnectionToModel(t *testing.T) {
 	}
 
 	model := dtos.Connection().ToModel(entity)
-	assert.Equal(t, expect, model, "Expected %v, got %v", expect, model)
+	assert.Equal(t, expect, model)
 }

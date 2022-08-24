@@ -20,7 +20,7 @@ func TestNewUser(t *testing.T) {
 	service := services.NewUser(cfg, repository)
 
 	expect := services.User{}
-	assert.NotEqual(t, expect, service, "Expected initialized service, got %v", service)
+	assert.NotEqual(t, expect, service)
 }
 
 func TestUserNew(t *testing.T) {
@@ -67,7 +67,7 @@ func TestUserNew(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
 			err = errors.New("Failed")
@@ -80,11 +80,11 @@ func TestUserNew(t *testing.T) {
 		user, err := service.New(ctx, test.newConnection, test.newUser)
 
 		if test.expected == nil {
-			assert.Nil(t, user, "(%d) Expected nil, got %v", i, user)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, user)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, user, "(%d) Expected %v, got %v", i, test.expected, user)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.expected, user)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -149,7 +149,7 @@ func TestUserFind(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
 			err = errors.New("Failed")
@@ -161,11 +161,11 @@ func TestUserFind(t *testing.T) {
 
 		user, err := service.Find(ctx, test.search, test.strict)
 		if test.expected == nil {
-			assert.Nil(t, user, "(%d) Expected nil, got %v", i, user)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, user)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, user, "(%d) Expected %v, got %v", i, test.expected, user)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.expected, user)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -214,7 +214,7 @@ func TestUserFindConnection(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
 			err = errors.New("Failed")
@@ -226,11 +226,11 @@ func TestUserFindConnection(t *testing.T) {
 
 		user, err := service.FindWithConnection(ctx, test.provider, test.sub)
 		if test.expected == nil {
-			assert.Nil(t, user, "(%d) Expected nil, got %v", i, user)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, user)
+			assert.Error(t, err)
 		} else {
-			assert.Equal(t, test.expected, user, "(%d) Expected %v, got %v", i, test.expected, user)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.expected, user)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -275,10 +275,10 @@ func TestUserFindStats(t *testing.T) {
 		stats, err := service.FindStats(ctx, test.input)
 		if test.expected == nil {
 			assert.Nil(t, stats, "(%d) Expected nil, got %v", i, stats)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Error(t, err)
 		} else {
 			assert.Equal(t, test.expected, stats, "(%d) Expected %v, got %v", i, test.expected, stats)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.NoError(t, err)
 		}
 	}
 }
@@ -316,7 +316,7 @@ func TestUserUpdate(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		if test.expected == nil && !test.input.IsComplete() {
 			test.input.Complete()
 		}
@@ -327,11 +327,11 @@ func TestUserUpdate(t *testing.T) {
 
 		user, err := service.Update(ctx, test.input)
 		if test.expected == nil {
-			assert.Equal(t, test.input, *user, "(%d) Expected %v, got %v", i, test.expected, user)
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.Equal(t, test.input, *user)
+			assert.NoError(t, err)
 		} else {
-			assert.Nil(t, user, "(%d) Expected nil, got %v", i, user)
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Nil(t, user)
+			assert.Error(t, err)
 		}
 	}
 }
@@ -363,16 +363,16 @@ func TestUserDelete(t *testing.T) {
 	ctx := context.Background()
 	defer ctx.Done()
 
-	for i, test := range tests {
+	for _, test := range tests {
 		repository.EXPECT().
 			Delete(ctx, test.input).
 			Return(test.expected)
 
 		err := service.Delete(ctx, test.input)
 		if test.expected == nil {
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.NoError(t, err)
 		} else {
-			assert.Error(t, err, "(%d) Expected error, got nil", i, err)
+			assert.Error(t, err)
 		}
 	}
 }

@@ -13,7 +13,7 @@ import (
 )
 
 func TestUser(t *testing.T) {
-	assert.NotNil(t, dtos.User(), "Expected singleton, got nil")
+	assert.NotNil(t, dtos.User())
 }
 
 func TestUserToEntity(t *testing.T) {
@@ -42,7 +42,7 @@ func TestUserToEntity(t *testing.T) {
 	}
 
 	entity := dtos.User().ToEntity(model)
-	assert.Equal(t, expect, entity, "Expected %v, got %v", expect, entity)
+	assert.Equal(t, expect, entity)
 
 	updatedAt := createdAt.Add(1 * time.Minute)
 	updatedState := entities.Complete
@@ -55,7 +55,7 @@ func TestUserToEntity(t *testing.T) {
 	expect.Username = updatedUsername
 
 	entity = dtos.User().ToEntity(model)
-	assert.Equal(t, expect, entity, "Expected %v, got %v", expect, entity)
+	assert.Equal(t, expect, entity)
 }
 
 func TestUserToModel(t *testing.T) {
@@ -84,7 +84,7 @@ func TestUserToModel(t *testing.T) {
 	}
 
 	model := dtos.User().ToModel(entity)
-	assert.Equal(t, expect, model, "Expected %v, got %v", expect, model)
+	assert.Equal(t, expect, model)
 
 	updatedAt := createdAt.Add(1 * time.Minute)
 	updatedState := entities.Complete
@@ -97,5 +97,5 @@ func TestUserToModel(t *testing.T) {
 	expect.Username = updatedUsername
 
 	model = dtos.User().ToModel(entity)
-	assert.Equal(t, expect, model, "Expected %v, got %v", expect, model)
+	assert.Equal(t, expect, model)
 }

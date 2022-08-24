@@ -12,13 +12,13 @@ import (
 func TestNewSession(t *testing.T) {
 	session := entities.NewSession()
 
-	assert.NotZero(t, session.ID, "Expected valid ID, got %v", session.ID)
-	assert.Equal(t, entities.Unauthenticated, session.State, "Expected %s, got %s", entities.Unauthenticated, session.State)
-	assert.NotNil(t, session.Token, "Expected valid token, got %s", session.Token)
-	assert.NotZero(t, session.CreatedAt, "Expected a non-zero time, got %v", session.CreatedAt)
-	assert.Nil(t, session.ExpiresAt, "Expected a zero time, got %v", session.ExpiresAt)
-	assert.Nil(t, session.AuthenticatedAt, "Expected a zero time, got %v", session.AuthenticatedAt)
-	assert.Nil(t, session.User, "Expected nil user, got %v", session.User)
+	assert.NotZero(t, session.ID)
+	assert.Equal(t, entities.Unauthenticated, session.State)
+	assert.NotNil(t, session.Token)
+	assert.NotZero(t, session.CreatedAt)
+	assert.Nil(t, session.ExpiresAt)
+	assert.Nil(t, session.AuthenticatedAt)
+	assert.Nil(t, session.User)
 }
 
 func TestSessionAuthenticate(t *testing.T) {
@@ -38,10 +38,10 @@ func TestSessionAuthenticate(t *testing.T) {
 
 	lifetime := 5 * time.Minute
 	session.Authenticate(lifetime, user)
-	assert.Equal(t, entities.Authenticated, session.State, "Expected %s, got %s", entities.Authenticated, session.State)
-	assert.NotNil(t, session.ExpiresAt, "Expected a non-zero time, got %v", session.ExpiresAt)
-	assert.NotNil(t, session.AuthenticatedAt, "Expected a non-zero time, got %v", session.AuthenticatedAt)
-	assert.Equal(t, user, *session.User, "Expected %v, got %v", user, session.User)
+	assert.Equal(t, entities.Authenticated, session.State)
+	assert.NotNil(t, session.ExpiresAt)
+	assert.NotNil(t, session.AuthenticatedAt)
+	assert.Equal(t, user, *session.User)
 }
 
 func TestSessionIsAuthenticated(t *testing.T) {
@@ -81,9 +81,9 @@ func TestSessionIsAuthenticated(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		isAuthenticated := test.session.IsAuthenticated()
-		assert.Equal(t, test.expected, isAuthenticated, "(%d) Expected %v, got %v", i, test.expected, isAuthenticated)
+		assert.Equal(t, test.expected, isAuthenticated)
 	}
 }
 
@@ -113,9 +113,9 @@ func TestSessionIsExpired(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		isExpired := test.session.IsExpired()
-		assert.Equal(t, test.expected, isExpired, "(%d) Expected %v, got %v", i, test.expected, isExpired)
+		assert.Equal(t, test.expected, isExpired)
 	}
 }
 
@@ -230,12 +230,12 @@ func TestSessionValidate(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		err := test.session.Validate()
 		if test.isValid {
-			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
+			assert.NoError(t, err)
 		} else {
-			assert.Error(t, err, "(%d) Expected error, got nil", i)
+			assert.Error(t, err)
 		}
 	}
 }
