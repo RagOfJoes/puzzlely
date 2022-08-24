@@ -1,8 +1,6 @@
 package entities
 
 import (
-	"errors"
-
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 )
 
@@ -15,7 +13,7 @@ type GameEdge struct {
 
 func (g *GameEdge) Validate() error {
 	if g.Cursor.Empty() {
-		return errors.New("invalid cursor")
+		return ErrCursorInvalid
 	}
 	if err := g.Cursor.Validate(); err != nil {
 		return err
