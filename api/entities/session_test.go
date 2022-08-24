@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSessionNewSession(t *testing.T) {
+func TestNewSession(t *testing.T) {
 	session := entities.NewSession()
 
 	assert.NotZero(t, session.ID, "Expected valid ID, got %v", session.ID)

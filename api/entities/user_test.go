@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUserNewUser(t *testing.T) {
+func TestNewUser(t *testing.T) {
 	user := entities.NewUser()
 
 	assert.NotZero(t, user.ID, "Expected valid ID, got %v", user.ID)

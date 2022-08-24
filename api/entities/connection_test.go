@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConnectionNewConnection(t *testing.T) {
+func TestNewConnection(t *testing.T) {
 	sub := "000"
 	provider := "google"
 	userID := uuid.New()

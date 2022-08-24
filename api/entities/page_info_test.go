@@ -46,6 +46,7 @@ func TestPageInfoValidate(t *testing.T) {
 
 	for i, test := range tests {
 		err := test.pageInfo.Validate()
+
 		if test.isValid {
 			assert.NoError(t, err, "(%d) Expected nil, got error %v", i, err)
 		} else {
