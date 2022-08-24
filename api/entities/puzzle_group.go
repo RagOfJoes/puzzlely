@@ -39,6 +39,6 @@ func NewGroup(description string, answers []string, blocks []PuzzleBlock) Puzzle
 	}
 }
 
-func (g *PuzzleGroup) Validate() error {
-	return validate.Check(g)
+func (p *PuzzleGroup) Validate() error {
+	return validate.Check(p)
 }

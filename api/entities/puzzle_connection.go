@@ -10,7 +10,7 @@ var _ Entity = (*PuzzleConnection)(nil)
 // PuzzleConnection defines a paginated list of puzzles
 type PuzzleConnection struct {
 	Edges    []PuzzleEdge `json:"edges" validate:"required,dive"`
-	PageInfo PageInfo     `json:"pageInfo" validate:"required"`
+	PageInfo PageInfo     `json:"pageInfo" validate:"required,dive"`
 }
 
 func BuildPuzzleConnection(limit int, sortKey string, nodes []PuzzleNode) (*PuzzleConnection, error) {
@@ -40,11 +40,12 @@ func BuildPuzzleConnection(limit int, sortKey string, nodes []PuzzleNode) (*Puzz
 	if edges == nil {
 		edges = []PuzzleEdge{}
 	}
+
 	connection := PuzzleConnection{
 		Edges:    edges,
 		PageInfo: pageInfo,
 	}
-	if err := validate.Check(connection); err != nil {
+	if err := connection.Validate(); err != nil {
 		return nil, err
 	}
 
@@ -52,5 +53,9 @@ func BuildPuzzleConnection(limit int, sortKey string, nodes []PuzzleNode) (*Puzz
 }
 
 func (p *PuzzleConnection) Validate() error {
+	if err := p.PageInfo.Validate(); err != nil {
+		return err
+	}
+
 	return validate.Check(p)
 }

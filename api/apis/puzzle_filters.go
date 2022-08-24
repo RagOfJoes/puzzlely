@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/RagOfJoes/puzzlely/entities"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 )
 
 // Retrieves puzzle filters from URL query
@@ -35,7 +34,7 @@ func getPuzzleFilters(r *http.Request) (*entities.PuzzleFilters, error) {
 		Difficulty:           difficulty,
 		NumOfLikes:           numOfLikes,
 	}
-	if err := validate.Check(filters); err != nil {
+	if err := filters.Validate(); err != nil {
 		return nil, err
 	}
 

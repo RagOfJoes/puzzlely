@@ -40,10 +40,10 @@ func NewUser(config config.Configuration, repository repositories.User) User {
 
 // New creates a new user given a valid connection and a valid user entity
 func (u *User) New(ctx context.Context, newConnection entities.Connection, newUser entities.User) (*entities.User, error) {
-	if err := validate.Check(newUser); err != nil {
+	if err := newUser.Validate(); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
-	if err := validate.Check(newConnection); err != nil {
+	if err := newConnection.Validate(); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 

@@ -98,10 +98,10 @@ func (g *Game) IsUpdateValid(oldGame Game, user *User) bool {
 		return false
 	}
 	// Validate Games
-	if err := validate.Check(oldGame); err != nil {
+	if err := oldGame.Validate(); err != nil {
 		return false
 	}
-	if err := validate.Check(g); err != nil {
+	if err := g.Validate(); err != nil {
 		return false
 	}
 

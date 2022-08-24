@@ -81,17 +81,13 @@ func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
 
 	createPuzzle := payload.ToEntity()
 	createPuzzle.CreatedBy = *session.User
-	if err := validate.Check(createPuzzle); err != nil {
+	if err := createPuzzle.Validate(); err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
 	puzzle, err := p.service.New(ctx, createPuzzle)
 	if err != nil {
-		render.Respond(w, r, err)
-		return
-	}
-	if err := validate.Check(puzzle); err != nil {
 		render.Respond(w, r, err)
 		return
 	}

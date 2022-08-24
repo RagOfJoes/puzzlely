@@ -8,7 +8,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -50,14 +49,14 @@ func NewGame(config config.Configuration, repository repositories.Game) Game {
 }
 
 func (g *Game) New(ctx context.Context, puzzle entities.Puzzle) (*entities.Game, error) {
-	if err := validate.Check(puzzle); err != nil {
+	if err := puzzle.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
 	}
 
 	user := entities.UserFromContext(ctx)
 
 	newGame := entities.NewGame(puzzle, user)
-	if err := validate.Check(newGame); err != nil {
+	if err := newGame.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameNew)
 	}
 
@@ -65,7 +64,7 @@ func (g *Game) New(ctx context.Context, puzzle entities.Puzzle) (*entities.Game,
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameNew)
 	}
-	if err := validate.Check(game); err != nil {
+	if err := game.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameNew)
 	}
 
@@ -77,7 +76,7 @@ func (g *Game) Challenge(ctx context.Context, challengeCode string) (*entities.G
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameInvalidChallengeCode)
 	}
-	if err := validate.Check(oldGame); err != nil {
+	if err := oldGame.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameInvalidChallengeCode)
 	}
 
@@ -91,7 +90,7 @@ func (g *Game) Challenge(ctx context.Context, challengeCode string) (*entities.G
 	newGame := entities.NewGame(oldGame.Puzzle, user)
 	newGame.Config = oldGame.Config
 	newGame.ChallengedBy = &challengedBy
-	if err := validate.Check(newGame); err != nil {
+	if err := newGame.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameNew)
 	}
 
@@ -99,7 +98,7 @@ func (g *Game) Challenge(ctx context.Context, challengeCode string) (*entities.G
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameNew)
 	}
-	if err := validate.Check(game); err != nil {
+	if err := game.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameNew)
 	}
 
@@ -111,7 +110,7 @@ func (g *Game) Find(ctx context.Context, id uuid.UUID) (*entities.Game, error) {
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameNotFound)
 	}
-	if err := validate.Check(game); err != nil {
+	if err := game.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameNotFound)
 
 	}
@@ -193,7 +192,7 @@ func (g *Game) Complete(ctx context.Context, oldGame, updateGame entities.Game) 
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameUpdate)
 	}
-	if err := validate.Check(game); err != nil {
+	if err := game.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameUpdate)
 	}
 
@@ -267,7 +266,7 @@ func (g *Game) Guess(ctx context.Context, oldGame, updateGame entities.Game) (*e
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameUpdate)
 	}
-	if err := validate.Check(game); err != nil {
+	if err := game.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameUpdate)
 	}
 

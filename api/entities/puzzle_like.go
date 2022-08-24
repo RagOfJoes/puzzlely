@@ -22,11 +22,11 @@ type PuzzleLike struct {
 }
 
 // Toggle toggles the active field and updates the updatedAt field
-func (l *PuzzleLike) Toggle() {
-	l.Active = !l.Active
-	l.UpdatedAt = time.Now()
+func (p *PuzzleLike) Toggle() {
+	p.Active = !p.Active
+	p.UpdatedAt = time.Now()
 }
 
-func (l *PuzzleLike) Validate() error {
-	return validate.Check(l)
+func (p *PuzzleLike) Validate() error {
+	return validate.Check(p)
 }

@@ -17,6 +17,6 @@ type GameResult struct {
 	PuzzleGroupID uuid.UUID `json:"groupID" validate:"required"`
 }
 
-func (r *GameResult) Validate() error {
-	return validate.Check(r)
+func (g *GameResult) Validate() error {
+	return validate.Check(g)
 }

@@ -12,6 +12,6 @@ type GameConfig struct {
 	TimeAllowed uint32 `json:"timeAllowed" validate:"min=0,max=3599000"`
 }
 
-func (c *GameConfig) Validate() error {
-	return validate.Check(c)
+func (g *GameConfig) Validate() error {
+	return validate.Check(g)
 }

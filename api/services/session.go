@@ -7,7 +7,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -41,7 +40,7 @@ func NewSession(config config.Configuration, repositry repositories.Session) Ses
 
 // New creates a new session
 func (s *Session) New(ctx context.Context, newSession entities.Session) (*entities.Session, error) {
-	if err := validate.Check(newSession); err != nil {
+	if err := newSession.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalid)
 	}
 

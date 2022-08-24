@@ -8,7 +8,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/payloads"
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/go-chi/chi/v5"
@@ -174,7 +173,7 @@ func (g *game) complete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updateGame := payload.ToEntity(*oldGame)
-	if err := validate.Check(updateGame); err != nil {
+	if err := updateGame.Validate(); err != nil {
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrGameInvalidUpdate))
 		return
 	}
@@ -198,7 +197,7 @@ func (g *game) complete(w http.ResponseWriter, r *http.Request) {
 		GuessedAt:     game.GuessedAt,
 		CompletedAt:   game.CompletedAt,
 	}
-	if err := validate.Check(response); err != nil {
+	if err := response.Validate(); err != nil {
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrGameUpdate))
 		return
 	}
@@ -230,7 +229,7 @@ func (g *game) guess(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updateGame := payload.ToEntity(*oldGame)
-	if err := validate.Check(updateGame); err != nil {
+	if err := updateGame.Validate(); err != nil {
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrGameInvalidUpdate))
 		return
 	}
@@ -254,7 +253,7 @@ func (g *game) guess(w http.ResponseWriter, r *http.Request) {
 		GuessedAt:     game.GuessedAt,
 		CompletedAt:   game.CompletedAt,
 	}
-	if err := validate.Check(response); err != nil {
+	if err := response.Validate(); err != nil {
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrGameUpdate))
 		return
 	}

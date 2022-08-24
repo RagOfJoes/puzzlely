@@ -43,7 +43,7 @@ func BuildGameConnection(limit int, sortKey string, nodes []GameNode) (*GameConn
 		Edges:    edges,
 		PageInfo: pageInfo,
 	}
-	if err := validate.Check(connection); err != nil {
+	if err := connection.Validate(); err != nil {
 		return nil, err
 	}
 

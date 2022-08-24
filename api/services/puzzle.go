@@ -8,7 +8,6 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -44,7 +43,7 @@ func NewPuzzle(config config.Configuration, repository repositories.Puzzle) Puzz
 
 // New creates a new puzzle
 func (p *Puzzle) New(ctx context.Context, newPuzzle entities.Puzzle) (*entities.Puzzle, error) {
-	if err := validate.Check(newPuzzle); err != nil {
+	if err := newPuzzle.Validate(); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
@@ -54,7 +53,7 @@ func (p *Puzzle) New(ctx context.Context, newPuzzle entities.Puzzle) (*entities.
 	}
 
 	puzzle.CreatedBy = newPuzzle.CreatedBy
-	if err := validate.Check(puzzle); err != nil {
+	if err := puzzle.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreate)
 	}
 
@@ -72,7 +71,7 @@ func (p *Puzzle) Find(ctx context.Context, id uuid.UUID, strict bool) (*entities
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
 	}
-	if err := validate.Check(puzzle); err != nil {
+	if err := puzzle.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
 	}
 	if strict && puzzle.CreatedBy.ID != user.ID {
@@ -242,10 +241,10 @@ func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Pu
 		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleNotAuthorized)
 	}
 
-	if err := validate.Check(oldPuzzle); err != nil {
+	if err := oldPuzzle.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
 	}
-	if err := validate.Check(updatePuzzle); err != nil {
+	if err := updatePuzzle.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
 	}
 

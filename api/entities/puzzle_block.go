@@ -26,6 +26,6 @@ func NewBlock(value string, groupID uuid.UUID) PuzzleBlock {
 	}
 }
 
-func (b *PuzzleBlock) Validate() error {
-	return validate.Check(b)
+func (p *PuzzleBlock) Validate() error {
+	return validate.Check(p)
 }
