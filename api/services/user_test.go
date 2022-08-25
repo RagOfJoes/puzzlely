@@ -2,11 +2,11 @@ package services_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/testutils"
 	mocks "github.com/RagOfJoes/puzzlely/mocks/repositories"
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/google/uuid"
@@ -24,10 +24,7 @@ func TestNewUser(t *testing.T) {
 }
 
 func TestUserNew(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.User{}
-
-	service := services.NewUser(cfg, repository)
+	repository, service := testutils.SetupUserService()
 
 	validUser := entities.NewUser()
 	validConnection := entities.NewConnection("google", "000", validUser.ID)
@@ -70,7 +67,7 @@ func TestUserNew(t *testing.T) {
 	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrUserCreate
 		}
 
 		repository.EXPECT().
@@ -90,10 +87,7 @@ func TestUserNew(t *testing.T) {
 }
 
 func TestUserFind(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.User{}
-
-	service := services.NewUser(cfg, repository)
+	repository, service := testutils.SetupUserService()
 
 	incompleteID := uuid.New()
 	incompleteUsername := "Raggy"
@@ -152,7 +146,7 @@ func TestUserFind(t *testing.T) {
 	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrUserDoesNotExist
 		}
 
 		repository.EXPECT().
@@ -171,10 +165,7 @@ func TestUserFind(t *testing.T) {
 }
 
 func TestUserFindConnection(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.User{}
-
-	service := services.NewUser(cfg, repository)
+	repository, service := testutils.SetupUserService()
 
 	id := uuid.New()
 	username := "Raggy"
@@ -217,7 +208,7 @@ func TestUserFindConnection(t *testing.T) {
 	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrUserDoesNotExist
 		}
 
 		repository.EXPECT().
@@ -236,10 +227,7 @@ func TestUserFindConnection(t *testing.T) {
 }
 
 func TestUserFindStats(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.User{}
-
-	service := services.NewUser(cfg, repository)
+	repository, service := testutils.SetupUserService()
 
 	tests := []struct {
 		input    uuid.UUID
@@ -265,7 +253,7 @@ func TestUserFindStats(t *testing.T) {
 	for i, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrUserDoesNotExist
 		}
 
 		repository.EXPECT().
@@ -284,10 +272,7 @@ func TestUserFindStats(t *testing.T) {
 }
 
 func TestUserUpdate(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.User{}
-
-	service := services.NewUser(cfg, repository)
+	repository, service := testutils.SetupUserService()
 
 	incomplete := entities.NewUser()
 	incomplete.Username = "Raggy"
@@ -301,7 +286,7 @@ func TestUserUpdate(t *testing.T) {
 	}{
 		{
 			input:    entities.User{},
-			expected: errors.New("Failed"),
+			expected: services.ErrUserUpdate,
 		},
 		{
 			input:    incomplete,
@@ -337,10 +322,7 @@ func TestUserUpdate(t *testing.T) {
 }
 
 func TestUserDelete(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.User{}
-
-	service := services.NewUser(cfg, repository)
+	repository, service := testutils.SetupUserService()
 
 	tests := []struct {
 		input    uuid.UUID
@@ -348,11 +330,11 @@ func TestUserDelete(t *testing.T) {
 	}{
 		{
 			input:    uuid.Nil,
-			expected: errors.New("Failed"),
+			expected: services.ErrUserDelete,
 		},
 		{
 			input:    uuid.New(),
-			expected: errors.New("failed"),
+			expected: services.ErrUserDelete,
 		},
 		{
 			input:    uuid.New(),

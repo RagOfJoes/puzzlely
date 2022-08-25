@@ -15,9 +15,9 @@ import (
 
 // Errors
 var (
+	ErrUserCreate       = errors.New("Failed to create user.")
 	ErrUserDelete       = errors.New("Failed to delete user.")
 	ErrUserConnection   = errors.New("Invalid connection provided.")
-	ErrUserNew          = errors.New("Failed to create user.")
 	ErrUserUpdate       = errors.New("Failed to update user.")
 	ErrUserDoesNotExist = errors.New("User does not exist.")
 )
@@ -49,7 +49,7 @@ func (u *User) New(ctx context.Context, newConnection entities.Connection, newUs
 
 	user, err := u.repository.Create(ctx, newConnection, newUser)
 	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrUserNew)
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrUserCreate)
 	}
 
 	return user, nil

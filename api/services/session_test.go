@@ -2,12 +2,12 @@ package services_test
 
 import (
 	"context"
-	"errors"
 	"testing"
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/testutils"
 	mocks "github.com/RagOfJoes/puzzlely/mocks/repositories"
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/google/uuid"
@@ -21,15 +21,11 @@ func TestNewSession(t *testing.T) {
 
 	service := services.NewSession(cfg, repository)
 
-	expect := services.Session{}
-	assert.NotEqual(t, expect, service)
+	assert.NotZero(t, service)
 }
 
 func TestSessionNew(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.Session{}
-
-	service := services.NewSession(cfg, repository)
+	repository, service := testutils.SetupSessionService()
 
 	unauthenticated := entities.NewSession()
 
@@ -60,7 +56,7 @@ func TestSessionNew(t *testing.T) {
 	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrSessionCreate
 		}
 
 		repository.EXPECT().
@@ -79,10 +75,7 @@ func TestSessionNew(t *testing.T) {
 }
 
 func TestSessionFindByID(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.Session{}
-
-	service := services.NewSession(cfg, repository)
+	repository, service := testutils.SetupSessionService()
 
 	user := entities.NewUser()
 	unauthenticated := entities.NewSession()
@@ -126,7 +119,7 @@ func TestSessionFindByID(t *testing.T) {
 	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrSessionInvalidID
 		}
 
 		repository.EXPECT().
@@ -145,10 +138,7 @@ func TestSessionFindByID(t *testing.T) {
 }
 
 func TestSessionFindByToken(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.Session{}
-
-	service := services.NewSession(cfg, repository)
+	repository, service := testutils.SetupSessionService()
 
 	user := entities.NewUser()
 	unauthenticated := entities.NewSession()
@@ -192,7 +182,7 @@ func TestSessionFindByToken(t *testing.T) {
 	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrSessionInvalidToken
 		}
 
 		repository.EXPECT().
@@ -211,10 +201,7 @@ func TestSessionFindByToken(t *testing.T) {
 }
 
 func TestSessionUpdate(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.Session{}
-
-	service := services.NewSession(cfg, repository)
+	repository, service := testutils.SetupSessionService()
 
 	user := entities.NewUser()
 	unauthenticated := entities.NewSession()
@@ -249,7 +236,7 @@ func TestSessionUpdate(t *testing.T) {
 	for _, test := range tests {
 		var err error = nil
 		if test.expected == nil {
-			err = errors.New("Failed")
+			err = services.ErrSessionUpdate
 		}
 
 		repository.EXPECT().
@@ -268,10 +255,7 @@ func TestSessionUpdate(t *testing.T) {
 }
 
 func TestSessionDelete(t *testing.T) {
-	cfg := config.Configuration{}
-	repository := &mocks.Session{}
-
-	service := services.NewSession(cfg, repository)
+	repository, service := testutils.SetupSessionService()
 
 	tests := []struct {
 		input    uuid.UUID
@@ -279,11 +263,11 @@ func TestSessionDelete(t *testing.T) {
 	}{
 		{
 			input:    uuid.Nil,
-			expected: errors.New("Failed"),
+			expected: services.ErrSessionDelete,
 		},
 		{
 			input:    uuid.New(),
-			expected: errors.New("failed"),
+			expected: services.ErrSessionDelete,
 		},
 		{
 			input:    uuid.New(),
