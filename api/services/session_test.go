@@ -25,12 +25,12 @@ func TestNewSession(t *testing.T) {
 }
 
 func TestSessionNew(t *testing.T) {
-	repository, service := testutils.SetupSessionService()
+	repository, service := testutils.SetupSessionService(t)
 
 	unauthenticated := entities.NewSession()
 
 	authenticated := entities.NewSession()
-	authenticated.Authenticate(5*time.Minute, entities.NewUser())
+	authenticated.Authenticate(5*time.Minute, testutils.GenerateUsers(t, 1)[0])
 
 	tests := []struct {
 		input    entities.Session
@@ -75,16 +75,17 @@ func TestSessionNew(t *testing.T) {
 }
 
 func TestSessionFindByID(t *testing.T) {
-	repository, service := testutils.SetupSessionService()
+	repository, service := testutils.SetupSessionService(t)
 
-	user := entities.NewUser()
+	users := testutils.GenerateUsers(t, 2)
+
 	unauthenticated := entities.NewSession()
-	unauthenticated.User = &user
+	unauthenticated.User = &users[0]
 	strippedUnauthenticated := unauthenticated
 	strippedUnauthenticated.User = nil
 
 	authenticated := entities.NewSession()
-	authenticated.Authenticate(5*time.Minute, entities.NewUser())
+	authenticated.Authenticate(5*time.Minute, users[1])
 
 	tests := []struct {
 		input            uuid.UUID
@@ -138,16 +139,17 @@ func TestSessionFindByID(t *testing.T) {
 }
 
 func TestSessionFindByToken(t *testing.T) {
-	repository, service := testutils.SetupSessionService()
+	repository, service := testutils.SetupSessionService(t)
 
-	user := entities.NewUser()
+	users := testutils.GenerateUsers(t, 2)
+
 	unauthenticated := entities.NewSession()
-	unauthenticated.User = &user
+	unauthenticated.User = &users[0]
 	strippedUnauthenticated := unauthenticated
 	strippedUnauthenticated.User = nil
 
 	authenticated := entities.NewSession()
-	authenticated.Authenticate(5*time.Minute, entities.NewUser())
+	authenticated.Authenticate(5*time.Minute, users[1])
 
 	tests := []struct {
 		input            string
@@ -201,16 +203,17 @@ func TestSessionFindByToken(t *testing.T) {
 }
 
 func TestSessionUpdate(t *testing.T) {
-	repository, service := testutils.SetupSessionService()
+	repository, service := testutils.SetupSessionService(t)
 
-	user := entities.NewUser()
+	users := testutils.GenerateUsers(t, 2)
+
 	unauthenticated := entities.NewSession()
-	unauthenticated.User = &user
+	unauthenticated.User = &users[0]
 	strippedUnauthenticated := unauthenticated
 	strippedUnauthenticated.User = nil
 
 	authenticated := entities.NewSession()
-	authenticated.Authenticate(5*time.Minute, entities.NewUser())
+	authenticated.Authenticate(5*time.Minute, users[1])
 
 	tests := []struct {
 		input    entities.Session
@@ -255,7 +258,7 @@ func TestSessionUpdate(t *testing.T) {
 }
 
 func TestSessionDelete(t *testing.T) {
-	repository, service := testutils.SetupSessionService()
+	repository, service := testutils.SetupSessionService(t)
 
 	tests := []struct {
 		input    uuid.UUID

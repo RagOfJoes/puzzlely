@@ -24,10 +24,10 @@ func TestNewUser(t *testing.T) {
 }
 
 func TestUserNew(t *testing.T) {
-	repository, service := testutils.SetupUserService()
+	repository, service := testutils.SetupUserService(t)
 
-	validUser := entities.NewUser()
-	validConnection := entities.NewConnection("google", "000", validUser.ID)
+	user := testutils.GenerateUsers(t, 1)[0]
+	connection := entities.NewConnection("google", "000", user.ID)
 
 	tests := []struct {
 		newConnection entities.Connection
@@ -46,18 +46,18 @@ func TestUserNew(t *testing.T) {
 				Sub:      "000",
 				UserID:   uuid.New(),
 			},
-			newUser:  validUser,
+			newUser:  user,
 			expected: nil,
 		},
 		{
-			newConnection: validConnection,
+			newConnection: connection,
 			newUser:       entities.User{},
 			expected:      nil,
 		},
 		{
-			newConnection: validConnection,
-			newUser:       validUser,
-			expected:      &validUser,
+			newConnection: connection,
+			newUser:       user,
+			expected:      &user,
 		},
 	}
 
@@ -87,17 +87,19 @@ func TestUserNew(t *testing.T) {
 }
 
 func TestUserFind(t *testing.T) {
-	repository, service := testutils.SetupUserService()
+	repository, service := testutils.SetupUserService(t)
+
+	users := testutils.GenerateUsers(t, 2)
 
 	incompleteID := uuid.New()
 	incompleteUsername := "Raggy"
-	incomplete := entities.NewUser()
+	incomplete := users[0]
 	incomplete.ID = incompleteID
 	incomplete.Username = incompleteUsername
 
 	completeID := uuid.New()
 	completeUsername := "Raggy2"
-	complete := entities.NewUser()
+	complete := users[1]
 	complete.ID = completeID
 	complete.Username = completeUsername
 	complete.Complete()
@@ -165,12 +167,12 @@ func TestUserFind(t *testing.T) {
 }
 
 func TestUserFindConnection(t *testing.T) {
-	repository, service := testutils.SetupUserService()
+	repository, service := testutils.SetupUserService(t)
 
 	id := uuid.New()
 	username := "Raggy"
 
-	expect := entities.NewUser()
+	expect := testutils.GenerateUsers(t, 1)[0]
 	expect.ID = id
 	expect.Username = username
 	expect.Complete()
@@ -227,7 +229,7 @@ func TestUserFindConnection(t *testing.T) {
 }
 
 func TestUserFindStats(t *testing.T) {
-	repository, service := testutils.SetupUserService()
+	repository, service := testutils.SetupUserService(t)
 
 	tests := []struct {
 		input    uuid.UUID
@@ -272,12 +274,14 @@ func TestUserFindStats(t *testing.T) {
 }
 
 func TestUserUpdate(t *testing.T) {
-	repository, service := testutils.SetupUserService()
+	repository, service := testutils.SetupUserService(t)
 
-	incomplete := entities.NewUser()
+	users := testutils.GenerateUsers(t, 2)
+
+	incomplete := users[0]
 	incomplete.Username = "Raggy"
 
-	complete := entities.NewUser()
+	complete := users[1]
 	complete.Complete()
 
 	tests := []struct {
@@ -322,7 +326,7 @@ func TestUserUpdate(t *testing.T) {
 }
 
 func TestUserDelete(t *testing.T) {
-	repository, service := testutils.SetupUserService()
+	repository, service := testutils.SetupUserService(t)
 
 	tests := []struct {
 		input    uuid.UUID

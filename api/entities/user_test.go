@@ -6,19 +6,20 @@ import (
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/entities"
+	"github.com/RagOfJoes/puzzlely/internal/testutils"
 	"github.com/google/uuid"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewUser(t *testing.T) {
-	user := entities.NewUser()
+	user := testutils.GenerateUsers(t, 1)[0]
 
 	assert.NotZero(t, user.ID)
 	assert.NotZero(t, user.CreatedAt)
 	assert.Nil(t, user.UpdatedAt)
 	assert.Equal(t, entities.Pending, user.State)
-	assert.Len(t, user.Username, 20)
+	assert.NotEmpty(t, user.Username)
 }
 
 func TestUserComplete(t *testing.T) {
@@ -104,7 +105,7 @@ func TestUserValidate(t *testing.T) {
 }
 
 func TestUserNewContext(t *testing.T) {
-	user := entities.NewUser()
+	user := testutils.GenerateUsers(t, 1)[0]
 
 	ctx := context.Background()
 	ctx = entities.UserNewContext(ctx, user)
@@ -114,7 +115,7 @@ func TestUserNewContext(t *testing.T) {
 }
 
 func TestUserFromContext(t *testing.T) {
-	user := entities.NewUser()
+	user := testutils.GenerateUsers(t, 1)[0]
 
 	ctx := context.Background()
 
