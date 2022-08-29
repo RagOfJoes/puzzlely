@@ -28,8 +28,8 @@ func (p *puzzle) ToEntity(model models.Puzzle) entities.Puzzle {
 		},
 
 		Name:        model.Name,
-		Difficulty:  entities.PuzzleDifficulty(model.Difficulty),
 		Description: model.Description,
+		Difficulty:  entities.PuzzleDifficulty(model.Difficulty),
 		MaxAttempts: model.MaxAttempts,
 		TimeAllowed: model.TimeAllowed,
 		CreatedBy: entities.User{
@@ -85,8 +85,8 @@ func (p *puzzle) ToNode(object interface{}) entities.PuzzleNode {
 			},
 
 			Name:        model.Name,
-			Difficulty:  entities.PuzzleDifficulty(model.Difficulty),
 			Description: model.Description,
+			Difficulty:  entities.PuzzleDifficulty(model.Difficulty),
 			MaxAttempts: model.MaxAttempts,
 			TimeAllowed: model.TimeAllowed,
 		}

@@ -312,7 +312,7 @@ func (p *puzzle) GetCreated(ctx context.Context, params entities.Pagination, use
 func (p *puzzle) GetLiked(ctx context.Context, params entities.Pagination) ([]entities.PuzzleNode, error) {
 	user := entities.UserFromContext(ctx)
 	if user == nil {
-		return nil, errors.New("user not found in context")
+		return nil, ErrUserNotFound
 	}
 
 	cursor, err := params.Cursor.Decode()
