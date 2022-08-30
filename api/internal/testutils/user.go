@@ -2,6 +2,7 @@ package testutils
 
 import (
 	"testing"
+	"time"
 
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal/config"
@@ -9,7 +10,15 @@ import (
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/brianvoe/gofakeit/v6"
 	"github.com/google/uuid"
+	"github.com/rs/xid"
 )
+
+// GenerateUserState creates a random user state
+func GenerateUserState(t *testing.T) entities.UserState {
+	t.Helper()
+
+	return entities.UserState(gofakeit.RandomString([]string{string(entities.Complete), string(entities.Pending)}))
+}
 
 // GenerateUsers creates n number of test user entities
 func GenerateUsers(t *testing.T, n int) []entities.User {
@@ -19,17 +28,27 @@ func GenerateUsers(t *testing.T, n int) []entities.User {
 
 	for i := 0; i < n; i++ {
 		id := uuid.New()
-		now := gofakeit.Date()
-		username := gofakeit.Username()
+		createdAt := time.Now().Add(-8766 * time.Hour)
+		state := GenerateUserState(t)
+
+		var updatedAt *time.Time
+		username := xid.New().String()
+
+		if state == entities.Complete {
+			u := gofakeit.DateRange(createdAt, time.Now())
+
+			updatedAt = &u
+			username = gofakeit.Username()
+		}
 
 		users = append(users, entities.User{
 			Base: entities.Base{
 				ID:        id,
-				CreatedAt: now,
-				UpdatedAt: nil,
+				CreatedAt: createdAt,
+				UpdatedAt: updatedAt,
 			},
 
-			State:    entities.Pending,
+			State:    state,
 			Username: username,
 		})
 	}

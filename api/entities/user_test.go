@@ -13,13 +13,13 @@ import (
 )
 
 func TestNewUser(t *testing.T) {
-	user := testutils.GenerateUsers(t, 1)[0]
+	user := entities.NewUser()
 
 	assert.NotZero(t, user.ID)
 	assert.NotZero(t, user.CreatedAt)
 	assert.Nil(t, user.UpdatedAt)
 	assert.Equal(t, entities.Pending, user.State)
-	assert.NotEmpty(t, user.Username)
+	assert.Len(t, user.Username, 20)
 }
 
 func TestUserComplete(t *testing.T) {
