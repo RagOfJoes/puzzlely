@@ -517,6 +517,7 @@ func (p *puzzle) Search(ctx context.Context, params entities.Pagination, search 
 
 func (p *puzzle) Update(ctx context.Context, updatePuzzle entities.Puzzle) (*entities.Puzzle, error) {
 	puzzleModel := dtos.Puzzle().ToModel(updatePuzzle)
+	puzzleModel.RefreshUpdated()
 
 	puzzleQuery, puzzleArgs, err := squirrel.
 		Update(PuzzleTable).
@@ -569,6 +570,8 @@ func (p *puzzle) Update(ctx context.Context, updatePuzzle entities.Puzzle) (*ent
 		tx.Rollback()
 		return nil, err
 	}
+
+	updatePuzzle.UpdatedAt = puzzleModel.UpdatedAt
 
 	return &updatePuzzle, nil
 }

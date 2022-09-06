@@ -3,11 +3,12 @@ package services
 import (
 	"context"
 	"errors"
-	"time"
+	"strings"
 
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
@@ -15,14 +16,16 @@ import (
 
 // Errors
 var (
-	ErrPuzzleCreate        = errors.New("Failed to create puzzle.")
-	ErrPuzzleDelete        = errors.New("Failed to delete puzzle.")
-	ErrPuzzleInvalid       = errors.New("Invalid puzzle.")
-	ErrPuzzleLike          = errors.New("Failed to like puzzle.")
-	ErrPuzzleList          = errors.New("Failed to fetch puzzles.")
-	ErrPuzzleNotAuthorized = errors.New("Not authorized to access this puzzle's details.")
-	ErrPuzzleNotFound      = errors.New("Puzzle not found.")
-	ErrPuzzleUpdate        = errors.New("Failed to update puzzle.")
+	ErrPuzzleCreate          = errors.New("Failed to create puzzle.")
+	ErrPuzzleDelete          = errors.New("Failed to delete puzzle.")
+	ErrPuzzleInvalid         = errors.New("Invalid puzzle.")
+	ErrPuzzleInvalidSearch   = errors.New("Invalid search term.")
+	ErrPuzzleLike            = errors.New("Failed to like puzzle.")
+	ErrPuzzleList            = errors.New("Failed to fetch puzzles.")
+	ErrPuzzleNotAuthorized   = errors.New("Not authorized to access this puzzle.")
+	ErrPuzzleNotFound        = errors.New("Puzzle not found.")
+	ErrPuzzleUpdate          = errors.New("Failed to update puzzle.")
+	ErrPuzzleUnauthenticated = errors.New("Must be authenticated to perform this action.")
 )
 
 // Puzzle defines the puzzle service
@@ -93,6 +96,12 @@ func (p *Puzzle) FindCreated(ctx context.Context, params entities.Pagination, us
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
+	for _, node := range nodes {
+		if node.CreatedBy.ID != user.ID {
+			return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+		}
+	}
+
 	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
@@ -111,6 +120,12 @@ func (p *Puzzle) FindLiked(ctx context.Context, params entities.Pagination) (*en
 	nodes, err := p.repository.GetLiked(ctx, params)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+	}
+
+	for _, node := range nodes {
+		if node.NumOfLikes == 0 || node.LikedAt == nil {
+			return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+		}
 	}
 
 	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
@@ -133,6 +148,12 @@ func (p *Puzzle) FindMostLiked(ctx context.Context) (*entities.PuzzleConnection,
 	nodes, err := p.repository.GetMostLiked(ctx, params)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+	}
+
+	for _, node := range nodes {
+		if node.NumOfLikes == 0 {
+			return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+		}
 	}
 
 	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
@@ -178,6 +199,37 @@ func (p *Puzzle) FindRecent(ctx context.Context, params entities.Pagination, fil
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
 	}
 
+	for _, node := range nodes {
+		if filters.CustomizableAttempts != nil {
+			customizableAttempts := *filters.CustomizableAttempts
+			if customizableAttempts && node.MaxAttempts != 0 {
+				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+			} else if !customizableAttempts && node.MaxAttempts == 0 {
+				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+			}
+		}
+		if filters.CustomizableTime != nil {
+			customizableTime := *filters.CustomizableTime
+			if customizableTime && node.TimeAllowed != 0 {
+				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+			} else if !customizableTime && node.TimeAllowed == 0 {
+				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+			}
+		}
+		if filters.Difficulty != nil {
+			difficulty := *filters.Difficulty
+			if node.Difficulty != difficulty {
+				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+			}
+		}
+		if filters.NumOfLikes != nil {
+			numOfLikes := *filters.NumOfLikes
+			if node.NumOfLikes < uint(numOfLikes) {
+				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+			}
+		}
+	}
+
 	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
 	if err != nil {
 		return nil, err
@@ -189,6 +241,14 @@ func (p *Puzzle) FindRecent(ctx context.Context, params entities.Pagination, fil
 
 // Search searches for puzzles with a similar name or description as search term
 func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleConnection, error) {
+	if err := validate.CheckPartial(entities.Puzzle{Name: search}, "Name"); err != nil {
+		fixedErr := errors.New(strings.Replace(err.Error(), "name", "Search term", 1))
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", fixedErr)
+	}
+	if strings.Contains(search, "--") {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidSearch)
+	}
+
 	params := entities.Pagination{
 		Cursor:    "",
 		Limit:     100,
@@ -209,13 +269,19 @@ func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleCon
 	return connection, nil
 }
 
-// ToggleLike toggles a user's like status on a puzzle
+// ToggleLike toggles a user's likhe status on a puzzle
 func (p *Puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error) {
+	user := entities.UserFromContext(ctx)
+	if user == nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
+	}
+
 	puzzle, err := p.repository.Get(ctx, id)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
 	}
 
+	// TODO: Pass like status here to cut down on number of requests
 	like, err := p.repository.ToggleLike(ctx, puzzle.ID)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLike)
@@ -228,7 +294,7 @@ func (p *Puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.Puzzle
 func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Puzzle) (*entities.Puzzle, error) {
 	user := entities.UserFromContext(ctx)
 	if user == nil {
-		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleNotAuthorized)
+		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
 	}
 
 	if oldPuzzle.ID != updatePuzzle.ID {
@@ -266,10 +332,6 @@ func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Pu
 	}
 	updatePuzzle.Groups = groups
 
-	// Update UpdatedAt value
-	now := time.Now()
-	updatePuzzle.UpdatedAt = &now
-
 	puzzle, err := p.repository.Update(ctx, updatePuzzle)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleUpdate)
@@ -280,6 +342,15 @@ func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Pu
 
 // Delete deletes an existing puzzle
 func (p *Puzzle) Delete(ctx context.Context, id uuid.UUID) error {
+	if entities.UserFromContext(ctx) == nil {
+		return internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
+	}
+
+	_, err := p.Find(ctx, id, true)
+	if err != nil {
+		return err
+	}
+
 	if err := p.repository.Delete(ctx, id); err != nil {
 		return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleDelete)
 	}

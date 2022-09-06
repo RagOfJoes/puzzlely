@@ -5,12 +5,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/payloads"
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/go-chi/chi/v5"
@@ -248,10 +246,6 @@ func (p *puzzle) getRecent(w http.ResponseWriter, r *http.Request) {
 
 func (p *puzzle) search(w http.ResponseWriter, r *http.Request) {
 	term := r.URL.Query().Get("term")
-	if err := validate.CheckPartial(entities.Puzzle{Name: term}, "Name"); err != nil {
-		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%s", strings.Replace(err.Error(), "name", "Search term", 1)))
-		return
-	}
 
 	p.session.Get(w, r, false)
 
