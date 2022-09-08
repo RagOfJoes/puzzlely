@@ -3,7 +3,6 @@ package validate
 import (
 	"reflect"
 	"strings"
-	"sync"
 
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/go-playground/validator/v10"
@@ -11,22 +10,8 @@ import (
 )
 
 var validate *validator.Validate
-var once sync.Once
 
 func init() {
-	logrus.Info("Initialized Validator")
-
-	once.Do(func() {
-		New()
-	})
-}
-
-// New initializes singleton object
-func New() *validator.Validate {
-	if validate != nil {
-		return validate
-	}
-
 	validate = validator.New()
 	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
 		name := strings.SplitN(field.Tag.Get("json"), ",", 2)[0]
@@ -39,7 +24,7 @@ func New() *validator.Validate {
 	validate.RegisterValidation("alphanumspace", AlphanumSpace)
 	validate.RegisterValidation("printasciiextra", PrintASCIIExtra)
 
-	return validate
+	logrus.Info("Initialized Validator")
 }
 
 // Check validates a structs exposed fields, and automatically validates nested structs, unless otherwise specified.
