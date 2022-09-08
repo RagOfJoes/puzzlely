@@ -3,7 +3,6 @@ package sanitize
 import (
 	"fmt"
 	"strings"
-	"sync"
 
 	goaway "github.com/TwiN/go-away"
 	"github.com/microcosm-cc/bluemonday"
@@ -12,7 +11,6 @@ import (
 
 // Singleton
 var sanitize *Sanitize
-var once sync.Once
 
 type Sanitize struct {
 	html      bluemonday.Policy
@@ -20,20 +18,7 @@ type Sanitize struct {
 }
 
 func init() {
-	logrus.Info("Initialized Sanitizer")
-
-	once.Do(func() {
-		New()
-	})
-}
-
-func New() *Sanitize {
-	if sanitize != nil {
-		return sanitize
-	}
-
 	html := bluemonday.UGCPolicy()
-
 	profanity := goaway.NewProfanityDetector()
 
 	sanitize = &Sanitize{
@@ -41,7 +26,7 @@ func New() *Sanitize {
 		profanity: *profanity,
 	}
 
-	return sanitize
+	logrus.Info("Initialized Sanitizer")
 }
 
 // Censor censors profane words from string

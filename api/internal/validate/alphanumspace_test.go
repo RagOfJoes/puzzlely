@@ -17,22 +17,18 @@ func TestAlphanumSpace(t *testing.T) {
 
 	s := "abcd123"
 	errs := validate.Var(s, tag)
-	assert.Equal(t, errs, nil, "AlphanumSpace failed Error: %s", errs)
+	assert.Equal(t, errs, nil)
 
 	s = "abc!23"
 	errs = validate.Var(s, tag)
 	assert.NotEqual(t, errs, nil)
-	if getError(errs, "", "").Tag() != tag {
-		t.Fatalf("AlphanumSpace failed Error: %s", errs)
-	}
+	assert.Equal(t, getError(errs, "", "").Tag(), tag)
 
 	s = "abc 23"
 	errs = validate.Var(s, tag)
-	assert.Equal(t, errs, nil, "AlphanumSpace failed Error: %s", errs)
+	assert.Equal(t, errs, nil)
 
 	errs = validate.Var(1, tag)
 	assert.NotEqual(t, errs, nil)
-	if getError(errs, "", "").Tag() != tag {
-		t.Fatalf("AlphanumSpace failed Error: %s", errs)
-	}
+	assert.Equal(t, getError(errs, "", "").Tag(), tag)
 }

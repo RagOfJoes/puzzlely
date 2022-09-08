@@ -10,21 +10,21 @@ import (
 
 const (
 	// Puzzle related tables
-	PuzzlesTable            string = "puzzles"
-	PuzzleBlocksTable       string = "puzzle_blocks"
-	PuzzleGroupAnswersTable string = "puzzle_group_answers"
-	PuzzleGroupsTable       string = "puzzle_groups"
-	PuzzleLikesTable        string = "puzzle_likes"
+	PuzzleTable            = "puzzles"
+	PuzzleBlockTable       = "puzzle_blocks"
+	PuzzleGroupAnswerTable = "puzzle_group_answers"
+	PuzzleGroupTable       = "puzzle_groups"
+	PuzzleLikeTable        = "puzzle_likes"
 	// User related tables
-	ConnectionsTable string = "connections"
-	SessionsTable    string = "sessions"
-	UsersTable       string = "users"
+	ConnectionTable = "connections"
+	SessionTable    = "sessions"
+	UserTable       = "users"
 	// Game related tables
-	GamesTable   string = "games"
-	GameConfigs  string = "game_configs"
-	GameAttempts string = "game_attempts"
-	GameCorrects string = "game_corrects"
-	GameResults  string = "game_results"
+	GameTable        = "games"
+	GameConfigTable  = "game_configs"
+	GameAttemptTable = "game_attempts"
+	GameCorrectTable = "game_corrects"
+	GameResultTable  = "game_results"
 )
 
 func Connect(cfg config.Configuration) (*sqlx.DB, error) {

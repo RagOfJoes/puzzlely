@@ -3,7 +3,6 @@ package validate
 import (
 	"reflect"
 	"strings"
-	"sync"
 
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/go-playground/validator/v10"
@@ -11,22 +10,8 @@ import (
 )
 
 var validate *validator.Validate
-var once sync.Once
 
 func init() {
-	logrus.Info("Initialized Validator")
-
-	once.Do(func() {
-		New()
-	})
-}
-
-// New initializes singleton object
-func New() *validator.Validate {
-	if validate != nil {
-		return validate
-	}
-
 	validate = validator.New()
 	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
 		name := strings.SplitN(field.Tag.Get("json"), ",", 2)[0]
@@ -39,7 +24,7 @@ func New() *validator.Validate {
 	validate.RegisterValidation("alphanumspace", AlphanumSpace)
 	validate.RegisterValidation("printasciiextra", PrintASCIIExtra)
 
-	return validate
+	logrus.Info("Initialized Validator")
 }
 
 // Check validates a structs exposed fields, and automatically validates nested structs, unless otherwise specified.
@@ -49,6 +34,23 @@ func Check(o interface{}) error {
 	e := validate.Struct(o)
 	if e != nil {
 		for _, ev := range e.(validator.ValidationErrors) {
+			field := strings.Join(strings.Split(ev.Namespace(), ".")[1:], ".")
+			return NewFormatError(ev.Kind(), field, ev.Tag(), ev.Param())
+		}
+	}
+	return nil
+}
+
+// CheckPartial validates the fields passed in only, ignoring all others.
+// Fields may be provided in a namespaced fashion relative to the  struct provided
+// eg. NestedStruct.Field or NestedArrayField[0].Struct.Name
+//
+// It returns InvalidValidationError for bad values passed in and nil or ValidationErrors as error otherwise.
+// You will need to assert the error if it's not nil eg. err.(validator.ValidationErrors) to access the array of errors.
+func CheckPartial(o interface{}, fields ...string) error {
+	err := validate.StructPartial(o, fields...)
+	if err != nil {
+		for _, ev := range err.(validator.ValidationErrors) {
 			field := strings.Join(strings.Split(ev.Namespace(), ".")[1:], ".")
 			return NewFormatError(ev.Kind(), field, ev.Tag(), ev.Param())
 		}
