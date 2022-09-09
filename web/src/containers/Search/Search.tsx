@@ -1,6 +1,6 @@
 import { Grid, GridItem, Heading, Text, VStack } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useQueryClient } from 'react-query';
 
 import PuzzleCard from '@/components/PuzzleCard';
 import useMe from '@/hooks/useMe';

@@ -1,7 +1,10 @@
-import { ComponentStyleConfig } from '@chakra-ui/react';
+import { inputAnatomy as parts } from '@chakra-ui/anatomy';
+import { createMultiStyleConfigHelpers } from '@chakra-ui/system';
 import { mode } from '@chakra-ui/theme-tools';
 
-const Input: ComponentStyleConfig = {
+const { defineMultiStyleConfig } = createMultiStyleConfigHelpers(parts.keys);
+
+const Input = defineMultiStyleConfig({
   baseStyle: {
     field: {
       _placeholder: {
@@ -32,7 +35,7 @@ const Input: ComponentStyleConfig = {
   },
   defaultProps: {
     focusBorderColor: 'purple.300',
-  },
-};
+  } as any,
+});
 
 export default Input;

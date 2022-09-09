@@ -1,15 +1,14 @@
 import { popoverAnatomy as parts } from '@chakra-ui/anatomy';
-import type {
-  PartsStyleFunction,
-  SystemStyleFunction,
-  SystemStyleObject,
-} from '@chakra-ui/theme-tools';
+import { createMultiStyleConfigHelpers, defineStyle } from '@chakra-ui/system';
 
-const baseStylePopper: SystemStyleObject = {
+const { defineMultiStyleConfig, definePartsStyle } =
+  createMultiStyleConfigHelpers(parts.keys);
+
+const baseStylePopper = defineStyle({
   zIndex: 10,
-};
+});
 
-const baseStyleContent: SystemStyleFunction = () => {
+const baseStyleContent = defineStyle((_) => {
   return {
     width: 'xs',
     bg: 'surface',
@@ -23,32 +22,32 @@ const baseStyleContent: SystemStyleFunction = () => {
       boxShadow: 'outline',
     },
   };
-};
+});
 
-const baseStyleHeader: SystemStyleObject = {
+const baseStyleHeader = defineStyle({
   p: '4',
   borderBottomWidth: '1px',
-};
+});
 
-const baseStyleBody: SystemStyleObject = {
+const baseStyleBody = defineStyle({
   py: '6',
   px: '4',
-};
+});
 
-const baseStyleFooter: SystemStyleObject = {
+const baseStyleFooter = defineStyle({
   p: '4',
   borderTopWidth: '1px',
-};
+});
 
-const baseStyleCloseButton: SystemStyleObject = {
+const baseStyleCloseButton = defineStyle({
   top: 1,
   padding: 2,
   insetEnd: 2,
   borderRadius: 'lg',
   position: 'absolute',
-};
+});
 
-const baseStyle: PartsStyleFunction<typeof parts> = (props) => ({
+const baseStyle = definePartsStyle((props) => ({
   popper: baseStylePopper,
   content: baseStyleContent(props),
   header: baseStyleHeader,
@@ -56,11 +55,10 @@ const baseStyle: PartsStyleFunction<typeof parts> = (props) => ({
   footer: baseStyleFooter,
   arrow: {},
   closeButton: baseStyleCloseButton,
-});
+}));
 
-const Popover = {
-  parts: parts.keys,
+const Popover = defineMultiStyleConfig({
   baseStyle,
-};
+});
 
 export default Popover;

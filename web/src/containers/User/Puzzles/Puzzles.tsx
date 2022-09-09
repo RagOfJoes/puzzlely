@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { Grid, GridItem, Heading } from '@chakra-ui/react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import PuzzleCard from '@/components/PuzzleCard';
 import Waypoint from '@/components/Waypoint';

@@ -1,6 +1,5 @@
+import { InfiniteData, QueryClient, QueryFilters } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { InfiniteData, QueryClient } from 'react-query';
-import { QueryFilters } from 'react-query/types/core/utils';
 
 import { PuzzleConnection, PuzzleNode } from '@/types/puzzle';
 

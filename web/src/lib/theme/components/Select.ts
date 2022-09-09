@@ -1,11 +1,10 @@
-import { selectAnatomy } from '@chakra-ui/anatomy';
-import { ComponentStyleConfig } from '@chakra-ui/react';
-import {
-  PartsStyleFunction,
-  SystemStyleFunction,
-} from '@chakra-ui/theme-tools';
+import { selectAnatomy as parts } from '@chakra-ui/anatomy';
+import { createMultiStyleConfigHelpers, defineStyle } from '@chakra-ui/system';
 
-const baseStyleField: SystemStyleFunction = () => {
+const { defineMultiStyleConfig, definePartsStyle } =
+  createMultiStyleConfigHelpers(parts.keys);
+
+const baseStyleField = defineStyle((_) => {
   return {
     bg: 'surface',
     appearance: 'none',
@@ -15,13 +14,13 @@ const baseStyleField: SystemStyleFunction = () => {
       bg: 'surface',
     },
   };
-};
-
-const baseStyle: PartsStyleFunction<typeof selectAnatomy> = (props) => ({
-  field: baseStyleField(props),
 });
 
-const Select: ComponentStyleConfig = {
+const baseStyle = definePartsStyle((props) => ({
+  field: baseStyleField(props),
+}));
+
+const Select = defineMultiStyleConfig({
   baseStyle,
   variants: {
     outline: () => ({
@@ -36,6 +35,6 @@ const Select: ComponentStyleConfig = {
   defaultProps: {
     colorScheme: 'purple',
   },
-};
+});
 
 export default Select;

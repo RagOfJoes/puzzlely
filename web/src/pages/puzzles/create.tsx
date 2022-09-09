@@ -1,6 +1,6 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { NextSeo } from 'next-seo';
-import { dehydrate, QueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError from '@/api/error';

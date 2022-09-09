@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
 import { Box, Grid, GridItem, Heading, Skeleton } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useQueryClient } from 'react-query';
 
 import PuzzleCard from '@/components/PuzzleCard';
 import useMe from '@/hooks/useMe';

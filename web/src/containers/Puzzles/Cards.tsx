@@ -1,7 +1,7 @@
 import { memo } from 'react';
 
 import { GridItem } from '@chakra-ui/react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import PuzzleCard from '@/components/PuzzleCard';
 import useMe from '@/hooks/useMe';

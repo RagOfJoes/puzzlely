@@ -1,7 +1,7 @@
-import { ComponentStyleConfig } from '@chakra-ui/react';
+import { defineStyleConfig } from '@chakra-ui/system';
 import { mode } from '@chakra-ui/theme-tools';
 
-const Textarea: ComponentStyleConfig = {
+const Textarea = defineStyleConfig({
   baseStyle: {
     _placeholder: {
       color: 'text.secondary',
@@ -26,7 +26,7 @@ const Textarea: ComponentStyleConfig = {
   },
   defaultProps: {
     focusBorderColor: 'purple.300',
-  },
-};
+  } as any,
+});
 
 export default Textarea;
