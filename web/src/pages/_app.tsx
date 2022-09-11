@@ -56,7 +56,7 @@ const App = ({
       <DefaultSeo
         defaultTitle="Puzzlely"
         titleTemplate="%s - Puzzlely"
-        description="A puzzle game that's inspired by the BBC's Only Connect game show."
+        description="An online puzzle game that's inspired by the BBC's Only Connect game show. Play user created puzzles or create your own to challenge your friends and other users."
         additionalMetaTags={[
           {
             name: 'application-name',

@@ -13,7 +13,7 @@ const PuzzlesLikedPage = () => {
   return (
     <>
       <PuzzlesLikedContainer />
-      <NextSeo title="Liked Puzzles" robotsProps={{ nosnippet: true }} />
+      <NextSeo title="Liked Puzzles" />
     </>
   );
 };

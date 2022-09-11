@@ -6,7 +6,7 @@ const PrivacyPage = () => {
   return (
     <>
       <PrivacyContainer />
-      <NextSeo title="Privacy Policy" robotsProps={{ nosnippet: true }} />
+      <NextSeo title="Privacy Policy" />
     </>
   );
 };

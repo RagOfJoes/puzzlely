@@ -7,12 +7,7 @@ const FAQPage = () => {
   return (
     <>
       <FAQContainer />
-      <NextSeo
-        title="F.A.Q"
-        robotsProps={{
-          nosnippet: true,
-        }}
-      />
+      <NextSeo title="F.A.Q" />
       <FAQPageJsonLd
         mainEntity={FAQ.map((section) =>
           section.questions.map((object) => ({

@@ -13,11 +13,7 @@ const HomePage = () => {
   return (
     <>
       <HomeContainer />
-      <NextSeo
-        robotsProps={{
-          nosnippet: true,
-        }}
-      />
+      <NextSeo />
       <SiteLinksSearchBoxJsonLd
         url={`${process.env.NEXT_PUBLIC_HOST_URL}/`}
         potentialActions={[

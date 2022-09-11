@@ -15,10 +15,7 @@ const SignupPage = () => {
       <SignupContainer />
       <NextSeo
         title="Sign up"
-        description="Create an account with Puzzlely and become a part of our community!"
-        robotsProps={{
-          nosnippet: true,
-        }}
+        description="Create an account with Puzzlely and become a part of the community! Submit your own puzzles and see how other users fare against them."
       />
     </>
   );

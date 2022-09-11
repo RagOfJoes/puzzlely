@@ -13,7 +13,7 @@ const PuzzlesPage = () => {
   return (
     <>
       <PuzzlesContainer />
-      <NextSeo title="Recent Puzzles" robotsProps={{ nosnippet: true }} />
+      <NextSeo title="Recent Puzzles" />
     </>
   );
 };

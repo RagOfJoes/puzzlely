@@ -13,13 +13,7 @@ const LoginPage = () => {
   return (
     <>
       <LoginContainer />
-      <NextSeo
-        title="Log in"
-        description="Log in to your Puzzlely account."
-        robotsProps={{
-          nosnippet: true,
-        }}
-      />
+      <NextSeo title="Log in" description="Log in to your Puzzlely account." />
     </>
   );
 };
