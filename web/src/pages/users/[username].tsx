@@ -5,6 +5,7 @@ import { NextSeo } from 'next-seo';
 import api from '@/api';
 import APIError from '@/api/error';
 import UserContainer from '@/containers/User';
+import MainLayout from '@/layouts/Main';
 import { USERNAME_SCHEMA } from '@/lib/constants';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
@@ -19,7 +20,15 @@ const UserPage = (props: UserPageProps) => {
 
   return (
     <>
-      <UserContainer user={user} />
+      <MainLayout
+        breadcrumbLinks={[
+          { path: '/profile', title: 'Profile' },
+          { path: `/users/${user.username}`, title: user.username },
+        ]}
+      >
+        <UserContainer user={user} />
+      </MainLayout>
+
       <NextSeo
         title={user.username}
         description={`View ${user.username}'s stats, achievements, created Puzzles, and played Games.`}

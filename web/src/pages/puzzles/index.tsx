@@ -5,6 +5,7 @@ import { NextSeo } from 'next-seo';
 import api from '@/api';
 import APIError from '@/api/error';
 import PuzzlesContainer from '@/containers/Puzzles';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { User } from '@/types/user';
@@ -12,7 +13,10 @@ import { User } from '@/types/user';
 const PuzzlesPage = () => {
   return (
     <>
-      <PuzzlesContainer />
+      <MainLayout breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}>
+        <PuzzlesContainer />
+      </MainLayout>
+
       <NextSeo title="Recent Puzzles" />
     </>
   );

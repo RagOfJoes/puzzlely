@@ -5,6 +5,7 @@ import { NextSeo } from 'next-seo';
 import api from '@/api';
 import APIError from '@/api/error';
 import LoginContainer from '@/containers/Login';
+import AuthLayout from '@/layouts/Auth';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { User } from '@/types/user';
@@ -12,7 +13,13 @@ import { User } from '@/types/user';
 const LoginPage = () => {
   return (
     <>
-      <LoginContainer />
+      <AuthLayout
+        lead="Welcome back to Puzzlely."
+        caption="Log in with one of the options below to continue."
+      >
+        <LoginContainer />
+      </AuthLayout>
+
       <NextSeo title="Log in" description="Log in to your Puzzlely account." />
     </>
   );

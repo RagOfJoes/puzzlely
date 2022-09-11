@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 import PuzzleCard from '@/components/PuzzleCard';
 import useMe from '@/hooks/useMe';
 import usePuzzleLike from '@/hooks/usePuzzleLike';
-import Main from '@/layouts/Main';
 import {
   toggleLikePuzzleConnection,
   toggleLikePuzzlePages,
@@ -28,12 +27,7 @@ const SearchContainer = (props: SearchContainerProps) => {
   const isPlural = result.edges.length === 0 || result.edges.length > 1;
 
   return (
-    <Main
-      breadcrumbLinks={[
-        { path: `/search`, title: 'Search' },
-        { path: `/search?term=${search}`, title: search },
-      ]}
-    >
+    <>
       <VStack w="100%" align="start" spacing="6">
         <VStack spacing="1" align="start">
           <Heading size="md">
@@ -157,7 +151,7 @@ const SearchContainer = (props: SearchContainerProps) => {
           })}
         </Grid>
       </VStack>
-    </Main>
+    </>
   );
 };
 

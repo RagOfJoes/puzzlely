@@ -9,17 +9,12 @@ import {
 import NextLink from 'next/link';
 import { IoLogoDiscord, IoLogoGithub, IoLogoGoogle } from 'react-icons/io5';
 
-import AuthLayout from '@/layouts/Auth';
-
 const SignupContainer = () => {
   const buttonBgHover = useColorModeValue('gray.200', 'slate');
   const buttonBgActive = useColorModeValue('blackAlpha.200', 'whiteAlpha.300');
 
   return (
-    <AuthLayout
-      lead="Welcome to Puzzlely."
-      caption="Sign up now by selecting one of the options below."
-    >
+    <>
       <VStack mt="6" spacing="4" align="flex-start">
         {[
           {
@@ -55,7 +50,7 @@ const SignupContainer = () => {
           <Text as="strong">Log in</Text>
         </Link>
       </Text>
-    </AuthLayout>
+    </>
   );
 };
 

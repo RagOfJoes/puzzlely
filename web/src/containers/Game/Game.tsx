@@ -2,7 +2,6 @@ import { useMemo, useRef, useState } from 'react';
 
 import { Box, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-import { motion } from 'framer-motion';
 import shuffle from 'lodash.shuffle';
 
 import useGameBlockSelect from '@/hooks/useGameBlockSelect';
@@ -16,7 +15,6 @@ import useGameStart from '@/hooks/useGameStart';
 import useGameWrong from '@/hooks/useGameWrong';
 import useMount from '@/hooks/useMount';
 import useTimer from '@/hooks/useTimer';
-import Main from '@/layouts/Main';
 import { millisecondsTo } from '@/lib/time';
 import { Game } from '@/types/game';
 import { Block } from '@/types/puzzle';
@@ -217,82 +215,73 @@ const GameContainer = (props: GameContainerProps) => {
    */
 
   return (
-    <Main
-      layoutScroll
-      as={motion.div}
-      breadcrumbLinks={[
-        { path: '/puzzles', title: 'Puzzles' },
-        { path: '/', title: puzzle.name },
-      ]}
-    >
-      <Box w="100%" display="flex" justifyContent="center">
-        <VStack w="100%" spacing="3" maxW="container.md">
-          {/* Game stats */}
-          <Stats
-            game={game}
-            minutes={minutes}
-            seconds={seconds}
-            onReset={onReset}
-            onShuffle={onShuffle}
-            onForfeit={onForfeit}
-          />
-          {/* Game grid */}
-          <Grid
-            ref={gridRef}
-            blocks={blocks}
-            correct={correct}
-            isWrong={isWrong}
-            selected={selected}
-            isGameOver={isGameOver}
-            game={{ startedAt: game.startedAt }}
-            onBlockSelect={onBlockSelect}
-          />
-          {/* Game menu cards */}
-          <Menus
-            blocks={blocks}
-            gridRef={gridRef}
-            isGameOver={isGameOver}
-            // States
-            game={{
-              id: game.id,
-              score: game.score,
-              config: game.config,
-              results: game.results,
-              correct: game.correct,
-              attempts: game.attempts,
-              guessedAt: game.guessedAt,
-              startedAt: game.startedAt,
-              challengedBy: game.challengedBy,
-              challengeCode: game.challengeCode,
-              completedAt: game.completedAt,
-              puzzle: {
-                id: puzzle.id,
-                name: puzzle.name,
-                groups: puzzle.groups,
-                likedAt: puzzle.likedAt,
-                createdAt: puzzle.createdAt,
-                createdBy: puzzle.createdBy,
-                difficulty: puzzle.difficulty,
-                numOfLikes: puzzle.numOfLikes,
-                maxAttempts: puzzle.maxAttempts,
-                timeAllowed: puzzle.timeAllowed,
-              },
-            }}
-            setGame={setGame}
-            // Callbacks
-            onMenu={onMenu}
-            onStart={onStart}
-            onConnect={onConnect}
-            onContinue={onContinue}
-            onUpdateTimeAllowed={(newTime) => {
-              if (!isRunning && !startedAt) {
-                resetTo(newTime, false);
-              }
-            }}
-          />
-        </VStack>
-      </Box>
-    </Main>
+    <Box w="100%" display="flex" justifyContent="center">
+      <VStack w="100%" spacing="3" maxW="container.md">
+        {/* Game stats */}
+        <Stats
+          game={game}
+          minutes={minutes}
+          seconds={seconds}
+          onReset={onReset}
+          onShuffle={onShuffle}
+          onForfeit={onForfeit}
+        />
+        {/* Game grid */}
+        <Grid
+          ref={gridRef}
+          blocks={blocks}
+          correct={correct}
+          isWrong={isWrong}
+          selected={selected}
+          isGameOver={isGameOver}
+          game={{ startedAt: game.startedAt }}
+          onBlockSelect={onBlockSelect}
+        />
+        {/* Game menu cards */}
+        <Menus
+          blocks={blocks}
+          gridRef={gridRef}
+          isGameOver={isGameOver}
+          // States
+          game={{
+            id: game.id,
+            score: game.score,
+            config: game.config,
+            results: game.results,
+            correct: game.correct,
+            attempts: game.attempts,
+            guessedAt: game.guessedAt,
+            startedAt: game.startedAt,
+            challengedBy: game.challengedBy,
+            challengeCode: game.challengeCode,
+            completedAt: game.completedAt,
+            puzzle: {
+              id: puzzle.id,
+              name: puzzle.name,
+              groups: puzzle.groups,
+              likedAt: puzzle.likedAt,
+              createdAt: puzzle.createdAt,
+              createdBy: puzzle.createdBy,
+              difficulty: puzzle.difficulty,
+              numOfLikes: puzzle.numOfLikes,
+              maxAttempts: puzzle.maxAttempts,
+              timeAllowed: puzzle.timeAllowed,
+            },
+          }}
+          setGame={setGame}
+          // Callbacks
+          onMenu={onMenu}
+          onStart={onStart}
+          onConnect={onConnect}
+          onContinue={onContinue}
+          onUpdateTimeAllowed={(newTime) => {
+            if (!isRunning && !startedAt) {
+              resetTo(newTime, false);
+            }
+          }}
+        />
+      </VStack>
+    </Box>
   );
 };
 

@@ -5,6 +5,7 @@ import { NextSeo, SiteLinksSearchBoxJsonLd } from 'next-seo';
 import api from '@/api';
 import APIError from '@/api/error';
 import HomeContainer from '@/containers/Home';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { User } from '@/types/user';
@@ -12,7 +13,10 @@ import { User } from '@/types/user';
 const HomePage = () => {
   return (
     <>
-      <HomeContainer />
+      <MainLayout breadcrumbLinks={[{ path: '/', title: 'Home' }]}>
+        <HomeContainer />
+      </MainLayout>
+
       <NextSeo />
       <SiteLinksSearchBoxJsonLd
         url={`${process.env.NEXT_PUBLIC_HOST_URL}/`}

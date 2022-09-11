@@ -7,6 +7,7 @@ import APIError, { APIErrorCode } from '@/api/error';
 import PuzzleUpdateContainer from '@/containers/PuzzleUpdate';
 import PuzzleUpdateErrorContainer from '@/containers/PuzzleUpdateError';
 import usePuzzle from '@/hooks/usePuzzle';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import isUUID from '@/lib/isUUID';
 import { generateQueryKey } from '@/lib/queryKeys';
@@ -25,11 +26,23 @@ const PuzzleUpdatePage = (props: PuzzleUpdatePageProps) => {
   if (!data || isError || !isSuccess) {
     return (
       <>
-        <PuzzleUpdateErrorContainer
-          error={
-            error || new APIError(APIErrorCode.NotFound, 'Puzzle not found.')
-          }
-        />
+        <MainLayout
+          display="flex"
+          flexDirection="column"
+          breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}
+          sx={{
+            '& > main': {
+              marginY: 'auto',
+            },
+          }}
+        >
+          <PuzzleUpdateErrorContainer
+            error={
+              error || new APIError(APIErrorCode.NotFound, 'Puzzle not found.')
+            }
+          />
+        </MainLayout>
+
         <NextSeo noindex nofollow title="Error" />
       </>
     );
@@ -37,7 +50,10 @@ const PuzzleUpdatePage = (props: PuzzleUpdatePageProps) => {
 
   return (
     <>
-      <PuzzleUpdateContainer puzzle={data} />
+      <MainLayout breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}>
+        <PuzzleUpdateContainer puzzle={data} />
+      </MainLayout>
+
       <NextSeo noindex nofollow title="Update Puzzle" />
     </>
   );

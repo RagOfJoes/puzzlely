@@ -11,8 +11,6 @@ import {
 import { ListProps } from '@chakra-ui/system';
 import Link from 'next/link';
 
-import DocLayout from '@/layouts/Doc';
-
 const Title = (props: HeadingProps) => <Heading mt="12" size="md" {...props} />;
 
 const Body = (props: TextProps) => <Text mt="4" {...props} />;
@@ -23,7 +21,7 @@ const List = (props: PropsWithChildren<ListProps>) => (
 
 const PrivacyContainer = () => {
   return (
-    <DocLayout title="Privacy Policy">
+    <>
       <Text mt="12">
         Your privacy is important to us. It is Puzzlely&apos;s policy to respect
         your privacy and comply with any applicable law and regulation regarding
@@ -155,7 +153,7 @@ const PrivacyContainer = () => {
           support@puzzlely.io
         </Body>
       </Link>
-    </DocLayout>
+    </>
   );
 };
 

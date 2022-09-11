@@ -2,12 +2,11 @@ import { Fragment } from 'react';
 
 import { Box, Heading, Text } from '@chakra-ui/react';
 
-import DocLayout from '@/layouts/Doc';
 import { FAQ } from '@/lib/constants';
 
 const FAQContainer = () => {
   return (
-    <DocLayout title="Common Questions">
+    <>
       {FAQ.map((section) => (
         <Fragment key={section.title}>
           <Heading
@@ -37,7 +36,7 @@ const FAQContainer = () => {
           ))}
         </Fragment>
       ))}
-    </DocLayout>
+    </>
   );
 };
 

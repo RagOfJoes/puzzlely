@@ -1,16 +1,8 @@
 import { useState } from 'react';
 
-import {
-  Heading,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-} from '@chakra-ui/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 
-import Main from '@/layouts/Main';
 import { User } from '@/types/user';
 
 import Details from './Details';
@@ -18,7 +10,7 @@ import Games from './Games';
 import Puzzles from './Puzzles';
 
 export type UserContainerProps = {
-  user?: User;
+  user: User;
 };
 
 const UserContainer = (props: UserContainerProps) => {
@@ -35,22 +27,8 @@ const UserContainer = (props: UserContainerProps) => {
     }
   });
 
-  // This should never happen but we should just check anyways
-  if (!user) {
-    return (
-      <Main breadcrumbLinks={[{ path: '/profile', title: 'Profile' }]}>
-        <Heading size="md">User not found!</Heading>
-      </Main>
-    );
-  }
-
   return (
-    <Main
-      breadcrumbLinks={[
-        { path: '/profile', title: 'Profile' },
-        { path: `/users/${user.username}`, title: user.username },
-      ]}
-    >
+    <>
       <Details user={user} />
       <Tabs
         isLazy
@@ -96,7 +74,7 @@ const UserContainer = (props: UserContainerProps) => {
           </TabPanel>
         </TabPanels>
       </Tabs>
-    </Main>
+    </>
   );
 };
 

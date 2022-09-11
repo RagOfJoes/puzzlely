@@ -1,12 +1,16 @@
 import { FAQPageJsonLd, NextSeo } from 'next-seo';
 
 import FAQContainer from '@/containers/FAQ';
+import DocLayout from '@/layouts/Doc';
 import { FAQ } from '@/lib/constants';
 
 const FAQPage = () => {
   return (
     <>
-      <FAQContainer />
+      <DocLayout title="Common Questions">
+        <FAQContainer />
+      </DocLayout>
+
       <NextSeo title="F.A.Q" />
       <FAQPageJsonLd
         mainEntity={FAQ.map((section) =>
