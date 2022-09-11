@@ -17,7 +17,7 @@ export const PUZZLE_DIFFICULTIES: Puzzle['difficulty'][] = [
 export const PUZZLES_LIMIT = 36;
 
 // Auth constants
-export const SUPPORTED_PROVIDERS = ['discord', 'google', 'github', 'microsoft'];
+export const SUPPORTED_PROVIDERS = ['discord', 'google', 'github'];
 
 // App constants
 export const COLOR_MODE_COOKIE = 'puzzlely-color-mode';
