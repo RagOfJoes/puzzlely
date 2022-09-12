@@ -42,11 +42,9 @@ jobs:
       working-directory: web
       run: |
         touch .env
-        echo API_URL=${{ secrets.API_URL }} >> .env
-        echo HOST_URL=${{ secrets.HOST_URL }} >> .env
-        
-        echo NEXT_PUBLIC_API_URL=$API_URL >> .env
-        echo NEXT_PUBLIC_HOST_URL=$HOST_URL >> .env
+
+        echo NEXT_PUBLIC_API_URL=${{ secrets.API_URL }} >> .env
+        echo NEXT_PUBLIC_HOST_URL=${{ secrets.HOST_URL }} >> .env
         echo NEXT_PUBLIC_PANELBEAR_ID=${{ secrets.PANELBEAR_ID }} >> .env
     - if: steps.filter.outputs.web == 'true'
       name: Build and push Web to Docker
