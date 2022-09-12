@@ -1,6 +1,10 @@
 import { useToast } from '@chakra-ui/react';
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { InfiniteData, useMutation, useQueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError, { APIErrorCode } from '@/api/error';

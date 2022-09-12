@@ -1,10 +1,11 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { NextSeo } from 'next-seo';
-import { dehydrate, QueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError from '@/api/error';
 import PuzzlesLikedContainer from '@/containers/PuzzlesLiked';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { User } from '@/types/user';
@@ -12,8 +13,16 @@ import { User } from '@/types/user';
 const PuzzlesLikedPage = () => {
   return (
     <>
-      <PuzzlesLikedContainer />
-      <NextSeo title="Liked Puzzles" robotsProps={{ nosnippet: true }} />
+      <MainLayout
+        breadcrumbLinks={[
+          { path: '/puzzles', title: 'Puzzles' },
+          { path: '/puzzles/liked', title: 'Liked' },
+        ]}
+      >
+        <PuzzlesLikedContainer />
+      </MainLayout>
+
+      <NextSeo title="Liked Puzzles" />
     </>
   );
 };

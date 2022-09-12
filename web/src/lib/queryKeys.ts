@@ -1,42 +1,56 @@
-import { QueryKey } from 'react-query';
+import { QueryKey } from '@tanstack/react-query';
 
 import { PuzzleFilters } from '@/types/puzzle';
 
-export const queryKeys = {
+export const queryKeys: {
+  [key in
+    | 'Game'
+    | 'GamesHistory'
+    | 'Me'
+    | 'PuzzleDetail'
+    | 'PuzzlesCreated'
+    | 'PuzzlesLiked'
+    | 'PuzzlesList'
+    | 'PuzzlesMostLiked'
+    | 'PuzzlesMostPlayed'
+    | 'Search'
+    | 'UsersProfile'
+    | 'UsersStats']: QueryKey;
+} = {
   // Games
   //
 
-  Game: 'games/play',
-  GamesHistory: 'games/history',
+  Game: ['games/play'],
+  GamesHistory: ['games/history'],
 
   // Puzzles
   //
 
-  PuzzlesCreated: 'puzzles/created',
-  PuzzleDetail: 'puzzles/detail',
-  PuzzlesLiked: 'puzzles/liked',
-  PuzzlesList: 'puzzles/list',
-  PuzzlesMostLiked: 'puzzles/mostLiked',
-  PuzzlesMostPlayed: 'puzzles/mostPlayed',
+  PuzzlesCreated: ['puzzles/created'],
+  PuzzleDetail: ['puzzles/detail'],
+  PuzzlesLiked: ['puzzles/liked'],
+  PuzzlesList: ['puzzles/list'],
+  PuzzlesMostLiked: ['puzzles/mostLiked'],
+  PuzzlesMostPlayed: ['puzzles/mostPlayed'],
 
   // User
   //
 
-  Me: 'me',
-  UsersProfile: 'users/profile',
-  UsersStats: 'users/stats',
+  Me: ['me'],
+  UsersProfile: ['users/profile'],
+  UsersStats: ['users/stats'],
 
   // Misc.
-  Search: 'search',
+  Search: ['search'],
 };
 
 export const generateQueryKey = {
   // Games
   //
 
-  Game: (gameID: string): QueryKey => [queryKeys.Game, { id: gameID }],
+  Game: (gameID: string): QueryKey => [...queryKeys.Game, { id: gameID }],
   GamesHistory: (userID: string): QueryKey => [
-    queryKeys.GamesHistory,
+    ...queryKeys.GamesHistory,
     { id: userID },
   ],
 
@@ -44,35 +58,35 @@ export const generateQueryKey = {
   //
 
   PuzzlesCreated: (userID: string): QueryKey => [
-    queryKeys.PuzzlesCreated,
+    ...queryKeys.PuzzlesCreated,
     { id: userID },
   ],
   PuzzleDetail: (puzzleID: string): QueryKey => [
-    queryKeys.PuzzleDetail,
+    ...queryKeys.PuzzleDetail,
     { id: puzzleID },
   ],
-  PuzzlesLiked: (): QueryKey => [queryKeys.PuzzlesLiked],
+  PuzzlesLiked: (): QueryKey => [...queryKeys.PuzzlesLiked],
   PuzzlesList: (filters?: {
     [key in PuzzleFilters]?: string;
-  }): QueryKey => [queryKeys.PuzzlesList, { filters }],
-  PuzzlesMostLiked: (): QueryKey => [queryKeys.PuzzlesMostLiked],
-  PuzzlesMostPlayed: (): QueryKey => [queryKeys.PuzzlesMostPlayed],
+  }): QueryKey => [...queryKeys.PuzzlesList, { filters }],
+  PuzzlesMostLiked: (): QueryKey => [...queryKeys.PuzzlesMostLiked],
+  PuzzlesMostPlayed: (): QueryKey => [...queryKeys.PuzzlesMostPlayed],
 
   // User
   //
 
-  Me: (): QueryKey => [queryKeys.Me],
+  Me: (): QueryKey => [...queryKeys.Me],
   UsersProfile: (userID: string): QueryKey => [
-    queryKeys.UsersProfile,
+    ...queryKeys.UsersProfile,
     { id: userID },
   ],
   UsersStats: (userID: string): QueryKey => [
-    queryKeys.UsersStats,
+    ...queryKeys.UsersStats,
     { id: userID },
   ],
 
   // Misc.
   //
 
-  Search: (term: string): QueryKey => [queryKeys.Search, { term }],
+  Search: (term: string): QueryKey => [...queryKeys.Search, { term }],
 };

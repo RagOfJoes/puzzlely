@@ -1,4 +1,8 @@
-import { useQuery, useQueryClient, UseQueryResult } from 'react-query';
+import {
+  useQuery,
+  useQueryClient,
+  UseQueryResult,
+} from '@tanstack/react-query';
 
 import APIError, { APIErrorCode } from '@/api/error';
 import { generateQueryKey } from '@/lib/queryKeys';

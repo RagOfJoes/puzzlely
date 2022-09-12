@@ -4,7 +4,6 @@ import { Grid, VStack } from '@chakra-ui/react';
 
 import Waypoint from '@/components/Waypoint';
 import usePuzzles from '@/hooks/usePuzzles';
-import Main from '@/layouts/Main';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { PuzzleConnection, PuzzleEdge, PuzzleFilters } from '@/types/puzzle';
 
@@ -58,41 +57,39 @@ const PuzzlesContainer = () => {
   }, [data]);
 
   return (
-    <Main breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}>
-      <VStack w="100%" align="start" spacing="6">
-        <Filter filters={filters} setFilters={setFilters} />
+    <VStack w="100%" align="start" spacing="6">
+      <Filter filters={filters} setFilters={setFilters} />
 
-        <Grid
-          gap="4"
-          w="100%"
-          templateColumns={{
-            base: 'repeat(1, 1fr)',
-            sm: 'repeat(1, 1fr)',
-            md: 'repeat(2, 1fr)',
-            xl: 'repeat(3, 1fr)',
-          }}
-        >
-          {!isFetched && isLoading && <Loading />}
+      <Grid
+        gap="4"
+        w="100%"
+        templateColumns={{
+          base: 'repeat(1, 1fr)',
+          sm: 'repeat(1, 1fr)',
+          md: 'repeat(2, 1fr)',
+          xl: 'repeat(3, 1fr)',
+        }}
+      >
+        {!isFetched && isLoading && <Loading />}
 
-          {isFetched && data && data.pages?.length > 0 && (
-            <Cards edges={connection.edges} />
-          )}
+        {isFetched && data && data.pages?.length > 0 && (
+          <Cards edges={connection.edges} />
+        )}
 
-          {isFetched && isFetchingNextPage && <Loading />}
+        {isFetched && isFetchingNextPage && <Loading />}
 
-          {hasNextPage && isFetched && !isLoading && (
-            <Waypoint
-              initialInView={false}
-              onChange={(inView) => {
-                if (inView) {
-                  fetchNextPage();
-                }
-              }}
-            />
-          )}
-        </Grid>
-      </VStack>
-    </Main>
+        {hasNextPage && isFetched && !isLoading && (
+          <Waypoint
+            initialInView={false}
+            onChange={(inView) => {
+              if (inView) {
+                fetchNextPage();
+              }
+            }}
+          />
+        )}
+      </Grid>
+    </VStack>
   );
 };
 

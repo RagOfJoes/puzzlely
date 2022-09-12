@@ -1,7 +1,11 @@
 import { modalAnatomy as parts } from '@chakra-ui/anatomy';
-import { mode, PartsStyleFunction } from '@chakra-ui/theme-tools';
+import { createMultiStyleConfigHelpers } from '@chakra-ui/system';
+import { mode } from '@chakra-ui/theme-tools';
 
-const baseStyle: PartsStyleFunction<typeof parts> = (props) => ({
+const { defineMultiStyleConfig, definePartsStyle } =
+  createMultiStyleConfigHelpers(parts.keys);
+
+const baseStyle = definePartsStyle((props) => ({
   overlay: {
     bg: mode('rgba(243,244,246,0.6)', 'rgba(40,44,52,0.6)')(props),
   },
@@ -9,10 +13,10 @@ const baseStyle: PartsStyleFunction<typeof parts> = (props) => ({
     bg: 'surface',
     boxShadow: 'md',
   },
-});
+}));
 
-const Modal = {
+const Modal = defineMultiStyleConfig({
   baseStyle,
-};
+});
 
 export default Modal;

@@ -1,4 +1,4 @@
-import { QueryKey, useInfiniteQuery } from 'react-query';
+import { QueryKey, useInfiniteQuery } from '@tanstack/react-query';
 
 import api from '@/api';
 import APIError from '@/api/error';

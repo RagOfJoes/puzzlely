@@ -1,10 +1,11 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { NextSeo } from 'next-seo';
-import { dehydrate, QueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError from '@/api/error';
 import PuzzleCreateContainer from '@/containers/PuzzleCreate';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { User } from '@/types/user';
@@ -12,7 +13,15 @@ import { User } from '@/types/user';
 const PuzzlesCreatePage = () => {
   return (
     <>
-      <PuzzleCreateContainer />
+      <MainLayout
+        breadcrumbLinks={[
+          { path: '/puzzles', title: 'Puzzles' },
+          { path: '/puzzles/create', title: 'Create' },
+        ]}
+      >
+        <PuzzleCreateContainer />
+      </MainLayout>
+
       <NextSeo title="Create a Puzzle" />
     </>
   );

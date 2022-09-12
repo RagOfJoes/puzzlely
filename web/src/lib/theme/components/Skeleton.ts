@@ -1,11 +1,8 @@
-import { keyframes } from '@chakra-ui/system';
+import { cssVar } from '@chakra-ui/system';
 import { getColor, mode, SystemStyleFunction } from '@chakra-ui/theme-tools';
 
-const fade = (startColor: string, endColor: string) =>
-  keyframes({
-    from: { borderColor: startColor, background: startColor },
-    to: { borderColor: endColor, background: endColor },
-  });
+const startColor = cssVar('skeleton-start-color');
+const endColor = cssVar('skeleton-end-color');
 
 const baseStyle: SystemStyleFunction = (props) => {
   //  surface
@@ -13,17 +10,17 @@ const baseStyle: SystemStyleFunction = (props) => {
   const defaultEndColor = mode('gray.300', 'slate')(props);
 
   const {
-    startColor = defaultStartColor,
-    endColor = defaultEndColor,
-    speed,
+    startColor: startColorProps = defaultStartColor,
+    endColor: endColorProps = defaultEndColor,
     theme,
   } = props;
 
-  const start = getColor(theme, startColor);
-  const end = getColor(theme, endColor);
+  const start = getColor(theme, startColorProps);
+  const end = getColor(theme, endColorProps);
 
   return {
-    animation: `${speed}s linear infinite alternate ${fade(start, end)}`,
+    [startColor.variable]: start,
+    [endColor.variable]: end,
     background: end,
     borderRadius: '2px',
     borderColor: start,

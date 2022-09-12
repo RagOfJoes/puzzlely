@@ -5,7 +5,7 @@
   </p>
 </a>
 <h3 align="center">
-  <strong>A puzzle game that's inspired by the BBC's Only Connect game show.</strong>
+  <strong>An online puzzle game that's inspired by the BBC's Only Connect game show. Play user created puzzles or create your own to challenge your friends and other users.</strong>
 </h3>
 
 ---

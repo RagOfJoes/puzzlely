@@ -1,31 +1,29 @@
-import type { SystemStyleObject } from '@chakra-ui/theme-tools';
+import { defineStyle, defineStyleConfig } from '@chakra-ui/system';
 
-const baseStyle: SystemStyleObject = {
+const baseStyle = defineStyle({
   opacity: 1,
   borderColor: 'inherit',
-};
+});
 
-const variantSolid: SystemStyleObject = {
+const variantSolid = defineStyle({
   borderStyle: 'solid',
-};
+});
 
-const variantDashed: SystemStyleObject = {
+const variantDashed = defineStyle({
   borderStyle: 'dashed',
-};
+});
 
 const variants = {
   solid: variantSolid,
   dashed: variantDashed,
 };
 
-const defaultProps = {
-  variant: 'solid',
-};
-
-const Divider = {
+const Divider = defineStyleConfig({
   baseStyle,
   variants,
-  defaultProps,
-};
+  defaultProps: {
+    variant: 'solid',
+  },
+});
 
 export default Divider;

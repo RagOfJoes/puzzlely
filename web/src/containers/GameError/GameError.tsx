@@ -1,8 +1,8 @@
 import { Box, Button, Heading, HStack, Icon, Text } from '@chakra-ui/react';
+import Link from 'next/link';
 
 import APIError from '@/api/error';
 import GameErrorIcon from '@/components/GameErrorIcon';
-import Main from '@/layouts/Main';
 
 export type GameErrorContainerProps = {
   error: APIError;
@@ -12,36 +12,27 @@ const GameErrorContainer = (props: GameErrorContainerProps) => {
   const { error } = props;
 
   return (
-    <Main
+    <Box
+      w="100%"
+      h="100%"
       display="flex"
-      flexDirection="column"
-      breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}
-      sx={{
-        '& > main': {
-          marginY: 'auto',
-        },
-      }}
+      alignItems="center"
+      justifyContent={{ base: 'flex-start', md: 'space-evenly' }}
     >
       <Box
-        w="100%"
-        h="100%"
         display="flex"
-        alignItems="center"
-        justifyContent={{ base: 'flex-start', md: 'space-evenly' }}
+        maxW="container.md"
+        flexDirection="column"
+        alignItems="flex-start"
+        justifyContent="center"
+        w={{ base: '100%', md: 'auto' }}
       >
-        <Box
-          display="flex"
-          maxW="container.md"
-          flexDirection="column"
-          alignItems="flex-start"
-          justifyContent="center"
-          w={{ base: '100%', md: 'auto' }}
-        >
-          <Heading size="md">{error.code}...</Heading>
-          <Text mt="4" fontSize="md" fontWeight="medium">
-            {error.message}
-          </Text>
-          <HStack mt="8" w="100%">
+        <Heading size="md">{error.code}...</Heading>
+        <Text mt="4" fontSize="md" fontWeight="medium">
+          {error.message}
+        </Text>
+        <HStack mt="8" w="100%">
+          <Link passHref href="/puzzles">
             <Button
               variant="outline"
               colorScheme="gray"
@@ -49,20 +40,23 @@ const GameErrorContainer = (props: GameErrorContainerProps) => {
             >
               Puzzles
             </Button>
-            <Button w={{ base: '100%', md: 'auto' }}>Take me home</Button>
-          </HStack>
-        </Box>
+          </Link>
 
-        <Icon
-          h="auto"
-          maxH="300px"
-          as={GameErrorIcon}
-          aria-label="Error"
-          w={{ base: '0', md: '40%' }}
-          display={{ base: 'none', md: 'block' }}
-        />
+          <Link passHref href="/">
+            <Button w={{ base: '100%', md: 'auto' }}>Take me home</Button>
+          </Link>
+        </HStack>
       </Box>
-    </Main>
+
+      <Icon
+        h="auto"
+        maxH="300px"
+        as={GameErrorIcon}
+        aria-label="Error"
+        w={{ base: '0', md: '40%' }}
+        display={{ base: 'none', md: 'block' }}
+      />
+    </Box>
   );
 };
 

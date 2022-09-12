@@ -1,11 +1,12 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { NextSeo } from 'next-seo';
-import { dehydrate, QueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError from '@/api/error';
 import SearchContainer from '@/containers/Search';
 import useSearch from '@/hooks/useSearch';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { PuzzleConnection } from '@/types/puzzle';
@@ -22,12 +23,23 @@ const SearchPage = (props: SearchPageProps) => {
 
   return (
     <>
-      <SearchContainer
-        search={search}
-        result={
-          result || { edges: [], pageInfo: { cursor: '', hasNextPage: false } }
-        }
-      />
+      <MainLayout
+        breadcrumbLinks={[
+          { path: `/search`, title: 'Search' },
+          { path: `/search?term=${search}`, title: search },
+        ]}
+      >
+        <SearchContainer
+          search={search}
+          result={
+            result || {
+              edges: [],
+              pageInfo: { cursor: '', hasNextPage: false },
+            }
+          }
+        />
+      </MainLayout>
+
       <NextSeo noindex nofollow title="Search" />
     </>
   );

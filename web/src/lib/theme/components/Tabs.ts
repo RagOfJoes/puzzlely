@@ -1,7 +1,7 @@
-import { ComponentStyleConfig } from '@chakra-ui/react';
+import { defineStyleConfig } from '@chakra-ui/system';
 import { mode } from '@chakra-ui/theme-tools';
 
-const Tabs: ComponentStyleConfig = {
+const Tabs = defineStyleConfig({
   variants: {
     'soft-rounded': (props) => {
       return {
@@ -30,6 +30,6 @@ const Tabs: ComponentStyleConfig = {
   defaultProps: {
     colorScheme: 'purple',
   },
-};
+});
 
 export default Tabs;

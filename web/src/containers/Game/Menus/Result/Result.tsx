@@ -9,10 +9,10 @@ import {
   useClipboard,
   VStack,
 } from '@chakra-ui/react';
+import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { IoCheckbox, IoCopy } from 'react-icons/io5';
-import { useQueryClient } from 'react-query';
 
 import GameChallengerResults from '@/components/GameChallengerResults';
 import GameMenuCard from '@/components/GameMenuCard';

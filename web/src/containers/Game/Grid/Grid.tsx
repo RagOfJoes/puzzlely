@@ -6,7 +6,8 @@ import { GridProps } from '../types';
 import Block from './Block';
 
 const Grid = forwardRef<GridProps, 'div'>((props, ref) => {
-  const { blocks, correct, game, isWrong, onBlockSelect, selected } = props;
+  const { blocks, correct, game, isRunning, isWrong, onBlockSelect, selected } =
+    props;
   const { startedAt } = game;
 
   const isSelected = useCallback(
@@ -58,7 +59,9 @@ const Grid = forwardRef<GridProps, 'div'>((props, ref) => {
             title={!startedAt ? '' : block.value}
             onClick={(_) => onBlockSelect(block, isItemCorrect, isItemSelected)}
           >
-            {!startedAt ? '_'.repeat(block.value.length) : block.value}
+            {!startedAt || !isRunning
+              ? '_'.repeat(block.value.length)
+              : block.value}
           </Block>
         );
       })}

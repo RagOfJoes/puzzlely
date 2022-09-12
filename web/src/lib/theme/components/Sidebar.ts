@@ -1,4 +1,6 @@
-const Sidebar = {
+import { ComponentStyleConfig } from '@chakra-ui/react';
+
+const Sidebar: ComponentStyleConfig = {
   parts: ['container', 'wrapper'],
   baseStyle: {
     container: {

@@ -1,10 +1,11 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { NextSeo } from 'next-seo';
-import { dehydrate, QueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError from '@/api/error';
 import SignupContainer from '@/containers/Signup';
+import AuthLayout from '@/layouts/Auth';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { User } from '@/types/user';
@@ -12,13 +13,16 @@ import { User } from '@/types/user';
 const SignupPage = () => {
   return (
     <>
-      <SignupContainer />
+      <AuthLayout
+        lead="Welcome to Puzzlely."
+        caption="Sign up now by selecting one of the options below."
+      >
+        <SignupContainer />
+      </AuthLayout>
+
       <NextSeo
         title="Sign up"
-        description="Create an account with Puzzlely and become a part of our community!"
-        robotsProps={{
-          nosnippet: true,
-        }}
+        description="Create an account with Puzzlely and become a part of the community! Submit your own puzzles and see how other users fare against them."
       />
     </>
   );

@@ -1,17 +1,21 @@
 import '@fontsource/inter/variable.css';
 import '@fontsource/raleway/variable.css';
 
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ChakraProvider } from '@chakra-ui/react';
+import {
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { DefaultSeo } from 'next-seo';
 import { AppProps } from 'next/app';
-import { Hydrate, QueryClient, QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
 
 import usePanelbear from '@/hooks/usePanelbear';
 import colorModeManager from '@/lib/colorModeManager';
@@ -27,10 +31,8 @@ const App = ({
   Component,
   pageProps,
 }: AppProps<{
-  pageProps: PropsWithChildren<{
-    colorMode?: string;
-    dehydratedState?: any;
-  }>;
+  colorMode?: string;
+  dehydratedState?: any;
 }>) => {
   // Destruct user and colorMode so we don't pass it to the actual page. This removes redundant copies and ensures that any access to these variables are done through their respective providers
   const { dehydratedState, ...otherPageProps } = pageProps;
@@ -54,7 +56,7 @@ const App = ({
       <DefaultSeo
         defaultTitle="Puzzlely"
         titleTemplate="%s - Puzzlely"
-        description="A puzzle game that's inspired by the BBC's Only Connect game show."
+        description="An online puzzle game that's inspired by the BBC's Only Connect game show. Play user created puzzles or create your own to challenge your friends and other users."
         additionalMetaTags={[
           {
             name: 'application-name',

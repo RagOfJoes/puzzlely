@@ -1,12 +1,11 @@
-import { switchAnatomy } from '@chakra-ui/anatomy';
-import { ComponentStyleConfig } from '@chakra-ui/react';
-import {
-  mode,
-  PartsStyleFunction,
-  SystemStyleFunction,
-} from '@chakra-ui/theme-tools';
+import { switchAnatomy as parts } from '@chakra-ui/anatomy';
+import { createMultiStyleConfigHelpers, defineStyle } from '@chakra-ui/system';
+import { mode } from '@chakra-ui/theme-tools';
 
-const baseStyleTrack: SystemStyleFunction = (props) => {
+const { defineMultiStyleConfig, definePartsStyle } =
+  createMultiStyleConfigHelpers(parts.keys);
+
+const baseStyleTrack = defineStyle((props) => {
   const { colorScheme } = props;
 
   if (colorScheme !== 'purple') {
@@ -21,17 +20,17 @@ const baseStyleTrack: SystemStyleFunction = (props) => {
       bg: 'primary',
     },
   };
-};
-
-const baseStyle: PartsStyleFunction<typeof switchAnatomy> = (props) => ({
-  track: baseStyleTrack(props),
 });
 
-const Switch: ComponentStyleConfig = {
+const baseStyle = definePartsStyle((props) => ({
+  track: baseStyleTrack(props),
+}));
+
+const Switch = defineMultiStyleConfig({
   baseStyle,
   defaultProps: {
     colorScheme: 'purple',
   },
-};
+});
 
 export default Switch;

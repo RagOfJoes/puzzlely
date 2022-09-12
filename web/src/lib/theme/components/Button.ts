@@ -1,7 +1,7 @@
-import { ComponentStyleConfig } from '@chakra-ui/react';
+import { defineStyleConfig } from '@chakra-ui/system';
 import { mode, transparentize } from '@chakra-ui/theme-tools';
 
-const Button: ComponentStyleConfig = {
+const Button = defineStyleConfig({
   variants: {
     solid: (props) => {
       const { theme } = props;
@@ -56,6 +56,6 @@ const Button: ComponentStyleConfig = {
   defaultProps: {
     colorScheme: 'purple',
   },
-};
+});
 
 export default Button;

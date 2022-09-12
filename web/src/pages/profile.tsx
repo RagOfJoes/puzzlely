@@ -1,12 +1,14 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { NextSeo } from 'next-seo';
-import { dehydrate, QueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError from '@/api/error';
 import UserContainer from '@/containers/User';
 import UserSetupContainer from '@/containers/UserSetup';
 import useMe from '@/hooks/useMe';
+import AuthLayout from '@/layouts/Auth';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import { generateQueryKey } from '@/lib/queryKeys';
 import { User } from '@/types/user';
@@ -23,7 +25,13 @@ const ProfilePage = (props: ProfilePageProps) => {
   if ((me || user).state === 'PENDING') {
     return (
       <>
-        <UserSetupContainer />
+        <AuthLayout
+          lead="Let's complete your account setup"
+          caption="To start enjoying all the features of Puzzlely"
+        >
+          <UserSetupContainer />
+        </AuthLayout>
+
         <NextSeo noindex nofollow title="Account Setup" />
       </>
     );
@@ -31,7 +39,15 @@ const ProfilePage = (props: ProfilePageProps) => {
 
   return (
     <>
-      <UserContainer user={me || user} />
+      <MainLayout
+        breadcrumbLinks={[
+          { path: '/profile', title: 'Profile' },
+          { path: `/users/${user.username}`, title: user.username },
+        ]}
+      >
+        <UserContainer user={me || user} />
+      </MainLayout>
+
       <NextSeo noindex nofollow title="Profile" />
     </>
   );

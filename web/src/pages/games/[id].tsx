@@ -1,12 +1,14 @@
+import { dehydrate, QueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import { NextSeo } from 'next-seo';
-import { dehydrate, QueryClient } from 'react-query';
 
 import api from '@/api';
 import APIError, { APIErrorCode } from '@/api/error';
 import GameContainer from '@/containers/Game';
 import GameErrorContainer from '@/containers/GameError';
 import useGame from '@/hooks/useGame';
+import MainLayout from '@/layouts/Main';
 import getColorModeCookie from '@/lib/getColorModeCookie';
 import isUUID from '@/lib/isUUID';
 import { generateQueryKey } from '@/lib/queryKeys';
@@ -25,11 +27,23 @@ const GamePage = (props: GamePageProps) => {
   if (!data || isError || !isSuccess) {
     return (
       <>
-        <GameErrorContainer
-          error={
-            error || new APIError(APIErrorCode.NotFound, 'Game not found.')
-          }
-        />
+        <MainLayout
+          display="flex"
+          flexDirection="column"
+          breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}
+          sx={{
+            '& > main': {
+              marginY: 'auto',
+            },
+          }}
+        >
+          <GameErrorContainer
+            error={
+              error || new APIError(APIErrorCode.NotFound, 'Game not found.')
+            }
+          />
+        </MainLayout>
+
         <NextSeo noindex nofollow title="Error" />
       </>
     );
@@ -37,7 +51,17 @@ const GamePage = (props: GamePageProps) => {
 
   return (
     <>
-      <GameContainer game={data} />
+      <MainLayout
+        layoutScroll
+        as={motion.div}
+        breadcrumbLinks={[
+          { path: '/puzzles', title: 'Puzzles' },
+          { path: '/', title: data.puzzle.name },
+        ]}
+      >
+        <GameContainer game={data} />
+      </MainLayout>
+
       <NextSeo noindex nofollow title={data.puzzle.name} />
     </>
   );
