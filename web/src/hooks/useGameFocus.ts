@@ -26,11 +26,13 @@ export type UseGameFocusParam = {
  */
 const useGameFocus = (args: UseGameFocusParam) => {
   const { game, isGameOver, isRunning, pause, setGame, start, time } = args;
+  const { config, guessedAt, startedAt } = game;
+  const { timeAllowed } = config;
 
   const isFocused = useWindowFocus();
 
   return useEffect(() => {
-    if (!game.startedAt || (game.guessedAt && game.startedAt)) {
+    if (!startedAt || (guessedAt && startedAt)) {
       return;
     }
 
@@ -40,14 +42,17 @@ const useGameFocus = (args: UseGameFocusParam) => {
     }
 
     if (!isGameOver && !isRunning) {
-      const newStartedAt = dayjs().tz().subtract(time, 'milliseconds').toDate();
+      const newStartedAt = dayjs()
+        .tz()
+        .subtract(timeAllowed - time, 'milliseconds')
+        .toDate();
       setGame((prev) => ({ ...prev, startedAt: newStartedAt }));
 
       start();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game.startedAt, isGameOver, isFocused, isRunning, time]);
+  }, [startedAt, isGameOver, isFocused, isRunning, time]);
 };
 
 export default useGameFocus;

@@ -13,14 +13,18 @@ const GameOver = (props: GameOverMenuProps) => {
   const { attempts, guessedAt, score, startedAt } = game;
 
   const timeElapsed = useMemo(() => {
-    const diff = dayjs(guessedAt).tz().diff(dayjs(startedAt).tz());
+    const diff = dayjs(guessedAt)
+      .tz()
+      .diff(dayjs(startedAt).tz(), 'milliseconds');
     const minutes = millisecondsTo('minutes', diff);
     const seconds = millisecondsTo('seconds', diff);
 
     const formatMin = `${minutes > 9 ? '' : 0}${minutes}`;
     const formatSec = `${seconds > 9 ? '' : 0}${seconds}`;
     return `${formatMin}:${formatSec}`;
-  }, [guessedAt, startedAt]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <GameMenuCard>
