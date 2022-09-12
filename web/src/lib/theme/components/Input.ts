@@ -18,6 +18,7 @@ const Input = defineMultiStyleConfig({
         _focusVisible: {
           borderColor: 'transparent',
           boxShadow: 'outline',
+          outline: 'none',
         },
         _hover: {
           bg: mode('gray.100', 'whiteAlpha.300')(props),
@@ -29,6 +30,7 @@ const Input = defineMultiStyleConfig({
         _focusVisible: {
           borderColor: 'transparent',
           boxShadow: 'outline',
+          outline: 'none',
         },
       },
     }),
