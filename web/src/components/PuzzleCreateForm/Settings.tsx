@@ -52,6 +52,14 @@ const Settings = () => {
             max: 999,
             clampValueOnBlur: true,
             isDisabled: isSubmitting,
+            onChange: (_, newValue) => {
+              const newMaxAttempts = Number(newValue);
+
+              setFieldValue(
+                'maxAttempts',
+                Number.isNaN(newMaxAttempts) ? 0 : newMaxAttempts
+              );
+            },
           }}
         />
         <Button
@@ -81,8 +89,10 @@ const Settings = () => {
                 if (newValue > 59) {
                   clamped = 59;
                 }
+
                 const secToMs = seconds * 1000;
                 const newTime = secToMs + clamped * 60000;
+
                 setFieldValue(
                   'timeAllowed',
                   Number.isNaN(newTime) ? secToMs : newTime
@@ -104,8 +114,10 @@ const Settings = () => {
                 if (newValue > 59) {
                   clamped = 59;
                 }
+
                 const minToMs = minutes * 60000;
                 const newTime = minToMs + clamped * 1000;
+
                 setFieldValue(
                   'timeAllowed',
                   Number.isNaN(newTime) ? minToMs : newTime
