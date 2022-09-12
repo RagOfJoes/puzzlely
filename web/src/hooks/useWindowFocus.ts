@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 const shouldFocus = typeof document !== 'undefined' && document.hasFocus();
 
 const useWindowFocus = () => {
-  // Focus for first render
   const [isFocused, toggleIsFocused] = useState(shouldFocus);
 
   useEffect(() => {
