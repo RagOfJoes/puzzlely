@@ -16,6 +16,7 @@ const Menus = (props: MenusProps) => {
     game,
     gridRef,
     isGameOver,
+    isRunning,
     onMenu,
     onStart,
     onConnect,
@@ -94,7 +95,11 @@ const Menus = (props: MenusProps) => {
   return (
     <Portal containerRef={gridRef}>
       <AnimatePresence>
-        {(isGameOver || guessedAt || !startedAt || completedAt) && (
+        {(isGameOver ||
+          !isRunning ||
+          guessedAt ||
+          !startedAt ||
+          completedAt) && (
           <Box
             top="0"
             w="100%"

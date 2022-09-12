@@ -7,6 +7,7 @@ import shuffle from 'lodash.shuffle';
 import useGameBlockSelect from '@/hooks/useGameBlockSelect';
 import useGameConnect from '@/hooks/useGameConnect';
 import useGameContinue from '@/hooks/useGameContinue';
+import useGameFocus from '@/hooks/useGameFocus';
 import useGameForfeit from '@/hooks/useGameForfeit';
 import useGameMenu from '@/hooks/useGameMenu';
 import useGameReset from '@/hooks/useGameReset';
@@ -120,6 +121,7 @@ const GameContainer = (props: GameContainerProps) => {
 
     setBlocks(shuffle(props.game.puzzle.groups.flatMap((g) => g.blocks)));
   });
+  useGameFocus({ game, isGameOver, isRunning, pause, setGame, start, time });
   useGameWrong({ isWrong, setSelected, toggleIsWrong });
 
   /**
@@ -223,6 +225,7 @@ const GameContainer = (props: GameContainerProps) => {
           minutes={minutes}
           seconds={seconds}
           onReset={onReset}
+          isRunning={isRunning}
           onShuffle={onShuffle}
           onForfeit={onForfeit}
         />
@@ -233,6 +236,7 @@ const GameContainer = (props: GameContainerProps) => {
           correct={correct}
           isWrong={isWrong}
           selected={selected}
+          isRunning={isRunning}
           isGameOver={isGameOver}
           game={{ startedAt: game.startedAt }}
           onBlockSelect={onBlockSelect}
@@ -241,6 +245,7 @@ const GameContainer = (props: GameContainerProps) => {
         <Menus
           blocks={blocks}
           gridRef={gridRef}
+          isRunning={isRunning}
           isGameOver={isGameOver}
           // States
           game={{

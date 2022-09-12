@@ -10,6 +10,7 @@ export type GameContainerProps = {
 
 export type StatsProps = {
   game: Game;
+  isRunning: boolean;
   minutes: number;
   onForfeit: () => void;
   onReset: () => void;
@@ -29,6 +30,7 @@ export type GridProps = {
   correct: Game['correct'];
   game: Pick<Game, 'startedAt'>;
   isGameOver: boolean;
+  isRunning: boolean;
   isWrong: boolean;
   onBlockSelect: (
     block: Block,
@@ -72,6 +74,7 @@ export type MenusProps = {
     >;
   };
   isGameOver: boolean;
+  isRunning: boolean;
   onConnect: (connected: UseGameConnectConnection) => void;
   onContinue: () => void;
   onMenu: () => void;

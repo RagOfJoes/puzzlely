@@ -14,7 +14,8 @@ import { StatsProps } from '../types';
 import Shortcuts from './Shortcuts';
 
 const Stats = (props: StatsProps) => {
-  const { game, minutes, onForfeit, onReset, onShuffle, seconds } = props;
+  const { game, isRunning, minutes, onForfeit, onReset, onShuffle, seconds } =
+    props;
   const { attempts, completedAt, config, guessedAt, startedAt } = game;
 
   return (
@@ -23,7 +24,9 @@ const Stats = (props: StatsProps) => {
       gap="2"
       templateColumns="repeat(4, 1fr)"
       transition="0.4s linear opacity"
-      opacity={!guessedAt && startedAt ? '1' : '0.4'}
+      opacity={
+        (!guessedAt && !startedAt) || (!isRunning && startedAt) ? 0.4 : 1
+      }
     >
       <GridItem
         colSpan={{

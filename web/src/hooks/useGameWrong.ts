@@ -34,6 +34,7 @@ const useGameWrong = (params: UseGameWrongParams) => {
         window.clearTimeout(timeoutId);
       }
     };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWrong]);
 };

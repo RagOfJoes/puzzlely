@@ -1,4 +1,5 @@
 import { Box, Button, Heading, HStack, Icon, Text } from '@chakra-ui/react';
+import Link from 'next/link';
 
 import APIError from '@/api/error';
 import GameErrorIcon from '@/components/GameErrorIcon';
@@ -31,14 +32,19 @@ const GameErrorContainer = (props: GameErrorContainerProps) => {
           {error.message}
         </Text>
         <HStack mt="8" w="100%">
-          <Button
-            variant="outline"
-            colorScheme="gray"
-            w={{ base: '100%', md: 'auto' }}
-          >
-            Puzzles
-          </Button>
-          <Button w={{ base: '100%', md: 'auto' }}>Take me home</Button>
+          <Link passHref href="/puzzles">
+            <Button
+              variant="outline"
+              colorScheme="gray"
+              w={{ base: '100%', md: 'auto' }}
+            >
+              Puzzles
+            </Button>
+          </Link>
+
+          <Link passHref href="/">
+            <Button w={{ base: '100%', md: 'auto' }}>Take me home</Button>
+          </Link>
         </HStack>
       </Box>
 
