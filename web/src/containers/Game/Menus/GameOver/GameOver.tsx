@@ -20,8 +20,7 @@ const GameOver = (props: GameOverMenuProps) => {
     const formatMin = `${minutes > 9 ? '' : 0}${minutes}`;
     const formatSec = `${seconds > 9 ? '' : 0}${seconds}`;
     return `${formatMin}:${formatSec}`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [guessedAt, startedAt]);
 
   return (
     <GameMenuCard>
