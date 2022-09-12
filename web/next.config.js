@@ -4,7 +4,7 @@ const ContentSecurityPolicy = `
   default-src 'self' www.puzzlely.io api.puzzlely.io;
   child-src puzzlely.io;
   connect-src api.puzzlely.io www.puzzlely.io api.panelbear.com;
-  script-src 'self' 'unsafe-inline';
+  script-src 'self';
   style-src 'self' 'unsafe-inline';
   font-src 'self';  
 `;
