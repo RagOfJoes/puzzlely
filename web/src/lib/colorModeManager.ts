@@ -1,4 +1,4 @@
-import { ColorMode, StorageManager } from '@chakra-ui/system';
+import { ColorMode, ColorModeProviderProps } from '@chakra-ui/system';
 
 import { COLOR_MODE_COOKIE } from './constants';
 import { isBrowser } from './hookUtils';
@@ -13,7 +13,9 @@ const match = (cookie: string, init?: ColorMode): ColorMode | undefined => {
   return (cookie.match(regExp)?.[2] as ColorMode | undefined) ?? init;
 };
 
-const colorModeManager = (cookies?: string): StorageManager => {
+const colorModeManager = (
+  cookies?: string
+): ColorModeProviderProps['colorModeManager'] => {
   return {
     ssr: true,
     type: 'cookie',
