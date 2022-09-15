@@ -1,24 +1,16 @@
-import {
-  Box,
-  Divider,
-  Heading,
-  HStack,
-  Tag,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Divider, Heading, HStack, Tag, Text } from '@chakra-ui/react';
 
 import FormikTextareaControl from '@/components/FormikTextareaControl';
-import { Group as PuzzleGroup } from '@/types/puzzle';
 
-const Group = (props: { group: PuzzleGroup; index: number }) => {
+import { PuzzleUpdateFormGroupProps } from '../types';
+
+const Group = (props: PuzzleUpdateFormGroupProps) => {
   const { group, index } = props;
 
   return (
-    <VStack w="100%" align="start">
+    <Box w="100%">
       <Heading size="sm">Group {index + 1}</Heading>
-
-      <Divider />
+      <Divider mt="2" mb="4" />
 
       <Box w="100%" overflow="hidden">
         <Text mb="2" fontSize="md" fontWeight="medium">
@@ -42,7 +34,8 @@ const Group = (props: { group: PuzzleGroup; index: number }) => {
           ))}
         </HStack>
       </Box>
-      <Box w="100%" overflow="hidden">
+
+      <Box mt="4" w="100%" overflow="hidden">
         <Text mb="2" fontSize="md" fontWeight="medium">
           Answers
         </Text>
@@ -62,7 +55,9 @@ const Group = (props: { group: PuzzleGroup; index: number }) => {
           ))}
         </HStack>
       </Box>
+
       <FormikTextareaControl
+        mt="4"
         isRequired
         label="Description"
         name={`groups[${index}].description`}
@@ -73,7 +68,7 @@ const Group = (props: { group: PuzzleGroup; index: number }) => {
           placeholder: 'Add a description...',
         }}
       />
-    </VStack>
+    </Box>
   );
 };
 

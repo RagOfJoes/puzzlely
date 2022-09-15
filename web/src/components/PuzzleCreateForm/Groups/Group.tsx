@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
-
 import {
+  Box,
   Divider,
   FormControl,
   FormErrorMessage,
@@ -8,231 +7,145 @@ import {
   FormLabel,
   Heading,
   Text,
-  VStack,
 } from '@chakra-ui/react';
-import { Field, FieldProps, useFormikContext } from 'formik';
 
 import FormikTextareaControl from '@/components/FormikTextareaControl';
-import TagInput, {
-  TagInputCreatable,
-  TagInputField,
-  TagInputList,
-  TagInputTag,
-} from '@/components/TagInput';
-import { PuzzleCreatePayload } from '@/types/puzzle';
+import TagInput, { TagInputField, TagInputTag } from '@/components/TagInput';
 
-const Group = (props: { index: number }) => {
-  const { index } = props;
+import { PuzzleCreateFormGroupProps } from '../types';
 
+const Group = (props: PuzzleCreateFormGroupProps) => {
   const {
     errors,
-    isSubmitting,
-    isValidating,
+    group,
+    index,
+    isDisabled,
     setFieldTouched,
     setFieldValue,
     touched,
-  } = useFormikContext<PuzzleCreatePayload>();
+  } = props;
 
-  const isDisabled = isSubmitting || isValidating;
-  const groupError = useMemo(() => {
-    const err = errors.groups?.[index] as
-      | null
-      | { answers: string; blocks: string; description: string }
-      | undefined;
-
-    return {
-      answers: err?.answers,
-      blocks: err?.blocks,
-      description: err?.description,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors.groups?.[index]]);
-  const groupTouched = useMemo(() => {
-    return touched.groups?.[index];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [touched.groups?.[index]]);
+  const blocksName = `groups.[${index}].blocks`;
+  const answersName = `groups.[${index}].answers`;
 
   return (
-    <VStack w="100%" align="start">
+    <Box w="100%">
       <Heading size="sm">Group {index + 1}</Heading>
+      <Divider mt="2" mb="4" />
 
-      <Divider />
+      <FormControl
+        isRequired
+        isDisabled={isDisabled}
+        isInvalid={!!errors?.blocks && !!touched?.blocks}
+      >
+        <FormLabel>Blocks</FormLabel>
+        <TagInput
+          value={group.blocks.map((v) => v.value)}
+          onBlur={() => setFieldTouched('')}
+          onChange={(newValue) => {
+            if (newValue.length > 4) {
+              return;
+            }
 
-      <Field name={`groups[${index}].blocks`}>
-        {({
-          field,
-        }: FieldProps<
-          { value: string }[],
-          { blocks?: { value?: string }[] }
-        >) => (
-          <FormControl
-            isRequired
-            isDisabled={isDisabled}
-            isInvalid={!!groupError.blocks && !!groupTouched?.blocks}
+            setFieldValue(
+              blocksName,
+              newValue.map((v) => ({ value: v }))
+            );
+          }}
+        >
+          <TagInputField
+            required={false}
+            disabled={isDisabled}
+            placeholder="Type a block, then, hit ENTER ..."
+            aria-invalid={!!(errors?.blocks && !!touched?.blocks)}
+            onBlur={() => {
+              setFieldTouched(blocksName, true);
+            }}
           >
-            <FormLabel>Blocks</FormLabel>
-            <TagInput
-              {...field}
-              isDisabled={isDisabled}
-              value={field.value.map((v) => v.value)}
-              onChange={(newValue) => {
-                if (newValue.length > 4) {
-                  return;
-                }
-                setFieldValue(
-                  field.name,
-                  newValue.map((v) => ({ value: v }))
-                );
-              }}
-            >
-              <TagInputField
-                required={false}
-                disabled={isDisabled}
-                placeholder="Add a block..."
-                aria-invalid={!!(groupError.blocks && !!groupTouched?.blocks)}
-                onBlur={() => {
-                  setFieldTouched(field.name, true);
-                }}
-              >
-                {({ tags }) =>
-                  tags.map((tag, idx) => (
-                    <TagInputTag
-                      key={idx}
-                      label={tag.label}
-                      onRemove={() => {
-                        if (isDisabled) {
-                          return;
-                        }
-
-                        tag.onRemove();
-                      }}
-                    />
-                  ))
-                }
-              </TagInputField>
-              <TagInputList>
-                <TagInputCreatable>
-                  {({ value }) => {
-                    if (value.length === 0) {
-                      return (
-                        <Text fontStyle="italic" color="text.secondary">
-                          Start typing, then, hit &quot;Enter&quot; to add a
-                          block....
-                        </Text>
-                      );
-                    }
-                    return (
-                      <Text>
-                        Add{' '}
-                        <Text as="strong" fontWeight="bold">
-                          &quot;{value}&quot;
-                        </Text>
-                      </Text>
-                    );
-                  }}
-                </TagInputCreatable>
-              </TagInputList>
-            </TagInput>
-            {groupError.blocks && !!groupTouched?.blocks ? (
-              <FormErrorMessage>{groupError.blocks}</FormErrorMessage>
-            ) : (
-              <FormHelperText>
-                Terms that will link this group together.
-              </FormHelperText>
-            )}
-          </FormControl>
+            {({ tagProps }) =>
+              tagProps.map((tagProp, idx) => (
+                <TagInputTag
+                  key={idx}
+                  label={tagProp.label}
+                  disabled={isDisabled}
+                  onRemove={() => tagProp.onRemove()}
+                />
+              ))
+            }
+          </TagInputField>
+        </TagInput>
+        {errors?.blocks && !!touched?.blocks ? (
+          <FormErrorMessage>{errors.blocks}</FormErrorMessage>
+        ) : (
+          <FormHelperText>
+            Terms that will link this group together.
+          </FormHelperText>
         )}
-      </Field>
-      <Field name={`groups[${index}].answers`}>
-        {({ field }: FieldProps<string[], { answers?: string[] }>) => (
-          <FormControl
-            isRequired
-            isDisabled={isDisabled}
-            isInvalid={!!groupError.answers && groupTouched?.answers}
+      </FormControl>
+
+      <FormControl
+        mt="4"
+        isRequired
+        isDisabled={isDisabled}
+        isInvalid={!!errors?.answers && touched?.answers}
+      >
+        <FormLabel>Answers</FormLabel>
+        <TagInput
+          value={group.answers}
+          onBlur={() => setFieldTouched(answersName, true)}
+          onChange={(newValue) => {
+            if (newValue.length > 8) {
+              return;
+            }
+
+            setFieldValue(answersName, newValue);
+          }}
+        >
+          <TagInputField
+            required={false}
+            disabled={isDisabled}
+            placeholder="Type an answer, then, hit ENTER..."
+            aria-invalid={!!(errors?.answers && !!touched?.answers)}
+            onBlur={() => {
+              setFieldTouched(answersName, true);
+            }}
           >
-            <FormLabel>Answers</FormLabel>
-            <TagInput
-              {...field}
-              isDisabled={isDisabled}
-              onChange={(newValue) => {
-                if (newValue.length > 8) {
-                  return;
-                }
-                setFieldValue(field.name, newValue);
-              }}
-            >
-              <TagInputField
-                required={false}
-                disabled={isDisabled}
-                placeholder="Add an answer..."
-                aria-invalid={!!(groupError.answers && !!groupTouched?.answers)}
-                onBlur={() => {
-                  setFieldTouched(field.name, true);
-                }}
-              >
-                {({ tags }) =>
-                  tags.map((tag, idx) => (
-                    <TagInputTag
-                      key={idx}
-                      label={tag.label}
-                      onRemove={() => {
-                        if (isDisabled) {
-                          return;
-                        }
-
-                        tag.onRemove();
-                      }}
-                    />
-                  ))
-                }
-              </TagInputField>
-              <TagInputList>
-                <TagInputCreatable>
-                  {({ value }) => {
-                    if (value.length === 0) {
-                      return (
-                        <Text fontStyle="italic" color="text.secondary">
-                          Start typing, then, hit &quot;Enter&quot; to add an
-                          answer....
-                        </Text>
-                      );
-                    }
-                    return (
-                      <Text>
-                        Add{' '}
-                        <Text as="strong" fontWeight="bold">
-                          &quot;{value}&quot;
-                        </Text>
-                      </Text>
-                    );
-                  }}
-                </TagInputCreatable>
-              </TagInputList>
-            </TagInput>
-            {groupError.answers && groupTouched?.answers ? (
-              <FormErrorMessage>{groupError.answers}</FormErrorMessage>
-            ) : (
-              <FormHelperText>
-                Keep words in their shortest form to ensure that you cover as
-                many answers as possible. Example{' '}
-                <Text as="i" fontWeight="bold">
-                  brit
-                </Text>{' '}
-                will match{' '}
-                <Text as="i" fontWeight="bold">
-                  british
-                </Text>{' '}
-                and{' '}
-                <Text as="i" fontWeight="bold">
-                  britain
-                </Text>
-                .
-              </FormHelperText>
-            )}
-          </FormControl>
+            {({ tagProps }) =>
+              tagProps.map((tagProp, idx) => (
+                <TagInputTag
+                  key={idx}
+                  label={tagProp.label}
+                  disabled={isDisabled}
+                  onRemove={() => tagProp.onRemove()}
+                />
+              ))
+            }
+          </TagInputField>
+        </TagInput>
+        {errors?.answers && touched?.answers ? (
+          <FormErrorMessage>{errors.answers}</FormErrorMessage>
+        ) : (
+          <FormHelperText>
+            Keep words in their shortest form to ensure that you cover as many
+            answers as possible. Example{' '}
+            <Text as="i" fontWeight="bold">
+              brit
+            </Text>{' '}
+            will match{' '}
+            <Text as="i" fontWeight="bold">
+              british
+            </Text>{' '}
+            and{' '}
+            <Text as="i" fontWeight="bold">
+              britain
+            </Text>
+            .
+          </FormHelperText>
         )}
-      </Field>
+      </FormControl>
+
       <FormikTextareaControl
+        mt="4"
         isRequired
         label="Description"
         name={`groups[${index}].description`}
@@ -243,7 +156,7 @@ const Group = (props: { index: number }) => {
           placeholder: 'Add a description...',
         }}
       />
-    </VStack>
+    </Box>
   );
 };
 

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 
-import { Box, Divider, Heading, HStack, Text } from '@chakra-ui/react';
+import { Box, HStack, Text } from '@chakra-ui/react';
 
+import PuzzleFormCard from '@/components/PuzzleFormCard';
 import {
   UNLIMITED_MAX_ATTEMPTS,
   UNLIMITED_TIME_ALLOWED,
@@ -22,16 +23,11 @@ const Settings = (props: Pick<PuzzleUpdateFormProps, 'puzzle'>) => {
   );
 
   return (
-    <Box p="4" mt="6" bg="surface" borderRadius="lg">
-      <Heading as="h4" size="md">
-        Settings
-      </Heading>
-      <Text fontSize="md" color="text.secondary">
-        Fields that restricts what player&apos;s can configure about their game.
-      </Text>
-
-      <Divider my="2" />
-
+    <PuzzleFormCard
+      mt="6"
+      title="Settings"
+      caption="Fields that restricts what player's can configure about their game."
+    >
       <HStack mt="4" w="100%" spacing="4" justify="space-between">
         <Box w="100%">
           <Text fontSize="md" fontWeight="medium">
@@ -54,7 +50,7 @@ const Settings = (props: Pick<PuzzleUpdateFormProps, 'puzzle'>) => {
           </Text>
         </Box>
       </HStack>
-    </Box>
+    </PuzzleFormCard>
   );
 };
 

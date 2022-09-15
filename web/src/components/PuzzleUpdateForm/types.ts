@@ -1,6 +1,11 @@
 import { FormikHelpers } from 'formik';
 
-import { Puzzle, PuzzleUpdatePayload } from '@/types/puzzle';
+import { Group, Puzzle, PuzzleUpdatePayload } from '@/types/puzzle';
+
+export type PuzzleUpdateFormGroupProps = {
+  group: Group;
+  index: number;
+};
 
 export type PuzzleUpdateFormProps = {
   isDeleting?: boolean;

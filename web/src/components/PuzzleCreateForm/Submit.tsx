@@ -1,6 +1,7 @@
-import { Box, Button, Text } from '@chakra-ui/react';
+import { Button, Text } from '@chakra-ui/react';
 import { useFormikContext } from 'formik';
 
+import PuzzleFormCard from '@/components/PuzzleFormCard';
 import { PuzzleCreatePayload } from '@/types/puzzle';
 
 const Submit = () => {
@@ -8,7 +9,7 @@ const Submit = () => {
     useFormikContext<PuzzleCreatePayload>();
 
   return (
-    <Box p="4" mt="6" w="100%" bg="surface" borderRadius="lg">
+    <PuzzleFormCard mt="6" hideDivider>
       <Text fontSize="sm" color="text.secondary">
         Make sure all the inputs contain their intended values. Once the Puzzle
         has been created the only fields that&apos;ll be editable are the
@@ -25,7 +26,7 @@ const Submit = () => {
       >
         Create Puzzle
       </Button>
-    </Box>
+    </PuzzleFormCard>
   );
 };
 
