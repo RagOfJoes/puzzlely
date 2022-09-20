@@ -3,9 +3,9 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useControllableState } from '@chakra-ui/react';
 import { runIfFn } from '@chakra-ui/utils';
 
-import { TagProp, TagInputProps, UseTagInputReturn } from './types';
+import { TagInputTagProps, TagInputProps, UseTagInput } from './types';
 
-const useTagInput = (props: TagInputProps): UseTagInputReturn => {
+const useTagInput = (props: TagInputProps): UseTagInput => {
   const {
     children,
     defaultQuery,
@@ -26,7 +26,7 @@ const useTagInput = (props: TagInputProps): UseTagInputReturn => {
     },
   });
 
-  const removeItem: UseTagInputReturn['removeItem'] = useCallback(
+  const removeItem: UseTagInput['removeItem'] = useCallback(
     (valueToRemove) => {
       if (!valueToRemove) {
         return;
@@ -50,7 +50,7 @@ const useTagInput = (props: TagInputProps): UseTagInputReturn => {
     [props.onTagRemove, query, value]
   );
 
-  const tagProps: TagProp[] = useMemo(() => {
+  const tagProps: TagInputTagProps[] = useMemo(() => {
     return value.map((v) => ({
       label: v,
       onRemove: () => removeItem(v),
