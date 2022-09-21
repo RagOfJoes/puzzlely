@@ -7,7 +7,6 @@ import Menu from './Menu';
 import Modal from './Modal';
 import Popover from './Popover';
 import Select from './Select';
-import Sidebar from './Sidebar';
 import Skeleton from './Skeleton';
 import Switch from './Switch';
 import Tabs from './Tabs';
@@ -25,7 +24,6 @@ const components = {
     NumberInput: Input,
     Popover,
     Select,
-    Sidebar,
     Skeleton,
     Switch,
     Tabs,

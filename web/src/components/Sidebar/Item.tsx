@@ -1,6 +1,4 @@
-import { UrlObject } from 'url';
-
-import React, { ReactNode } from 'react';
+import React from 'react';
 
 import {
   Button,
@@ -11,85 +9,49 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 
-export type SidebarItemProps = {
-  name: string;
-  icon?: ReactNode;
-  active?: boolean;
-  section?: boolean;
-  passHref?: boolean;
-  href?: string | UrlObject;
-};
+import styles from './styles';
+import { SidebarItemProps } from './types';
 
-const Item = (props: SidebarItemProps) => {
-  const { active, href, icon, passHref, section, name } = props;
+const SidebarItem = (props: SidebarItemProps) => {
+  const { href, icon, isActive, isSection, name, passHref } = props;
 
   const boxShadow = '0px 7px 11px rgba(0, 0, 0, 0.04)';
   const buttonHoverBg = useColorModeValue('gray.200', 'whiteAlpha.50');
   const iconBoxShadow = useColorModeValue('sm', '');
 
-  if (section) {
-    return (
-      <Heading
-        w="100%"
-        pt="12px"
-        size="xs"
-        color="text.primary"
-        textTransform="uppercase"
-        ps={{ sm: '10px', xl: '16px' }}
-      >
-        {name}
-      </Heading>
-    );
+  if (isSection) {
+    return <Heading {...(styles.itemSection as any)}>{name}</Heading>;
   }
+
   return (
     <Link href={href ?? ''} passHref={passHref}>
       <Button
+        {...(styles.itemButton as any)}
         as="a"
-        w="100%"
-        h="54px"
-        py="12px"
-        cursor="pointer"
-        borderRadius="15px"
-        alignItems="center"
-        justifyContent="flex-start"
-        transition="0.12s linear all"
-        boxShadow={active ? boxShadow : 'none'}
-        bgColor={active ? 'surface' : 'transparent'}
-        mb={{ xl: '12px' }}
-        mx={{ xl: 'auto' }}
+        boxShadow={isActive ? boxShadow : 'none'}
+        bgColor={isActive ? 'surface' : 'transparent'}
         _hover={{
-          bg: !active && buttonHoverBg,
+          bg: !isActive && buttonHoverBg,
         }}
         _focus={{
-          bg: !active && buttonHoverBg,
-          boxShadow: active ? boxShadow : 'none',
-        }}
-        _active={{
-          bg: 'inherit',
-          transform: 'none',
-          borderColor: 'transparent',
+          bg: !isActive && buttonHoverBg,
+          boxShadow: isActive ? boxShadow : 'none',
         }}
       >
         {icon && (
           <Flex
-            w="30px"
-            h="30px"
-            me="12px"
-            borderRadius="8px"
-            alignItems="center"
-            justifyContent="center"
-            bg={active ? 'primary' : 'surface'}
-            color={active ? 'surface' : 'primary'}
-            boxShadow={active ? '' : iconBoxShadow}
+            {...(styles.itemIcon as any)}
+            bg={isActive ? 'primary' : 'surface'}
+            color={isActive ? 'surface' : 'primary'}
+            boxShadow={isActive ? '' : iconBoxShadow}
           >
             {icon}
           </Flex>
         )}
+
         <Text
-          my="auto"
-          fontSize="sm"
-          fontWeight="semibold"
-          color={active ? 'text.primary' : 'text.secondary'}
+          {...(styles.itemText as any)}
+          color={isActive ? 'text.primary' : 'text.secondary'}
         >
           {name}
         </Text>
@@ -98,4 +60,4 @@ const Item = (props: SidebarItemProps) => {
   );
 };
 
-export default Item;
+export default SidebarItem;

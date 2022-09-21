@@ -1,43 +1,46 @@
-import { ReactNode, useMemo } from 'react';
+import { useMemo } from 'react';
 
-import { Icon } from '@chakra-ui/react';
 import { NextRouter } from 'next/router';
+import { IconType } from 'react-icons';
 import { IoHome, IoExtensionPuzzle, IoBookmark } from 'react-icons/io5';
 
 import { User } from '@/types/user';
 
+export type UseSidebarLinks = {
+  icon?: IconType;
+  isActive?: boolean;
+  isSection?: boolean;
+  path: string;
+  title: string;
+};
+
 // Links that will be visible to everybody
-const links = [
-  { path: '', section: true, title: 'Menu' },
-  { path: '/', title: 'Home', icon: <Icon as={IoHome} /> },
+const links: UseSidebarLinks[] = [
+  { path: '', isSection: true, title: 'Menu' },
+  { path: '/', title: 'Home', icon: IoHome },
   {
     path: '/puzzles',
     title: 'Puzzles',
-    icon: <Icon as={IoExtensionPuzzle} />,
+    icon: IoExtensionPuzzle,
   },
 ];
 
 // Links that will only be visible to authenticated users
-const authLinks = [
+const authLinks: UseSidebarLinks[] = [
   {
     path: '/puzzles/liked',
     title: 'Liked',
-    icon: <Icon as={IoBookmark} />,
+    icon: IoBookmark,
   },
 ];
 
-const getSidebarLinks = (
+const useSidebarLinks = (
   route: NextRouter,
   user?: User,
   overrideLink?: string
-): {
-  path: string;
-  title: string;
-  active?: boolean;
-  section?: boolean;
-  icon?: ReactNode;
-}[] => {
+): UseSidebarLinks[] => {
   const { pathname } = route;
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMemo(() => {
     const split =
@@ -63,9 +66,9 @@ const getSidebarLinks = (
         }
       }
 
-      return { ...link, active: true };
+      return { ...link, isActive: true };
     });
   }, [overrideLink, pathname, user]);
 };
 
-export default getSidebarLinks;
+export default useSidebarLinks;
