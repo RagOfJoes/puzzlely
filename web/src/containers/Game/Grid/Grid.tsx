@@ -1,14 +1,31 @@
 import { memo, useCallback } from 'react';
 
-import { Box, forwardRef, Grid as ChakraGrid } from '@chakra-ui/react';
+import { Box, forwardRef } from '@chakra-ui/react';
+
+import GameGrid, { GameGridBlock } from '@/components/GameGrid';
 
 import { GridProps } from '../types';
-import Block from './Block';
 
 const Grid = forwardRef<GridProps, 'div'>((props, ref) => {
-  const { blocks, correct, game, isRunning, isWrong, onBlockSelect, selected } =
-    props;
-  const { startedAt } = game;
+  const {
+    blocks,
+    correct,
+    game,
+    isGameOver,
+    isRunning,
+    isWrong,
+    onBlockSelect,
+    selected,
+  } = props;
+  const { completedAt, guessedAt, startedAt } = game;
+
+  const isDisabled = !!(
+    isGameOver ||
+    !isRunning ||
+    guessedAt ||
+    !startedAt ||
+    completedAt
+  );
 
   const isSelected = useCallback(
     (id: string) => {
@@ -24,50 +41,29 @@ const Grid = forwardRef<GridProps, 'div'>((props, ref) => {
   );
 
   return (
-    <ChakraGrid
-      gap="2"
-      w="100%"
-      borderRadius="lg"
-      position="relative"
-      templateRows="repeat(4, 1fr)"
-      templateColumns="repeat(4, minmax(0, 1fr))"
-      css={{
-        '&:before': {
-          width: 0,
-          content: '""',
-          gridRow: '1 / 1',
-          gridColumn: '1 / 1',
-          paddingBottom: '100%',
-        },
-        '& > *:first-of-type': {
-          gridRow: '1 / 1',
-          gridColumn: '1 / 1',
-        },
-      }}
-    >
+    <GameGrid>
       {blocks.map((block) => {
         const isItemSelected = isSelected(block.id);
         const isItemCorrect = isCorrect(block.groupID);
 
         return (
-          <Block
+          <GameGridBlock
             key={block.id}
-            correct={isItemCorrect}
-            selected={isItemSelected}
+            isDisabled={isDisabled}
+            isCorrect={isItemCorrect}
             layoutDependency={blocks}
-            error={isWrong && isItemSelected}
+            isSelected={isItemSelected}
+            isError={isWrong && isItemSelected}
             title={!startedAt ? '' : block.value}
             onClick={(_) => onBlockSelect(block, isItemCorrect, isItemSelected)}
           >
-            {!startedAt || !isRunning
-              ? '_'.repeat(block.value.length)
-              : block.value}
-          </Block>
+            {block.value}
+          </GameGridBlock>
         );
       })}
 
       <Box ref={ref} />
-    </ChakraGrid>
+    </GameGrid>
   );
 });
 
@@ -94,5 +90,6 @@ export default memo(Grid, (prev, next) => {
       return false;
     }
   }
+
   return true;
 });

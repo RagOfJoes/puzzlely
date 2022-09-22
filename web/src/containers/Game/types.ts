@@ -28,7 +28,7 @@ export type ShortcutsProps = Pick<
 export type GridProps = {
   blocks: Block[];
   correct: Game['correct'];
-  game: Pick<Game, 'startedAt'>;
+  game: Pick<Game, 'completedAt' | 'guessedAt' | 'startedAt'>;
   isGameOver: boolean;
   isRunning: boolean;
   isWrong: boolean;
@@ -74,7 +74,6 @@ export type MenusProps = {
     >;
   };
   isGameOver: boolean;
-  isRunning: boolean;
   onConnect: (connected: UseGameConnectConnection) => void;
   onContinue: () => void;
   onMenu: () => void;

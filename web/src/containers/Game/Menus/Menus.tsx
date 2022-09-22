@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import { Box, Portal, useDisclosure } from '@chakra-ui/react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Portal, useDisclosure } from '@chakra-ui/react';
+import { AnimatePresence } from 'framer-motion';
 
 import { MenusProps } from '../types';
 import Config from './Config';
@@ -16,7 +16,6 @@ const Menus = (props: MenusProps) => {
     game,
     gridRef,
     isGameOver,
-    isRunning,
     onMenu,
     onStart,
     onConnect,
@@ -94,40 +93,7 @@ const Menus = (props: MenusProps) => {
 
   return (
     <Portal containerRef={gridRef}>
-      <AnimatePresence>
-        {(isGameOver ||
-          !isRunning ||
-          guessedAt ||
-          !startedAt ||
-          completedAt) && (
-          <Box
-            top="0"
-            w="100%"
-            h="100%"
-            bg="background"
-            as={motion.div}
-            position="absolute"
-            // For AnimatePresence
-            key="Game.MenuOverlay"
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 0.6,
-              transition: {
-                duration: 0.4,
-              },
-            }}
-            exit={{
-              opacity: 0,
-              transition: {
-                duration: 0.4,
-              },
-            }}
-          />
-        )}
-        {Menu}
-      </AnimatePresence>
+      <AnimatePresence>{Menu}</AnimatePresence>
     </Portal>
   );
 };
