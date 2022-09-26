@@ -238,14 +238,17 @@ const GameContainer = (props: GameContainerProps) => {
           selected={selected}
           isRunning={isRunning}
           isGameOver={isGameOver}
-          game={{ startedAt: game.startedAt }}
+          game={{
+            completedAt: game.completedAt,
+            guessedAt: game.guessedAt,
+            startedAt: game.startedAt,
+          }}
           onBlockSelect={onBlockSelect}
         />
         {/* Game menu cards */}
         <Menus
           blocks={blocks}
           gridRef={gridRef}
-          isRunning={isRunning}
           isGameOver={isGameOver}
           // States
           game={{

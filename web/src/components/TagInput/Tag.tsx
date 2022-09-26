@@ -12,9 +12,9 @@ import { runIfFn } from '@chakra-ui/utils';
 import { TagInputTagProps } from './types';
 
 const disabledStyles: TagProps = {
+  opacity: 0.4,
   cursor: 'text',
   userSelect: 'none',
-  opacity: 0.4,
   _focusVisible: { boxShadow: 'none' },
 };
 
@@ -32,7 +32,14 @@ const TagInputTag = (props: TagInputTagProps) => {
         <TagLabel>{label}</TagLabel>
         <TagCloseButton
           cursor="pointer"
-          onClick={() => !disabled && runIfFn(onRemove)}
+          isDisabled={disabled}
+          onClick={() => {
+            if (disabled) {
+              return;
+            }
+
+            runIfFn(onRemove);
+          }}
           {...(disabled && disabledStyles)}
         />
       </Tag>

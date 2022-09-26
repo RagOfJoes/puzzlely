@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { Grid, VStack } from '@chakra-ui/react';
+import { QueryKey } from '@tanstack/react-query';
 
 import Waypoint from '@/components/Waypoint';
 import usePuzzles from '@/hooks/usePuzzles';
@@ -15,10 +16,8 @@ const PuzzlesContainer = () => {
   const [filters, setFilters] = useState<{
     [key in PuzzleFilters]?: string;
   }>({});
-
-  const queryKey = useMemo(
-    () => generateQueryKey.PuzzlesList(filters),
-    [filters]
+  const [queryKey, setQueryKey] = useState<QueryKey>(
+    generateQueryKey.PuzzlesList(filters)
   );
 
   const {
@@ -44,12 +43,10 @@ const PuzzlesContainer = () => {
     const pageInfo: PuzzleConnection['pageInfo'] = data.pages[
       data.pages.length - 1
     ]?.pageInfo || { cursor: '', hasNextPage: false };
-    const edges: PuzzleEdge[] = [];
-    data.pages.forEach((page) => {
-      if (page.edges.length > 0) {
-        edges.push(...page.edges);
-      }
-    });
+    const edges: PuzzleEdge[] = data.pages
+      .filter((page) => page.edges.length > 0)
+      .flatMap((page) => page.edges);
+
     return {
       edges,
       pageInfo,
@@ -58,7 +55,12 @@ const PuzzlesContainer = () => {
 
   return (
     <VStack w="100%" align="start" spacing="6">
-      <Filter filters={filters} setFilters={setFilters} />
+      <Filter
+        filters={filters}
+        queryKey={queryKey}
+        setFilters={setFilters}
+        setQueryKey={setQueryKey}
+      />
 
       <Grid
         gap="4"

@@ -1,4 +1,6 @@
-import { Box, Divider, Heading, Text, VStack } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
+
+import PuzzleFormCard from '@/components/PuzzleFormCard';
 
 import { PuzzleUpdateFormProps } from '../types';
 import Group from './Group';
@@ -7,16 +9,11 @@ const Groups = (props: Pick<PuzzleUpdateFormProps, 'puzzle'>) => {
   const { puzzle } = props;
 
   return (
-    <Box p="4" mt="6" bg="surface" borderRadius="lg">
-      <Heading as="h4" size="md">
-        Groups
-      </Heading>
-      <Text fontSize="md" color="text.secondary">
-        The building blocks of your puzzle.
-      </Text>
-
-      <Divider my="2" />
-
+    <PuzzleFormCard
+      mt="6"
+      title="Groups"
+      caption="The building blocks of your puzzle."
+    >
       <VStack mt="4" w="100%" align="start" spacing="6">
         {puzzle.groups.map((group, index) => {
           return (
@@ -28,7 +25,7 @@ const Groups = (props: Pick<PuzzleUpdateFormProps, 'puzzle'>) => {
           );
         })}
       </VStack>
-    </Box>
+    </PuzzleFormCard>
   );
 };
 

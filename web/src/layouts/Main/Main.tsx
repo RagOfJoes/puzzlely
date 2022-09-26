@@ -9,7 +9,6 @@ import {
   Icon,
   Text,
   useColorMode,
-  useMultiStyleConfig,
   useTheme,
   VStack,
 } from '@chakra-ui/react';
@@ -20,11 +19,11 @@ import { useRouter } from 'next/router';
 import { IoAdd, IoCreate, IoLogIn, IoLogOut, IoPerson } from 'react-icons/io5';
 
 import PuzzlelyIcon from '@/components/PuzzlelyIcon';
-import Sidebar from '@/components/Sidebar';
+import { Sidebar, SidebarItem, styles } from '@/components/Sidebar';
 import Topbar, { TopbarProps } from '@/components/Topbar';
 import useMe from '@/hooks/useMe';
+import useSidebarLinks from '@/hooks/useSidebarLinks';
 import { PROFILE_ROUTE } from '@/lib/constants';
-import getSidebarLinks from '@/lib/getSidebarLinks';
 
 export type MainLayoutProps = {
   breadcrumbLinks: TopbarProps['links'];
@@ -44,9 +43,7 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
 
     const [isOpen, toggleIsOpen] = useState(false);
 
-    const { container: { w } = { w: 0 } } = useMultiStyleConfig('Sidebar', {});
-
-    const links = getSidebarLinks(router, me, overrideLink);
+    const links = useSidebarLinks(router, me, overrideLink);
     const isProfile = useMemo(() => {
       return me && router.pathname.split('/')?.[1] === PROFILE_ROUTE;
     }, [me, router.pathname]);
@@ -95,7 +92,7 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
           ]}
         />
 
-        <Box overflow="hidden">
+        <Box px="0" maxW="1500px" marginX="auto" overflow="hidden">
           <SkipNavLink zIndex="1" bg="surface">
             Skip to content
           </SkipNavLink>
@@ -106,82 +103,83 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
             containerProps={{
               transition: '0.12s linear opacity',
               opacity: {
-                md: isOpen ? 1 : 0,
+                base: isOpen ? 1 : 0,
                 lg: 1,
               },
             }}
           >
-            {me && (
-              <Link passHref href="/puzzles/create">
-                <Button
-                  as="a"
-                  mt="2"
-                  mb="4"
-                  h="48px"
-                  py="12px"
-                  width="100%"
-                  flex="0 0 auto"
-                  cursor="pointer"
-                  borderRadius="full"
-                  alignItems="center"
-                  colorScheme="purple"
-                  aria-label="Create puzzle"
-                  justifyContent="flex-start"
-                  // purple.400
-                  boxShadow="0 0 12px 1px rgba(152, 131, 213, 0.6)"
-                  mx={{ xl: 'auto' }}
-                  ps={{ sm: '10px', xl: '16px' }}
+            <Link passHref href="/puzzles/create">
+              <Button
+                as="a"
+                mt="2"
+                mb="4"
+                h="48px"
+                py="12px"
+                width="100%"
+                flex="0 0 auto"
+                cursor="pointer"
+                borderRadius="full"
+                alignItems="center"
+                colorScheme="purple"
+                aria-label="Create puzzle"
+                justifyContent="flex-start"
+                // purple.400
+                boxShadow="0 0 12px 1px rgba(152, 131, 213, 0.6)"
+                mx={{ xl: 'auto' }}
+                ps={{ sm: '10px', xl: '16px' }}
+              >
+                <Flex
+                  w="30px"
+                  h="30px"
+                  me="12px"
+                  align="center"
+                  justify="center"
+                  borderRadius="8px"
+                  css={{
+                    path: {
+                      strokeWidth: 64,
+                    },
+                  }}
                 >
-                  <Flex
-                    w="30px"
-                    h="30px"
-                    me="12px"
-                    align="center"
-                    justify="center"
-                    borderRadius="8px"
-                    css={{
-                      path: {
-                        strokeWidth: 64,
-                      },
-                    }}
-                  >
-                    <Icon as={IoAdd} />
-                  </Flex>
-                  <Text my="auto" fontSize="sm" fontWeight="semibold">
-                    Create a Puzzle
-                  </Text>
-                </Button>
-              </Link>
-            )}
+                  <Icon as={IoAdd} />
+                </Flex>
+                <Text my="auto" fontSize="sm" fontWeight="semibold">
+                  Create a Puzzle
+                </Text>
+              </Button>
+            </Link>
 
             {links.map((link) => {
-              const { path, icon, title, active, section } = link;
-              if (section) {
-                return <Sidebar.Item section key={path} name={title} />;
+              const { path, icon, title, isActive, isSection } = link;
+
+              if (isSection) {
+                return <SidebarItem isSection key={path} name={title} />;
               }
+
               return (
-                <Sidebar.Item
+                <SidebarItem
                   passHref
                   key={path}
                   href={path}
-                  icon={icon}
                   name={title}
-                  active={active}
+                  isActive={isActive}
+                  icon={<Icon as={icon} />}
                 />
               );
             })}
+
             <VStack w="100%" h="100%" align="start" justify="end">
-              <Sidebar.Item section name="Account" />
+              <SidebarItem isSection name="Account" />
               {me ? (
                 <>
-                  <Sidebar.Item
+                  <SidebarItem
                     passHref
                     name="Profile"
                     href="/profile/"
-                    active={!!isProfile}
+                    isActive={!!isProfile}
                     icon={<Icon as={IoPerson} />}
                   />
-                  <Sidebar.Item
+                  <SidebarItem
                     name="Sign out"
                     href="/api/logout"
                     icon={<Icon as={IoLogOut} />}
@@ -189,13 +187,13 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
                 </>
               ) : (
                 <>
-                  <Sidebar.Item
+                  <SidebarItem
                     passHref
                     href="/signup/"
                     name="Sign up"
                     icon={<Icon as={IoCreate} />}
                   />
-                  <Sidebar.Item
+                  <SidebarItem
                     passHref
                     href="/login/"
                     name="Sign in"
@@ -215,8 +213,11 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
             overflow="hidden auto"
             justifyContent="center"
             transition="0.12s linear all"
-            ms={{ base: '0px', lg: w as string }}
-            left={{ base: isOpen ? (w as string) : '0px', lg: '0px' }}
+            ms={{ base: '0px', lg: styles.container.w as string }}
+            left={{
+              base: isOpen ? (styles.container.w as string) : '0px',
+              lg: '0px',
+            }}
           >
             <SkipNavContent />
             <Box
@@ -229,8 +230,8 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
               {...rest}
             >
               <Topbar
-                links={breadcrumbLinks}
                 open={isOpen}
+                links={breadcrumbLinks}
                 toggleOpen={toggleIsOpen}
                 onSearch={async (
                   values,
