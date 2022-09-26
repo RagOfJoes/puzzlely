@@ -6,8 +6,8 @@ const FilterLabel = forwardRef<FilterLabelProps, 'p'>((props, ref) => {
   return (
     <Text
       fontSize="md"
+      fontWeight="medium"
       whiteSpace="nowrap"
-      fontWeight="semibold"
       {...props}
       ref={ref}
     />
