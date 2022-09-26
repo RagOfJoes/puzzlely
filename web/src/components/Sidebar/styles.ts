@@ -18,7 +18,6 @@ const styles: Record<
     w: '260px',
     ps: '20px',
     pe: '20px',
-    left: '0px',
     flex: '1 1 0px',
     position: 'fixed',
     overflow: 'hidden auto',

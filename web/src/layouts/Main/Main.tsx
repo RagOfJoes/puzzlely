@@ -92,7 +92,7 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
           ]}
         />
 
-        <Box overflow="hidden">
+        <Box px="0" maxW="1500px" marginX="auto" overflow="hidden">
           <SkipNavLink zIndex="1" bg="surface">
             Skip to content
           </SkipNavLink>
@@ -103,7 +103,7 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
             containerProps={{
               transition: '0.12s linear opacity',
               opacity: {
-                md: isOpen ? 1 : 0,
+                base: isOpen ? 1 : 0,
                 lg: 1,
               },
             }}
