@@ -70,6 +70,20 @@ export const PUZZLE_OVERVIEW_FILTERS: Record<
     }[];
   }
 > = {
+  customizable_time: {
+    label: 'Custom Time',
+    options: [
+      { label: 'True', value: true },
+      { label: 'False', value: false },
+    ],
+  },
+  customizable_attempts: {
+    label: 'Custom Attempts',
+    options: [
+      { label: 'True', value: true },
+      { label: 'False', value: false },
+    ],
+  },
   difficulty: {
     label: 'Difficulty',
     options: PUZZLE_DIFFICULTIES.map((diff) => ({
@@ -77,22 +91,8 @@ export const PUZZLE_OVERVIEW_FILTERS: Record<
       value: diff,
     })),
   },
-  customizable_time: {
-    label: 'Customizable Time',
-    options: [
-      { label: 'True', value: true },
-      { label: 'False', value: false },
-    ],
-  },
-  customizable_attempts: {
-    label: 'Customizable Attempts',
-    options: [
-      { label: 'True', value: true },
-      { label: 'False', value: false },
-    ],
-  },
   num_of_likes: {
-    label: 'Number of Likes',
+    label: 'Num. of Likes',
     options: [1, 5, 10, 25, 50, 100].map((num) => ({
       label: `${num}+`,
       value: num,

@@ -66,7 +66,7 @@ export const generateQueryKey = {
     { id: puzzleID },
   ],
   PuzzlesLiked: (): QueryKey => [...queryKeys.PuzzlesLiked],
-  PuzzlesList: (filters?: {
+  PuzzlesList: (filters: {
     [key in PuzzleFilters]?: string;
   }): QueryKey => [...queryKeys.PuzzlesList, { filters }],
   PuzzlesMostLiked: (): QueryKey => [...queryKeys.PuzzlesMostLiked],
