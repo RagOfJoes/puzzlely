@@ -92,7 +92,13 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
           ]}
         />
 
-        <Box px="0" maxW="1500px" marginX="auto" overflow="hidden">
+        <Box
+          px="0"
+          maxW="1500px"
+          marginX="auto"
+          overflow="hidden"
+          position="relative"
+        >
           <SkipNavLink zIndex="1" bg="surface">
             Skip to content
           </SkipNavLink>
@@ -126,7 +132,7 @@ const MainLayout = forwardRef<BoxProps & MainLayoutProps, 'div'>(
                 // purple.400
                 boxShadow="0 0 12px 1px rgba(152, 131, 213, 0.6)"
                 mx={{ xl: 'auto' }}
-                ps={{ sm: '10px', xl: '16px' }}
+                ps={{ base: '10px', xl: '16px' }}
               >
                 <Flex
                   w="30px"
