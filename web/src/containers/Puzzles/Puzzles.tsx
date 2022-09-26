@@ -43,12 +43,10 @@ const PuzzlesContainer = () => {
     const pageInfo: PuzzleConnection['pageInfo'] = data.pages[
       data.pages.length - 1
     ]?.pageInfo || { cursor: '', hasNextPage: false };
-    const edges: PuzzleEdge[] = [];
-    data.pages.forEach((page) => {
-      if (page.edges.length > 0) {
-        edges.push(...page.edges);
-      }
-    });
+    const edges: PuzzleEdge[] = data.pages
+      .filter((page) => page.edges.length > 0)
+      .flatMap((page) => page.edges);
+
     return {
       edges,
       pageInfo,

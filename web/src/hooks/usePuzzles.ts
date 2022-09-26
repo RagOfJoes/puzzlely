@@ -15,6 +15,7 @@ const usePuzzles = (
     queryKey,
     async ({ pageParam = '' }) => {
       const { filters } = params;
+
       return api.findPuzzles(
         { limit: PUZZLES_LIMIT, cursor: pageParam },
         filters

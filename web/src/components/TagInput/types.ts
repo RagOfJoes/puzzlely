@@ -1,16 +1,7 @@
 import { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
 
 import { InputProps, TagProps } from '@chakra-ui/react';
-
-/**
- * Utility types
- */
-
-export type MaybeRenderProp<P> = ReactNode | ((props: P) => ReactNode);
-
-/**
- * Base types
- */
+import { MaybeRenderProp } from '@chakra-ui/react-utils';
 
 export type TagInputProps = {
   children: ReactNode;
@@ -20,11 +11,6 @@ export type TagInputProps = {
   onTagRemove?: (removedTag: string) => void;
   ref?: RefObject<TagInputRefMethods>;
   value?: string[];
-};
-
-export type TagInputTagProp = {
-  label: string;
-  onRemove: () => void;
 };
 
 export type TagInputRefMethods =
@@ -40,7 +26,7 @@ export interface TagInputFieldProps extends Omit<InputProps, 'children'> {
 export interface TagInputTagProps extends TagProps {
   disabled?: boolean;
   label: string;
-  onRemove?: () => void;
+  onRemove: () => void;
 }
 
 export type UseTagInput = {
@@ -51,6 +37,6 @@ export type UseTagInput = {
   removeItem: (valueToRemove?: string) => void;
   setQuery: Dispatch<SetStateAction<string>>;
   setValue: Dispatch<SetStateAction<string[]>>;
-  tagProps: TagInputTagProp[];
+  tagProps: TagInputTagProps[];
   value: string[];
 };
