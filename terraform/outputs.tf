@@ -9,11 +9,11 @@ output "web_servers_private" {
 }
 
 # The fully qualified domain name of the api load balancer
-output "api_loadbalancer_fqdn" {
-  value = digitalocean_record.api.fqdn
-}
-
+# output "api_loadbalancer_fqdn" {
+#   value = digitalocean_record.api.fqdn
+# }
+#
 # The fully qualified domain name of the web load balancer
-output "web_loadbalancer_fqdn" {
-  value = digitalocean_record.web.fqdn
-}
+# output "web_loadbalancer_fqdn" {
+#   value = digitalocean_record.web.fqdn
+# }

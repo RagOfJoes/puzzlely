@@ -1,16 +1,45 @@
 ################################################################################
 # Create a certificate for SSL for our Load Balancer                           #
 ################################################################################
-resource "digitalocean_certificate" "web" {
+resource "tls_private_key" "web" {
+  # Name of the algorithm to use when generating the private key
+  algorithm = "RSA"
+}
 
+resource "tls_cert_request" "web" {
+  # Private key in PEM (RFC 1421) format, that the certificate will belong to
+  private_key_pem = tls_private_key.web.private_key_pem
+
+  # The subject for which a certificate is being requested
+  subject {
+    common_name  = "${var.web_subdomain}.${data.digitalocean_domain.domain.name}"
+    organization = "Puzzlely"
+  }
+}
+
+resource "cloudflare_origin_ca_certificate" "web" {
+  # The Certificate Signing Request
+  csr = tls_cert_request.web.cert_request_pem
+
+  # An array of hostnames or wildcard names bound to the certificate
+  hostnames = ["${var.web_subdomain}.${data.digitalocean_domain.domain.name}"]
+
+  # The signature type desired on the certificate
+  request_type = "origin-rsa"
+}
+
+resource "digitalocean_certificate" "web" {
   # Human friendly name of the certificate
   name = "${var.name}-web-certificate"
 
-  # type of certificate. Use Let's Encrypt to create the ticket
-  type = "lets_encrypt"
+  # Type of certificate
+  type = "custom"
 
-  # The fqdn to get the certificate for
-  domains = ["${var.web_subdomain}.${data.digitalocean_domain.domain.name}"]
+  # The contents of a PEM-formatted private-key corresponding to the SSL certificate
+  private_key = tls_private_key.web.private_key_pem
+
+  # The contents of a PEM-formatted public TLS certificate
+  leaf_certificate = cloudflare_origin_ca_certificate.web.certificate
 
   # Ensure we create a new certificate successfully before deleting the old
   # one
@@ -64,8 +93,8 @@ resource "digitalocean_loadbalancer" "web" {
   }
 
   healthcheck {
-    port      = 80
-    protocol  = "tcp"
+    port     = 80
+    protocol = "tcp"
   }
 
   #-----------------------------------------------------------------------------------------------#
@@ -75,24 +104,4 @@ resource "digitalocean_loadbalancer" "web" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-################################################################################
-# Create a DNS A record for our loadbalancer. The name will be the subdomain.  #
-################################################################################
-resource "digitalocean_record" "web" {
-  # Get the domain from our data source
-  domain = data.digitalocean_domain.domain.name
-
-  # An A record is an IPv4 name record. Like www.digitalocean.com
-  type = "A"
-
-  # Set the name to the region we chose. Can be anything
-  name = var.web_subdomain
-
-  # Point the record at the IP address of our load balancer
-  value = digitalocean_loadbalancer.web.ip
-
-  # The Time-to-Live for this record is 30 seconds. Then the cache invalidates
-  ttl = 300
 }
