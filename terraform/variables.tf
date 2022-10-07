@@ -9,9 +9,18 @@
 # Our DigitalOcean API token.
 variable "do_token" {}
 
+# Our Cloudflare Email
+variable "cf_email" {}
+
+# Our Cloudflare API Key
+variable "cf_key" {}
+
+# Our Cloudflare Origin CA Key
+variable "cf_origin_key" {}
+
 # Name of SSH key as it appears in the DigitalOcean dashboard
 variable "ssh_key" {
-  type = string 
+  type = string
 }
 
 # Domain you have registered and DigitalOcean manages
