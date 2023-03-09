@@ -1,20 +1,13 @@
-import { UrlObject } from 'url';
+import type { ComponentProps } from "react";
 
-import { ReactNode } from 'react';
-
-import { BoxProps } from '@chakra-ui/react';
-
-export type SidebarProps = BoxProps & {
-  containerProps?: BoxProps;
-  icon?: JSX.Element;
-  name: string;
+export type SidebarProps = ComponentProps<"nav"> & {
+  isOpen?: boolean;
 };
 
-export type SidebarItemProps = {
-  href?: string | UrlObject;
-  icon?: ReactNode;
+export type SidebarHeadingProps = ComponentProps<"h3">;
+
+export type SidebarItemProps = ComponentProps<"a"> & {
   isActive?: boolean;
-  isSection?: boolean;
-  name: string;
-  passHref?: boolean;
 };
+
+export type SidebarIconProps = ComponentProps<"div">;

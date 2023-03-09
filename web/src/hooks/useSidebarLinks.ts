@@ -1,13 +1,13 @@
-import { useMemo } from 'react';
+import type { ReactNode } from "react";
+import { useMemo } from "react";
 
-import { NextRouter } from 'next/router';
-import { IconType } from 'react-icons';
-import { IoHome, IoExtensionPuzzle, IoBookmark } from 'react-icons/io5';
+import type { NextRouter } from "next/router";
+import { IoHome, IoExtensionPuzzle, IoBookmark } from "react-icons/io5";
 
-import { User } from '@/types/user';
+import type { User } from "@/types/user";
 
-export type UseSidebarLinks = {
-  icon?: IconType;
+export type UseSidebarLink = {
+  icon?: ReactNode;
   isActive?: boolean;
   isSection?: boolean;
   path: string;
@@ -15,50 +15,46 @@ export type UseSidebarLinks = {
 };
 
 // Links that will be visible to everybody
-const links: UseSidebarLinks[] = [
-  { path: '', isSection: true, title: 'Menu' },
-  { path: '/', title: 'Home', icon: IoHome },
+const DEFAULT_LINKS: UseSidebarLink[] = [
+  { path: "", isSection: true, title: "Menu" },
+  { path: "/", title: "Home", icon: IoHome({}) },
   {
-    path: '/puzzles',
-    title: 'Puzzles',
-    icon: IoExtensionPuzzle,
+    path: "/puzzles",
+    title: "Puzzles",
+    icon: IoExtensionPuzzle({}),
   },
 ];
 
 // Links that will only be visible to authenticated users
-const authLinks: UseSidebarLinks[] = [
+const PROTECTED_LINKS: UseSidebarLink[] = [
   {
-    path: '/puzzles/liked',
-    title: 'Liked',
-    icon: IoBookmark,
+    path: "/puzzles/liked",
+    title: "Liked",
+    icon: IoBookmark({}),
   },
 ];
 
-const useSidebarLinks = (
-  route: NextRouter,
-  user?: User,
-  overrideLink?: string
-): UseSidebarLinks[] => {
+/**
+ * Hook that generate sidebar links
+ */
+function useSidebarLinks(route: NextRouter, user?: User): UseSidebarLink[] {
   const { pathname } = route;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMemo(() => {
-    const split =
-      typeof overrideLink === 'string'
-        ? ['', overrideLink]
-        : pathname.split('/');
+    const split = pathname.split("/");
 
-    const mergedLinks = [...links];
+    const mergedLinks = [...DEFAULT_LINKS];
     if (user) {
-      mergedLinks.push(...authLinks);
+      mergedLinks.push(...PROTECTED_LINKS);
     }
 
     return mergedLinks.map((link) => {
-      const pathSplit = link.path.split('/');
+      const pathSplit = link.path.split("/");
 
       if (split.length !== pathSplit.length) {
         return link;
       }
+
       // eslint-disable-next-line no-cond-assign
       for (let i = split.length; (i -= 1); ) {
         if (split[i] !== pathSplit[i]) {
@@ -68,7 +64,7 @@ const useSidebarLinks = (
 
       return { ...link, isActive: true };
     });
-  }, [overrideLink, pathname, user]);
-};
+  }, [pathname, user]);
+}
 
 export default useSidebarLinks;

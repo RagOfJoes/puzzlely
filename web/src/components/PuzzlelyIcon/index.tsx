@@ -1,1 +1,1 @@
-export { default } from './PuzzlelyIcon';
+export * from "./PuzzlelyIcon";
