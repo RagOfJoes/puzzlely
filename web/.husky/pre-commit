@@ -1,5 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-# Disable concurrent to run build-types after ESLint in lint-staged
-cd ./web && npx lint-staged --concurrent false
