@@ -1,76 +1,96 @@
-import { useMemo } from 'react';
+import type { ComponentProps } from "react";
+import { forwardRef } from "react";
 
-import {
-  FormControl,
-  Icon,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { Field, FieldProps, Form, Formik } from 'formik';
-import { useRouter } from 'next/router';
-import { IoSearch } from 'react-icons/io5';
-import * as yup from 'yup';
+import { zodResolver } from "@hookform/resolvers/zod";
+import clsx from "clsx";
+import { useRouter } from "next/router";
+import { useForm } from "react-hook-form";
+import { IoSearch } from "react-icons/io5";
+import { z } from "zod";
 
-import { TopbarProps, TopbarSearchForm } from './types';
+import { FormControl, useFormControlProps } from "@/components/FormControl";
+import omit from "@/lib/omit";
+import pick from "@/lib/pick";
 
-const schema = yup.object().shape({
-  search: yup.string().max(64, 'Must not have more than 64 characters!'),
+const schema = z.object({
+  search: z
+    .string()
+    .min(1, "Must have more than 1 character.")
+    .max(64, "Must not have more than 64 characters"),
 });
 
-const Search = (props: Pick<TopbarProps, 'onSearch'>) => {
-  const { onSearch = () => {} } = props;
+// eslint-disable-next-line react/display-name
+const Input = forwardRef<
+  HTMLInputElement,
+  ComponentProps<"input"> & { invalid?: boolean }
+>((props, ref) => {
+  const { placeholder = "Search", ...other } = props;
 
-  const router = useRouter();
-
-  const initialValue: TopbarSearchForm = useMemo(() => {
-    const term = router.query.term;
-    if (typeof term === 'string') {
-      return { search: term };
-    }
-    return { search: '' };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const hover = useColorModeValue('blackAlpha.50', 'whiteAlpha.300');
+  const ctx = useFormControlProps(
+    pick(props, ["disabled", "id", "invalid", "readOnly", "required"])
+  );
 
   return (
-    <Formik
-      validationSchema={schema}
-      initialValues={initialValue}
-      onSubmit={onSearch}
-    >
-      <Form>
-        <Field name="search">
-          {({ field, form }: FieldProps<string, { search: string }>) => (
-            <FormControl
-              isInvalid={!!form.errors.search && form.touched.search}
-            >
-              <InputGroup variant="filled" placeholder="Search">
-                <InputLeftElement pointerEvents="none">
-                  <Icon as={IoSearch} />
-                </InputLeftElement>
-                <Input
-                  {...field}
-                  bg="surface"
-                  type="search"
-                  maxLength={64}
-                  autoComplete="off"
-                  placeholder="Search"
-                  aria-label="Search for a puzzle"
-                  id={`Topbar__${field.name}`}
-                  _hover={{
-                    bg: hover,
-                  }}
-                />
-              </InputGroup>
-            </FormControl>
-          )}
-        </Field>
-      </Form>
-    </Formik>
-  );
-};
+    <div className="relative flex w-full text-sm font-medium">
+      <div className="pointer-events-none absolute left-0 top-0 z-[2] flex h-10 w-10 items-center justify-center text-subtle">
+        <IoSearch className="inline-block h-4 w-4 shrink-0" />
+      </div>
 
-export default Search;
+      <input
+        {...omit(other, [
+          "className",
+          "disabled",
+          "id",
+          "invalid",
+          "readOnly",
+          "required",
+        ])}
+        {...omit(ctx, ["invalid"])}
+        ref={ref}
+        placeholder={placeholder}
+        className={clsx(
+          "relative h-10 w-full min-w-0 appearance-none rounded-lg border border-transparent bg-surface pl-10 pr-4 outline-none transition-shadow",
+
+          "dark:border-muted/20",
+          "focus:ring",
+          "placeholder:text-muted"
+        )}
+      />
+    </div>
+  );
+});
+
+export function Search() {
+  const router = useRouter();
+
+  const {
+    formState: { errors },
+    register,
+    handleSubmit,
+  } = useForm<z.infer<typeof schema>>({
+    mode: "onSubmit",
+    reValidateMode: "onBlur",
+    defaultValues: {
+      search: typeof router.query.term === "string" ? router.query.term : "",
+    },
+    resolver: zodResolver(schema),
+  });
+
+  return (
+    <form
+      role="search"
+      className="w-full"
+      onSubmit={handleSubmit(({ search }) => {
+        router.push({ pathname: "/search", query: { term: search } });
+      })}
+    >
+      <FormControl
+        required
+        className="w-full"
+        invalid={!!errors.search?.message}
+      >
+        <Input {...register("search")} />
+      </FormControl>
+    </form>
+  );
+}
