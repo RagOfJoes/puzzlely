@@ -1,3 +1,7 @@
+import { z } from "zod";
+
+import parseCookie from "@/lib/parseCookie";
+
 import type { ColorModes, StorageManager } from "./types";
 
 const path = "/";
@@ -5,24 +9,26 @@ const sameSite = "Lax";
 const maxAge = "31536000";
 const isProd = process.env.NODE_ENV === "production";
 
-function parseCookie(cookie: string, key: string): ColorModes | undefined {
-  const match = cookie.match(new RegExp(`(^| )${key}=([^;]+)`));
-
-  return match?.[2] as ColorModes | undefined;
-}
-
 function storageManager(key: string, cookie?: string): StorageManager {
   return {
-    get(fallback?: ColorModes): ColorModes | undefined {
+    get(fallback): ColorModes | undefined {
       if (cookie) {
-        return parseCookie(cookie, key);
+        const colorMode = z
+          .enum(["dark", "light"] as const)
+          .safeParse(parseCookie(cookie, key));
+
+        return colorMode.success ? colorMode.data : undefined;
       }
 
       if (!globalThis?.document) {
         return fallback;
       }
 
-      return parseCookie(document.cookie, key) || fallback;
+      const colorMode = z
+        .enum(["dark", "light"] as const)
+        .safeParse(parseCookie(document.cookie, key));
+
+      return colorMode.success ? colorMode.data : undefined;
     },
     set(value) {
       if (typeof window === "undefined") {
