@@ -25,12 +25,19 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>((props, ref) => {
       )}
     >
       <div className="h-full rounded-md bg-none transition duration-200 ease-linear">
-        <Link href="/" className="mb-6 flex items-center px-4 no-underline">
-          <PuzzlelyIcon className="h-9 w-9" />
+        <Link
+          href="/"
+          className={clsx(
+            "mb-6 flex items-center px-4 no-underline outline-none",
+
+            "focus-visible:ring"
+          )}
+        >
+          <PuzzlelyIcon className="h-10 w-10" />
 
           <h1
             className={clsx(
-              "relative ml-3 font-heading text-lg font-bold",
+              "relative ml-3 font-heading text-xl font-bold",
 
               'before:absolute before:left-0 before:right-2.5 before:bottom-1 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
             )}
@@ -48,7 +55,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>((props, ref) => {
             className={clsx(
               "mb-6 flex h-12 w-full flex-shrink-0 flex-grow-0 basis-auto cursor-pointer items-center justify-start rounded-full bg-cyan px-4 py-3 text-base shadow-[0_0_12px_1px] shadow-cyan/60 outline-none transition",
 
-              "focus:shadow-muted/0.3 focus:shadow-none focus:ring",
+              "focus:shadow-none focus-visible:ring focus-visible:ring-cyan/60",
               "hover:bg-cyan/80",
               "max-lg:px-[10px]"
             )}
