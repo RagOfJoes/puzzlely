@@ -1,60 +1,74 @@
-import { Box, Button, Flex, Heading, Icon, Text } from '@chakra-ui/react';
-import Link from 'next/link';
-import { IoArrowForward } from 'react-icons/io5';
+import type { ComponentProps } from "react";
+import { forwardRef } from "react";
 
-import JoinIcon from '../JoinIcon';
+import clsx from "clsx";
+import Link from "next/link";
+import { IoArrowForward } from "react-icons/io5";
 
-const JoinBanner = () => {
-  return (
-    <Box
-      py="6"
-      as="section"
-      bg="surface"
-      maxH="300px"
-      display="flex"
-      boxShadow="sm"
-      borderRadius="lg"
-      position="relative"
-      px={{ base: '4', md: '6', lg: '12' }}
-    >
-      <Flex
-        align="start"
-        justify="center"
-        direction="column"
-        w={{ base: '100%', md: '60%' }}
+import { JoinIcon } from "@/components/JoinIcon";
+import omit from "@/lib/omit";
+
+export const JoinBanner = forwardRef<HTMLDivElement, ComponentProps<"div">>(
+  (props, ref) => {
+    const { className, ...other } = omit(props, ["children"]);
+
+    return (
+      <div
+        {...other}
+        ref={ref}
+        className={clsx(
+          "relative flex max-h-72 rounded-lg bg-surface py-6 px-12 shadow",
+
+          "max-lg:px-6",
+          "max-md:px-4",
+
+          className
+        )}
       >
-        <Heading size="md">Create, play, and, share brilliant puzzles</Heading>
-        <Text mt="2" fontSize="lg" color="text.secondary">
-          Join{' '}
-          <Text as="span" color="primary" fontWeight="bold">
-            puzzlely.io
-          </Text>{' '}
-          now to create and share amazing puzzles. Challenge friends and other
-          users to see how you stack up against them.
-        </Text>
-        <Link passHref href="/signup">
-          <Button
-            as="a"
-            size="md"
-            mt={{ base: '4', md: '8' }}
-            ml={{ base: 'auto', md: '0' }}
-            rightIcon={<Icon as={IoArrowForward} />}
+        <div
+          className={clsx(
+            "flex basis-3/5 flex-col items-start justify-center",
+
+            "max-lg:basis-full"
+          )}
+        >
+          <h2 className="font-heading text-xl font-bold">
+            Create, play, and, share brilliant puzzles
+          </h2>
+
+          <p className="mt-2 text-lg text-subtle">
+            Join <span className="font-bold text-cyan">puzzlely.io</span> now to
+            create and share amazing puzzles. Challenge friends and other users
+            to see how you stack up against them.
+          </p>
+
+          <Link
+            href="/signup"
+            className={clsx(
+              "relative mt-8 flex h-10 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-4 font-semibold text-surface outline-none transition",
+
+              "active:bg-cyan/70",
+              "focus-visible:ring focus-visible:ring-cyan/60",
+              "hover:bg-cyan/60",
+              "max-lg:mt-4"
+            )}
           >
             Get Started
-          </Button>
-        </Link>
-      </Flex>
+            <IoArrowForward />
+          </Link>
+        </div>
 
-      <Icon
-        h="auto"
-        maxH="225px"
-        as={JoinIcon}
-        aria-label="Join now"
-        w={{ base: '0', md: '40%' }}
-        display={{ base: 'none', md: 'block' }}
-      />
-    </Box>
-  );
-};
+        <JoinIcon
+          aria-label="Join now"
+          className={clsx(
+            "block max-h-56 w-2/5",
 
-export default JoinBanner;
+            "max-lg:hidden max-lg:w-0"
+          )}
+        />
+      </div>
+    );
+  }
+);
+
+JoinBanner.displayName = "JoinBanner";
