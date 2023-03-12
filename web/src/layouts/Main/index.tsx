@@ -1,2 +1,2 @@
-export * from './Main';
-export { default } from './Main';
+export * from "./types";
+export * from "./Main";
