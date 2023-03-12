@@ -2,9 +2,18 @@
 module.exports = {
   content: ["./src/**/*.{ts,tsx,js,jsx}"],
   darkMode: ["class", ".puzzlely-dark"],
-  plugins: [],
+  plugins: [
+    // eslint-disable-next-line max-len
+    // eslint-disable-next-line global-require, import/no-extraneous-dependencies
+    require("@tailwindcss/line-clamp"),
+  ],
   theme: {
     extend: {
+      animation: {
+        skeleton: "skeleton linear infinite alternate 800ms",
+        "skeleton-fade": "fade 400ms",
+      },
+
       borderColor: {
         DEFAULT: "hsl(var(--color-muted) / 0.2)",
       },
@@ -42,6 +51,27 @@ module.exports = {
           "Courier New",
           "monospace",
         ],
+      },
+
+      keyframes: {
+        skeleton: {
+          from: {
+            background: "hsl(var(--color-surface))",
+            "border-color": "hsl(var(--color-surface))",
+          },
+          to: {
+            background: "hsl(var(--color-muted) / 0.2)",
+            "border-color": "hsl(var(--color-muted) / 0.2)",
+          },
+        },
+        "skeleton-fade": {
+          from: {
+            opacity: 0,
+          },
+          to: {
+            opacity: 1,
+          },
+        },
       },
 
       ringColor: {
