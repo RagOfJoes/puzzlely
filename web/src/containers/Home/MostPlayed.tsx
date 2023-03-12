@@ -1,24 +1,25 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { Box, Grid, GridItem, Heading, Skeleton } from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
+import { useQueryClient } from "@tanstack/react-query";
+import clsx from "clsx";
+import dayjs from "dayjs";
 
-import PuzzleCard from '@/components/PuzzleCard';
-import useMe from '@/hooks/useMe';
-import usePuzzleLike from '@/hooks/usePuzzleLike';
-import usePuzzlesMostPlayed from '@/hooks/usePuzzlesMostPlayed';
-import { LOADING_DATE_PLACEHOLDER } from '@/lib/constants';
+import { PuzzleCard } from "@/components/PuzzleCard";
+import { Skeleton } from "@/components/Skeleton";
+import useMe from "@/hooks/useMe";
+import usePuzzleLike from "@/hooks/usePuzzleLike";
+import usePuzzlesMostPlayed from "@/hooks/usePuzzlesMostPlayed";
+import { LOADING_DATE_PLACEHOLDER } from "@/lib/constants";
 import {
   toggleLikePuzzleConnection,
   toggleLikePuzzlePages,
-} from '@/lib/puzzleConnection';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import { PuzzleConnection } from '@/types/puzzle';
+} from "@/lib/puzzleConnection";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type { PuzzleConnection } from "@/types/puzzle";
 
 const NUM_OF_ITEMS = 6;
 
-const MostPlayed = () => {
+function MostPlayed() {
   const { data: me } = useMe();
   const { mutate } = usePuzzleLike();
   const queryClient = useQueryClient();
@@ -30,18 +31,16 @@ const MostPlayed = () => {
   );
 
   return (
-    <Box mt="10" as="section">
-      <Heading size="md">Most Played Puzzles</Heading>
+    <section className="mt-10">
+      <h2 className="font-heading text-xl font-bold">Most Played Puzzles</h2>
 
-      <Grid
-        mt="5"
-        gap="4"
-        templateColumns={{
-          base: 'repeat(1, 1fr)',
-          sm: 'repeat(1, 1fr)',
-          md: 'repeat(2, 1fr)',
-          xl: 'repeat(3, 1fr)',
-        }}
+      <div
+        className={clsx(
+          "mt-5 grid grid-cols-3 gap-4",
+
+          "max-xl:grid-cols-2",
+          "max-md:grid-cols-1"
+        )}
       >
         {data &&
           data.edges.length > 0 &&
@@ -54,10 +53,9 @@ const MostPlayed = () => {
 
             const { cursor, node } = edge;
             return (
-              <GridItem
-                colSpan={1}
-                rowSpan={1}
-                key={`PuzzlesMostPlayed__Puzzle_${cursor}`}
+              <div
+                className="col-span-1 row-span-1"
+                key={`PuzzlesMostPlayed__Puzzle__${cursor}`}
               >
                 <PuzzleCard
                   id={node.id}
@@ -115,14 +113,14 @@ const MostPlayed = () => {
                     });
                   }}
                 />
-              </GridItem>
+              </div>
             );
           })}
 
         {isLoading &&
           Array.from({ length: NUM_OF_ITEMS }).map((_, index) => (
             <Skeleton key={`PuzzlesMostPlayed__Loading__${index}`}>
-              <GridItem colSpan={1} rowSpan={1}>
+              <div className="invisible col-span-1 row-span-1">
                 <PuzzleCard
                   id=""
                   numOfLikes={0}
@@ -133,12 +131,12 @@ const MostPlayed = () => {
                   name="Puzzle Name"
                   createdAt={loadingTime}
                 />
-              </GridItem>
+              </div>
             </Skeleton>
           ))}
-      </Grid>
-    </Box>
+      </div>
+    </section>
   );
-};
+}
 
 export default MostPlayed;
