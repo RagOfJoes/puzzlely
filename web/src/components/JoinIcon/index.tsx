@@ -1,1 +1,1 @@
-export { default } from './JoinIcon';
+export * from "./JoinIcon";
