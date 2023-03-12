@@ -1,23 +1,16 @@
-import { memo } from 'react';
+import { useQueryClient } from "@tanstack/react-query";
 
-import { GridItem } from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
-
-import PuzzleCard from '@/components/PuzzleCard';
-import useMe from '@/hooks/useMe';
-import usePuzzleLike from '@/hooks/usePuzzleLike';
+import { PuzzleCard } from "@/components/PuzzleCard";
+import useMe from "@/hooks/useMe";
+import usePuzzleLike from "@/hooks/usePuzzleLike";
 import {
   toggleLikePuzzleConnection,
   toggleLikePuzzlePages,
-} from '@/lib/puzzleConnection';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import { PuzzleEdge } from '@/types/puzzle';
+} from "@/lib/puzzleConnection";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type { PuzzleEdge } from "@/types/puzzle";
 
-type CardProps = {
-  edges: PuzzleEdge[];
-};
-
-const Cards = (props: CardProps) => {
+function Cards(props: { edges: PuzzleEdge[] }) {
   const { edges } = props;
 
   const { data: me } = useMe();
@@ -29,7 +22,7 @@ const Cards = (props: CardProps) => {
       {edges.map((edge) => {
         const { cursor, node } = edge;
         return (
-          <GridItem colSpan={1} rowSpan={1} key={cursor}>
+          <div key={cursor} className="col-span-1 row-span-1">
             <PuzzleCard
               id={node.id}
               name={node.name}
@@ -79,11 +72,11 @@ const Cards = (props: CardProps) => {
                 });
               }}
             />
-          </GridItem>
+          </div>
         );
       })}
     </>
   );
-};
+}
 
-export default memo(Cards);
+export default Cards;

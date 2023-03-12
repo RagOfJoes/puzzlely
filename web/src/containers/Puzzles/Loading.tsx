@@ -1,12 +1,12 @@
-import { memo, useMemo } from 'react';
+import { useMemo } from "react";
 
-import { GridItem, Skeleton } from '@chakra-ui/react';
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
-import PuzzleCard from '@/components/PuzzleCard';
-import { LOADING_DATE_PLACEHOLDER, PUZZLES_LIMIT } from '@/lib/constants';
+import { PuzzleCard } from "@/components/PuzzleCard";
+import { Skeleton } from "@/components/Skeleton";
+import { LOADING_DATE_PLACEHOLDER, PUZZLES_LIMIT } from "@/lib/constants";
 
-const Loading = () => {
+function Loading() {
   const today = useMemo(
     () => dayjs(LOADING_DATE_PLACEHOLDER).tz().toDate(),
     []
@@ -17,14 +17,7 @@ const Loading = () => {
       {Array.from({ length: PUZZLES_LIMIT }).map((_, idx) => {
         return (
           <Skeleton key={`Puzzles__Loading__${idx}`}>
-            <GridItem
-              w="100%"
-              h="100%"
-              colSpan={1}
-              rowSpan={1}
-              boxShadow="sm"
-              overflow="hidden"
-            >
+            <div className="invisible col-span-1 row-span-1 h-full w-full overflow-hidden">
               <PuzzleCard
                 id=""
                 numOfLikes={0}
@@ -35,12 +28,12 @@ const Loading = () => {
                 createdBy="Lorem"
                 name="Lorem Ipsum"
               />
-            </GridItem>
+            </div>
           </Skeleton>
         );
       })}
     </>
   );
-};
+}
 
-export default memo(Loading);
+export default Loading;
