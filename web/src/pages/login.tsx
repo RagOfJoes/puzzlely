@@ -1,14 +1,14 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import LoginContainer from '@/containers/Login';
-import AuthLayout from '@/layouts/Auth';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError from "@/api/error";
+import { LoginContainer } from "@/containers/Login";
+import { AuthLayout } from "@/layouts/Auth";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { User } from "@/types/user";
 
 const LoginPage = () => {
   return (
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const me = queryClient.getQueryData<User>(key);
   if (me) {
-    const destination = me.state === 'PENDING' ? '/profile' : '/';
+    const destination = me.state === "PENDING" ? "/profile" : "/";
     return {
       redirect: {
         permanent: false,
