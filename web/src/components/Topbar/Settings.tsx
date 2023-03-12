@@ -30,20 +30,20 @@ export function Settings() {
         <Popover.Content
           align="end"
           sideOffset={8}
-          className="z-10 w-80 rounded-lg border bg-surface shadow"
+          className="z-10 w-80 rounded-lg border border-muted/20 bg-surface shadow"
         >
-          <header className="border-b px-3 py-4 font-semibold">Settings</header>
+          <header className="border-b border-b-muted/20 px-3 py-4 font-heading font-semibold">
+            Settings
+          </header>
 
           <div className="px-4 py-6">
-            <p className="text-sm font-medium text-subtle">Appearance</p>
-
-            <hr role="separator" className="my-4 bg-muted/20" />
+            <p className="text-sm font-semibold">Appearance</p>
 
             <ToggleGroup.Root
               type="single"
               value={colorMode}
               aria-label="Color Mode"
-              className="flex rounded-md bg-muted/20"
+              className="mt-2 flex rounded-md bg-muted/20"
               onValueChange={(newValue) => {
                 if (newValue !== "dark" && newValue !== "light") {
                   return;
@@ -60,9 +60,10 @@ export function Settings() {
                   value={item.value}
                   key={`colorMode-option-${item.value}`}
                   className={clsx(
-                    "flex flex-1 items-center justify-center rounded-md py-1 px-4 text-sm font-medium",
+                    "flex flex-1 items-center justify-center rounded-md py-1 px-4 text-sm font-medium text-subtle outline-none",
 
-                    "aria-checked:bg-cyan aria-checked:text-surface"
+                    "aria-checked:bg-cyan aria-checked:text-surface aria-checked:focus-visible:ring-cyan/60",
+                    "focus-visible:ring"
                   )}
                 >
                   {item.label}
@@ -71,9 +72,16 @@ export function Settings() {
             </ToggleGroup.Root>
           </div>
 
-          <footer className="border-t p-4">
+          <footer className="border-t border-t-muted/20 p-4">
             <ul className="flex items-center justify-center gap-1">
-              <Link href="/faq" className="text-xs font-medium text-subtle">
+              <Link
+                href="/faq"
+                className={clsx(
+                  "text-xs font-medium text-subtle outline-none",
+
+                  "focus-visible:ring"
+                )}
+              >
                 F.A.Q
               </Link>
 
@@ -84,7 +92,14 @@ export function Settings() {
                 &bull;
               </p>
 
-              <Link href="/privacy" className="text-xs font-medium text-subtle">
+              <Link
+                href="/privacy"
+                className={clsx(
+                  "text-xs font-medium text-subtle outline-none",
+
+                  "focus-visible:ring"
+                )}
+              >
                 Privacy Policy
               </Link>
             </ul>

@@ -1,16 +1,27 @@
+import { forwardRef } from "react";
+
 import clsx from "clsx";
 import Link from "next/link";
 import { IoMenu } from "react-icons/io5";
+
+import omit from "@/lib/omit";
 
 import { Search } from "./Search";
 import { Settings } from "./Settings";
 import type { TopbarProps } from "./types";
 
-export function Topbar(props: TopbarProps) {
-  const { links, isOpen, toggleIsOpen } = props;
+export const Topbar = forwardRef<HTMLElement, TopbarProps>((props, ref) => {
+  const { className, links, isOpen, toggleIsOpen } = omit(props, ["children"]);
 
   return (
-    <header className="z-[1] flex w-full items-center justify-between p-5 pt-3">
+    <header
+      ref={ref}
+      className={clsx(
+        "z-[1] flex w-full items-center justify-between p-5 pt-3",
+
+        className
+      )}
+    >
       <button
         onClick={() => toggleIsOpen(!isOpen)}
         aria-label={
@@ -45,7 +56,7 @@ export function Topbar(props: TopbarProps) {
               <li
                 key={path}
                 className={clsx(
-                  "inline-flex items-center justify-center rounded-md font-medium text-subtle outline-none",
+                  "inline-flex items-center justify-center font-medium text-subtle outline-none",
 
                   "focus-within:ring"
                 )}
@@ -80,4 +91,6 @@ export function Topbar(props: TopbarProps) {
       </div>
     </header>
   );
-}
+});
+
+Topbar.displayName = "Topbar";

@@ -49,11 +49,11 @@ const Input = forwardRef<
         ref={ref}
         placeholder={placeholder}
         className={clsx(
-          "relative h-10 w-full min-w-0 appearance-none rounded-lg border border-transparent bg-surface pl-10 pr-4 outline-none transition-shadow",
+          "relative h-10 w-full min-w-0 appearance-none rounded-lg border border-transparent bg-surface pl-10 pr-4 outline-none transition",
 
           "dark:border-muted/20",
           "focus:ring",
-          "placeholder:text-muted"
+          "placeholder:text-subtle"
         )}
       />
     </div>
