@@ -1,2 +1,2 @@
-export * from './LikeButton';
-export { default } from './LikeButton';
+export * from "./types";
+export * from "./LikeButton";
