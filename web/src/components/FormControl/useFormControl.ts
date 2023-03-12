@@ -25,7 +25,7 @@ function useFormControl(props: FormControlProps): UseFormControl {
       id: errorID,
       "aria-live": "polite",
       className: clsx(
-        "mt-1 text-xs text-ofs-text-error",
+        "mt-1 text-xs text-red",
 
         {
           hidden: !invalid,
@@ -51,8 +51,8 @@ function useFormControl(props: FormControlProps): UseFormControl {
         "mt-1 text-xs",
 
         {
-          "text-ofs-text-secondary": !disabled,
-          "text-ofs-text-disabled": disabled,
+          "text-subtle": !disabled,
+          "text-muted": disabled,
 
           hidden: invalid,
         },
@@ -73,10 +73,10 @@ function useFormControl(props: FormControlProps): UseFormControl {
     (labelProps = {}) => ({
       ...labelProps,
       className: clsx(
-        "mb-2",
+        "mb-2 font-medium",
 
         {
-          "text-ofs-text-disabled": disabled,
+          "text-muted": disabled,
         },
 
         labelProps.className
