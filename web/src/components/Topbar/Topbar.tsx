@@ -55,11 +55,7 @@ export const Topbar = forwardRef<HTMLElement, TopbarProps>((props, ref) => {
             return (
               <li
                 key={path}
-                className={clsx(
-                  "inline-flex items-center justify-center font-medium text-subtle outline-none",
-
-                  "focus-within:ring"
-                )}
+                className="inline-flex items-center justify-center font-medium text-subtle outline-none"
               >
                 <Link
                   href={path}
@@ -67,6 +63,7 @@ export const Topbar = forwardRef<HTMLElement, TopbarProps>((props, ref) => {
                   className={clsx(
                     "outline-none",
 
+                    "focus-visible:ring",
                     "hover:underline"
                   )}
                   aria-current={isLast && "page"}
