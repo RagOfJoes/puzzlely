@@ -52,7 +52,7 @@ function useFormControl(props: FormControlProps): UseFormControl {
 
         {
           "text-subtle": !disabled,
-          "text-muted": disabled,
+          "text-muted/60": disabled,
 
           hidden: invalid,
         },
@@ -76,7 +76,7 @@ function useFormControl(props: FormControlProps): UseFormControl {
         "mb-2 font-medium",
 
         {
-          "text-muted": disabled,
+          "text-muted/60": disabled,
         },
 
         labelProps.className

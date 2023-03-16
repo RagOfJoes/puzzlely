@@ -19,8 +19,8 @@ export const FormControlStar = forwardRef<
       {...other}
       ref={ref}
       className={clsx({
-        "text-ofs-text-error": !disabled,
-        "text-ofs-text-disabled": disabled,
+        "text-red": !disabled,
+        "text-muted/60": disabled,
       })}
     >
       {children}

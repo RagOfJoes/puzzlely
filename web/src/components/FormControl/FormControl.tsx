@@ -48,7 +48,6 @@ export const FormControl = forwardRef<
 
   return (
     <FormControlProvider value={ctx}>
-      {/* eslint-disable-next-line react/jsx-pascal-case */}
       <Primitive.div
         {...omit(props, [
           "className",
