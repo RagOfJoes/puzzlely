@@ -11,7 +11,7 @@ module.exports = {
     extend: {
       animation: {
         skeleton: "skeleton linear infinite alternate 800ms",
-        "skeleton-fade": "fade 400ms",
+        "skeleton-fade": "skeleton-fade 400ms",
       },
 
       borderColor: {
@@ -56,11 +56,11 @@ module.exports = {
       keyframes: {
         skeleton: {
           from: {
-            background: "hsl(var(--color-surface))",
+            background: "hsl(var(--color-muted) / 0.2)",
             "border-color": "hsl(var(--color-surface))",
           },
           to: {
-            background: "hsl(var(--color-muted) / 0.2)",
+            background: "hsl(var(--color-muted) / 0.6)",
             "border-color": "hsl(var(--color-muted) / 0.2)",
           },
         },
