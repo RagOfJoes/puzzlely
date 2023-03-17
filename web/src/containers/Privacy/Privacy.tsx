@@ -1,39 +1,86 @@
-import { PropsWithChildren } from 'react';
+import type { ComponentProps } from "react";
 
-import {
-  Heading,
-  HeadingProps,
-  ListItem,
-  Text,
-  TextProps,
-  UnorderedList,
-} from '@chakra-ui/react';
-import { ListProps } from '@chakra-ui/system';
-import Link from 'next/link';
+import clsx from "clsx";
+import Link from "next/link";
 
-const Title = (props: HeadingProps) => <Heading mt="12" size="md" {...props} />;
+function Title(props: ComponentProps<"h2">) {
+  const { children, className, ...other } = props;
 
-const Body = (props: TextProps) => <Text mt="4" {...props} />;
+  return (
+    <h2
+      {...other}
+      className={clsx(
+        "mt-12 font-heading text-xl font-bold",
 
-const List = (props: PropsWithChildren<ListProps>) => (
-  <UnorderedList mt="4" pl="4" {...props} />
-);
+        className
+      )}
+    >
+      {children}
+    </h2>
+  );
+}
 
-const PrivacyContainer = () => {
+const Body = (props: ComponentProps<"p">) => {
+  const { children, className, ...other } = props;
+
+  return (
+    <p
+      {...other}
+      className={clsx(
+        "mt-4",
+
+        className
+      )}
+    >
+      {children}
+    </p>
+  );
+};
+
+function List(props: ComponentProps<"ul">) {
+  const { children, className, ...other } = props;
+
+  return (
+    <ul
+      {...other}
+      role="list"
+      className={clsx(
+        "mt-4 ml-4 list-disc pl-4",
+
+        className
+      )}
+    >
+      {children}
+    </ul>
+  );
+}
+
+function ListItem(props: ComponentProps<"li">) {
+  const { children, className, ...other } = props;
+
+  return (
+    <li {...other} className={className}>
+      {children}
+    </li>
+  );
+}
+
+export function PrivacyContainer() {
   return (
     <>
-      <Text mt="12">
+      <p className="mt-12">
         Your privacy is important to us. It is Puzzlely&apos;s policy to respect
         your privacy and comply with any applicable law and regulation regarding
         any personal information we may collect about you, including across our
-        website,{' '}
-        <Link passHref href={process.env.NEXT_PUBLIC_HOST_URL || ''}>
-          <Text as="a" color="primary" fontWeight="medium">
-            {process.env.NEXT_PUBLIC_HOST_URL}
-          </Text>
+        website,{" "}
+        <Link
+          className="font-medium text-cyan"
+          href={process.env.NEXT_PUBLIC_HOST_URL || ""}
+        >
+          {process.env.NEXT_PUBLIC_HOST_URL}
         </Link>
         , and other sites we own and operate.
-      </Text>
+      </p>
       <Body>
         This policy is effect as of June 29, 2022 and was last updated on June
         29, 2022.
@@ -148,13 +195,12 @@ const PrivacyContainer = () => {
         For any questions or concerns regarding your privacy, you may contact us
         using the following details:
       </Body>
-      <Link passHref href="mailto:support@puzzlely.io">
-        <Body as="a" color="primary" fontWeight="medium">
-          support@puzzlely.io
-        </Body>
+      <Link
+        href="mailto:support@puzzlely.io"
+        className="mt-4 font-medium text-cyan"
+      >
+        support@puzzlely.io
       </Link>
     </>
   );
-};
-
-export default PrivacyContainer;
+}

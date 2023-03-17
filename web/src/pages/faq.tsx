@@ -1,10 +1,10 @@
-import { FAQPageJsonLd, NextSeo } from 'next-seo';
+import { FAQPageJsonLd, NextSeo } from "next-seo";
 
-import FAQContainer from '@/containers/FAQ';
-import DocLayout from '@/layouts/Doc';
-import { FAQ } from '@/lib/constants';
+import { FAQContainer } from "@/containers/FAQ";
+import { DocLayout } from "@/layouts/Doc";
+import { FAQ } from "@/lib/constants";
 
-const FAQPage = () => {
+function FAQPage() {
   return (
     <>
       <DocLayout title="Common Questions">
@@ -22,6 +22,6 @@ const FAQPage = () => {
       />
     </>
   );
-};
+}
 
 export default FAQPage;

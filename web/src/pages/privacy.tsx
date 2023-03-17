@@ -1,7 +1,7 @@
-import { NextSeo } from 'next-seo';
+import { NextSeo } from "next-seo";
 
-import PrivacyContainer from '@/containers/Privacy';
-import DocLayout from '@/layouts/Doc';
+import { PrivacyContainer } from "@/containers/Privacy";
+import { DocLayout } from "@/layouts/Doc";
 
 const PrivacyPage = () => {
   return (
