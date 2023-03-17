@@ -1,23 +1,19 @@
-import { Icon } from '@chakra-ui/react';
-import { NextSeo } from 'next-seo';
+import { NextSeo } from "next-seo";
 
-import NotFoundIcon from '@/components/NotFoundIcon';
-import NotFoundContainer from '@/containers/NotFound';
-import ErrorLayout from '@/layouts/Error';
+import { NotFoundIcon } from "@/components/NotFoundIcon";
+import { NotFoundContainer } from "@/containers/NotFound";
+import { ErrorLayout } from "@/layouts/Error";
 
-const NotFoundPage = () => {
+function NotFoundPage() {
   return (
     <>
       <ErrorLayout
         lead="Page Not Found..."
         caption="Hmmm... Seems you're a bit lost. Let's get you back on track."
         icon={
-          <Icon
-            h="auto"
-            w="100%"
-            maxH="250px"
-            as={NotFoundIcon}
+          <NotFoundIcon
             aria-label="Not Found"
+            className="h-auto max-h-64 w-full"
           />
         }
       >
@@ -27,6 +23,6 @@ const NotFoundPage = () => {
       <NextSeo noindex nofollow title="Not Found" />
     </>
   );
-};
+}
 
 export default NotFoundPage;

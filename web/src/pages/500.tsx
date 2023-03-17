@@ -1,23 +1,19 @@
-import { Icon } from '@chakra-ui/react';
-import { NextSeo } from 'next-seo';
+import { NextSeo } from "next-seo";
 
-import InternalErrorIcon from '@/components/InternalErrorIcon';
-import InternalErrorContainer from '@/containers/InternalError';
-import ErrorLayout from '@/layouts/Error';
+import { InternalErrorIcon } from "@/components/InternalErrorIcon";
+import { InternalErrorContainer } from "@/containers/InternalError";
+import { ErrorLayout } from "@/layouts/Error";
 
-const InternalErrorPage = () => {
+function InternalErrorPage() {
   return (
     <>
       <ErrorLayout
         lead="Internal Error..."
-        caption="Oops! Sorry, unexpected error. Please try again later."
+        caption="Oops! Sorry, an unexpected error occurred. Please try again later."
         icon={
-          <Icon
-            h="auto"
-            w="100%"
-            maxH="250px"
-            as={InternalErrorIcon}
+          <InternalErrorIcon
             aria-label="Internal Error"
+            className="h-auto max-h-64 w-full"
           />
         }
       >
@@ -27,6 +23,6 @@ const InternalErrorPage = () => {
       <NextSeo noindex nofollow title="Oops!" />
     </>
   );
-};
+}
 
 export default InternalErrorPage;

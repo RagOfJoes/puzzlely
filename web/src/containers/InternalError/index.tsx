@@ -1,1 +1,1 @@
-export { default } from './InternalError';
+export * from "./InternalError";

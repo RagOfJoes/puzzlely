@@ -1,1 +1,1 @@
-export { default } from './InternalErrorIcon';
+export * from "./InternalErrorIcon";
