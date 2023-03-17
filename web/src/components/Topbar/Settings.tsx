@@ -31,12 +31,12 @@ export function Settings() {
           sideOffset={8}
           className="z-10 w-80 rounded-lg border border-muted/20 bg-surface shadow"
         >
-          <header className="border-b border-b-muted/20 px-3 py-4 font-heading font-semibold">
+          <header className="border-b border-b-muted/20 px-3 py-4 font-semibold">
             Settings
           </header>
 
           <div className="px-4 py-6">
-            <p className="text-sm font-semibold">Appearance</p>
+            <p className="text-sm font-medium">Appearance</p>
 
             <ToggleGroup.Root
               type="single"
