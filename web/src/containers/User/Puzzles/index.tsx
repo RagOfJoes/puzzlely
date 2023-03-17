@@ -1,1 +1,1 @@
-export { default } from './Puzzles';
+export { default } from "./Puzzles";

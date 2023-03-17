@@ -1,114 +1,137 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  HStack,
-  Icon,
-  Skeleton,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import { IoCreate } from 'react-icons/io5';
+import { forwardRef, useMemo } from "react";
 
-export type UserCardProps = {
-  isEditable?: boolean;
-  isLoading?: boolean;
-  joined: Date;
-  numOfGamesPlayed: number;
-  numOfPuzzlesCreated: number;
-  numOfPuzzlesLiked: number;
-  onEdit?: () => void | Promise<void>;
-  username: string;
-};
+import * as Dialog from "@radix-ui/react-dialog";
+import clsx from "clsx";
+import dayjs from "dayjs";
+import { IoCreate } from "react-icons/io5";
 
-const UserCard = (props: UserCardProps) => {
-  const {
-    isEditable,
-    isLoading,
-    joined,
-    numOfGamesPlayed,
-    numOfPuzzlesCreated,
-    numOfPuzzlesLiked,
-    onEdit = () => {},
-    username,
-  } = props;
+import { Skeleton } from "@/components/Skeleton";
+import { UserUpdateModal } from "@/components/UserUpdateModal";
+import { LOADING_DATE_PLACEHOLDER } from "@/lib/constants";
 
-  return (
-    <Box p="4" bg="surface" boxShadow="sm" borderRadius="lg">
-      <HStack w="100%" justify="space-between">
-        <HStack>
-          <Avatar
-            size="md"
-            name={username}
-            color="background"
-            textTransform="none"
-            borderColor="surface"
-            bgGradient="linear(to-br, primary, secondary)"
-          />
-          <Text fontSize="lg" fontWeight="bold">
-            {username}
-          </Text>
-        </HStack>
-        {isEditable && (
-          <Button
-            size="sm"
-            variant="link"
-            colorScheme="gray"
-            onClick={onEdit}
-            leftIcon={<Icon as={IoCreate} />}
-          >
-            Edit
-          </Button>
+import type { UserCardProps } from "./types";
+
+export const UserCard = forwardRef<HTMLDivElement, UserCardProps>(
+  (props, ref) => {
+    const {
+      className,
+      isEditable,
+      isLoading,
+      isOpen,
+      onEdit = () => {},
+      stats,
+      togglsIsOpen,
+      user,
+      ...other
+    } = props;
+    const { gamesPlayed, puzzlesCreated, puzzlesLiked } = stats;
+    const { createdAt, username } = user;
+
+    // Prevents hydration errors
+    const joined = useMemo(() => {
+      const format = "MMM DD, YYYY";
+
+      if (isLoading) {
+        return dayjs(LOADING_DATE_PLACEHOLDER).tz().format(format);
+      }
+
+      return dayjs(createdAt).tz().format(format);
+    }, [createdAt, isLoading]);
+
+    return (
+      <div
+        {...other}
+        ref={ref}
+        className={clsx(
+          "rounded-lg bg-surface p-4",
+
+          className
         )}
-      </HStack>
+      >
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan to-magenta">
+              <div
+                role="img"
+                aria-label={username}
+                className="text-xl font-medium text-surface"
+              >
+                {username[0]}
+              </div>
+            </span>
 
-      <VStack mt="4">
-        {[
-          { title: 'Games Played', body: numOfGamesPlayed },
-          { title: 'Puzzles Created', body: numOfPuzzlesCreated },
-          { title: 'Puzzles Liked', body: numOfPuzzlesLiked },
-        ].map(({ body, title }) => {
-          return (
-            <HStack
-              w="100%"
-              justify="space-between"
-              key={`User__${username}__Stats__${title}`}
-            >
-              <Text fontSize="sm" fontWeight="semibold" color="text.secondary">
-                {title}
-              </Text>
-              <Skeleton isLoaded={!isLoading}>
-                <Text fontSize="sm" color="text.primary" fontWeight="semibold">
-                  {isLoading ? '0000000' : body}
-                </Text>
-              </Skeleton>
-            </HStack>
-          );
-        })}
-        <HStack
-          w="100%"
-          justify="space-between"
-          key={`User__${username}__Stats__Joined`}
-        >
-          <Text fontSize="sm" fontWeight="semibold" color="text.secondary">
-            Joined
-          </Text>
-          <Skeleton isLoaded={!isLoading}>
-            <Text
-              as="time"
-              fontSize="sm"
-              color="text.primary"
-              fontWeight="semibold"
-              dateTime={dayjs(joined).tz().toISOString()}
-            >
-              {dayjs(joined).tz().format('MMM DD, YYYY')}
-            </Text>
-          </Skeleton>
-        </HStack>
-      </VStack>
-    </Box>
-  );
-};
+            <p className="text-lg font-bold">{username}</p>
+          </div>
 
-export default UserCard;
+          {isEditable && (
+            <UserUpdateModal
+              defaultValues={{ username }}
+              isOpen={isOpen}
+              onSubmit={onEdit}
+              toggleIsOpen={togglsIsOpen}
+            >
+              <Dialog.Trigger asChild>
+                <button
+                  onClick={() => togglsIsOpen(true)}
+                  className={clsx(
+                    "relative inline-flex select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold outline-none transition",
+
+                    "focus-visible:ring",
+                    "hover:underline"
+                  )}
+                >
+                  <IoCreate />
+                  Edit
+                </button>
+              </Dialog.Trigger>
+            </UserUpdateModal>
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-col gap-2">
+          {[
+            { title: "Games Played", body: gamesPlayed },
+            { title: "Puzzles Created", body: puzzlesCreated },
+            { title: "Puzzles Liked", body: puzzlesLiked },
+          ].map(({ body, title }) => {
+            return (
+              <div
+                key={`User__${username}__Stats__${title}`}
+                className="flex w-full items-center justify-between"
+              >
+                <p className="text-sm font-semibold text-subtle">{title}</p>
+
+                <Skeleton isLoaded={!isLoading}>
+                  <p
+                    className={clsx(
+                      "text-sm font-semibold",
+
+                      {
+                        invisible: isLoading,
+                      }
+                    )}
+                  >
+                    {isLoading ? "0000000" : body}
+                  </p>
+                </Skeleton>
+              </div>
+            );
+          })}
+
+          <div
+            key={`User__${username}__Stats__Joined`}
+            className="flex w-full items-center justify-between"
+          >
+            <p className="text-sm font-semibold text-subtle">Joined</p>
+
+            <Skeleton isLoaded={!isLoading}>
+              <p className="text-sm font-semibold">{joined}</p>
+            </Skeleton>
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+
+UserCard.displayName = "UserCard";

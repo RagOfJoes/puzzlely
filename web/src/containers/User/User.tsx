@@ -1,81 +1,98 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
+import * as Tabs from "@radix-ui/react-tabs";
+import clsx from "clsx";
+import { useRouter } from "next/router";
 
-import { User } from '@/types/user';
+import Details from "./Details";
+import Games from "./Games";
+import Puzzles from "./Puzzles";
+import type { UserContainerProps } from "./types";
 
-import Details from './Details';
-import Games from './Games';
-import Puzzles from './Puzzles';
-
-export type UserContainerProps = {
-  user: User;
-};
-
-const UserContainer = (props: UserContainerProps) => {
+export function UserContainer(props: UserContainerProps) {
   const { user } = props;
 
   const { query, replace } = useRouter();
 
   const [tab, setTab] = useState(() => {
-    switch (query?.tab) {
-      case 'games':
-        return 1;
-      default:
-        return 0;
+    if (query?.tab !== "games" && query?.tab !== "puzzles") {
+      return "puzzles";
     }
+
+    return query.tab;
   });
 
   return (
-    <>
-      <Details user={user} />
-      <Tabs
-        isLazy
-        mt="12"
-        index={tab}
-        variant="soft-rounded"
-        onChange={(index) => {
-          const newTab = index === 1 ? 'games' : 'puzzles';
+    <article>
+      <div className="flex flex-col gap-12">
+        <Details user={user} />
 
-          setTab(index);
-          replace({ query: { ...query, tab: newTab } }, undefined, {
-            scroll: false,
-            shallow: true,
-          });
-        }}
-      >
-        <TabList bg="transparent">
-          <Tab
-            _selected={{
-              bg: 'surface',
-              boxShadow: 'sm',
-              color: 'text.primary',
+        <section>
+          <Tabs.Root
+            value={tab}
+            className="flex flex-col"
+            onValueChange={(newValue) => {
+              if (newValue !== "games" && newValue !== "puzzles") {
+                return;
+              }
+
+              setTab(newValue);
+              replace({ query: { ...query, tab: newValue } }, undefined, {
+                scroll: false,
+                shallow: true,
+              });
             }}
           >
-            Puzzles
-          </Tab>
-          <Tab
-            _selected={{
-              bg: 'surface',
-              boxShadow: 'sm',
-              color: 'text.primary',
-            }}
-          >
-            Games
-          </Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel px="0">
-            <Puzzles user={user} />
-          </TabPanel>
-          <TabPanel px="0">
-            <Games user={user} />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </>
+            <Tabs.List className="flex shrink-0">
+              <Tabs.Trigger
+                value="puzzles"
+                className={clsx(
+                  "flex h-10 select-none items-center justify-center rounded-lg px-4 font-semibold leading-none text-muted outline-none transition",
+
+                  "data-[state=active]:bg-surface data-[state=active]:text-text",
+                  "data-[state=active]:focus:relative data-[state=active]:focus:ring",
+                  "hover:bg-muted/10"
+                )}
+              >
+                Puzzles
+              </Tabs.Trigger>
+              <Tabs.Trigger
+                value="games"
+                className={clsx(
+                  "flex h-10 select-none items-center justify-center rounded-lg px-4 font-semibold leading-none text-muted outline-none transition",
+
+                  "data-[state=active]:bg-surface data-[state=active]:text-text",
+                  "data-[state=active]:focus:relative data-[state=active]:focus:ring",
+                  "hover:bg-muted/10"
+                )}
+              >
+                Games
+              </Tabs.Trigger>
+            </Tabs.List>
+
+            <Tabs.Content
+              value="puzzles"
+              className={clsx(
+                "grow py-4 outline-none",
+
+                "focus-visible:ring"
+              )}
+            >
+              <Puzzles user={user} />
+            </Tabs.Content>
+            <Tabs.Content
+              value="games"
+              className={clsx(
+                "grow py-4 outline-none",
+
+                "focus-visible:ring"
+              )}
+            >
+              <Games user={user} />
+            </Tabs.Content>
+          </Tabs.Root>
+        </section>
+      </div>
+    </article>
   );
-};
-
-export default UserContainer;
+}

@@ -1,120 +1,84 @@
-import { useMemo } from 'react';
+import { useState } from "react";
 
-import {
-  Avatar,
-  Box,
-  Grid,
-  GridItem,
-  Heading,
-  Icon,
-  Text,
-  useDisclosure,
-  useToast,
-  VStack,
-} from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import { IoConstruct } from 'react-icons/io5';
+import clsx from "clsx";
+import { IoConstruct } from "react-icons/io5";
 
-import UserCard from '@/components/UserCard';
-import UserUpdateModal from '@/components/UserUpdateModal';
-import useMe from '@/hooks/useMe';
-import useUserStats from '@/hooks/useUserStats';
-import useUserUpdate from '@/hooks/useUserUpdate';
-import { LOADING_DATE_PLACEHOLDER } from '@/lib/constants';
-import { User } from '@/types/user';
+import { UserCard } from "@/components/UserCard";
+import useMe from "@/hooks/useMe";
+import useUserStats from "@/hooks/useUserStats";
+import useUserUpdate from "@/hooks/useUserUpdate";
+import type { User } from "@/types/user";
 
-type DetailsProps = {
-  user: User;
-};
-
-const Details = (props: DetailsProps) => {
+const Details = (props: { user: User }) => {
   const { user } = props;
 
-  const toast = useToast();
   const { data: me } = useMe();
   const { mutate } = useUserUpdate();
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [isOpen, toggleIsOpen] = useState(false);
   const {
     data: stats = { gamesPlayed: 0, puzzlesCreated: 0, puzzlesLiked: 0 },
     isLoading,
   } = useUserStats(user.id);
 
-  const loadingTime = useMemo(
-    () => dayjs(LOADING_DATE_PLACEHOLDER).tz().toDate(),
-    []
-  );
-
   return (
-    <>
-      <Grid
-        gap="4"
-        w="100%"
-        autoRows="1fr"
-        templateColumns={{
-          base: 'repeat(1, 1fr)',
-          sm: 'repeat(1, 1fr)',
-          md: 'repeat(2, 1fr)',
-        }}
-      >
-        <GridItem colSpan={1} rowSpan={1}>
-          <UserCard
-            isLoading={isLoading}
-            username={user.username}
-            isEditable={me && me.id === user.id}
-            numOfGamesPlayed={stats.gamesPlayed}
-            numOfPuzzlesLiked={stats.puzzlesLiked}
-            numOfPuzzlesCreated={stats.puzzlesCreated}
-            joined={isLoading ? loadingTime : user.createdAt}
-            onEdit={onOpen}
-          />
-        </GridItem>
-        <GridItem colSpan={1} rowSpan={1}>
-          <Box p="4" h="100%" bg="surface" boxShadow="sm" borderRadius="md">
-            <Heading size="sm">Achievements</Heading>
-            <VStack h="100%" justify="center">
-              <Avatar
-                size="md"
-                bg="primary"
-                color="surface"
-                icon={<Icon as={IoConstruct} />}
-              />
-              <Text fontSize="md" fontWeight="bold">
-                Coming Soon!
-              </Text>
-            </VStack>
-          </Box>
-        </GridItem>
-      </Grid>
+    <section
+      className={clsx(
+        "grid w-full auto-rows-fr grid-cols-2 gap-4",
 
-      {!!me && me.id === user.id && (
-        <UserUpdateModal
+        "max-md:grid-cols-1"
+      )}
+    >
+      <div className="col-span-1 row-span-1">
+        <UserCard
+          isEditable={me && me.id === user.id}
+          isLoading={isLoading}
           isOpen={isOpen}
-          initialValues={{ username: me.username }}
-          onClose={onClose}
-          onSubmit={(values, { setSubmitting }) => {
-            setSubmitting(true);
-
+          onEdit={(data) => {
             mutate(
-              { updates: values },
+              {
+                updates: data,
+              },
               {
                 onError: (error) => {
-                  toast({
-                    duration: 3000,
-                    status: 'error',
-                    title: `Failed to edit profile: ${error.message}`,
-                  });
-                },
-                onSettled: () => {
-                  setSubmitting(false);
+                  // TODO: Call toast here
+                  // toast({
+                  //   duration: 3000,
+                  //   status: "error",
+                  //   title: `Failed to edit profile: ${error.message}`,
+                  // });
+                  console.log(error);
                 },
               }
             );
 
-            onClose();
+            toggleIsOpen(false);
           }}
+          stats={stats}
+          togglsIsOpen={toggleIsOpen}
+          user={user}
         />
-      )}
-    </>
+      </div>
+
+      <div className="col-span-1 row-span-1">
+        <div className="h-full w-full rounded-lg bg-surface p-4">
+          <h2 className="font-heading font-bold">Achievements</h2>
+
+          <div className="flex h-full flex-col items-center justify-center gap-2">
+            <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cyan">
+              <div
+                role="img"
+                aria-label="Achievements"
+                className="text-xl font-medium text-surface"
+              >
+                <IoConstruct />
+              </div>
+            </span>
+
+            <p className="font-bold">Coming Soon!</p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 

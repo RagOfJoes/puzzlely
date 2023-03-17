@@ -16,7 +16,7 @@ export type UseClipboardOptions = {
 /**
  * Ref: https://github.com/chakra-ui/chakra-ui/blob/main/packages/legacy/hooks/src/use-clipboard.ts
  */
-export function useClipboard(
+function useClipboard(
   value: string,
   optionsOrTimeout: number | UseClipboardOptions = {}
 ) {
@@ -58,3 +58,5 @@ export function useClipboard(
     hasCopied,
   };
 }
+
+export default useClipboard;

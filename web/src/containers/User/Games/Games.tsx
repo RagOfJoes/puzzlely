@@ -1,21 +1,17 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { Grid, GridItem, Heading } from '@chakra-ui/react';
+import clsx from "clsx";
 
-import GameCard from '@/components/GameCard';
-import Waypoint from '@/components/Waypoint';
-import useGameHistory from '@/hooks/useGameHistory';
-import useMe from '@/hooks/useMe';
-import { GameConnection, GameEdge } from '@/types/game';
-import { User } from '@/types/user';
+import { GameCard } from "@/components/GameCard";
+import Waypoint from "@/components/Waypoint";
+import useGameHistory from "@/hooks/useGameHistory";
+import useMe from "@/hooks/useMe";
+import type { GameConnection, GameEdge } from "@/types/game";
+import type { User } from "@/types/user";
 
-import Loading from './Loading';
+import Loading from "./Loading";
 
-type ProfileGamesProps = {
-  user: User;
-};
-
-const Games = (props: ProfileGamesProps) => {
+function Games(props: { user: User }) {
   const { user } = props;
 
   const { data: me } = useMe();
@@ -33,15 +29,15 @@ const Games = (props: ProfileGamesProps) => {
       return {
         edges: [],
         pageInfo: {
-          cursor: '',
+          cursor: "",
           hasNextPage: false,
         },
       };
     }
 
-    const pageInfo: GameConnection['pageInfo'] = games.pages[
+    const pageInfo: GameConnection["pageInfo"] = games.pages[
       games.pages.length - 1
-    ]?.pageInfo || { cursor: '', hasNextPage: false };
+    ]?.pageInfo || { cursor: "", hasNextPage: false };
     const edges: GameEdge[] = [];
     games.pages.forEach((page) => {
       if (page.edges.length > 0) {
@@ -56,22 +52,20 @@ const Games = (props: ProfileGamesProps) => {
 
   if (connection.edges.length === 0 && isFetched) {
     return (
-      <Heading size="sm" color="text.secondary">
+      <h3 className="px-5 font-heading font-bold text-subtle">
         No games played.
-      </Heading>
+      </h3>
     );
   }
 
   return (
-    <Grid
-      gap="4"
-      w="100%"
-      templateColumns={{
-        base: 'repeat(1, 1fr)',
-        sm: 'repeat(1, 1fr)',
-        md: 'repeat(2, 1fr)',
-        xl: 'repeat(3, 1fr)',
-      }}
+    <div
+      className={clsx(
+        "grid w-full grid-cols-3 gap-4",
+
+        "max-xl:grid-cols-2",
+        "max-md:grid-cols-1"
+      )}
     >
       {!isFetched && isLoading && <Loading />}
 
@@ -84,9 +78,8 @@ const Games = (props: ProfileGamesProps) => {
           const isPlayable = me?.id !== user.id;
 
           return (
-            <GridItem colSpan={1} rowSpan={1} key={cursor}>
+            <div key={cursor} className="col-span-1 row-span-1">
               <GameCard
-                // puzzle.groups.length
                 id={node.id}
                 maxScore={8}
                 score={node.score}
@@ -101,7 +94,7 @@ const Games = (props: ProfileGamesProps) => {
                 timeAllowed={node.config.timeAllowed}
                 createdBy={node.puzzle.createdBy.username}
               />
-            </GridItem>
+            </div>
           );
         })}
 
@@ -117,8 +110,8 @@ const Games = (props: ProfileGamesProps) => {
           }}
         />
       )}
-    </Grid>
+    </div>
   );
-};
+}
 
 export default Games;
