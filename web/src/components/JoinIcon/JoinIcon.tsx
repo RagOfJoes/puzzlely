@@ -66,13 +66,13 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
 
         {/* Being One */}
         <circle
-          className="fill-muted/80"
+          className="fill-muted"
           cx="336.97785"
           cy="450.70425"
           r="42.01233"
         />
         <rect
-          className="fill-muted/80"
+          className="fill-muted"
           height="12.76328"
           transform="translate(-457.82019 238.05835) rotate(-26.60099)"
           width="22.86756"
@@ -80,7 +80,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           y="563.55388"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="563.82041"
           cy="573.74843"
           rx="3.98853"
@@ -88,7 +88,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           transform="translate(-489.27546 647.82906) rotate(-56.60122)"
         />
         <rect
-          className="fill-muted/80"
+          className="fill-muted"
           height="22.86756"
           transform="translate(-428.72163 791.92555) rotate(-63.39901)"
           width="12.76328"
@@ -96,7 +96,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           y="558.50174"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="637.60379"
           cy="573.74843"
           rx="10.63605"
@@ -111,7 +111,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           r="14.35864"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="597.86951"
           cy="515.08401"
           rx="4.76624"
@@ -125,7 +125,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           transform="translate(-263.73425 -80.80301)"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="644.38811"
           cy="537.56776"
           rx="6.59448"
@@ -133,7 +133,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           transform="translate(-458.4377 468.61755) rotate(-40.64516)"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="557.15365"
           cy="537.56776"
           rx="21.00616"
@@ -201,7 +201,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
 
         {/* Being Two */}
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="858.10361"
           cy="764.78333"
           rx="6.76007"
@@ -209,35 +209,35 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           transform="translate(-554.53185 648.46489) rotate(-39.93837)"
         />
         <circle
-          className="fill-muted/80"
+          className="fill-muted"
           cx="812.2965"
           cy="757.30544"
           r="43.06733"
           transform="translate(-426.75153 1207.63346) rotate(-71.56505)"
         />
         <rect
-          className="fill-muted/80"
+          className="fill-muted"
           x="553.7073"
           y="710.30199"
           width="13.08374"
           height="23.44171"
         />
         <rect
-          className="fill-muted/80"
+          className="fill-muted"
           x="527.53982"
           y="710.30199"
           width="13.08374"
           height="23.44171"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="555.8879"
           cy="734.01629"
           rx="10.90314"
           ry="4.08868"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="529.72042"
           cy="733.47115"
           rx="10.90314"
@@ -245,12 +245,12 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
         />
         {/* Being Two Hair */}
         <path
-          className="fill-subtle"
+          className="fill-text"
           d="M798.77365,703.16853c3.84557-15.487,20.82057-24.60076,37.91471-20.35617s27.83428,20.24028,23.98871,35.72729-16.60394,15.537-33.69809,11.29233S794.92806,718.65557,798.77365,703.16853Z"
           transform="translate(-263.73425 -80.80301)"
         />
         <ellipse
-          className="fill-muted/80"
+          className="fill-muted"
           cx="763.7883"
           cy="737.32189"
           rx="6.76007"
@@ -265,7 +265,7 @@ export const JoinIcon = forwardRef<SVGSVGElement, SVGProps<SVGSVGElement>>(
           r="14.35864"
         />
         <circle
-          className="fill-muted/80"
+          className="fill-muted"
           cx="536.22229"
           cy="662.26808"
           r="4.78622"
