@@ -66,7 +66,7 @@ export const AuthLayout = forwardRef<HTMLElement, AuthLayoutProps>(
             <Link
               href="/"
               className={clsx(
-                "mb-6 flex items-center px-4 no-underline outline-none",
+                "mb-6 flex items-center no-underline outline-none",
 
                 "focus-visible:ring"
               )}
