@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import clsx from "clsx";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { IoSearch } from "react-icons/io5";
@@ -48,11 +47,7 @@ export function Search() {
         <Input
           {...register("search")}
           placeholder="Search"
-          className={clsx(
-            "border-transparent text-sm",
-
-            "dark:aria-[invalid=false]:enabled:border-muted/20"
-          )}
+          className="border-transparent text-sm"
         >
           <InputLeftIcon>
             <IoSearch />

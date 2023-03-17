@@ -17,7 +17,6 @@ export function Settings() {
           className={clsx(
             "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent bg-surface text-subtle outline-none transition",
 
-            "dark:border-muted/20",
             "focus:ring",
             "hover:bg-muted/10"
           )}
