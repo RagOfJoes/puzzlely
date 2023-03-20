@@ -75,7 +75,7 @@ export function PrivacyContainer() {
         website,{" "}
         <Link
           className="font-medium text-cyan"
-          href={process.env.NEXT_PUBLIC_HOST_URL || ""}
+          href={`${process.env.NEXT_PUBLIC_HOST_URL || ""}/`}
         >
           {process.env.NEXT_PUBLIC_HOST_URL}
         </Link>
