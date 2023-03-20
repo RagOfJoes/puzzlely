@@ -21,6 +21,7 @@ function Cards(props: { edges: PuzzleEdge[] }) {
     <>
       {edges.map((edge) => {
         const { cursor, node } = edge;
+
         return (
           <div key={cursor} className="col-span-1 row-span-1">
             <PuzzleCard

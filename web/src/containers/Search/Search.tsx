@@ -49,6 +49,7 @@ export function SearchContainer(props: SearchContainerProps) {
           >
             {result.edges.map((edge) => {
               const { cursor, node } = edge;
+
               return (
                 <div key={cursor} className="col-span-1 row-span-1">
                   <PuzzleCard

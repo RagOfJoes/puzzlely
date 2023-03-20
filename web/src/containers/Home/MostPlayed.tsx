@@ -52,6 +52,7 @@ function MostPlayed() {
             }
 
             const { cursor, node } = edge;
+
             return (
               <div
                 className="col-span-1 row-span-1"
