@@ -1,25 +1,22 @@
-import { useToast } from '@chakra-ui/react';
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import dayjs from 'dayjs';
-import { useRouter } from 'next/router';
+import { useToast } from "@chakra-ui/react";
+import type { InfiniteData } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
+import { useRouter } from "next/router";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import useMe from '@/hooks/useMe';
-import { ERR_PUZZLE_LIKE, TOASTER_OPTS } from '@/lib/constants';
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import useMe from "@/hooks/useMe";
+import { ERR_PUZZLE_LIKE, TOASTER_OPTS } from "@/lib/constants";
 import {
   toggleLikePuzzleConnection,
   toggleLikePuzzlePages,
-} from '@/lib/puzzleConnection';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import { PuzzleConnection, PuzzleLike, PuzzleNode } from '@/types/puzzle';
-import { UserStats } from '@/types/user';
+} from "@/lib/puzzleConnection";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type { PuzzleConnection, PuzzleLike, PuzzleNode } from "@/types/puzzle";
+import type { UserStats } from "@/types/user";
 
-export const usePuzzleLike = () => {
+export function usePuzzleLike() {
   const queryKey = generateQueryKey.PuzzlesLiked();
 
   const router = useRouter();
@@ -37,7 +34,7 @@ export const usePuzzleLike = () => {
       if (!me) {
         throw new APIError(
           APIErrorCode.Unauthorized,
-          'You must be logged in to access this resource.'
+          "You must be logged in to access this resource."
         );
       }
       return api.togglePuzzleLike(puzzle.id);
@@ -47,13 +44,13 @@ export const usePuzzleLike = () => {
       // If the mutation fails, use the context return from onMutate to rollback cache
       onError: (err, _, context) => {
         if (err.code === APIErrorCode.Unauthorized) {
-          router.push('/login');
+          router.push("/login");
           return;
         }
 
         toast({
           duration: 3000,
-          status: 'error',
+          status: "error",
           isClosable: false,
           title: ERR_PUZZLE_LIKE,
         });
@@ -157,4 +154,4 @@ export const usePuzzleLike = () => {
       },
     }
   );
-};
+}

@@ -1,1 +1,1 @@
-export { default } from './PuzzlesLiked';
+export * from "./PuzzlesLiked";
