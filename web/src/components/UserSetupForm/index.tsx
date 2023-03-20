@@ -1,2 +1,2 @@
-export * from './UserSetupForm';
-export { default } from './UserSetupForm';
+export * from "./types";
+export * from "./UserSetupForm";

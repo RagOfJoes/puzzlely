@@ -1,58 +1,78 @@
-import { Button, HStack } from '@chakra-ui/react';
-import { Form, Formik, FormikHelpers } from 'formik';
-import * as yup from 'yup';
+import { forwardRef } from "react";
 
-import FormikInputControl from '@/components/FormikInputControl';
-import { USERNAME_SCHEMA } from '@/lib/constants';
-import { UserUpdatePayload } from '@/types/user';
+import { zodResolver } from "@hookform/resolvers/zod";
+import clsx from "clsx";
+import { useForm } from "react-hook-form";
 
-export type UserSetupFormProps = {
-  initialValues?: UserUpdatePayload;
-  onSubmit?: (
-    values: UserUpdatePayload,
-    helpers: FormikHelpers<UserUpdatePayload>
-  ) => void | Promise<void>;
-};
+import {
+  FormControl,
+  FormControlError,
+  FormControlHelper,
+  FormControlLabel,
+} from "@/components/FormControl";
+import { Input } from "@/components/Input";
+import type { UserUpdatePayload } from "@/types/user";
 
-const schema = yup.object().shape({
-  username: USERNAME_SCHEMA,
-});
+import { userSetupSchema } from "./schema";
+import type { UserSetupFormProps } from "./types";
 
-const UserSetupForm = (props: UserSetupFormProps) => {
-  const { initialValues = { username: '' }, onSubmit = () => {} } = props;
+export const UserSetupForm = forwardRef<HTMLFormElement, UserSetupFormProps>(
+  (props, ref) => {
+    const { className, defaultValues, onSubmit = () => {}, ...other } = props;
 
-  return (
-    <Formik
-      validateOnChange
-      validationSchema={schema}
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-    >
-      {({ dirty, isSubmitting, isValid }) => (
-        <Form style={{ width: '100%' }}>
-          <FormikInputControl
-            isRequired
-            name="username"
-            label="Username"
-            helperText="Must be 4 - 24 characters long. Only letters and numbers are allowed."
-            inputProps={{
-              autoComplete: 'off',
-            }}
-          />
-          <HStack mt="4" justify="end">
-            <Button
-              ml="auto"
-              type="submit"
-              isLoading={isSubmitting}
-              isDisabled={!dirty || isSubmitting || !isValid}
-            >
-              Submit
-            </Button>
-          </HStack>
-        </Form>
-      )}
-    </Formik>
-  );
-};
+    const { formState, handleSubmit, register } = useForm<UserUpdatePayload>({
+      defaultValues,
+      mode: "onChange",
+      reValidateMode: "onChange",
+      resolver: zodResolver(userSetupSchema),
+    });
 
-export default UserSetupForm;
+    return (
+      <form
+        {...other}
+        ref={ref}
+        className={clsx(
+          "w-full",
+
+          className
+        )}
+        onSubmit={(e) => {
+          handleSubmit(onSubmit)(e);
+        }}
+      >
+        <FormControl required invalid={!!formState.errors.username?.message}>
+          <FormControlLabel>Username</FormControlLabel>
+
+          <Input {...register("username")} autoComplete="off" />
+
+          <FormControlError>
+            {formState.errors.username?.message}
+          </FormControlError>
+          <FormControlHelper>
+            Must be 4 - 24 characters long. Only letters and numbers are
+            allowed.
+          </FormControlHelper>
+        </FormControl>
+
+        <div className="mt-6 flex justify-end">
+          <button
+            type="submit"
+            disabled={!!formState.errors.username || !formState.isDirty}
+            className={clsx(
+              "relative flex h-10 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-4 font-semibold text-surface outline-none transition",
+
+              "active:bg-cyan/70",
+              "disabled:cursor-not-allowed disabled:bg-cyan/40",
+              "focus-visible:ring focus-visible:ring-cyan/60",
+              "hover:bg-cyan/70"
+            )}
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    );
+  }
+);
+
+UserSetupForm.displayName = "UserSetupForm";

@@ -5,7 +5,7 @@ import { NextSeo } from "next-seo";
 import api from "@/api";
 import APIError from "@/api/error";
 import { UserContainer } from "@/containers/User";
-import UserSetupContainer from "@/containers/UserSetup";
+import { UserSetupContainer } from "@/containers/UserSetup";
 import useMe from "@/hooks/useMe";
 import { AuthLayout } from "@/layouts/Auth";
 import { MainLayout } from "@/layouts/Main";
