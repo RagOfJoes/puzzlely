@@ -1,8 +1,12 @@
-import { InfiniteData, QueryClient, QueryFilters } from '@tanstack/react-query';
+import type {
+  InfiniteData,
+  QueryClient,
+  QueryFilters,
+} from "@tanstack/react-query";
 
-import { GameConnection, GameNode } from '@/types/game';
+import type { GameConnection, GameNode } from "@/types/game";
 
-const updateNode = (newNode: GameNode, oldNode: GameNode): GameNode => {
+function updateNode(newNode: GameNode, oldNode: GameNode): GameNode {
   if (oldNode.id !== newNode.id) {
     return oldNode;
   }
@@ -10,13 +14,13 @@ const updateNode = (newNode: GameNode, oldNode: GameNode): GameNode => {
     ...oldNode,
     ...newNode,
   };
-};
+}
 
-export const updateGameConnection = async (
+export async function updateGameConnection(
   update: GameNode | ((node: GameNode) => GameNode),
   queryClient: QueryClient,
   queryFilters: QueryFilters
-): Promise<void> => {
+): Promise<void> {
   // Cancel any outgoing refetches so they don't overwrite our optimistic update
   await queryClient.cancelQueries(queryFilters);
 
@@ -32,7 +36,7 @@ export const updateGameConnection = async (
           return {
             ...page,
             edges: page.edges.map((edge) => {
-              if (typeof update === 'function') {
+              if (typeof update === "function") {
                 return {
                   ...edge,
                   node: update(edge.node),
@@ -48,4 +52,4 @@ export const updateGameConnection = async (
       };
     }
   );
-};
+}

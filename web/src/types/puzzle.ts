@@ -1,4 +1,4 @@
-import { User } from './user';
+import type { User } from "./user";
 
 /**
  * Base
@@ -48,7 +48,7 @@ export type Puzzle = {
   /**
    * Difficulty of the connection between blocks
    */
-  difficulty: 'Easy' | 'Medium' | 'Hard';
+  difficulty: "Easy" | "Medium" | "Hard";
   /**
    * Description can be used as hints, red herrings, etc.
    */
@@ -95,24 +95,24 @@ export type Puzzle = {
 
 export type PuzzleCreatePayload = Pick<
   Puzzle,
-  'name' | 'description' | 'difficulty' | 'maxAttempts' | 'timeAllowed'
+  "name" | "description" | "difficulty" | "maxAttempts" | "timeAllowed"
 > & {
-  groups: (Pick<Group, 'answers' | 'description'> & {
-    blocks: { value: Block['value'] }[];
+  groups: (Pick<Group, "answers" | "description"> & {
+    blocks: { value: Block["value"] }[];
   })[];
 };
 export type PuzzleUpdatePayload = Pick<
   Puzzle,
-  'name' | 'description' | 'difficulty'
+  "name" | "description" | "difficulty"
 > & {
-  groups: Pick<Group, 'id' | 'description'>[];
+  groups: Pick<Group, "id" | "description">[];
 };
 
 /**
  * Cursor pagination
  */
 
-export type PuzzleNode = Omit<Puzzle, 'groups'>;
+export type PuzzleNode = Omit<Puzzle, "groups">;
 export type PuzzleEdge = {
   cursor: string;
   node: PuzzleNode;
@@ -130,10 +130,10 @@ export type PuzzleConnection = {
  */
 
 export type PuzzleFilters =
-  | 'customizable_attempts'
-  | 'customizable_time'
-  | 'difficulty'
-  | 'num_of_likes';
+  | "customizable_attempts"
+  | "customizable_time"
+  | "difficulty"
+  | "num_of_likes";
 export type PuzzleLike = {
   id: string;
   active: boolean;

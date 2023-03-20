@@ -1,47 +1,47 @@
-import { QueryKey } from '@tanstack/react-query';
+import type { QueryKey } from "@tanstack/react-query";
 
-import { PuzzleFilters } from '@/types/puzzle';
+import type { PuzzleFilters } from "@/types/puzzle";
 
 export const queryKeys: {
   [key in
-    | 'Game'
-    | 'GamesHistory'
-    | 'Me'
-    | 'PuzzleDetail'
-    | 'PuzzlesCreated'
-    | 'PuzzlesLiked'
-    | 'PuzzlesList'
-    | 'PuzzlesMostLiked'
-    | 'PuzzlesMostPlayed'
-    | 'Search'
-    | 'UsersProfile'
-    | 'UsersStats']: QueryKey;
+    | "Game"
+    | "GamesHistory"
+    | "Me"
+    | "PuzzleDetail"
+    | "PuzzlesCreated"
+    | "PuzzlesLiked"
+    | "PuzzlesList"
+    | "PuzzlesMostLiked"
+    | "PuzzlesMostPlayed"
+    | "Search"
+    | "UsersProfile"
+    | "UsersStats"]: QueryKey;
 } = {
   // Games
   //
 
-  Game: ['games/play'],
-  GamesHistory: ['games/history'],
+  Game: ["games/play"],
+  GamesHistory: ["games/history"],
 
   // Puzzles
   //
 
-  PuzzlesCreated: ['puzzles/created'],
-  PuzzleDetail: ['puzzles/detail'],
-  PuzzlesLiked: ['puzzles/liked'],
-  PuzzlesList: ['puzzles/list'],
-  PuzzlesMostLiked: ['puzzles/mostLiked'],
-  PuzzlesMostPlayed: ['puzzles/mostPlayed'],
+  PuzzlesCreated: ["puzzles/created"],
+  PuzzleDetail: ["puzzles/detail"],
+  PuzzlesLiked: ["puzzles/liked"],
+  PuzzlesList: ["puzzles/list"],
+  PuzzlesMostLiked: ["puzzles/mostLiked"],
+  PuzzlesMostPlayed: ["puzzles/mostPlayed"],
 
   // User
   //
 
-  Me: ['me'],
-  UsersProfile: ['users/profile'],
-  UsersStats: ['users/stats'],
+  Me: ["me"],
+  UsersProfile: ["users/profile"],
+  UsersStats: ["users/stats"],
 
   // Misc.
-  Search: ['search'],
+  Search: ["search"],
 };
 
 export const generateQueryKey = {
