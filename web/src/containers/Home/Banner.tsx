@@ -12,7 +12,9 @@ function Banner() {
     );
   }
 
-  return <h2 className="font-heading text-3xl font-bold">Welcome Testing!</h2>;
+  return (
+    <h2 className="font-heading text-3xl font-bold">Welcome {me.username}!</h2>
+  );
 }
 
 export default Banner;

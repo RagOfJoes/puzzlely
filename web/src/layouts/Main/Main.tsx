@@ -105,8 +105,8 @@ export const MainLayout = forwardRef<HTMLDivElement, MainLayoutProps>(
                   <SidebarItem href="/profile/" isActive={!!isProfile}>
                     <SidebarIcon>
                       <IoPerson />
-                      Profile
                     </SidebarIcon>
+                    Profile
                   </SidebarItem>
                   <SidebarItem href="/api/logout">
                     <SidebarIcon>
