@@ -1,25 +1,25 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import { ERR_UNAUTHORIZED } from '@/lib/constants';
-import { updateGameConnection } from '@/lib/gameConnection';
-import { updatePuzzlePages } from '@/lib/puzzleConnection';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import { GameNode } from '@/types/game';
-import { PuzzleConnection, PuzzleNode } from '@/types/puzzle';
-import { UserUpdatePayload, User } from '@/types/user';
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import { ERR_UNAUTHORIZED } from "@/lib/constants";
+import { updateGameConnection } from "@/lib/gameConnection";
+import { updatePuzzlePages } from "@/lib/puzzleConnection";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type { GameNode } from "@/types/game";
+import type { PuzzleConnection, PuzzleNode } from "@/types/puzzle";
+import type { UserUpdatePayload, User } from "@/types/user";
 
-import useMe from './useMe';
+import useMe from "./useMe";
 
-const useUserUpdate = () => {
+function useUserUpdate() {
   const router = useRouter();
   const { data: me } = useMe();
   const queryClient = useQueryClient();
 
-  const gamesHistoryKey = generateQueryKey.GamesHistory(me?.id || '');
-  const puzzleCreatedKey = generateQueryKey.PuzzlesCreated(me?.id || '');
+  const gamesHistoryKey = generateQueryKey.GamesHistory(me?.id || "");
+  const puzzleCreatedKey = generateQueryKey.PuzzlesCreated(me?.id || "");
   const puzzleLikedKey = generateQueryKey.PuzzlesLiked();
   const puzzleListKey = queryKeys.PuzzlesList;
   const meKey = generateQueryKey.Me();
@@ -44,7 +44,7 @@ const useUserUpdate = () => {
         queryClient.setQueryData(meKey, () => context?.previous);
 
         if (err.code === APIErrorCode.Unauthorized) {
-          router.push('/login');
+          router.push("/login");
         }
       },
       onMutate: async ({ updates }) => {
@@ -138,6 +138,6 @@ const useUserUpdate = () => {
       },
     }
   );
-};
+}
 
 export default useUserUpdate;
