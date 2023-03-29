@@ -1,5 +1,7 @@
+import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
+import { Primitive } from "@radix-ui/react-primitive";
 import clsx from "clsx";
 import Link from "next/link";
 import { IoAdd } from "react-icons/io5";
@@ -9,14 +11,17 @@ import { Separator } from "@/components/Separator";
 
 import type { SidebarProps } from "./types";
 
-export const Sidebar = forwardRef<HTMLElement, SidebarProps>((props, ref) => {
+export const Sidebar = forwardRef<
+  ElementRef<typeof Primitive.nav>,
+  SidebarProps
+>((props, ref) => {
   const { children, isOpen } = props;
 
   return (
-    <nav
+    <Primitive.nav
       ref={ref}
       className={clsx(
-        "fixed h-screen w-64 flex-1 overflow-y-auto overflow-x-hidden bg-base px-5 pt-10 pb-6 transition-opacity duration-150",
+        "fixed h-screen w-64 flex-1 overflow-y-auto overflow-x-hidden bg-base px-5 pb-6 pt-10 transition-opacity duration-150",
 
         {
           "max-lg:opacity-0": !isOpen,
@@ -39,7 +44,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>((props, ref) => {
             className={clsx(
               "relative ml-3 font-heading text-xl font-bold",
 
-              'before:absolute before:left-0 before:right-2.5 before:bottom-1 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
+              'before:absolute before:bottom-1 before:left-0 before:right-2.5 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
             )}
           >
             Puzzlely
@@ -70,7 +75,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>((props, ref) => {
           {children}
         </div>
       </div>
-    </nav>
+    </Primitive.nav>
   );
 });
 

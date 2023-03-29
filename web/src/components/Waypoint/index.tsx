@@ -1,3 +1,2 @@
-export * from './Waypoint';
-
-export { default } from './Waypoint';
+export * from "./types";
+export * from "./Waypoint";

@@ -1,8 +1,11 @@
-import type { ComponentProps } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
 
 import type { Puzzle } from "@/types/puzzle";
 
-export type PuzzleCardProps = ComponentProps<"div"> &
+export type PuzzleCardProps = ComponentPropsWithoutRef<typeof Primitive.div> &
   Pick<
     Puzzle,
     | "createdAt"

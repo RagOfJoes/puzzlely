@@ -1,8 +1,15 @@
-import type { SVGProps } from "react";
+import type { ElementRef } from "react";
+import { forwardRef } from "react";
 
-export function NotFoundIcon(props: SVGProps<SVGSVGElement>) {
+import type { ComponentPropsWithoutRef } from "@radix-ui/react-primitive";
+import { Primitive } from "@radix-ui/react-primitive";
+
+export const NotFoundIcon = forwardRef<
+  ElementRef<typeof Primitive.svg>,
+  ComponentPropsWithoutRef<typeof Primitive.svg>
+>((props, ref) => {
   return (
-    <svg viewBox="0 0 523 336" {...props}>
+    <Primitive.svg viewBox="0 0 523 336" {...props} ref={ref}>
       {/* Being One */}
       <circle
         className="fill-muted"
@@ -265,6 +272,8 @@ export function NotFoundIcon(props: SVGProps<SVGSVGElement>) {
         cy="216.17011"
         r="6.46689"
       />
-    </svg>
+    </Primitive.svg>
   );
-}
+});
+
+NotFoundIcon.displayName = "NotFoundIcon";

@@ -1,3 +1,4 @@
+import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
@@ -8,7 +9,7 @@ import { useNumberInputCtx } from "./Context";
 import type { NumberInputDecrementButtonProps } from "./types";
 
 export const NumberInputDecrementButton = forwardRef<
-  HTMLButtonElement,
+  ElementRef<typeof Primitive.button>,
   NumberInputDecrementButtonProps
 >((props, ref) => {
   const { getDecrementButtonProps } = useNumberInputCtx();
@@ -19,7 +20,7 @@ export const NumberInputDecrementButton = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "flex flex-1 cursor-pointer select-none items-center justify-center border-t border-l leading-[normal] transition",
+        "flex flex-1 cursor-pointer select-none items-center justify-center border-l border-t leading-[normal] transition",
 
         "disabled:cursor-not-allowed disabled:text-muted/60",
 

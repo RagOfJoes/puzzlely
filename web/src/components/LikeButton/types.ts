@@ -1,6 +1,11 @@
-import type { ComponentProps } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
 
-export type LikeButtonProps = ComponentProps<"button"> & {
+export type LikeButtonProps = ComponentPropsWithoutRef<
+  typeof Primitive.button
+> & {
   isLiked?: boolean;
   numOfLikes?: number;
   onLike?: () => void | Promise<void>;

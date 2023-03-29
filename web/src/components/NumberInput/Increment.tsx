@@ -1,3 +1,4 @@
+import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
@@ -8,7 +9,7 @@ import { useNumberInputCtx } from "./Context";
 import type { NumberInputIncrementButtonProps } from "./types";
 
 export const NumberInputIncrementButton = forwardRef<
-  HTMLButtonElement,
+  ElementRef<typeof Primitive.button>,
   NumberInputIncrementButtonProps
 >((props, ref) => {
   const { getIncrementButtonProps } = useNumberInputCtx();

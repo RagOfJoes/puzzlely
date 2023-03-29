@@ -1,8 +1,8 @@
-import { useFormControlContext } from "./Context";
+import { useFormControlCtx } from "./Context";
 import type { UseFormControlProps } from "./types";
 
 function useFormControlProps(props: UseFormControlProps): UseFormControlProps {
-  const ctx = useFormControlContext();
+  const ctx = useFormControlCtx();
 
   const { id, disabled, invalid, readOnly, required, ...other } = props;
 

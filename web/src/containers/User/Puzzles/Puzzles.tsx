@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 
 import { PuzzleCard } from "@/components/PuzzleCard";
-import Waypoint from "@/components/Waypoint";
+import { Waypoint } from "@/components/Waypoint";
 import useMe from "@/hooks/useMe";
 import usePuzzleLike from "@/hooks/usePuzzleLike";
 import usePuzzlesCreated from "@/hooks/usePuzzlesCreated";

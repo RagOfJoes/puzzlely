@@ -1,18 +1,19 @@
+import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
 import clsx from "clsx";
 
-import { useFormControlContext } from "./Context";
+import { useFormControlCtx } from "./Context";
 import type { FormControlStarProps } from "./types";
 
 export const FormControlStar = forwardRef<
-  HTMLSpanElement,
+  ElementRef<typeof Primitive.span>,
   FormControlStarProps
 >((props, ref) => {
   const { children = "*", ...other } = props;
 
-  const { disabled } = useFormControlContext();
+  const { disabled } = useFormControlCtx();
 
   return (
     <Primitive.span

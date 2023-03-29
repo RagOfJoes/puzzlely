@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import clsx from "clsx";
 
 import { GameCard } from "@/components/GameCard";
-import Waypoint from "@/components/Waypoint";
+import { Waypoint } from "@/components/Waypoint";
 import useGameHistory from "@/hooks/useGameHistory";
 import useMe from "@/hooks/useMe";
 import type { GameConnection, GameEdge } from "@/types/game";

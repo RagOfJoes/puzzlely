@@ -1,8 +1,15 @@
-import type { SVGProps } from "react";
+import type { ElementRef } from "react";
+import { forwardRef } from "react";
 
-export function InternalErrorIcon(props: SVGProps<SVGSVGElement>) {
+import type { ComponentPropsWithoutRef } from "@radix-ui/react-primitive";
+import { Primitive } from "@radix-ui/react-primitive";
+
+export const InternalErrorIcon = forwardRef<
+  ElementRef<typeof Primitive.svg>,
+  ComponentPropsWithoutRef<typeof Primitive.svg>
+>((props, ref) => {
   return (
-    <svg viewBox="0 0 1119.60911 699" {...props}>
+    <Primitive.svg viewBox="0 0 1119.60911 699" {...props} ref={ref}>
       {/* Leaves */}
       <circle className="fill-surface" cx="292.60911" cy="213" r="213" />
       <path
@@ -320,6 +327,8 @@ export function InternalErrorIcon(props: SVGProps<SVGSVGElement>) {
         d="M394,661.5c0,7.732-19.90861,23-42,23s-43-14.268-43-22,20.90861-6,43-6S394,653.768,394,661.5Z"
         transform="translate(-31.39089 -100.5)"
       />
-    </svg>
+    </Primitive.svg>
   );
-}
+});
+
+InternalErrorIcon.displayName = "InternalErrorIcon";

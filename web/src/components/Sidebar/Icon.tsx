@@ -1,29 +1,32 @@
+import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
+import { Primitive } from "@radix-ui/react-primitive";
 import clsx from "clsx";
 
 import type { SidebarIconProps } from "./types";
 
-export const SidebarIcon = forwardRef<HTMLDivElement, SidebarIconProps>(
-  (props, ref) => {
-    const { children, className, ...other } = props;
+export const SidebarIcon = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  SidebarIconProps
+>((props, ref) => {
+  const { children, className, ...other } = props;
 
-    return (
-      <div
-        {...other}
-        ref={ref}
-        className={clsx(
-          "flex h-7 w-7 items-center justify-center rounded-lg bg-surface text-cyan",
+  return (
+    <Primitive.div
+      {...other}
+      ref={ref}
+      className={clsx(
+        "flex h-7 w-7 items-center justify-center rounded-lg bg-surface text-cyan",
 
-          "group-aria-[current=page]:bg-cyan group-aria-[current=page]:text-surface group-aria-[current=page]:shadow-sm",
+        "group-aria-[current=page]:bg-cyan group-aria-[current=page]:text-surface group-aria-[current=page]:shadow-sm",
 
-          className
-        )}
-      >
-        {children}
-      </div>
-    );
-  }
-);
+        className
+      )}
+    >
+      {children}
+    </Primitive.div>
+  );
+});
 
 SidebarIcon.displayName = "SidebarIcon";

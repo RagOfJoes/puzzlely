@@ -1,11 +1,13 @@
-import type { ComponentProps } from "react";
-
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
 import type { SubmitHandler } from "react-hook-form";
 
 import type { UserUpdatePayload } from "@/types/user";
 
 export type UserSetupFormProps = Omit<
-  ComponentProps<"form">,
+  ComponentPropsWithoutRef<typeof Primitive.form>,
   "children" | "onSubmit"
 > & {
   defaultValues?: UserUpdatePayload;

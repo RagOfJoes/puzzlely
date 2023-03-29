@@ -1,3 +1,4 @@
+import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
@@ -7,7 +8,7 @@ import { useNumberInputCtx } from "./Context";
 import type { NumberInputFieldProps } from "./types";
 
 export const NumberInputField = forwardRef<
-  HTMLInputElement,
+  ElementRef<typeof Primitive.input>,
   NumberInputFieldProps
 >((props, ref) => {
   const { getFieldProps } = useNumberInputCtx();

@@ -1,8 +1,16 @@
-import type { SVGProps } from "react";
+import { forwardRef } from "react";
 
-export function PuzzlelyIcon(props: SVGProps<SVGSVGElement>) {
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
+
+export const PuzzlelyIcon = forwardRef<
+  SVGSVGElement,
+  ComponentPropsWithoutRef<typeof Primitive.svg>
+>((props, ref) => {
   return (
-    <svg viewBox="0 0 480 480" {...props}>
+    <svg viewBox="0 0 480 480" {...props} ref={ref}>
       <rect rx="100" width="480" height="480" className="fill-surface" />
       <path
         strokeWidth="3"
@@ -103,4 +111,6 @@ export function PuzzlelyIcon(props: SVGProps<SVGSVGElement>) {
       />
     </svg>
   );
-}
+});
+
+PuzzlelyIcon.displayName = "PuzzlelyIcon";

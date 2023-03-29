@@ -70,7 +70,7 @@ function useFormControl(props: FormControlProps): UseFormControl {
     [disabled, helperID, invalid]
   );
   const getLabelProps = useCallback<UseFormControl["getLabelProps"]>(
-    (labelProps = {}) => ({
+    (labelProps, forwardedRef) => ({
       ...labelProps,
       className: clsx(
         "mb-2 font-medium",
@@ -86,6 +86,7 @@ function useFormControl(props: FormControlProps): UseFormControl {
       "data-readonly": readOnly,
       htmlFor: labelProps.htmlFor ?? id,
       id: labelProps.id ?? labelID,
+      ref: forwardedRef,
     }),
     [disabled, id, invalid, labelID, readOnly]
   );

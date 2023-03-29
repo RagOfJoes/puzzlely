@@ -1,9 +1,14 @@
-import type { ComponentProps } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
 
-export type InputProps = ComponentProps<"input"> & {
+export type InputProps = ComponentPropsWithoutRef<typeof Primitive.input> & {
   invalid?: boolean;
 };
 
-export type InputLeftIconProps = ComponentProps<"div">;
+export type InputLeftIconProps = ComponentPropsWithoutRef<typeof Primitive.div>;
 
-export type InputRightIconProps = ComponentProps<"div">;
+export type InputRightIconProps = ComponentPropsWithoutRef<
+  typeof Primitive.div
+>;

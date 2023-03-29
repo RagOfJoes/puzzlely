@@ -1,17 +1,19 @@
+import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
+import { Primitive } from "@radix-ui/react-primitive";
 import clsx from "clsx";
 
 import type { SidebarHeadingProps } from "./types";
 
 export const SidebarHeading = forwardRef<
-  HTMLHeadingElement,
+  ElementRef<typeof Primitive.h3>,
   SidebarHeadingProps
 >((props, ref) => {
   const { children, className, ...other } = props;
 
   return (
-    <h3
+    <Primitive.h3
       {...other}
       ref={ref}
       className={clsx(
@@ -23,7 +25,7 @@ export const SidebarHeading = forwardRef<
       )}
     >
       {children}
-    </h3>
+    </Primitive.h3>
   );
 });
 

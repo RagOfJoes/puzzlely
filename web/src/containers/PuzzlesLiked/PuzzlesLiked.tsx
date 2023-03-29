@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import clsx from "clsx";
 
-import Waypoint from "@/components/Waypoint";
+import { Waypoint } from "@/components/Waypoint";
 import useMe from "@/hooks/useMe";
 import usePuzzlesLiked from "@/hooks/usePuzzlesLiked";
 import useUserStats from "@/hooks/useUserStats";

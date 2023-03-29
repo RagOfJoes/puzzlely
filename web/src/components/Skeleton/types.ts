@@ -1,5 +1,8 @@
-import type { ComponentProps } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
 
-export type SkeletonProps = ComponentProps<"div"> & {
+export type SkeletonProps = ComponentPropsWithoutRef<typeof Primitive.div> & {
   isLoaded?: boolean;
 };
