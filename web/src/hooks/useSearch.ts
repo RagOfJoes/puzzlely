@@ -1,10 +1,10 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import APIError from '@/api/error';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { PuzzleConnection } from '@/types/puzzle';
+import type APIError from "@/api/error";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { PuzzleConnection } from "@/types/puzzle";
 
-const useSearch = (term: string) => {
+function useSearch(term: string) {
   const queryClient = useQueryClient();
 
   return useQuery<PuzzleConnection, APIError>(
@@ -12,7 +12,7 @@ const useSearch = (term: string) => {
     async ({ queryKey }) => {
       const cached = queryClient.getQueryData<PuzzleConnection>(queryKey);
       if (!cached) {
-        return { edges: [], pageInfo: { cursor: '', hasNextPage: false } };
+        return { edges: [], pageInfo: { cursor: "", hasNextPage: false } };
       }
       return cached;
     },
@@ -22,6 +22,6 @@ const useSearch = (term: string) => {
       refetchOnWindowFocus: false,
     }
   );
-};
+}
 
 export default useSearch;

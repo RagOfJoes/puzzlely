@@ -3,9 +3,9 @@ import { useMemo, useCallback, useRef, useState } from "react";
 
 import useAttributeObserver from "@/hooks/useAttributeObserver";
 import useCallbackRef from "@/hooks/useCallbackRef";
-import { useCounter } from "@/hooks/useCounter";
+import useCounter from "@/hooks/useCounter";
 import { mergeRefs } from "@/hooks/useMergeRefs";
-import { useSafeLayoutEffect } from "@/hooks/useSafeLayoutEffect";
+import useSafeLayoutEffect from "@/hooks/useSafeLayoutEffect";
 import useSpinner from "@/hooks/useSpinner";
 import useUpdateEffect from "@/hooks/useUpdateEffect";
 

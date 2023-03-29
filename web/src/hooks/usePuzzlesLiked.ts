@@ -1,15 +1,15 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import { PUZZLES_LIMIT } from '@/lib/constants';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { PuzzleConnection } from '@/types/puzzle';
+import api from "@/api";
+import type APIError from "@/api/error";
+import { PUZZLES_LIMIT } from "@/lib/constants";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { PuzzleConnection } from "@/types/puzzle";
 
-const usePuzzlesLiked = () => {
+function usePuzzlesLiked() {
   return useInfiniteQuery<PuzzleConnection, APIError>(
     generateQueryKey.PuzzlesLiked(),
-    async ({ pageParam = '' }) => {
+    async ({ pageParam = "" }) => {
       return api.findPuzzlesLiked({ limit: PUZZLES_LIMIT, cursor: pageParam });
     },
     {
@@ -26,6 +26,6 @@ const usePuzzlesLiked = () => {
       },
     }
   );
-};
+}
 
 export default usePuzzlesLiked;

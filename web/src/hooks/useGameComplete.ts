@@ -1,24 +1,21 @@
-import { useToast } from '@chakra-ui/react';
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useToast } from "@chakra-ui/react";
+import type { InfiniteData } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import { ERR_FAILED_UPDATE_GAME } from '@/lib/constants';
-import { generateQueryKey } from '@/lib/queryKeys';
-import {
+import api from "@/api";
+import type APIError from "@/api/error";
+import { ERR_FAILED_UPDATE_GAME } from "@/lib/constants";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type {
   Game,
   GameConnection,
   GameEdge,
   GameUpdatePayload,
   GameUpdateResponse,
-} from '@/types/game';
-import { UserStats } from '@/types/user';
+} from "@/types/game";
+import type { UserStats } from "@/types/user";
 
-const useGameComplete = (id: string) => {
+function useGameComplete(id: string) {
   const toast = useToast();
   const queryClient = useQueryClient();
 
@@ -42,7 +39,7 @@ const useGameComplete = (id: string) => {
       // Render toast
       toast({
         duration: 3000,
-        status: 'error',
+        status: "error",
         isClosable: false,
         title: ERR_FAILED_UPDATE_GAME,
       });
@@ -101,7 +98,7 @@ const useGameComplete = (id: string) => {
                 {
                   cursor: Buffer.from(
                     `Cursor:${updatedGame.createdAt}`
-                  ).toString('base64'),
+                  ).toString("base64"),
                   node: {
                     id: updatedGame.id,
                     score: updatedGame.score,
@@ -160,6 +157,6 @@ const useGameComplete = (id: string) => {
       }
     },
   });
-};
+}
 
 export default useGameComplete;

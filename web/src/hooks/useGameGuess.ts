@@ -1,13 +1,13 @@
-import { useToast } from '@chakra-ui/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useToast } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import { ERR_FAILED_UPDATE_GAME } from '@/lib/constants';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { Game, GameUpdatePayload, GameUpdateResponse } from '@/types/game';
+import api from "@/api";
+import type APIError from "@/api/error";
+import { ERR_FAILED_UPDATE_GAME } from "@/lib/constants";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { Game, GameUpdatePayload, GameUpdateResponse } from "@/types/game";
 
-const useGameGuess = (id: string) => {
+function useGameGuess(id: string) {
   const toast = useToast();
   const queryClient = useQueryClient();
 
@@ -29,7 +29,7 @@ const useGameGuess = (id: string) => {
       // Render toast
       toast({
         duration: 3000,
-        status: 'error',
+        status: "error",
         isClosable: false,
         title: ERR_FAILED_UPDATE_GAME,
       });
@@ -52,6 +52,6 @@ const useGameGuess = (id: string) => {
       return { previous };
     },
   });
-};
+}
 
 export default useGameGuess;

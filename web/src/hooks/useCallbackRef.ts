@@ -1,9 +1,10 @@
+import type { DependencyList } from "react";
 import { useCallback, useEffect, useRef } from "react";
 
-const useCallbackRef = <T extends (...args: any[]) => any>(
+function useCallbackRef<T extends (...args: any[]) => any>(
   callback: T | undefined,
-  deps: React.DependencyList = []
-) => {
+  deps: DependencyList = []
+) {
   const callbackRef = useRef(callback);
 
   useEffect(() => {
@@ -12,6 +13,6 @@ const useCallbackRef = <T extends (...args: any[]) => any>(
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(((...args) => callbackRef.current?.(...args)) as T, deps);
-};
+}
 
 export default useCallbackRef;

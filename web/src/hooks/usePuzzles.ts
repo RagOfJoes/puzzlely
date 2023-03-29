@@ -1,19 +1,22 @@
-import { QueryKey, useInfiniteQuery } from '@tanstack/react-query';
+import type { QueryKey } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import { PUZZLES_LIMIT } from '@/lib/constants';
-import { PuzzleConnection, PuzzleFilters } from '@/types/puzzle';
+import api from "@/api";
+import type APIError from "@/api/error";
+import { PUZZLES_LIMIT } from "@/lib/constants";
+import type { PuzzleConnection, PuzzleFilters } from "@/types/puzzle";
 
-const usePuzzles = (
+function usePuzzles(
   queryKey: QueryKey,
   params: {
-    filters: { [key in PuzzleFilters]?: string };
+    filters: {
+      [key in PuzzleFilters]?: string;
+    };
   }
-) => {
+) {
   return useInfiniteQuery<PuzzleConnection, APIError>(
     queryKey,
-    async ({ pageParam = '' }) => {
+    async ({ pageParam = "" }) => {
       const { filters } = params;
 
       return api.findPuzzles(
@@ -35,6 +38,6 @@ const usePuzzles = (
       },
     }
   );
-};
+}
 
 export default usePuzzles;

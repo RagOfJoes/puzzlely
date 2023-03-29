@@ -1,23 +1,24 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 
-import shuffle from 'lodash.shuffle';
+import shuffle from "lodash.shuffle";
 
-import { Game } from '@/types/game';
-import { Block } from '@/types/puzzle';
+import type { Game } from "@/types/game";
+import type { Block } from "@/types/puzzle";
 
 export type UseGameShuffleParams = {
   blocks: Block[];
-  completedAt: Game['completedAt'];
-  correct: Game['correct'];
-  guessedAt: Game['guessedAt'];
+  completedAt: Game["completedAt"];
+  correct: Game["correct"];
+  guessedAt: Game["guessedAt"];
   setBlocks: Dispatch<SetStateAction<Block[]>>;
-  startedAt: Game['startedAt'];
+  startedAt: Game["startedAt"];
 };
 
 /**
  * When User shuffles blocks during the Game.
  */
-const useGameShuffle = (args: UseGameShuffleParams) => {
+function useGameShuffle(args: UseGameShuffleParams) {
   const { blocks, completedAt, correct, guessedAt, setBlocks, startedAt } =
     args;
 
@@ -43,6 +44,6 @@ const useGameShuffle = (args: UseGameShuffleParams) => {
     setBlocks(newBlocks);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blocks, correct, completedAt, guessedAt, startedAt]);
-};
+}
 
 export default useGameShuffle;

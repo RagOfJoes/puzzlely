@@ -1,27 +1,24 @@
-import { useToast } from '@chakra-ui/react';
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { useRouter } from 'next/router';
+import { useToast } from "@chakra-ui/react";
+import type { InfiniteData } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import useMe from '@/hooks/useMe';
-import { ERR_UNAUTHORIZED } from '@/lib/constants';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { PuzzleConnection, PuzzleLike, PuzzleNode } from '@/types/puzzle';
-import { UserStats } from '@/types/user';
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import useMe from "@/hooks/useMe";
+import { ERR_UNAUTHORIZED } from "@/lib/constants";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { PuzzleConnection, PuzzleLike, PuzzleNode } from "@/types/puzzle";
+import type { UserStats } from "@/types/user";
 
-const usePuzzleLike = () => {
+function usePuzzleLike() {
   const toast = useToast();
   const router = useRouter();
   const { data: me } = useMe();
   const queryClient = useQueryClient();
 
   const likedKey = generateQueryKey.PuzzlesLiked();
-  const statsKey = generateQueryKey.UsersStats(me?.id || '');
+  const statsKey = generateQueryKey.UsersStats(me?.id || "");
 
   return useMutation<PuzzleLike, APIError, PuzzleNode>(
     async (puzzle) => {
@@ -34,14 +31,14 @@ const usePuzzleLike = () => {
       retry: false,
       onError: (err) => {
         if (err.code === APIErrorCode.Unauthorized || !me) {
-          router.push('/login');
+          router.push("/login");
           return;
         }
 
         // Render toast
         toast({
           duration: 3000,
-          status: 'error',
+          status: "error",
           isClosable: false,
           title: err.message,
         });
@@ -91,7 +88,7 @@ const usePuzzleLike = () => {
               const newData = { ...old };
               const newCursor = Buffer.from(
                 `Cursor:${like.updatedAt!}`
-              ).toString('base64');
+              ).toString("base64");
               const updatedPuzzle: PuzzleNode = {
                 ...puzzle,
                 numOfLikes: puzzle.numOfLikes + 1,
@@ -113,6 +110,6 @@ const usePuzzleLike = () => {
       },
     }
   );
-};
+}
 
 export default usePuzzleLike;

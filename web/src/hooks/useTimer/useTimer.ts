@@ -1,19 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from "react";
 
-import useInterval from '../useInterval';
-import { UseTimerParam, UseTimerReturn } from './types';
+import type { UseTimerParam, UseTimerReturn } from "./types";
+import useInterval from "../useInterval";
 
-const useTimer = ({
+function useTimer({
   autostart = false,
   endTime,
-  initialStatus = 'STOPPED',
-  startTime = 0,
+  initialStatus = "STOPPED",
   interval = 1000,
-  step = 1,
-  timerType = 'INCREMENTAL',
   onTimeOver,
   onTimeUpdate,
-}: Partial<UseTimerParam> = {}): UseTimerReturn => {
+  startTime = 0,
+  step = 1,
+  timerType = "INCREMENTAL",
+}: Partial<UseTimerParam> = {}): UseTimerReturn {
   const [state, setState] = useState({
     status: initialStatus,
     time: startTime,
@@ -25,40 +25,40 @@ const useTimer = ({
     (timeToAdd: number) => {
       setState((prev) => ({
         ...prev,
-        time: timerType === 'DECREMENTAL' ? time - timeToAdd : time + timeToAdd,
+        time: timerType === "DECREMENTAL" ? time - timeToAdd : time + timeToAdd,
       }));
     },
     [time, timerType]
   );
 
   const pause = useCallback(() => {
-    if (status !== 'RUNNING') {
+    if (status !== "RUNNING") {
       return;
     }
     setState((prev) => ({
       ...prev,
-      status: 'PAUSED',
+      status: "PAUSED",
     }));
   }, [status]);
 
   const reset = useCallback(() => {
     setState(() => ({
-      status: 'STOPPED',
+      status: "STOPPED",
       time: startTime,
     }));
   }, [startTime]);
 
   const resetTo = useCallback((newTime: number, shouldAutostart: boolean) => {
     setState((prev) => ({
-      status: shouldAutostart ? 'RUNNING' : prev.status,
-      time: prev.status === 'STOPPED' ? newTime : prev.time,
+      status: shouldAutostart ? "RUNNING" : prev.status,
+      time: prev.status === "STOPPED" ? newTime : prev.time,
     }));
   }, []);
 
   const start = useCallback(() => {
     setState((prev) => ({
-      status: 'RUNNING',
-      time: prev.status === 'STOPPED' ? startTime : prev.time,
+      status: "RUNNING",
+      time: prev.status === "STOPPED" ? startTime : prev.time,
     }));
   }, [startTime]);
 
@@ -70,18 +70,18 @@ const useTimer = ({
   }, []);
 
   useEffect(() => {
-    if (typeof onTimeUpdate === 'function') {
+    if (typeof onTimeUpdate === "function") {
       onTimeUpdate(time);
     }
   }, [time, onTimeUpdate]);
 
   useEffect(() => {
-    if (status !== 'STOPPED' && time === endTime) {
+    if (status !== "STOPPED" && time === endTime) {
       setState({
         time: endTime,
-        status: 'STOPPED',
+        status: "STOPPED",
       });
-      if (typeof onTimeOver === 'function') {
+      if (typeof onTimeOver === "function") {
         onTimeOver();
       }
     }
@@ -91,13 +91,13 @@ const useTimer = ({
     () => {
       setState((prev) => ({
         ...prev,
-        time: timerType === 'DECREMENTAL' ? prev.time - step : prev.time + step,
+        time: timerType === "DECREMENTAL" ? prev.time - step : prev.time + step,
       }));
     },
-    status === 'RUNNING' ? interval : null
+    status === "RUNNING" ? interval : null
   );
 
   return { advanceTime, pause, reset, resetTo, start, status, time };
-};
+}
 
 export default useTimer;

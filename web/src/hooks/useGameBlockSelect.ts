@@ -1,27 +1,28 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
-import useGameGuess from '@/hooks/useGameGuess';
-import { UNLIMITED_MAX_ATTEMPTS } from '@/lib/constants';
-import groupBy from '@/lib/groupBy';
-import uniqueBy from '@/lib/uniqueBy';
-import { Game } from '@/types/game';
-import { Block } from '@/types/puzzle';
+import useGameGuess from "@/hooks/useGameGuess";
+import { UNLIMITED_MAX_ATTEMPTS } from "@/lib/constants";
+import groupBy from "@/lib/groupBy";
+import uniqueBy from "@/lib/uniqueBy";
+import type { Game } from "@/types/game";
+import type { Block } from "@/types/puzzle";
 
 export type UseGameBlockSelectParam = {
   blocks: Block[];
-  correct: Game['correct'];
+  correct: Game["correct"];
   game: Game;
   isGameOver: boolean;
   isWrong: boolean;
   pause: () => void;
   selected: Block[];
   setBlocks: Dispatch<SetStateAction<Block[]>>;
-  setCorrect: Dispatch<SetStateAction<Game['correct']>>;
+  setCorrect: Dispatch<SetStateAction<Game["correct"]>>;
   setGame: Dispatch<SetStateAction<Game>>;
   setSelected: Dispatch<SetStateAction<Block[]>>;
-  startedAt: Game['startedAt'];
+  startedAt: Game["startedAt"];
   toggleIsGameOver: Dispatch<SetStateAction<boolean>>;
   toggleIsWrong: Dispatch<SetStateAction<boolean>>;
 };
@@ -29,7 +30,7 @@ export type UseGameBlockSelectParam = {
 /**
  * When User selects a Block
  */
-const useGameBlockSelect = (args: UseGameBlockSelectParam) => {
+function useGameBlockSelect(args: UseGameBlockSelectParam) {
   const {
     blocks,
     correct,
@@ -153,7 +154,7 @@ const useGameBlockSelect = (args: UseGameBlockSelectParam) => {
           .filter((g) => !newCorrect.includes(g.id))
           .map((g) => g.id);
         // Make sure there's only one group left also make typescript happy
-        if (lastGroup.length === 1 && typeof lastGroup[0] === 'string') {
+        if (lastGroup.length === 1 && typeof lastGroup[0] === "string") {
           newCorrect.push(lastGroup[0]);
         }
       }
@@ -217,6 +218,6 @@ const useGameBlockSelect = (args: UseGameBlockSelectParam) => {
       startedAt,
     ]
   );
-};
+}
 
 export default useGameBlockSelect;

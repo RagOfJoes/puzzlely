@@ -1,6 +1,7 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useEffect } from "react";
 
-import { Block } from '@/types/puzzle';
+import type { Block } from "@/types/puzzle";
 
 export type UseGameWrongParams = {
   isWrong: boolean;
@@ -13,7 +14,7 @@ export type UseGameWrongParams = {
  * - Reset `selected` state
  * - Reset `isWrong` state to false
  */
-const useGameWrong = (params: UseGameWrongParams) => {
+function useGameWrong(params: UseGameWrongParams) {
   const { isWrong, setSelected, toggleIsWrong } = params;
 
   return useEffect(() => {
@@ -37,6 +38,6 @@ const useGameWrong = (params: UseGameWrongParams) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWrong]);
-};
+}
 
 export default useGameWrong;

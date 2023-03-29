@@ -1,15 +1,15 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import { PUZZLES_LIMIT } from '@/lib/constants';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { PuzzleConnection } from '@/types/puzzle';
+import api from "@/api";
+import type APIError from "@/api/error";
+import { PUZZLES_LIMIT } from "@/lib/constants";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { PuzzleConnection } from "@/types/puzzle";
 
-const usePuzzlesCreated = (userID: string) => {
+function usePuzzlesCreated(userID: string) {
   return useInfiniteQuery<PuzzleConnection, APIError>(
     generateQueryKey.PuzzlesCreated(userID),
-    async ({ pageParam = '' }) =>
+    async ({ pageParam = "" }) =>
       api.findPuzzlesCreated(userID, PUZZLES_LIMIT, pageParam),
     {
       // 30 minutes
@@ -25,6 +25,6 @@ const usePuzzlesCreated = (userID: string) => {
       },
     }
   );
-};
+}
 
 export default usePuzzlesCreated;

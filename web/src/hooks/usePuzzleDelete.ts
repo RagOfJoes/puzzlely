@@ -1,15 +1,15 @@
-import { useToast } from '@chakra-ui/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
+import { useToast } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import { ERR_UNAUTHORIZED } from '@/lib/constants';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import { ERR_UNAUTHORIZED } from "@/lib/constants";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
 
-import useMe from './useMe';
+import useMe from "./useMe";
 
-const usePuzzleDelete = () => {
+function usePuzzleDelete() {
   const toast = useToast();
   const router = useRouter();
   const { data: me } = useMe();
@@ -26,14 +26,14 @@ const usePuzzleDelete = () => {
       retry: false,
       onError: async (err) => {
         if (err.code === APIErrorCode.Unauthorized || !me) {
-          router.push('/login');
+          router.push("/login");
           return;
         }
 
         // Render toast
         toast({
           duration: 3000,
-          status: 'error',
+          status: "error",
           isClosable: false,
           title: err.message,
         });
@@ -42,7 +42,7 @@ const usePuzzleDelete = () => {
         // Reset Game and Puzzle queries
         const resetCreated = queryClient.resetQueries({
           exact: true,
-          queryKey: generateQueryKey.PuzzlesCreated(me?.id ?? ''),
+          queryKey: generateQueryKey.PuzzlesCreated(me?.id ?? ""),
         });
         const resetGamesPlayed = queryClient.resetQueries({
           exact: false,
@@ -62,7 +62,7 @@ const usePuzzleDelete = () => {
         const resetStats = queryClient.resetQueries(
           {
             exact: true,
-            queryKey: generateQueryKey.UsersStats(me?.id || ''),
+            queryKey: generateQueryKey.UsersStats(me?.id || ""),
           },
           {
             cancelRefetch: true,
@@ -78,10 +78,10 @@ const usePuzzleDelete = () => {
         ]);
 
         // Redirect to profile page
-        router.push('/profile');
+        router.push("/profile");
       },
     }
   );
-};
+}
 
 export default usePuzzleDelete;

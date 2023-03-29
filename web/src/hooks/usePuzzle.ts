@@ -1,15 +1,12 @@
-import {
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from '@tanstack/react-query';
-import he from 'he';
+import type { UseQueryResult } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import he from "he";
 
-import APIError, { APIErrorCode } from '@/api/error';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { Puzzle } from '@/types/puzzle';
+import APIError, { APIErrorCode } from "@/api/error";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { Puzzle } from "@/types/puzzle";
 
-const usePuzzle = (id: string): UseQueryResult<Puzzle, APIError> => {
+function usePuzzle(id: string): UseQueryResult<Puzzle, APIError> {
   const queryClient = useQueryClient();
 
   return useQuery<Puzzle, APIError>(
@@ -17,7 +14,7 @@ const usePuzzle = (id: string): UseQueryResult<Puzzle, APIError> => {
     async ({ queryKey }) => {
       const cached = queryClient.getQueryData<Puzzle>(queryKey);
       if (!cached) {
-        throw new APIError(APIErrorCode.NotFound, 'Puzzle not found.');
+        throw new APIError(APIErrorCode.NotFound, "Puzzle not found.");
       }
       return cached;
     },
@@ -51,6 +48,6 @@ const usePuzzle = (id: string): UseQueryResult<Puzzle, APIError> => {
       onError: async () => {},
     }
   );
-};
+}
 
 export default usePuzzle;

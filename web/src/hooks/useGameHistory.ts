@@ -1,15 +1,15 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import { GAMES_LIMIT } from '@/lib/constants';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { GameConnection } from '@/types/game';
+import api from "@/api";
+import type APIError from "@/api/error";
+import { GAMES_LIMIT } from "@/lib/constants";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { GameConnection } from "@/types/game";
 
-const useGameHistory = (userID: string) => {
+function useGameHistory(userID: string) {
   return useInfiniteQuery<GameConnection, APIError>(
     generateQueryKey.GamesHistory(userID),
-    async ({ pageParam = '' }) =>
+    async ({ pageParam = "" }) =>
       api.findGameHistory(userID, GAMES_LIMIT, pageParam),
     {
       // 30 minutes
@@ -25,6 +25,6 @@ const useGameHistory = (userID: string) => {
       },
     }
   );
-};
+}
 
 export default useGameHistory;

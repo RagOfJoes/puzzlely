@@ -1,27 +1,27 @@
-import { useToast } from '@chakra-ui/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/router';
+import { useToast } from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import useMe from '@/hooks/useMe';
-import { ERR_UNAUTHORIZED } from '@/lib/constants';
-import { updatePuzzlePages } from '@/lib/puzzleConnection';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import {
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import useMe from "@/hooks/useMe";
+import { ERR_UNAUTHORIZED } from "@/lib/constants";
+import { updatePuzzlePages } from "@/lib/puzzleConnection";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type {
   Puzzle,
   PuzzleConnection,
   PuzzleNode,
   PuzzleUpdatePayload,
-} from '@/types/puzzle';
+} from "@/types/puzzle";
 
-const usePuzzleUpdate = (id: string) => {
+function usePuzzleUpdate(id: string) {
   const toast = useToast();
   const router = useRouter();
   const { data: me } = useMe();
   const queryClient = useQueryClient();
 
-  const createdKey = generateQueryKey.PuzzlesCreated(me?.id || '');
+  const createdKey = generateQueryKey.PuzzlesCreated(me?.id || "");
   const likedKey = generateQueryKey.PuzzlesLiked();
   const listKey = queryKeys.PuzzlesList;
   const searchKey = queryKeys.Search;
@@ -37,14 +37,14 @@ const usePuzzleUpdate = (id: string) => {
       retry: false,
       onError: async (err) => {
         if (err.code === APIErrorCode.Unauthorized || !me) {
-          router.push('/login');
+          router.push("/login");
           return;
         }
 
         // Render toast
         toast({
           duration: 3000,
-          status: 'error',
+          status: "error",
           isClosable: false,
           title: err.message,
         });
@@ -91,10 +91,10 @@ const usePuzzleUpdate = (id: string) => {
         ]);
 
         // Redirect to Profile page
-        router.push('/profile');
+        router.push("/profile");
       },
     }
   );
-};
+}
 
 export default usePuzzleUpdate;

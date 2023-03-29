@@ -60,7 +60,7 @@ function cast(
   return toPrecision(parsedValue, precision ?? decimalPlaces);
 }
 
-export function useCounter(props: UseCounterProps = {}) {
+function useCounter(props: UseCounterProps = {}) {
   const {
     onChange: onChangeProp,
     precision: precisionProp,
@@ -179,3 +179,5 @@ export function useCounter(props: UseCounterProps = {}) {
     valueAsNumber,
   };
 }
+
+export default useCounter;

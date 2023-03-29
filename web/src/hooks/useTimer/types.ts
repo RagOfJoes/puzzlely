@@ -1,5 +1,6 @@
-export type TimerType = 'DECREMENTAL' | 'INCREMENTAL';
-export type Status = 'RUNNING' | 'PAUSED' | 'STOPPED';
+export type Status = "RUNNING" | "PAUSED" | "STOPPED";
+
+export type TimerType = "DECREMENTAL" | "INCREMENTAL";
 
 export type UseTimerParam = {
   autostart: boolean;

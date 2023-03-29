@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
-import useGameComplete from '@/hooks/useGameComplete';
-import { Game } from '@/types/game';
+import useGameComplete from "@/hooks/useGameComplete";
+import type { Game } from "@/types/game";
 
 export type UseGameConnectParam = {
   game: Game;
@@ -19,7 +20,7 @@ export type UseGameConnectConnection = {
 /**
  * When User submits guesses to group connections
  */
-const useGameConnect = (args: UseGameConnectParam) => {
+function useGameConnect(args: UseGameConnectParam) {
   const { game, setGame } = args;
   const {
     attempts,
@@ -44,7 +45,7 @@ const useGameConnect = (args: UseGameConnectParam) => {
       }
 
       let correctCount = 0;
-      const results: Game['results'] = [];
+      const results: Game["results"] = [];
       puzzle.groups.forEach((group) => {
         const connection = connections[group.id];
         if (!connection) {
@@ -95,6 +96,6 @@ const useGameConnect = (args: UseGameConnectParam) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [attempts, completedAt, config, correct, guessedAt, score, startedAt]
   );
-};
+}
 
 export default useGameConnect;
