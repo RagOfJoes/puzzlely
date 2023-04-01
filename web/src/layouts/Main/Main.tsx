@@ -1,6 +1,5 @@
 import { forwardRef, useMemo, useState } from "react";
 
-import { Slot } from "@radix-ui/react-slot";
 import clsx from "clsx";
 import { useRouter } from "next/router";
 import { NextSeo } from "next-seo";
@@ -22,7 +21,7 @@ import type { MainLayoutProps } from "./types";
 
 export const MainLayout = forwardRef<HTMLDivElement, MainLayoutProps>(
   (props, ref) => {
-    const { asChild, breadcrumbLinks = [], children, ...rest } = props;
+    const { breadcrumbLinks = [], children, className, ...other } = props;
 
     const router = useRouter();
     const { data: me } = useMe();
@@ -31,7 +30,6 @@ export const MainLayout = forwardRef<HTMLDivElement, MainLayoutProps>(
 
     const [isOpen, toggleIsOpen] = useState(false);
 
-    const Container = asChild ? Slot : "div";
     const isProfile = useMemo(() => {
       return me && router.pathname.split("/")?.[1] === PROFILE_ROUTE;
     }, [me, router.pathname]);
@@ -136,7 +134,7 @@ export const MainLayout = forwardRef<HTMLDivElement, MainLayoutProps>(
 
           <div
             className={clsx(
-              "relative left-0 z-[1] ml-64 flex min-h-screen flex-1 justify-center overflow-y-auto overflow-x-hidden transition-[left,margin-left] duration-150 ease-linear",
+              "relative left-0 z-[1] ml-64 flex min-h-screen overflow-y-auto overflow-x-hidden transition-[left,margin-left] ease-linear",
 
               "max-lg:ml-0",
 
@@ -146,10 +144,9 @@ export const MainLayout = forwardRef<HTMLDivElement, MainLayoutProps>(
               }
             )}
           >
-            <Container
+            <div
               ref={ref}
-              className="w-full max-w-7xl pt-5 pb-10"
-              {...rest}
+              className="flex w-full max-w-7xl flex-col pb-10 pt-5"
             >
               <Topbar
                 isOpen={isOpen}
@@ -157,8 +154,17 @@ export const MainLayout = forwardRef<HTMLDivElement, MainLayoutProps>(
                 toggleIsOpen={toggleIsOpen}
               />
 
-              <main className="px-5 pt-[calc(34px+0.5rem)]">{children}</main>
-            </Container>
+              <main
+                className={clsx(
+                  "px-5 pt-[calc(34px+0.5rem)]",
+
+                  className
+                )}
+                {...other}
+              >
+                {children}
+              </main>
+            </div>
           </div>
         </div>
       </>
