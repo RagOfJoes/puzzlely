@@ -13,7 +13,7 @@ export function FAQContainer() {
             className={clsx(
               "relative mt-12 inline-block font-heading text-xl font-bold leading-none",
 
-              'before:absolute before:left-0 before:right-0 before:bottom-0 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
+              'before:absolute before:bottom-0 before:left-0 before:right-0 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
             )}
           >
             {section.title}

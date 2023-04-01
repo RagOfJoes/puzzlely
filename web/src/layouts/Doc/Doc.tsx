@@ -61,7 +61,7 @@ export const DocLayout = forwardRef<HTMLElement, DocLayoutProps>(
           ]}
         />
 
-        <div className="m-auto flex max-w-5xl flex-col items-start py-6 px-4">
+        <div className="m-auto flex max-w-5xl flex-col items-start px-4 py-6">
           <header>
             <Link
               href="/"
@@ -77,7 +77,7 @@ export const DocLayout = forwardRef<HTMLElement, DocLayoutProps>(
                 className={clsx(
                   "relative ml-3 font-heading text-xl font-bold",
 
-                  'before:absolute before:left-0 before:right-2.5 before:bottom-1 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
+                  'before:absolute before:bottom-1 before:left-0 before:right-2.5 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
                 )}
               >
                 Puzzlely

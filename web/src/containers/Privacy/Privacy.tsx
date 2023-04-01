@@ -45,7 +45,7 @@ function List(props: ComponentProps<"ul">) {
       {...other}
       role="list"
       className={clsx(
-        "mt-4 ml-4 list-disc pl-4",
+        "ml-4 mt-4 list-disc pl-4",
 
         className
       )}

@@ -29,7 +29,7 @@ export const Sidebar = forwardRef<
         }
       )}
     >
-      <div className="h-full rounded-md bg-none transition duration-200 ease-linear">
+      <div className="h-full rounded-md bg-none">
         <Link
           href="/"
           className={clsx(

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import type { QueryKey } from "@tanstack/react-query";
 import clsx from "clsx";
 
-import Waypoint from "@/components/Waypoint";
+import { Waypoint } from "@/components/Waypoint";
 import usePuzzles from "@/hooks/usePuzzles";
 import { generateQueryKey } from "@/lib/queryKeys";
 import type {

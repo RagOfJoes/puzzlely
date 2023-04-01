@@ -84,7 +84,7 @@ function Filter(props: FilterProps) {
                     "dark:bg-muted/20"
                   )}
                 >
-                  <p className="text-ellipsis text-sm font-medium capitalize leading-none line-clamp-1">
+                  <p className="line-clamp-1 text-ellipsis text-sm font-medium capitalize leading-none">
                     {filter.label}: {filters[typedKey]}
                   </p>
 
