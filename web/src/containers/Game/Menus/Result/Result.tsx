@@ -1,36 +1,29 @@
-import { SetStateAction } from 'react';
+import type { SetStateAction } from "react";
 
-import {
-  Button,
-  Divider,
-  HStack,
-  Icon,
-  Text,
-  useClipboard,
-  VStack,
-} from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
-import Link from 'next/link';
-import { IoCheckbox, IoCopy } from 'react-icons/io5';
+import { useQueryClient } from "@tanstack/react-query";
+import clsx from "clsx";
+import dayjs from "dayjs";
+import Link from "next/link";
+import { IoCheckbox, IoCopy } from "react-icons/io5";
 
-import GameChallengerResults from '@/components/GameChallengerResults';
-import GameMenuCard from '@/components/GameMenuCard';
-import LikeButton from '@/components/LikeButton';
-import { ResultMenuProps } from '@/containers/Game';
-import usePuzzleLike from '@/hooks/usePuzzleLike';
+import { GameChallengerResults } from "@/components/GameChallengerResults";
+import { GameMenuCard } from "@/components/GameMenuCard";
+import { LikeButton } from "@/components/LikeButton";
+import useClipboard from "@/hooks/useClipboard";
+import usePuzzleLike from "@/hooks/usePuzzleLike";
 import {
   toggleLikePuzzleConnection,
   toggleLikePuzzlePages,
-} from '@/lib/puzzleConnection';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import { Game } from '@/types/game';
+} from "@/lib/puzzleConnection";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type { Game } from "@/types/game";
 
-import Attempts from './Attempts';
-import Guesses from './Guesses';
-import Overview from './Overview';
+import Attempts from "./Attempts";
+import Guesses from "./Guesses";
+import Overview from "./Overview";
+import type { ResultMenuProps } from "../../types";
 
-const Result = (props: ResultMenuProps) => {
+function Result(props: ResultMenuProps) {
   const { blocks, game, setGame } = props;
   const {
     attempts,
@@ -43,7 +36,7 @@ const Result = (props: ResultMenuProps) => {
     score,
     startedAt,
   } = game;
-  const { createdBy, groups, likedAt, name, numOfLikes } = puzzle;
+  const { groups } = puzzle;
 
   const { mutate } = usePuzzleLike();
   const queryClient = useQueryClient();
@@ -54,27 +47,28 @@ const Result = (props: ResultMenuProps) => {
 
   return (
     <GameMenuCard>
-      <HStack w="100%" justify="space-between">
-        <VStack w="100%" spacing="0" align="flex-start">
-          <Text fontSize="sm" fontWeight="semibold">
-            {name}
-          </Text>
-          <Link passHref href={`/users/${createdBy.username}`}>
-            <Text
-              as="a"
-              fontSize="xs"
-              fontWeight="medium"
-              color="text.secondary"
-            >
-              {createdBy.username}
-            </Text>
+      <div className="flex w-full items-center justify-between gap-6">
+        <div className="flex w-full flex-col items-start justify-center">
+          <h3 className="line-clamp-1 text-ellipsis font-heading text-sm font-bold leading-tight">
+            {puzzle.name}
+          </h3>
+
+          <Link
+            className={clsx(
+              "text-sm font-semibold leading-tight text-subtle outline-none",
+
+              "focus-visible:ring"
+            )}
+            href={`/users/${puzzle.createdBy.username}`}
+          >
+            {puzzle.createdBy.username}
           </Link>
-        </VStack>
+        </div>
 
         <LikeButton
-          isLiked={!!likedAt}
-          numOfLikes={numOfLikes}
-          onLike={() => {
+          isLiked={!!puzzle.likedAt}
+          numOfLikes={puzzle.numOfLikes}
+          onLike={async () => {
             const now = dayjs().tz().toDate();
             const action: SetStateAction<Game> = (prev) => ({
               ...prev,
@@ -129,51 +123,65 @@ const Result = (props: ResultMenuProps) => {
             });
           }}
         />
-      </HStack>
+      </div>
 
-      <Button
-        mt="4"
-        size="sm"
-        width="100%"
+      <button
         aria-label="Copy challenge code"
-        leftIcon={<Icon as={hasCopied ? IoCheckbox : IoCopy} />}
-        onClick={onCopy}
+        className={clsx(
+          "relative mt-4 flex h-8 w-full shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md border bg-cyan px-3 text-sm font-semibold text-surface outline-none transition",
+
+          "focus-visible:ring focus-visible:ring-cyan",
+          "hover:bg-cyan/70"
+        )}
+        onClick={() => onCopy()}
       >
-        {hasCopied ? 'Copied!' : 'Challenge your friends.'}
-      </Button>
+        {hasCopied ? <IoCheckbox /> : <IoCopy />}
+        {hasCopied ? "Copied!" : "Challenge your friends."}
+      </button>
 
       {!!challengedBy && (
         <>
-          <Divider my="4" />
+          <hr className="my-4 h-[1px] w-full bg-muted/20" />
+
           <GameChallengerResults
-            user={challengedBy.user}
-            score={challengedBy.score}
-            maxScore={groups.length * 2}
             attempts={challengedBy.attempts}
             maxAttempts={config.maxAttempts}
+            maxScore={groups.length * 2}
+            score={challengedBy.score}
+            user={challengedBy.user}
           />
-          <Divider my="4" />
+
+          <hr className="my-4 h-[1px] w-full bg-muted/20" />
         </>
       )}
 
-      <VStack mt="4" w="100%" spacing="4">
+      <div className="mt-4 flex w-full flex-col items-center justify-center gap-4">
         <Overview
           completedAt={completedAt}
           puzzle={puzzle}
           score={score}
           startedAt={startedAt}
         />
+
         <Attempts attempts={attempts} blocks={blocks} />
+
         <Guesses blocks={blocks} puzzle={puzzle} results={results} />
 
-        <Link passHref href="/puzzles">
-          <Button w="100%" size="sm" aria-label="Back to puzzles">
-            Back to Puzzles
-          </Button>
+        <Link
+          href="/puzzles"
+          className={clsx(
+            "relative flex h-10 w-full select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-4 font-semibold text-surface outline-none transition",
+
+            "active:bg-cyan/70",
+            "focus-visible:ring focus-visible:ring-cyan/60",
+            "hover:bg-cyan/70"
+          )}
+        >
+          Back to Puzzles
         </Link>
-      </VStack>
+      </div>
     </GameMenuCard>
   );
-};
+}
 
 export default Result;

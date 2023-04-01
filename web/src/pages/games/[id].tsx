@@ -1,25 +1,24 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import GameContainer from '@/containers/Game';
-import GameErrorContainer from '@/containers/GameError';
-import useGame from '@/hooks/useGame';
-import MainLayout from '@/layouts/Main';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import isUUID from '@/lib/isUUID';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { Game } from '@/types/game';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import { GameContainer } from "@/containers/Game";
+import { GameErrorContainer } from "@/containers/GameError";
+import useGame from "@/hooks/useGame";
+import { MainLayout } from "@/layouts/Main";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import isUUID from "@/lib/isUUID";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { Game } from "@/types/game";
+import type { User } from "@/types/user";
 
 export type GamePageProps = {
   id: string;
 };
 
-const GamePage = (props: GamePageProps) => {
+function GamePage(props: GamePageProps) {
   const { id } = props;
 
   const { data, error, isError, isSuccess } = useGame(id);
@@ -28,18 +27,12 @@ const GamePage = (props: GamePageProps) => {
     return (
       <>
         <MainLayout
-          display="flex"
-          flexDirection="column"
-          breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}
-          sx={{
-            '& > main': {
-              marginY: 'auto',
-            },
-          }}
+          breadcrumbLinks={[{ path: "/puzzles", title: "Puzzles" }]}
+          className="my-auto"
         >
           <GameErrorContainer
             error={
-              error || new APIError(APIErrorCode.NotFound, 'Game not found.')
+              error || new APIError(APIErrorCode.NotFound, "Game not found.")
             }
           />
         </MainLayout>
@@ -52,11 +45,9 @@ const GamePage = (props: GamePageProps) => {
   return (
     <>
       <MainLayout
-        layoutScroll
-        as={motion.div}
         breadcrumbLinks={[
-          { path: '/puzzles', title: 'Puzzles' },
-          { path: '/', title: data.puzzle.name },
+          { path: "/puzzles", title: "Puzzles" },
+          { path: "/", title: data.puzzle.name },
         ]}
       >
         <GameContainer game={data} />
@@ -65,17 +56,17 @@ const GamePage = (props: GamePageProps) => {
       <NextSeo noindex nofollow title={data.puzzle.name} />
     </>
   );
-};
+}
 
 export const getServerSideProps: GetServerSideProps<GamePageProps> = async (
   ctx
 ) => {
   const gameID = ctx.query.id;
-  if (typeof gameID !== 'string' || !isUUID(gameID)) {
+  if (typeof gameID !== "string" || !isUUID(gameID)) {
     return {
       redirect: {
         permanent: false,
-        destination: '/puzzles',
+        destination: "/puzzles",
       },
     };
   }
@@ -110,11 +101,11 @@ export const getServerSideProps: GetServerSideProps<GamePageProps> = async (
   await Promise.all([meQuery, gameQuery]);
 
   const me = queryClient.getQueryData<User>(meKey);
-  if (me && me.state === 'PENDING') {
+  if (me && me.state === "PENDING") {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }

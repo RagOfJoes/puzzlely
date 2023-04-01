@@ -1,2 +1,2 @@
-export * from './GameChallengerResults';
-export { default } from './GameChallengerResults';
+export * from "./types";
+export * from "./GameChallengerResults";

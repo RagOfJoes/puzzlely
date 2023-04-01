@@ -1,95 +1,63 @@
-import { useMemo } from 'react';
+import { forwardRef } from "react";
 
-import {
-  Box,
-  forwardRef,
-  GridItem,
-  Text,
-  useColorModeValue,
-  usePrefersReducedMotion,
-} from '@chakra-ui/react';
-import { motion } from 'framer-motion';
+import clsx from "clsx";
+import { motion } from "framer-motion";
 
-import { GameGridBlockProps } from './types';
+import type { GameGridBlockProps } from "./types";
 
-const GameGridBlock = forwardRef<GameGridBlockProps, 'div'>((props, ref) => {
-  const {
-    children,
-    isCorrect = false,
-    isDisabled = false,
-    isError = false,
-    isSelected = false,
-    ...otherProps
-  } = props;
+export const GameGridBlock = forwardRef<HTMLButtonElement, GameGridBlockProps>(
+  (props, ref) => {
+    const {
+      children,
+      className,
+      isCorrect,
+      isDisabled,
+      isError,
+      isSelected,
+      ...other
+    } = props;
 
-  const reduceMotion = usePrefersReducedMotion();
+    return (
+      <motion.button
+        {...other}
+        ref={ref}
+        className={clsx(
+          "col-span-1 row-span-1 appearance-none rounded-xl bg-surface outline-none transition-[background-color,box-shadow,color]",
 
-  const background = useMemo(() => {
-    if (isCorrect) {
-      return 'primary';
-    }
-    if (isError) {
-      return 'red.500';
-    }
-    if (isSelected) {
-      return 'background';
-    }
+          "dark:data-[selected=true]:enabled:shadow-[inset_5px_5px_10px_#0d0c12,inset_-5px_-5px_10px_#262336]",
+          "data-[correct=true]:cursor-not-allowed data-[correct=true]:bg-muted/20 data-[correct=true]:text-subtle data-[correct=true]:hover:bg-muted/20",
+          "data-[error=true]:enabled:bg-red data-[error=true]:enabled:text-base data-[error=true]:focus-visible:enabled:ring-red/60",
+          "data-[selected=true]:enabled:bg-base data-[selected=true]:enabled:shadow-[inset_5px_5px_10px_#dcd6d1,inset_-5px_-5px_10px_#ffffff]",
+          "disabled:cursor-not-allowed disabled:opacity-40",
+          "first-of-type:col-start-1 first-of-type:col-end-1 first-of-type:row-start-1 first-of-type:row-end-1",
+          "focus-visible:enabled:ring",
+          "hover:enabled:bg-muted/10",
+          "motion-reduce:transition-none",
 
-    return 'surface';
-  }, [isCorrect, isError, isSelected]);
-  const color = isCorrect || isError ? 'white' : 'text.primary';
-  const hoverBg = useColorModeValue('gray.200', 'whiteAlpha.300');
-  const selectedBoxShadow = useColorModeValue(
-    'inset 4px 4px 8px 0 rgba(26, 32, 44, 0.2), inset -4px -4px 8px 0 rgba(247, 250, 252, 0.8)',
-    'inset 4px 4px 8px 0 rgba(0, 0, 0, 0.2), inset -4px -4px 8px 0 rgba(26, 32, 44, 0.8)'
-  );
-
-  return (
-    <GridItem
-      ref={ref}
-      {...otherProps}
-      rowSpan={1}
-      colSpan={1}
-      color={color}
-      as={motion.div}
-      borderRadius="xl"
-      bgColor={background}
-      layout={!reduceMotion}
-      opacity={isDisabled ? '0.4' : '1'}
-      cursor={isCorrect ? 'not-allowed' : 'pointer'}
-      boxShadow={!isError && isSelected ? selectedBoxShadow : ''}
-      transition="0.2s linear background-color,box-shadow,color, 0.4s linear opacity"
-      animate={{
-        transition: { damping: 25, type: 'spring' },
-      }}
-      _hover={
-        isCorrect || isDisabled || isError || isSelected
-          ? {}
-          : {
-              bg: hoverBg,
-            }
-      }
-    >
-      <Box
-        p="2"
-        w="100%"
-        h="100%"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
+          className
+        )}
+        data-correct={isCorrect}
+        data-disabled={isDisabled}
+        data-error={isError}
+        data-selected={isSelected}
+        disabled={isDisabled}
+        layout
+        transition={{
+          layout: {
+            duration: 0.3,
+          },
+        }}
       >
-        <Text
-          fontSize="md"
-          noOfLines={2}
-          align="center"
-          userSelect="none"
-          fontWeight="medium"
-        >
-          {isDisabled ? '_'.repeat(children?.toString().length || 0) : children}
-        </Text>
-      </Box>
-    </GridItem>
-  );
-});
+        <div className="flex h-full w-full items-center justify-center p-2">
+          <p className="line-clamp-4 select-none text-center font-medium leading-tight">
+            {isDisabled
+              ? "_".repeat(children?.toString().length || 0)
+              : children}
+          </p>
+        </div>
+      </motion.button>
+    );
+  }
+);
 
-export default GameGridBlock;
+GameGridBlock.displayName = "GameGridBlock";

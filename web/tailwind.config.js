@@ -2,14 +2,14 @@
 module.exports = {
   content: ["./src/**/*.{ts,tsx,js,jsx}"],
   darkMode: ["class", ".puzzlely-dark"],
-  plugins: [
-    // eslint-disable-next-line max-len
-    // eslint-disable-next-line global-require, import/no-extraneous-dependencies
-    require("@tailwindcss/line-clamp"),
-  ],
+  plugins: [],
   theme: {
     extend: {
       animation: {
+        accordionSlideDown:
+          "accordionSlideDown 300ms cubic-bezier(0.87, 0, 0.13, 1)",
+        accordionSlideUp:
+          "accordionSlideUp 300ms cubic-bezier(0.87, 0, 0.13, 1)",
         skeleton: "skeleton linear infinite alternate 800ms",
         "skeleton-fade": "skeleton-fade 400ms",
         toasterEnter: "toasterEnter 200ms ease-out",
@@ -56,6 +56,22 @@ module.exports = {
       },
 
       keyframes: {
+        accordionSlideDown: {
+          from: {
+            height: 0,
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        accordionSlideUp: {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: 0,
+          },
+        },
         skeleton: {
           from: {
             background: "hsl(var(--color-muted) / 0.2)",

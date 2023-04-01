@@ -1,16 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { Heading, HStack, Text, VStack } from '@chakra-ui/react';
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
-import { ResultMenuProps } from '../../types';
+import type { ResultMenuProps } from "../../types";
 
-const Overview = (
+function Overview(
   props: Pick<
-    ResultMenuProps['game'],
-    'completedAt' | 'puzzle' | 'score' | 'startedAt'
+    ResultMenuProps["game"],
+    "completedAt" | "puzzle" | "score" | "startedAt"
   >
-) => {
+) {
   const { completedAt, puzzle, score, startedAt } = props;
   const { groups } = puzzle;
 
@@ -18,42 +17,40 @@ const Overview = (
     const diff = dayjs.duration(
       dayjs(completedAt).tz().diff(dayjs(startedAt).tz())
     );
-    return diff.format('HH:mm:ss');
+    return diff.format("HH:mm:ss");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <VStack w="100%" align="flex-start">
-      <Heading size="xs" noOfLines={1}>
-        Overview
-      </Heading>
-      <HStack w="100%" justify="space-between">
-        <Text fontSize="sm" fontWeight="medium" color="text.secondary">
-          Score
-        </Text>
-        <Text fontSize="sm" fontWeight="medium">
-          {score}
-          <Text
-            as="small"
-            fontSize="sm"
-            fontWeight="medium"
-            color="text.secondary"
-          >
-            {' / '}
-            {groups.length * 2}
-          </Text>
-        </Text>
-      </HStack>
-      <HStack w="100%" justify="space-between">
-        <Text fontSize="sm" fontWeight="medium" color="text.secondary">
-          Total Time
-        </Text>
-        <Text fontSize="sm" fontWeight="medium">
-          {timeElapsed}
-        </Text>
-      </HStack>
-    </VStack>
+    <div className="w-full">
+      <h4 className="font-heading text-sm font-bold leading-tight">Overview</h4>
+
+      <div className="mt-1 flex w-full flex-col items-start justify-center gap-1">
+        <div className="flex w-full items-center justify-between">
+          <p className="text-sm font-semibold leading-tight text-subtle">
+            Score
+          </p>
+
+          <p className="text-sm font-semibold leading-tight">
+            {score}
+
+            <small className="text-sm font-semibold leading-tight text-subtle">
+              {" / "}
+              {groups.length * 2}
+            </small>
+          </p>
+        </div>
+
+        <div className="flex w-full items-center justify-between">
+          <p className="text-sm font-semibold leading-tight text-subtle">
+            Total Time
+          </p>
+
+          <p className="text-sm font-semibold leading-tight">{timeElapsed}</p>
+        </div>
+      </div>
+    </div>
   );
-};
+}
 
 export default Overview;

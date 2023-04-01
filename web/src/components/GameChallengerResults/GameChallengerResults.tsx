@@ -1,71 +1,76 @@
-import { Heading, HStack, Text } from '@chakra-ui/react';
-import Link from 'next/link';
+import type { ElementRef } from "react";
+import { forwardRef } from "react";
 
-import { User } from '@/types/user';
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
+import Link from "next/link";
 
-export type GameChallengerResultsProps = {
-  attempts: number;
-  maxAttempts: number;
-  maxScore: number;
-  score: number;
-  user?: User;
-};
+import type { GameChallengerResultsProps } from "./types";
 
-const GameChallengerResults = (props: GameChallengerResultsProps) => {
-  const { attempts, maxAttempts, maxScore: numOfGroups, score, user } = props;
+export const GameChallengerResults = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  GameChallengerResultsProps
+>((props, ref) => {
+  const { attempts, maxAttempts, maxScore, score, user } = props;
 
   return (
-    <>
-      <Heading size="xs">Challenger&apos;s results</Heading>
+    <Primitive.div ref={ref}>
+      <h4 className="font-heading text-sm font-bold leading-tight">
+        Challenger&apos;s results
+      </h4>
 
-      <HStack mt="1" w="100%" justify="space-between">
-        <Text fontSize="sm" fontWeight="medium" color="text.secondary">
-          Score
-        </Text>
-        <Text fontSize="sm" fontWeight="medium">
-          {score}
-          <Text
-            as="small"
-            fontSize="sm"
-            fontWeight="medium"
-            color="text.secondary"
-          >
-            {' / '}
-            {numOfGroups}
-          </Text>
-        </Text>
-      </HStack>
-      <HStack mt="1" w="100%" justify="space-between">
-        <Text fontSize="sm" fontWeight="medium" color="text.secondary">
-          Attempts
-        </Text>
-        <Text fontSize="sm" fontWeight="medium">
-          {attempts}
-          <Text
-            as="small"
-            fontSize="sm"
-            fontWeight="medium"
-            color="text.secondary"
-          >
-            {' / '}
-            {maxAttempts}
-          </Text>
-        </Text>
-      </HStack>
-      {!!user && (
-        <HStack mt="1" w="100%" justify="space-between">
-          <Text fontSize="sm" fontWeight="medium" color="text.secondary">
-            Challenger
-          </Text>
-          <Link passHref href={`/users/${user.username}`}>
-            <Text as="a" fontSize="sm" noOfLines={1} fontWeight="medium">
+      <div className="mt-1 flex flex-col items-start justify-center gap-1">
+        <div className="flex w-full items-center justify-between">
+          <p className="text-sm font-semibold leading-tight text-subtle">
+            Score
+          </p>
+
+          <p className="text-sm font-semibold leading-tight">
+            {score}
+
+            <small className="text-sm font-semibold leading-tight text-subtle">
+              {" / "}
+              {maxScore}
+            </small>
+          </p>
+        </div>
+
+        <div className="flex w-full items-center justify-between">
+          <p className="text-sm font-semibold leading-tight text-subtle">
+            Attempts
+          </p>
+
+          <p className="text-sm font-semibold leading-tight">
+            {attempts}
+
+            <small className="text-sm font-semibold leading-tight text-subtle">
+              {" / "}
+              {maxAttempts}
+            </small>
+          </p>
+        </div>
+
+        {!!user && (
+          <div className="flex w-full items-center justify-between">
+            <p className="text-sm font-semibold leading-tight text-subtle">
+              Challenger
+            </p>
+
+            <Link
+              className={clsx(
+                "text-sm font-bold leading-tight outline-none",
+
+                "focus-visible:ring"
+              )}
+              href={`/users/${user.username}`}
+            >
               {user.username}
-            </Text>
-          </Link>
-        </HStack>
-      )}
-    </>
+            </Link>
+          </div>
+        )}
+      </div>
+    </Primitive.div>
   );
-};
+});
 
-export default GameChallengerResults;
+GameChallengerResults.displayName = "GameChallengerResults";

@@ -1,2 +1,2 @@
-export * from './GameStatCard';
-export { default } from './GameStatCard';
+export * from "./types";
+export * from "./GameStatCard";

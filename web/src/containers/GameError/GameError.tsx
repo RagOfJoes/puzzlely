@@ -1,63 +1,55 @@
-import { Box, Button, Heading, HStack, Icon, Text } from '@chakra-ui/react';
-import Link from 'next/link';
+import clsx from "clsx";
+import Link from "next/link";
 
-import APIError from '@/api/error';
-import GameErrorIcon from '@/components/GameErrorIcon';
+import { NotFoundIcon } from "@/components/NotFoundIcon";
 
-export type GameErrorContainerProps = {
-  error: APIError;
-};
+import type { GameErrorContainerProps } from "./types";
 
-const GameErrorContainer = (props: GameErrorContainerProps) => {
+export function GameErrorContainer(props: GameErrorContainerProps) {
   const { error } = props;
 
   return (
-    <Box
-      w="100%"
-      h="100%"
-      display="flex"
-      alignItems="center"
-      justifyContent={{ base: 'flex-start', md: 'space-evenly' }}
-    >
-      <Box
-        display="flex"
-        maxW="container.md"
-        flexDirection="column"
-        alignItems="flex-start"
-        justifyContent="center"
-        w={{ base: '100%', md: 'auto' }}
-      >
-        <Heading size="md">{error.code}...</Heading>
-        <Text mt="4" fontSize="md" fontWeight="medium">
-          {error.message}
-        </Text>
-        <HStack mt="8" w="100%">
-          <Link passHref href="/puzzles">
-            <Button
-              variant="outline"
-              colorScheme="gray"
-              w={{ base: '100%', md: 'auto' }}
-            >
-              Puzzles
-            </Button>
+    <article className="mx-auto w-full max-w-xl">
+      <div className="flex flex-col gap-4">
+        <NotFoundIcon className="h-auto max-h-64 w-full" />
+
+        <div className="my-auto flex w-full flex-col justify-center gap-0.5">
+          <h2 className="font-heading text-xl font-bold leading-none">
+            {error.code}...
+          </h2>
+          <p className="font-medium leading-none text-subtle">
+            {error.message}
+          </p>
+        </div>
+
+        <div className="flex w-full items-start gap-2">
+          <Link
+            href="/puzzles"
+            className={clsx(
+              "relative flex h-10 w-full select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md border px-4 font-semibold outline-none transition",
+
+              "active:bg-muted/20",
+              "focus-visible:ring",
+              "hover:bg-muted/10"
+            )}
+          >
+            See all Puzzles
           </Link>
 
-          <Link passHref href="/">
-            <Button w={{ base: '100%', md: 'auto' }}>Take me home</Button>
-          </Link>
-        </HStack>
-      </Box>
+          <Link
+            href="/"
+            className={clsx(
+              "relative flex h-10 w-full select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-4 font-semibold text-surface outline-none transition",
 
-      <Icon
-        h="auto"
-        maxH="300px"
-        as={GameErrorIcon}
-        aria-label="Error"
-        w={{ base: '0', md: '40%' }}
-        display={{ base: 'none', md: 'block' }}
-      />
-    </Box>
+              "active:bg-cyan/70",
+              "focus-visible:ring focus-visible:ring-cyan/60",
+              "hover:bg-cyan/70"
+            )}
+          >
+            Take me home
+          </Link>
+        </div>
+      </div>
+    </article>
   );
-};
-
-export default GameErrorContainer;
+}

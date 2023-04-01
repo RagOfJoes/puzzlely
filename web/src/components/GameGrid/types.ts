@@ -1,19 +1,21 @@
-import { ReactNode } from 'react';
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
+import type { MotionProps } from "framer-motion";
 
-import { GridItemProps } from '@chakra-ui/react';
-import { MotionProps } from 'framer-motion';
+export type GameGridProps = ComponentPropsWithoutRef<typeof Primitive.div>;
 
-export type UseGameGrid = {
-  children: ReactNode;
-};
-
-export type GameGridProps = {};
-
-export type GameGridBlockProps = GridItemProps &
+export type GameGridBlockProps = ComponentPropsWithoutRef<
+  typeof Primitive.button
+> &
   MotionProps & {
-    children: ReactNode;
     isCorrect?: boolean;
     isDisabled?: boolean;
     isError?: boolean;
     isSelected?: boolean;
   };
+
+export type GameGridOverlayProps = ComponentPropsWithoutRef<
+  typeof Primitive.div
+>;

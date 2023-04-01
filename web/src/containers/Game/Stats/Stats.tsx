@@ -1,70 +1,84 @@
-import { memo } from 'react';
+import clsx from "clsx";
+import { IoHeart, IoTime } from "react-icons/io5";
 
-import { Grid, GridItem, Icon } from '@chakra-ui/react';
-import { IoHeart, IoTime } from 'react-icons/io5';
-
-import GameStatCard from '@/components/GameStatCard';
+import { GameStatCard } from "@/components/GameStatCard";
 import {
   UNLIMITED_MAX_ATTEMPTS,
   UNLIMITED_TIME_ALLOWED,
-} from '@/lib/constants';
-import { formatTime } from '@/lib/time';
+} from "@/lib/constants";
+import { formatTime } from "@/lib/time";
 
-import { StatsProps } from '../types';
-import Shortcuts from './Shortcuts';
+import Shortcuts from "./Shortcuts";
+import type { StatsProps } from "../types";
 
-const Stats = (props: StatsProps) => {
+function Stats(props: StatsProps) {
   const { game, isRunning, minutes, onForfeit, onReset, onShuffle, seconds } =
     props;
-  const { attempts, completedAt, config, guessedAt, startedAt } = game;
+  const { attempts, config, guessedAt, startedAt } = game;
 
   return (
-    <Grid
-      w="100%"
-      gap="2"
-      templateColumns="repeat(4, 1fr)"
-      transition="0.4s linear opacity"
-      opacity={
-        (!guessedAt && !startedAt) || (!isRunning && startedAt) ? 0.4 : 1
-      }
+    <div
+      className={clsx(
+        "grid w-full grid-cols-4 gap-2 transition-opacity",
+
+        {
+          "opacity-40": (!guessedAt && !startedAt) || (!isRunning && startedAt),
+          "opacity-100": guessedAt && isRunning && startedAt,
+        }
+      )}
     >
-      <GridItem
-        colSpan={{
-          base: 4,
-          md: 2,
-        }}
+      <div
+        className={clsx(
+          "col-span-2",
+
+          "max-md:col-span-4"
+        )}
       >
         <Shortcuts
-          game={{ completedAt, guessedAt, startedAt }}
+          game={game}
+          onForfeit={onForfeit}
           onReset={onReset}
           onShuffle={onShuffle}
-          onForfeit={onForfeit}
         />
-      </GridItem>
-      <GridItem colSpan={{ base: 2, md: 1 }} colStart={{ base: 1, md: 3 }}>
+      </div>
+
+      <div
+        className={clsx(
+          "col-span-1 col-start-3",
+
+          "max-md:col-span-2 max-md:col-start-1"
+        )}
+      >
         <GameStatCard
           label="Attempts"
-          icon={<Icon as={IoHeart} />}
+          icon={<IoHeart />}
           body={
             config.maxAttempts === UNLIMITED_MAX_ATTEMPTS
-              ? 'Unlimited'
+              ? "Unlimited"
               : `${config.maxAttempts - attempts.length}`
           }
         />
-      </GridItem>
-      <GridItem colSpan={{ base: 2, md: 1 }}>
+      </div>
+
+      <div
+        className={clsx(
+          "col-span-1",
+
+          "max-md:col-span-2"
+        )}
+      >
         <GameStatCard
           label="Time"
-          icon={<Icon as={IoTime} />}
+          icon={<IoTime />}
           body={
             config.timeAllowed === UNLIMITED_TIME_ALLOWED
-              ? 'Unlimited'
+              ? "Unlimited"
               : `${formatTime(minutes)}:${formatTime(seconds)}`
           }
         />
-      </GridItem>
-    </Grid>
+      </div>
+    </div>
   );
-};
+}
 
-export default memo(Stats);
+export default Stats;
