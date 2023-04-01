@@ -1,10 +1,10 @@
 export enum APIErrorCode {
-  BadRequest = 'BadRequest',
-  Forbidden = 'Forbidden',
-  Internal = 'Internal',
-  MethodNotAllowed = 'MethodNowAllowed',
-  NotFound = 'NotFound',
-  Unauthorized = 'Unauthorized',
+  BadRequest = "BadRequest",
+  Forbidden = "Forbidden",
+  Internal = "Internal",
+  MethodNotAllowed = "MethodNowAllowed",
+  NotFound = "NotFound",
+  Unauthorized = "Unauthorized",
 }
 
 class APIError extends Error {
@@ -17,7 +17,7 @@ class APIError extends Error {
     }
 
     this.code = code || APIErrorCode.Internal;
-    this.message = message || 'Something went wrong. Please try again later.';
+    this.message = message || "Something went wrong. Please try again later.";
   }
 }
 
