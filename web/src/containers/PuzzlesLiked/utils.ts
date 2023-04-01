@@ -1,13 +1,13 @@
-import { useToast } from "@chakra-ui/react";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 import api from "@/api";
 import APIError, { APIErrorCode } from "@/api/error";
 import useMe from "@/hooks/useMe";
-import { ERR_PUZZLE_LIKE, TOASTER_OPTS } from "@/lib/constants";
+import { ERR_UNAUTHORIZED } from "@/lib/constants";
 import {
   toggleLikePuzzleConnection,
   toggleLikePuzzlePages,
@@ -21,7 +21,6 @@ export function usePuzzleLike() {
 
   const router = useRouter();
   const { data: me } = useMe();
-  const toast = useToast(TOASTER_OPTS);
   const queryClient = useQueryClient();
 
   return useMutation<
@@ -32,11 +31,9 @@ export function usePuzzleLike() {
   >(
     async (puzzle) => {
       if (!me) {
-        throw new APIError(
-          APIErrorCode.Unauthorized,
-          "You must be logged in to access this resource."
-        );
+        throw new APIError(APIErrorCode.Unauthorized, ERR_UNAUTHORIZED);
       }
+
       return api.togglePuzzleLike(puzzle.id);
     },
     {
@@ -48,25 +45,25 @@ export function usePuzzleLike() {
           return;
         }
 
-        toast({
-          duration: 3000,
-          status: "error",
-          isClosable: false,
-          title: ERR_PUZZLE_LIKE,
-        });
+        toast.error(err.message);
+
         queryClient.setQueryData(queryKey, context?.previous);
       },
       onMutate: async (puzzle) => {
         // Cancel any outgoing refetches so they don't overwrite our optimistic update
         await queryClient.cancelQueries(queryKey);
+
         // Snapshot the previous value
         const previous = queryClient.getQueryData<
           InfiniteData<PuzzleConnection> | undefined
         >(queryKey);
         // Update Puzzles List cached data
         if (!me) {
-          return { previous };
+          return {
+            previous,
+          };
         }
+
         queryClient.setQueryData<InfiniteData<PuzzleConnection> | undefined>(
           queryKey,
           (old) => {
@@ -90,9 +87,11 @@ export function usePuzzleLike() {
                       },
                     };
                   }
+
                   return edge;
                 })
                 .filter((edge) => edge.node.likedAt);
+
               return {
                 ...page,
                 edges: newEdges,
@@ -103,7 +102,9 @@ export function usePuzzleLike() {
           }
         );
 
-        return { previous };
+        return {
+          previous,
+        };
       },
       onSuccess: async (like, puzzle) => {
         const statsKey = generateQueryKey.UsersStats(me!.id);

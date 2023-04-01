@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import clsx from "clsx";
+import { toast } from "react-hot-toast";
 import { IoConstruct } from "react-icons/io5";
 
 import { UserCard } from "@/components/UserCard";
@@ -40,13 +41,7 @@ const Details = (props: { user: User }) => {
               },
               {
                 onError: (error) => {
-                  // TODO: Call toast here
-                  // toast({
-                  //   duration: 3000,
-                  //   status: "error",
-                  //   title: `Failed to edit profile: ${error.message}`,
-                  // });
-                  console.log(error);
+                  toast.error(`Failed to edit profile: ${error.message}`);
                 },
               }
             );

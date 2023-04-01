@@ -1,4 +1,3 @@
-import type { UseToastOptions } from "@chakra-ui/react";
 import { z } from "zod";
 
 import type { Puzzle, PuzzleFilters } from "@/types/puzzle";
@@ -98,10 +97,6 @@ export const PUZZLE_OVERVIEW_FILTERS: Record<
       value: num,
     })),
   },
-};
-export const TOASTER_OPTS: UseToastOptions = {
-  variant: "solid",
-  position: "bottom",
 };
 
 // Error messages

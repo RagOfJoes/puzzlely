@@ -1,7 +1,7 @@
-import { useToast } from "@chakra-ui/react";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 import api from "@/api";
 import APIError, { APIErrorCode } from "@/api/error";
@@ -12,7 +12,6 @@ import type { PuzzleConnection, PuzzleLike, PuzzleNode } from "@/types/puzzle";
 import type { UserStats } from "@/types/user";
 
 function usePuzzleLike() {
-  const toast = useToast();
   const router = useRouter();
   const { data: me } = useMe();
   const queryClient = useQueryClient();
@@ -25,6 +24,7 @@ function usePuzzleLike() {
       if (!me) {
         throw new APIError(APIErrorCode.Unauthorized, ERR_UNAUTHORIZED);
       }
+
       return api.togglePuzzleLike(puzzle.id);
     },
     {
@@ -36,12 +36,7 @@ function usePuzzleLike() {
         }
 
         // Render toast
-        toast({
-          duration: 3000,
-          status: "error",
-          isClosable: false,
-          title: err.message,
-        });
+        toast.error(err.message);
       },
       onSuccess: async (like, puzzle) => {
         if (queryClient.getQueryState<UserStats, APIError>(statsKey)) {

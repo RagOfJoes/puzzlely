@@ -4,7 +4,6 @@ import "@fontsource/raleway/variable.css";
 
 import React, { useEffect, useState } from "react";
 
-import { ChakraProvider } from "@chakra-ui/react";
 import {
   Hydrate,
   QueryClient,
@@ -17,10 +16,10 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import type { AppProps } from "next/app";
 import { DefaultSeo } from "next-seo";
+import { Toaster } from "react-hot-toast";
 
 import { ColorMode } from "@/components/ColorMode";
-import { TOASTER_OPTS } from "@/lib/constants";
-import theme from "@/lib/theme";
+import { Toast } from "@/components/Toast";
 
 // Setup dayjs
 dayjs.extend(utc);
@@ -101,13 +100,17 @@ const App = ({
       <QueryClientProvider client={queryClient}>
         <Hydrate state={dehydratedState}>
           <ColorMode cookie={otherPageProps.colorMode}>
-            <ChakraProvider
-              resetCSS
-              theme={theme}
-              toastOptions={{ defaultOptions: TOASTER_OPTS }}
+            <Toaster
+              position="bottom-right"
+              reverseOrder
+              toastOptions={{
+                duration: 5000,
+              }}
             >
-              <Component {...otherPageProps} />
-            </ChakraProvider>
+              {(t) => <Toast {...t} />}
+            </Toaster>
+
+            <Component {...otherPageProps} />
           </ColorMode>
         </Hydrate>
         {/* <ReactQueryDevtools /> */}

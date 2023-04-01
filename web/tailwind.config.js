@@ -12,6 +12,8 @@ module.exports = {
       animation: {
         skeleton: "skeleton linear infinite alternate 800ms",
         "skeleton-fade": "skeleton-fade 400ms",
+        toasterEnter: "toasterEnter 200ms ease-out",
+        toasterLeave: "toasterLeave 150ms ease-in forwards",
       },
 
       borderColor: {
@@ -70,6 +72,26 @@ module.exports = {
           },
           to: {
             opacity: 1,
+          },
+        },
+        toasterEnter: {
+          "0%": {
+            opacity: 0,
+            transform: "scale(0.9)",
+          },
+          "100%": {
+            opacity: 1,
+            transform: "scale(1)",
+          },
+        },
+        toasterLeave: {
+          "0%": {
+            opacity: 1,
+            transform: "scale(1)",
+          },
+          "100%": {
+            opacity: 0,
+            transform: "scale(0.9)",
           },
         },
       },
