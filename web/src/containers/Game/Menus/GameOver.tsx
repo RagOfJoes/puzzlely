@@ -9,7 +9,7 @@ import { millisecondsTo } from "@/lib/time";
 
 import type { GameOverMenuProps } from "../types";
 
-const GameOver = (props: GameOverMenuProps) => {
+function GameOver(props: GameOverMenuProps) {
   const { game, onContinue, onMenu } = props;
   const { attempts, guessedAt, score, startedAt } = game;
 
@@ -80,6 +80,6 @@ const GameOver = (props: GameOverMenuProps) => {
       </div>
     </GameMenuCard>
   );
-};
+}
 
 export default GameOver;

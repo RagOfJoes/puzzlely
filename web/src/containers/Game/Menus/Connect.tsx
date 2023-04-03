@@ -11,7 +11,7 @@ import groupBy from "@/lib/groupBy";
 
 import type { ConnectMenuProps } from "../types";
 
-const Connect = (props: ConnectMenuProps) => {
+function Connect(props: ConnectMenuProps) {
   const { blocks, game, onConnect } = props;
   const { attempts, completedAt, puzzle, score } = game;
 
@@ -121,6 +121,6 @@ const Connect = (props: ConnectMenuProps) => {
       </button>
     </GameMenuCard>
   );
-};
+}
 
 export default Connect;

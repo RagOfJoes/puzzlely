@@ -24,7 +24,7 @@ import { millisecondsTo } from "@/lib/time";
 
 import type { ConfigMenuProps } from "../types";
 
-const Config = (props: ConfigMenuProps) => {
+function Config(props: ConfigMenuProps) {
   const { game, onMenu, onStart, onUpdateTimeAllowed, setGame } = props;
   const { config, challengedBy, puzzle } = game;
 
@@ -245,6 +245,6 @@ const Config = (props: ConfigMenuProps) => {
       </div>
     </GameMenuCard>
   );
-};
+}
 
 export default Config;
