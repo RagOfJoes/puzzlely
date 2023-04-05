@@ -50,9 +50,9 @@ export const Input = forwardRef<ElementRef<typeof Primitive.input>, InputProps>(
           {...omit(ctx, ["invalid"])}
           ref={ref}
           className={clsx(
-            "peer relative h-10 w-full min-w-0 appearance-none rounded-lg border border-muted/20 bg-surface px-4 outline-none transition",
+            "peer relative h-10 w-full min-w-0 appearance-none rounded-lg border bg-surface px-4 outline-none transition",
 
-            "aria-[invalid=true]:enabled::border-red",
+            "aria-[invalid=true]:enabled:border-red",
             "disabled:cursor-not-allowed disabled:bg-muted/10 disabled:text-muted/60 disabled:placeholder:text-muted",
             "focus:enabled:ring",
             "placeholder:enabled:text-subtle",
