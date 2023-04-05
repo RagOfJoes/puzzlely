@@ -1,9 +1,9 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from "react";
 
-import { useControllableState } from '@chakra-ui/react';
-import { runIfFn } from '@chakra-ui/utils';
+import { useControllableState } from "@chakra-ui/react";
+import { runIfFn } from "@chakra-ui/utils";
 
-import { TagInputTagProps, TagInputProps, UseTagInput } from './types';
+import type { TagInputProps, UseTagInput, TagInputItemProps } from "./types";
 
 const useTagInput = (props: TagInputProps): UseTagInput => {
   const {
@@ -15,9 +15,9 @@ const useTagInput = (props: TagInputProps): UseTagInput => {
   } = props;
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const inputWrapperRef = useRef<HTMLDivElement>(null);
+  const inputWrapperRef = useRef<HTMLUListElement>(null);
 
-  const [query, setQuery] = useState(defaultQuery ?? '');
+  const [query, setQuery] = useState(defaultQuery ?? "");
   const [value, setValue] = useControllableState<string[]>({
     value: valueProp,
     defaultValue,
@@ -26,33 +26,28 @@ const useTagInput = (props: TagInputProps): UseTagInput => {
     },
   });
 
-  const removeItem: UseTagInput['removeItem'] = useCallback(
-    (valueToRemove) => {
-      if (!valueToRemove) {
-        return;
-      }
+  const removeItem: UseTagInput["removeItem"] = (valueToRemove) => {
+    if (!valueToRemove) {
+      return;
+    }
 
-      const found = value.findIndex((v) => v === valueToRemove);
-      if (found === -1) {
-        return;
-      }
+    const found = value.findIndex((v) => v === valueToRemove);
+    if (found === -1) {
+      return;
+    }
 
-      runIfFn(props.onTagRemove, valueToRemove);
-      setValue(value.filter((_, idx) => idx !== found));
-      if (query === valueToRemove) {
-        setQuery('');
-      }
+    runIfFn(props.onTagRemove, valueToRemove);
+    setValue(value.filter((_, idx) => idx !== found));
+    if (query === valueToRemove) {
+      setQuery("");
+    }
 
-      inputRef.current?.focus();
-    },
+    inputRef.current?.focus();
+  };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [props.onTagRemove, query, value]
-  );
-
-  const tagProps: TagInputTagProps[] = useMemo(() => {
+  const tagProps: TagInputItemProps[] = useMemo(() => {
     return value.map((v) => ({
-      label: v,
+      children: v,
       onRemove: () => removeItem(v),
     }));
 
