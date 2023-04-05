@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 
-import { useControllableState } from "@chakra-ui/react";
-import { runIfFn } from "@chakra-ui/utils";
+import useControllableState from "@/hooks/useControllableState";
 
 import type { TagInputProps, UseTagInput, TagInputItemProps } from "./types";
 
@@ -22,7 +21,7 @@ const useTagInput = (props: TagInputProps): UseTagInput => {
     value: valueProp,
     defaultValue,
     onChange: (newValues: string[]) => {
-      runIfFn(onChange, newValues);
+      onChange?.(newValues);
     },
   });
 
@@ -36,7 +35,7 @@ const useTagInput = (props: TagInputProps): UseTagInput => {
       return;
     }
 
-    runIfFn(props.onTagRemove, valueToRemove);
+    props?.onTagRemove?.(valueToRemove);
     setValue(value.filter((_, idx) => idx !== found));
     if (query === valueToRemove) {
       setQuery("");
