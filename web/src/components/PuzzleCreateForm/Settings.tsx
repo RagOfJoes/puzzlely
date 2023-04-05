@@ -1,138 +1,187 @@
-import { useMemo } from 'react';
+import clsx from "clsx";
+import { Controller, useFormContext } from "react-hook-form";
 
-import { Button, Divider, Heading, HStack, Text } from '@chakra-ui/react';
-import { useFormikContext } from 'formik';
-
-import FormikNumberInputControl from '@/components/FormikNumberInputControl';
-import PuzzleFormCard from '@/components/PuzzleFormCard';
+import {
+  FormControl,
+  FormControlError,
+  FormControlLabel,
+} from "@/components/FormControl";
+import {
+  NumberInput,
+  NumberInputDecrementButton,
+  NumberInputField,
+  NumberInputIncrementButton,
+  NumberInputStepper,
+} from "@/components/NumberInput";
+import { PuzzleFormCard } from "@/components/PuzzleFormCard";
 import {
   UNLIMITED_MAX_ATTEMPTS,
   UNLIMITED_TIME_ALLOWED,
-} from '@/lib/constants';
-import { millisecondsTo } from '@/lib/time';
-import { PuzzleCreatePayload } from '@/types/puzzle';
+} from "@/lib/constants";
+import omit from "@/lib/omit";
+import { millisecondsTo } from "@/lib/time";
+import type { PuzzleCreatePayload } from "@/types/puzzle";
 
-const Settings = () => {
-  const { isSubmitting, values, setFieldValue } =
-    useFormikContext<PuzzleCreatePayload>();
-
-  const { minutes, seconds } = useMemo(
-    () => ({
-      minutes: millisecondsTo('minutes', values.timeAllowed),
-      seconds: millisecondsTo('seconds', values.timeAllowed),
-    }),
-    [values.timeAllowed]
-  );
+function Settings() {
+  const { control, formState, setValue } =
+    useFormContext<PuzzleCreatePayload>();
 
   return (
     <PuzzleFormCard
-      mt="6"
-      title="Settings"
       caption="Fields that restricts what player's can configure about their game."
+      title="Settings"
     >
-      <FormikNumberInputControl
-        name="maxAttempts"
-        label="Max Attempts"
-        isDisabled={isSubmitting}
-        numberInputProps={{
-          min: 0,
-          max: 999,
-          clampValueOnBlur: true,
-          isDisabled: isSubmitting,
-          onChange: (_, newValue) => {
-            const newMaxAttempts = Number(newValue);
+      <div className="flex flex-col items-start gap-2">
+        <Controller
+          control={control}
+          name="maxAttempts"
+          render={({ field }) => (
+            <FormControl
+              className="w-full"
+              invalid={!!formState.errors.maxAttempts?.message}
+            >
+              <FormControlLabel>Max Attempts</FormControlLabel>
 
-            setFieldValue(
-              'maxAttempts',
-              Number.isNaN(newMaxAttempts) ? 0 : newMaxAttempts
-            );
-          },
-        }}
-      />
-      <Button
-        mt="2"
-        size="sm"
-        variant="link"
-        colorScheme="gray"
-        disabled={isSubmitting}
-        onClick={() => setFieldValue('maxAttempts', UNLIMITED_MAX_ATTEMPTS)}
-      >
-        Unlimited Attempts
-      </Button>
+              <NumberInput
+                {...omit(field, ["onBlur", "onChange", "ref"])}
+                max={999}
+                min={0}
+                onChange={(_, newValue) => {
+                  setValue(
+                    "maxAttempts",
+                    Number.isNaN(newValue) ? 0 : newValue
+                  );
+                }}
+              >
+                <NumberInputField ref={field.ref} onBlur={field.onBlur} />
 
-      <Heading mt="4" as="h5" size="sm">
-        Time Limit
-      </Heading>
-      <Text fontSize="sm" color="text.secondary">
-        Controls how long a user can connect blocks.
-      </Text>
-      <Divider my="2" />
+                <NumberInputStepper>
+                  <NumberInputIncrementButton />
+                  <NumberInputDecrementButton />
+                </NumberInputStepper>
+              </NumberInput>
 
-      <HStack mt="4" w="100%" align="end">
-        <FormikNumberInputControl
-          name="minutes"
-          isDisabled={isSubmitting}
-          label={`Minute${minutes === 0 || minutes > 1 ? 's' : ''}`}
-          numberInputProps={{
-            min: 0,
-            max: 59,
-            value: minutes,
-            isDisabled: isSubmitting,
-            onChange: (_, newValue) => {
-              let clamped = newValue;
-              if (newValue > 59) {
-                clamped = 59;
-              }
-
-              const secToMs = seconds * 1000;
-              const newTime = secToMs + clamped * 60000;
-
-              setFieldValue(
-                'timeAllowed',
-                Number.isNaN(newTime) ? secToMs : newTime
-              );
-            },
-          }}
+              <FormControlError>
+                {formState.errors.maxAttempts?.message}
+              </FormControlError>
+            </FormControl>
+          )}
         />
-        <FormikNumberInputControl
-          name="seconds"
-          isDisabled={isSubmitting}
-          label={`Second${seconds === 0 || seconds > 1 ? 's' : ''}`}
-          numberInputProps={{
-            min: 0,
-            max: 59,
-            value: seconds,
-            isDisabled: isSubmitting,
-            onChange: (_, newValue) => {
-              let clamped = newValue;
-              if (newValue > 59) {
-                clamped = 59;
-              }
 
-              const minToMs = minutes * 60000;
-              const newTime = minToMs + clamped * 1000;
+        <button
+          onClick={() => setValue("maxAttempts", UNLIMITED_MAX_ATTEMPTS)}
+          className={clsx(
+            "relative inline-flex select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold outline-none transition",
 
-              setFieldValue(
-                'timeAllowed',
-                Number.isNaN(newTime) ? minToMs : newTime
-              );
-            },
-          }}
-        />
-      </HStack>
+            "focus-visible:ring",
+            "hover:underline"
+          )}
+        >
+          Unlimited Attempts
+        </button>
+      </div>
 
-      <Button
-        mt="2"
-        size="sm"
-        variant="link"
-        colorScheme="gray"
-        disabled={isSubmitting}
-        onClick={() => setFieldValue('timeAllowed', UNLIMITED_TIME_ALLOWED)}
-      >
-        Unlimited Time
-      </Button>
+      <h4 className="text-md mt-4 font-heading font-bold">Time Limit</h4>
+      <p className="text-sm font-medium text-subtle">
+        Fields that restricts what player&apos;s can configure about their game.
+      </p>
+      <hr className="mb-4 mt-2 h-[1px] w-full bg-muted/20" />
+
+      <div className="flex flex-col items-start gap-2">
+        <div className="flex w-full gap-2">
+          <Controller
+            control={control}
+            name="timeAllowed"
+            render={({ field }) => (
+              <FormControl className="w-full">
+                <FormControlLabel>Minutes</FormControlLabel>
+
+                <NumberInput
+                  {...omit(field, ["onBlur", "onChange", "ref"])}
+                  max={59}
+                  min={0}
+                  onChange={(_, newValue) => {
+                    let clamped = newValue;
+                    if (newValue > 59) {
+                      clamped = 59;
+                    }
+
+                    const secToMs =
+                      millisecondsTo("seconds", field.value) * 1000;
+                    const newTime = secToMs + clamped * 60000;
+
+                    setValue(
+                      "timeAllowed",
+                      Number.isNaN(newTime) ? secToMs : newTime
+                    );
+                  }}
+                  value={millisecondsTo("minutes", field.value)}
+                >
+                  <NumberInputField ref={field.ref} onBlur={field.onBlur} />
+
+                  <NumberInputStepper>
+                    <NumberInputIncrementButton />
+                    <NumberInputDecrementButton />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+            )}
+          />
+
+          <Controller
+            control={control}
+            name="timeAllowed"
+            render={({ field }) => (
+              <FormControl className="w-full">
+                <FormControlLabel>Seconds</FormControlLabel>
+
+                <NumberInput
+                  {...omit(field, ["onBlur", "onChange", "ref"])}
+                  min={0}
+                  max={59}
+                  onChange={(_, newValue) => {
+                    let clamped = newValue;
+                    if (newValue > 59) {
+                      clamped = 59;
+                    }
+
+                    const minToMs =
+                      millisecondsTo("minutes", field.value) * 60000;
+                    const newTime = minToMs + clamped * 1000;
+
+                    setValue(
+                      "timeAllowed",
+                      Number.isNaN(newTime) ? minToMs : newTime
+                    );
+                  }}
+                  value={millisecondsTo("seconds", field.value)}
+                >
+                  <NumberInputField ref={field.ref} onBlur={field.onBlur} />
+
+                  <NumberInputStepper>
+                    <NumberInputIncrementButton />
+                    <NumberInputDecrementButton />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+            )}
+          />
+        </div>
+
+        <button
+          onClick={() => setValue("timeAllowed", UNLIMITED_TIME_ALLOWED)}
+          className={clsx(
+            "relative inline-flex select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold outline-none transition",
+
+            "focus-visible:ring",
+            "hover:underline"
+          )}
+        >
+          Unlimited Time
+        </button>
+      </div>
     </PuzzleFormCard>
   );
-};
+}
 
 export default Settings;

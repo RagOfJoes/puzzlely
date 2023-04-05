@@ -1,41 +1,51 @@
-import { Box, VStack } from '@chakra-ui/react';
+import { PuzzleCreateForm } from "@/components/PuzzleCreateForm";
+import usePuzzleCreate from "@/hooks/usePuzzleCreate";
+import {
+  maxAttemptsFromDifficulty,
+  timeAllowedFromDifficulty,
+} from "@/lib/game";
 
-import PuzzleCreateForm from '@/components/PuzzleCreateForm';
-import usePuzzleCreate from '@/hooks/usePuzzleCreate';
-
-import { initialValues } from './utils';
-
-const PuzzleCreateContainer = () => {
+export function PuzzleCreateContainer() {
   const { mutate } = usePuzzleCreate();
 
   return (
-    <Box w="100%" display="flex" justifyContent="center">
-      <VStack w="100%" spacing="3" maxW="container.md">
+    <article>
+      <div className="mx-auto block max-w-3xl">
         <PuzzleCreateForm
-          initialValues={initialValues}
-          onSubmit={async (
-            values,
-            { setErrors, setSubmitting, validateForm }
-          ) => {
-            setSubmitting(true);
-
-            const errors = await validateForm(values);
-            if (Object.keys(errors).length > 0) {
-              setErrors(errors);
-              setSubmitting(false);
-              return;
-            }
-
-            mutate(values, {
-              onSettled: () => {
-                setSubmitting(false);
+          defaultValues={{
+            name: "",
+            description: "",
+            difficulty: "Easy",
+            maxAttempts: maxAttemptsFromDifficulty.Easy,
+            timeAllowed: timeAllowedFromDifficulty.Easy,
+            groups: [
+              {
+                answers: [],
+                blocks: [],
+                description: "",
               },
-            });
+              {
+                answers: [],
+                blocks: [],
+                description: "",
+              },
+              {
+                answers: [],
+                blocks: [],
+                description: "",
+              },
+              {
+                answers: [],
+                blocks: [],
+                description: "",
+              },
+            ],
+          }}
+          onSubmit={(data) => {
+            mutate(data);
           }}
         />
-      </VStack>
-    </Box>
+      </div>
+    </article>
   );
-};
-
-export default PuzzleCreateContainer;
+}

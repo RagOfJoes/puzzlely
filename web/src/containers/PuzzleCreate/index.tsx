@@ -1,1 +1,1 @@
-export { default } from './PuzzleCreate';
+export * from "./PuzzleCreate";
