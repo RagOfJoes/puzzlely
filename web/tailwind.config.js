@@ -42,8 +42,8 @@ module.exports = {
       },
 
       fontFamily: {
-        body: ["InterVariable", "sans-serif"],
-        heading: ["RalewayVariable", "sans-serif"],
+        body: ["var(--font-body)", "sans-serif"],
+        heading: ["var(--font-heading)", "sans-serif"],
         mono: [
           "SFMono-Regular",
           "Menlo",

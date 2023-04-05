@@ -1,5 +1,3 @@
-import React from "react";
-
 import clsx from "clsx";
 import NextDocument, { Head, Html, Main, NextScript } from "next/document";
 
@@ -30,7 +28,7 @@ class Document extends NextDocument {
         )}
       >
         <Head />
-        <body className="bg-base font-body text-text antialiased">
+        <body className="bg-base text-text antialiased">
           <Main />
           <NextScript />
         </body>
