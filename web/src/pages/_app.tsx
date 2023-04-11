@@ -7,7 +7,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -121,7 +121,8 @@ function App({
             </div>
           </ColorMode>
         </Hydrate>
-        {/* <ReactQueryDevtools /> */}
+
+        <ReactQueryDevtools />
       </QueryClientProvider>
     </>
   );
