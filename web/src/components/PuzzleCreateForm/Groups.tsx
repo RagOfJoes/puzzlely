@@ -17,6 +17,7 @@ import type { PuzzleCreatePayload } from "@/types/puzzle";
 function Groups() {
   const { control, formState, register, setValue } =
     useFormContext<PuzzleCreatePayload>();
+  const { errors } = formState;
 
   return (
     <PuzzleFormCard
@@ -24,10 +25,8 @@ function Groups() {
       title="Groups"
     >
       {Array.from({ length: 4 }).map((_, g) => {
-        const answersError =
-          formState.errors.groups?.[g]?.answers?.[0]?.message;
-        const blocksError =
-          formState.errors.groups?.[g]?.blocks?.[0]?.value?.message;
+        const answersError = errors.groups?.[g]?.answers?.[0]?.message;
+        const blocksError = errors.groups?.[g]?.blocks?.[0]?.value?.message;
 
         return (
           <Fragment key={`groups.${g}`}>
@@ -64,7 +63,6 @@ function Groups() {
                       value={field.value.map((v) => v.value)}
                     >
                       <TagInputField
-                        // ref={field.ref}
                         onBlur={field.onBlur}
                         placeholder="Type a block, then, hit ENTER ..."
                       >
@@ -113,7 +111,7 @@ function Groups() {
                       }}
                     >
                       <TagInputField
-                        // ref={field.ref}
+                        ref={field.ref}
                         onBlur={field.onBlur}
                         placeholder="Type an answer, then, hit ENTER..."
                       >
@@ -146,7 +144,7 @@ function Groups() {
               />
 
               <FormControl
-                invalid={!!formState.errors.groups?.[g]?.description?.message}
+                invalid={!!errors.groups?.[g]?.description?.message}
                 required
               >
                 <FormControlLabel>Description</FormControlLabel>
@@ -157,7 +155,7 @@ function Groups() {
                 />
 
                 <FormControlError>
-                  {formState.errors.groups?.[g]?.description?.message}
+                  {errors.groups?.[g]?.description?.message}
                 </FormControlError>
 
                 <FormControlHelper>

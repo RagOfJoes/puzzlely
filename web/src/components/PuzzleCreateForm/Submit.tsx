@@ -7,6 +7,7 @@ import type { PuzzleCreatePayload } from "@/types/puzzle";
 
 function Submit() {
   const { formState } = useFormContext<PuzzleCreatePayload>();
+  const { isDirty, isSubmitSuccessful, isSubmitting, isValid } = formState;
 
   return (
     <PuzzleFormCard hideDivider>
@@ -25,15 +26,13 @@ function Submit() {
           "focus-visible:enabled:ring focus-visible:enabled:ring-cyan/60",
           "hover:enabled:bg-cyan/70"
         )}
-        disabled={
-          !formState.isDirty || !formState.isValid || formState.isSubmitting
-        }
+        disabled={!isDirty || !isValid || isSubmitting || isSubmitSuccessful}
         type="submit"
       >
-        {formState.isSubmitting && (
+        {isSubmitting && (
           <CgSpinner className="shrink-0 animate-spin fill-text" size={24} />
         )}
-        {formState.isSubmitting ? "Creating Puzzle..." : "Create Puzzle"}
+        {isSubmitting ? "Creating Puzzle..." : "Create Puzzle"}
       </button>
     </PuzzleFormCard>
   );

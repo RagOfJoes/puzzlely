@@ -27,6 +27,7 @@ import type { Puzzle, PuzzleCreatePayload } from "@/types/puzzle";
 function Meta() {
   const { control, formState, register, setValue } =
     useFormContext<PuzzleCreatePayload>();
+  const { errors, touchedFields } = formState;
 
   return (
     <PuzzleFormCard
@@ -41,7 +42,7 @@ function Meta() {
 
               "max-md:col-span-4"
             )}
-            invalid={!!formState.errors.name?.message}
+            invalid={!!errors.name?.message}
             required
           >
             <FormControlLabel>Name</FormControlLabel>
@@ -52,9 +53,7 @@ function Meta() {
               placeholder="Add a name..."
             />
 
-            <FormControlError>
-              {formState.errors.name?.message}
-            </FormControlError>
+            <FormControlError>{errors.name?.message}</FormControlError>
 
             <FormControlHelper>
               Use proper words to improve the searchability of your puzzle.
@@ -81,7 +80,7 @@ function Meta() {
                   onValueChange={(newValue) => {
                     setValue("difficulty", newValue as Puzzle["difficulty"]);
 
-                    if (!formState.touchedFields.maxAttempts) {
+                    if (!touchedFields.maxAttempts) {
                       setValue(
                         "maxAttempts",
                         maxAttemptsFromDifficulty[
@@ -89,7 +88,7 @@ function Meta() {
                         ]
                       );
                     }
-                    if (!formState.touchedFields.timeAllowed) {
+                    if (!touchedFields.timeAllowed) {
                       setValue(
                         "timeAllowed",
                         timeAllowedFromDifficulty[
@@ -127,7 +126,7 @@ function Meta() {
           />
         </div>
 
-        <FormControl invalid={!!formState.errors.description?.message}>
+        <FormControl invalid={!!errors.description?.message}>
           <FormControlLabel>Description</FormControlLabel>
 
           <Textarea
@@ -135,9 +134,7 @@ function Meta() {
             placeholder="Add a description..."
           />
 
-          <FormControlError>
-            {formState.errors.description?.message}
-          </FormControlError>
+          <FormControlError>{errors.description?.message}</FormControlError>
         </FormControl>
       </div>
     </PuzzleFormCard>

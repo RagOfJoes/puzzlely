@@ -25,8 +25,8 @@ export const puzzleCreateSchema = z.object({
               "Can only contain numbers, letters, and spaces!"
             )
         )
-        .max(8, "Each group must have at least 1 answer!")
-        .min(1, "Each group can only have a max of 8 answers!"),
+        .max(8, "Each group can only have a max of 8 answers!")
+        .min(1, "Each group must have at least 1 answer!"),
       blocks: z
         .array(
           z.object({

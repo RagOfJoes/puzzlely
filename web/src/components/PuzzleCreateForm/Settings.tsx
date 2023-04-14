@@ -25,6 +25,7 @@ import type { PuzzleCreatePayload } from "@/types/puzzle";
 function Settings() {
   const { control, formState, setValue } =
     useFormContext<PuzzleCreatePayload>();
+  const { errors } = formState;
 
   return (
     <PuzzleFormCard
@@ -38,7 +39,7 @@ function Settings() {
           render={({ field }) => (
             <FormControl
               className="w-full"
-              invalid={!!formState.errors.maxAttempts?.message}
+              invalid={!!errors.maxAttempts?.message}
             >
               <FormControlLabel>Max Attempts</FormControlLabel>
 
@@ -61,9 +62,7 @@ function Settings() {
                 </NumberInputStepper>
               </NumberInput>
 
-              <FormControlError>
-                {formState.errors.maxAttempts?.message}
-              </FormControlError>
+              <FormControlError>{errors.maxAttempts?.message}</FormControlError>
             </FormControl>
           )}
         />
