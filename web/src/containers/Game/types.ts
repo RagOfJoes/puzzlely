@@ -1,66 +1,8 @@
 import type { Dispatch, RefObject, SetStateAction } from "react";
 
-import type { StoreApi } from "zustand";
-
-import type useGameBlockSelect from "@/hooks/useGameBlockSelect";
 import type { UseGameConnectConnection } from "@/hooks/useGameConnect";
-import type useGameConnect from "@/hooks/useGameConnect";
-import type useGameContinue from "@/hooks/useGameContinue";
-import type useGameForfeit from "@/hooks/useGameForfeit";
-import type useGameMenu from "@/hooks/useGameMenu";
-import type useGameReset from "@/hooks/useGameReset";
-import type useGameShuffle from "@/hooks/useGameShuffle";
-import type useGameStart from "@/hooks/useGameStart";
 import type { Game } from "@/types/game";
 import type { Block, Puzzle } from "@/types/puzzle";
-
-export type UseGameProps = GameContainerProps;
-
-export type UseGame = {
-  blocks: Block[];
-  correct: Game["correct"];
-  game: Game;
-  gridRef: RefObject<HTMLElement>;
-  isGameOver: boolean;
-  isRunning: boolean;
-  isWrong: boolean;
-  onBlockSelect: ReturnType<typeof useGameBlockSelect>;
-  onConnect: ReturnType<typeof useGameConnect>;
-  onContinue: ReturnType<typeof useGameContinue>;
-  onForfeit: ReturnType<typeof useGameForfeit>;
-  onMenu: ReturnType<typeof useGameMenu>;
-  onReset: ReturnType<typeof useGameReset>;
-  onShuffle: ReturnType<typeof useGameShuffle>;
-  onStart: ReturnType<typeof useGameStart>;
-  onUpdateMaxAttempts: (newAttempts: number) => void;
-  onUpdateTimeAllowed: (newTime: number) => void;
-  selected: Block[];
-  time: number;
-};
-
-export type GameState = {
-  blocks: Block[];
-  correct: Game["correct"];
-  game: Game;
-  isGameOver: boolean;
-  isRunning: boolean;
-  isWrong: boolean;
-  onBlockSelect: ReturnType<typeof useGameBlockSelect>;
-  onConnect: ReturnType<typeof useGameConnect>;
-  onContinue: ReturnType<typeof useGameContinue>;
-  onForfeit: ReturnType<typeof useGameForfeit>;
-  onMenu: ReturnType<typeof useGameMenu>;
-  onMount: () => void;
-  onReset: ReturnType<typeof useGameReset>;
-  onShuffle: ReturnType<typeof useGameShuffle>;
-  onStart: ReturnType<typeof useGameStart>;
-  onUpdateMaxAttempts: (newAttempts: number) => void;
-  onUpdateTimeAllowed: (newTime: number) => void;
-  selected: Block[];
-  time: number;
-};
-
-export type GameStore = StoreApi<GameState>;
 
 export type GameContainerProps = {
   game: Game;
