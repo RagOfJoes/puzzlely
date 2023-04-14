@@ -1,6 +1,6 @@
-import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 import api from "@/api";
 import APIError, { APIErrorCode } from "@/api/error";
@@ -10,7 +10,6 @@ import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
 import useMe from "./useMe";
 
 function usePuzzleDelete() {
-  const toast = useToast();
   const router = useRouter();
   const { data: me } = useMe();
   const queryClient = useQueryClient();
@@ -31,12 +30,7 @@ function usePuzzleDelete() {
         }
 
         // Render toast
-        toast({
-          duration: 3000,
-          status: "error",
-          isClosable: false,
-          title: err.message,
-        });
+        toast.error(err.message);
       },
       onSuccess: async () => {
         // Reset Game and Puzzle queries

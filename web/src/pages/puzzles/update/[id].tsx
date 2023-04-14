@@ -1,18 +1,18 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import PuzzleUpdateContainer from '@/containers/PuzzleUpdate';
-import PuzzleUpdateErrorContainer from '@/containers/PuzzleUpdateError';
-import usePuzzle from '@/hooks/usePuzzle';
-import MainLayout from '@/layouts/Main';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import isUUID from '@/lib/isUUID';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { Puzzle } from '@/types/puzzle';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import { PuzzleUpdateContainer } from "@/containers/PuzzleUpdate";
+import { PuzzleUpdateErrorContainer } from "@/containers/PuzzleUpdateError";
+import usePuzzle from "@/hooks/usePuzzle";
+import { MainLayout } from "@/layouts/Main";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import isUUID from "@/lib/isUUID";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { Puzzle } from "@/types/puzzle";
+import type { User } from "@/types/user";
 
 export type PuzzleUpdatePageProps = {
   id: string;
@@ -27,18 +27,12 @@ const PuzzleUpdatePage = (props: PuzzleUpdatePageProps) => {
     return (
       <>
         <MainLayout
-          display="flex"
-          flexDirection="column"
-          breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}
-          sx={{
-            '& > main': {
-              marginY: 'auto',
-            },
-          }}
+          breadcrumbLinks={[{ path: "/puzzles", title: "Puzzles" }]}
+          className="my-auto"
         >
           <PuzzleUpdateErrorContainer
             error={
-              error || new APIError(APIErrorCode.NotFound, 'Puzzle not found.')
+              error || new APIError(APIErrorCode.NotFound, "Puzzle not found.")
             }
           />
         </MainLayout>
@@ -50,7 +44,7 @@ const PuzzleUpdatePage = (props: PuzzleUpdatePageProps) => {
 
   return (
     <>
-      <MainLayout breadcrumbLinks={[{ path: '/puzzles', title: 'Puzzles' }]}>
+      <MainLayout breadcrumbLinks={[{ path: "/puzzles", title: "Puzzles" }]}>
         <PuzzleUpdateContainer puzzle={data} />
       </MainLayout>
 
@@ -63,11 +57,11 @@ export const getServerSideProps: GetServerSideProps<
   PuzzleUpdatePageProps
 > = async (ctx) => {
   const puzzleID = ctx.query.id;
-  if (typeof puzzleID !== 'string' || !isUUID(puzzleID)) {
+  if (typeof puzzleID !== "string" || !isUUID(puzzleID)) {
     return {
       redirect: {
         permanent: false,
-        destination: '/puzzles',
+        destination: "/puzzles",
       },
     };
   }
@@ -85,6 +79,7 @@ export const getServerSideProps: GetServerSideProps<
       const { error } = res;
       throw new APIError(error?.code, error?.message);
     }
+
     return res.payload.user;
   });
   const puzzleQuery = queryClient.prefetchQuery<Puzzle, APIError>(
@@ -95,6 +90,7 @@ export const getServerSideProps: GetServerSideProps<
         const { error } = res;
         throw new APIError(error?.code, error?.message);
       }
+
       return res.payload;
     }
   );
@@ -106,15 +102,15 @@ export const getServerSideProps: GetServerSideProps<
     return {
       redirect: {
         permanent: false,
-        destination: '/login',
+        destination: "/login",
       },
     };
   }
-  if (me.state === 'PENDING') {
+  if (me.state === "PENDING") {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }

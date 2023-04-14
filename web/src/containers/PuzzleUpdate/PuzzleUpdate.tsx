@@ -1,50 +1,42 @@
-import { Box, VStack } from '@chakra-ui/react';
+import { PuzzleUpdateForm } from "@/components/PuzzleUpdateForm/PuzzleUpdateForm";
+import usePuzzleDelete from "@/hooks/usePuzzleDelete";
+import usePuzzleUpdate from "@/hooks/usePuzzleUpdate";
 
-import PuzzleUpdateForm from '@/components/PuzzleUpdateForm';
-import usePuzzleDelete from '@/hooks/usePuzzleDelete';
-import usePuzzleUpdate from '@/hooks/usePuzzleUpdate';
-import { Puzzle } from '@/types/puzzle';
+import type { PuzzleUpdateContainerProps } from "./types";
 
-export type PuzzleUpdateContainerProps = {
-  puzzle: Puzzle;
-};
-
-const PuzzleUpdateContainer = (props: PuzzleUpdateContainerProps) => {
+export function PuzzleUpdateContainer(props: PuzzleUpdateContainerProps) {
   const { puzzle } = props;
 
-  const { isLoading: isDeleting, mutate: deletePuzzle } = usePuzzleDelete();
-  const { mutate: updatePuzzle } = usePuzzleUpdate(puzzle.id);
+  const {
+    isLoading: isDeleting,
+    isSuccess: isDeleted,
+    mutateAsync: deletePuzzleAsync,
+  } = usePuzzleDelete();
+  const { mutateAsync } = usePuzzleUpdate(puzzle.id);
 
   return (
-    <Box w="100%" display="flex" justifyContent="center">
-      <VStack w="100%" spacing="3" maxW="container.md">
+    <article>
+      <div className="mx-auto block max-w-3xl">
         <PuzzleUpdateForm
-          puzzle={puzzle}
+          isDeleted={isDeleted}
           isDeleting={isDeleting}
-          onDelete={() => deletePuzzle(puzzle.id)}
-          onSubmit={async (
-            values,
-            { setErrors, setSubmitting, validateForm }
-          ) => {
-            setSubmitting(true);
-
-            const errors = await validateForm(values);
-            if (Object.keys(errors).length > 0) {
-              setErrors(errors);
-              setSubmitting(false);
-              return;
+          onDelete={async () => {
+            try {
+              await deletePuzzleAsync(puzzle.id);
+            } catch (e) {
+              // TODO: Capture Error
             }
-
-            updatePuzzle(values, {
-              onSettled: () => {
-                setSubmitting(false);
-              },
-            });
           }}
+          onEdit={async (data) => {
+            try {
+              await mutateAsync(data);
+            } catch (e) {
+              // TODO: Capture error
+            }
+          }}
+          puzzle={puzzle}
         />
-      </VStack>
-    </Box>
+      </div>
+    </article>
   );
-};
-
-export default PuzzleUpdateContainer;
+}
