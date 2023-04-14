@@ -4,7 +4,8 @@ export function clampValue(value: number, min: number, max: number) {
   }
 
   if (max < min) {
-    console.warn("clampValue: max cannot be less than min");
+    // eslint-disable-next-line no-console
+    console.warn("[clampValue]: max cannot be less than min");
   }
 
   return Math.min(Math.max(value, min), max);

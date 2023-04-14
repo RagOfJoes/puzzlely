@@ -59,7 +59,7 @@ export function Settings() {
                   value={item.value}
                   key={`colorMode-option-${item.value}`}
                   className={clsx(
-                    "flex flex-1 items-center justify-center rounded-md py-1 px-4 text-sm font-medium text-subtle outline-none",
+                    "flex flex-1 items-center justify-center rounded-md px-4 py-1 text-sm font-medium text-subtle outline-none",
 
                     "aria-checked:bg-cyan aria-checked:text-surface aria-checked:focus-visible:ring-cyan/60",
                     "focus-visible:ring"

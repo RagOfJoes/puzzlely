@@ -1,2 +1,2 @@
-export * from './UserUpdateModal';
-export { default } from './UserUpdateModal';
+export * from "./types";
+export * from "./UserUpdateModal";

@@ -95,6 +95,4 @@ const Grid = memo(
   }
 );
 
-Grid.displayName = "GameGrid";
-
 export default Grid;

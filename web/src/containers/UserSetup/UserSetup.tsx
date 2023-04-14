@@ -8,14 +8,7 @@ export function UserSetupContainer() {
     <div className="mt-6 flex w-full items-start justify-center">
       <UserSetupForm
         onSubmit={(values) => {
-          mutate(
-            { updates: values },
-            {
-              onError: (error) => {
-                console.log(error);
-              },
-            }
-          );
+          mutate({ updates: values });
         }}
       />
     </div>

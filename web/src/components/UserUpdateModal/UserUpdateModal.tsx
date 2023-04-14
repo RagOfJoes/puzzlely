@@ -146,5 +146,3 @@ export const UserUpdateModal = forwardRef<
 });
 
 UserUpdateModal.displayName = "UserUpdateModal";
-
-export default UserUpdateModal;
