@@ -40,6 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       const { error } = res;
       throw new APIError(error?.code, error?.message);
     }
+
     return res.payload.user;
   });
 
