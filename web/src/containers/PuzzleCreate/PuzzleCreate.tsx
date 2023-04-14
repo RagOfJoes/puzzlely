@@ -6,7 +6,7 @@ import {
 } from "@/lib/game";
 
 export function PuzzleCreateContainer() {
-  const { mutate } = usePuzzleCreate();
+  const { mutateAsync } = usePuzzleCreate();
 
   return (
     <article>
@@ -41,8 +41,12 @@ export function PuzzleCreateContainer() {
               },
             ],
           }}
-          onSubmit={(data) => {
-            mutate(data);
+          onSubmit={async (data) => {
+            try {
+              await mutateAsync(data);
+            } catch (e) {
+              // TODO: Capture error
+            }
           }}
         />
       </div>
