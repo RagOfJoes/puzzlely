@@ -1,32 +1,32 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 
-import shuffle from 'lodash.shuffle';
+import shuffle from "lodash.shuffle";
 
-import { UNLIMITED_TIME_ALLOWED } from '@/lib/constants';
-import { Game } from '@/types/game';
-import { Block } from '@/types/puzzle';
+import { UNLIMITED_TIME_ALLOWED } from "@/lib/constants";
+import type { Game } from "@/types/game";
+import type { Block } from "@/types/puzzle";
 
 export type UseGameMenuParams = {
   blocks: Block[];
   reset: () => void;
   setBlocks: Dispatch<SetStateAction<Block[]>>;
-  setCorrect: Dispatch<SetStateAction<Game['correct']>>;
+  setCorrect: Dispatch<SetStateAction<Game["correct"]>>;
   setGame: Dispatch<SetStateAction<Game>>;
   setSelected: Dispatch<SetStateAction<Block[]>>;
-  startedAt: Game['startedAt'];
-  timeAllowed: Game['config']['timeAllowed'];
+  startedAt: Game["startedAt"];
+  timeAllowed: Game["config"]["timeAllowed"];
   toggleIsGameOver: Dispatch<SetStateAction<boolean>>;
 };
 
 /**
  * When User wants to go back to MainMenu from GameOver screen.
  */
-const useGameMenu = (args: UseGameMenuParams) => {
+function useGameMenu(args: UseGameMenuParams) {
   const {
     blocks,
     startedAt,
     timeAllowed,
-
     reset,
     setBlocks,
     setCorrect,
@@ -63,6 +63,6 @@ const useGameMenu = (args: UseGameMenuParams) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startedAt, timeAllowed]);
-};
+}
 
 export default useGameMenu;

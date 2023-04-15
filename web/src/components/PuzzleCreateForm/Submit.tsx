@@ -1,33 +1,41 @@
-import { Button, Text } from '@chakra-ui/react';
-import { useFormikContext } from 'formik';
+import clsx from "clsx";
+import { useFormContext } from "react-hook-form";
+import { CgSpinner } from "react-icons/cg";
 
-import PuzzleFormCard from '@/components/PuzzleFormCard';
-import { PuzzleCreatePayload } from '@/types/puzzle';
+import { PuzzleFormCard } from "@/components/PuzzleFormCard";
+import type { PuzzleCreatePayload } from "@/types/puzzle";
 
-const Submit = () => {
-  const { dirty, isSubmitting, isValid } =
-    useFormikContext<PuzzleCreatePayload>();
+function Submit() {
+  const { formState } = useFormContext<PuzzleCreatePayload>();
+  const { isDirty, isSubmitSuccessful, isSubmitting, isValid } = formState;
 
   return (
-    <PuzzleFormCard mt="6" hideDivider>
-      <Text fontSize="sm" color="text.secondary">
+    <PuzzleFormCard hideDivider>
+      <p className="text-sm font-medium text-subtle">
         Make sure all the inputs contain their intended values. Once the Puzzle
         has been created the only fields that&apos;ll be editable are the
-        Puzzle&apos;s Name, Puzzle&apos;s Description, Puzzle&apos;s Difficulty,
-        and, Group Description.
-      </Text>
+        puzzle&apos;s name, description, difficulty, and, group description.
+      </p>
 
-      <Button
-        mt="4"
-        w="100%"
+      <button
+        className={clsx(
+          "relative mt-4 flex h-10 w-full select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-4 font-semibold text-surface outline-none transition",
+
+          "active:enabled:bg-cyan/70",
+          "disabled:cursor-not-allowed disabled:bg-cyan/40",
+          "focus-visible:enabled:ring focus-visible:enabled:ring-cyan/60",
+          "hover:enabled:bg-cyan/70"
+        )}
+        disabled={!isDirty || !isValid || isSubmitting || isSubmitSuccessful}
         type="submit"
-        isLoading={isSubmitting}
-        isDisabled={!dirty || !isValid}
       >
-        Create Puzzle
-      </Button>
+        {isSubmitting && (
+          <CgSpinner className="shrink-0 animate-spin fill-text" size={24} />
+        )}
+        {isSubmitting ? "Creating Puzzle..." : "Create Puzzle"}
+      </button>
     </PuzzleFormCard>
   );
-};
+}
 
 export default Submit;

@@ -1,22 +1,22 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import PuzzleCreateContainer from '@/containers/PuzzleCreate';
-import MainLayout from '@/layouts/Main';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError from "@/api/error";
+import { PuzzleCreateContainer } from "@/containers/PuzzleCreate";
+import { MainLayout } from "@/layouts/Main";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { User } from "@/types/user";
 
-const PuzzlesCreatePage = () => {
+function PuzzlesCreatePage() {
   return (
     <>
       <MainLayout
         breadcrumbLinks={[
-          { path: '/puzzles', title: 'Puzzles' },
-          { path: '/puzzles/create', title: 'Create' },
+          { path: "/puzzles", title: "Puzzles" },
+          { path: "/puzzles/create", title: "Create" },
         ]}
       >
         <PuzzleCreateContainer />
@@ -25,7 +25,7 @@ const PuzzlesCreatePage = () => {
       <NextSeo title="Create a Puzzle" />
     </>
   );
-};
+}
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const key = generateQueryKey.Me();
@@ -40,6 +40,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       const { error } = res;
       throw new APIError(error?.code, error?.message);
     }
+
     return res.payload.user;
   });
 
@@ -48,15 +49,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         permanent: false,
-        destination: '/login',
+        destination: "/login",
       },
     };
   }
-  if (me.state === 'PENDING') {
+  if (me.state === "PENDING") {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }

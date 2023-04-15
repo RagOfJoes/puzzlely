@@ -1,9 +1,9 @@
-import { User } from './user';
+import type { User } from "./user";
 
 export type Session = {
   id: string;
   token: string;
-  state: 'Unauthenticated' | 'Authenticated';
+  state: "Unauthenticated" | "Authenticated";
   createdAt: Date;
   expiresAt?: Date;
   authenticatedAt?: Date;

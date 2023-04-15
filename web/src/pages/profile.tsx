@@ -1,17 +1,17 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import UserContainer from '@/containers/User';
-import UserSetupContainer from '@/containers/UserSetup';
-import useMe from '@/hooks/useMe';
-import AuthLayout from '@/layouts/Auth';
-import MainLayout from '@/layouts/Main';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError from "@/api/error";
+import { UserContainer } from "@/containers/User";
+import { UserSetupContainer } from "@/containers/UserSetup";
+import useMe from "@/hooks/useMe";
+import { AuthLayout } from "@/layouts/Auth";
+import { MainLayout } from "@/layouts/Main";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { User } from "@/types/user";
 
 export type ProfilePageProps = {
   user: User;
@@ -22,7 +22,7 @@ const ProfilePage = (props: ProfilePageProps) => {
 
   const { data: me } = useMe();
 
-  if ((me || user).state === 'PENDING') {
+  if ((me || user).state === "PENDING") {
     return (
       <>
         <AuthLayout
@@ -41,7 +41,7 @@ const ProfilePage = (props: ProfilePageProps) => {
     <>
       <MainLayout
         breadcrumbLinks={[
-          { path: '/profile', title: 'Profile' },
+          { path: "/profile", title: "Profile" },
           { path: `/users/${user.username}`, title: user.username },
         ]}
       >
@@ -76,7 +76,7 @@ export const getServerSideProps: GetServerSideProps<ProfilePageProps> = async (
     return {
       redirect: {
         permanent: false,
-        destination: '/login',
+        destination: "/login",
       },
     };
   }

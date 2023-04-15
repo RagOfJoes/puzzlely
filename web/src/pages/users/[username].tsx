@@ -1,15 +1,15 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import UserContainer from '@/containers/User';
-import MainLayout from '@/layouts/Main';
-import { USERNAME_SCHEMA } from '@/lib/constants';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError from "@/api/error";
+import { UserContainer } from "@/containers/User";
+import { MainLayout } from "@/layouts/Main";
+import { USERNAME_SCHEMA } from "@/lib/constants";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { User } from "@/types/user";
 
 export type UserPageProps = {
   user: User;
@@ -22,7 +22,7 @@ const UserPage = (props: UserPageProps) => {
     <>
       <MainLayout
         breadcrumbLinks={[
-          { path: '/profile', title: 'Profile' },
+          { path: "/profile", title: "Profile" },
           { path: `/users/${user.username}`, title: user.username },
         ]}
       >
@@ -41,10 +41,7 @@ export const getServerSideProps: GetServerSideProps<UserPageProps> = async (
   ctx
 ) => {
   const search = ctx.query.username;
-  try {
-    await USERNAME_SCHEMA.validate(search, { strict: true });
-  } catch {
-    // TODO: Capture error
+  if (!USERNAME_SCHEMA.safeParse(search).success) {
     return {
       notFound: true,
     };
@@ -84,13 +81,13 @@ export const getServerSideProps: GetServerSideProps<UserPageProps> = async (
   const me = queryClient.getQueryData<User>(meKey);
   if (
     me &&
-    (me.state === 'PENDING' ||
+    (me.state === "PENDING" ||
       me.username.toLowerCase() === username.toLowerCase())
   ) {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }

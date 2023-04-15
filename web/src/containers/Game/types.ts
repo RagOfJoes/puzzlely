@@ -1,8 +1,8 @@
-import { Dispatch, RefObject, SetStateAction } from 'react';
+import type { Dispatch, RefObject, SetStateAction } from "react";
 
-import { UseGameConnectConnection } from '@/hooks/useGameConnect';
-import { Game } from '@/types/game';
-import { Block, Puzzle } from '@/types/puzzle';
+import type { UseGameConnectConnection } from "@/hooks/useGameConnect";
+import type { Game } from "@/types/game";
+import type { Block, Puzzle } from "@/types/puzzle";
 
 export type GameContainerProps = {
   game: Game;
@@ -20,15 +20,15 @@ export type StatsProps = {
 
 export type ShortcutsProps = Pick<
   StatsProps,
-  'onForfeit' | 'onReset' | 'onShuffle'
+  "onForfeit" | "onReset" | "onShuffle"
 > & {
-  game: Pick<Game, 'completedAt' | 'guessedAt' | 'startedAt'>;
+  game: Pick<Game, "completedAt" | "guessedAt" | "startedAt">;
 };
 
 export type GridProps = {
   blocks: Block[];
-  correct: Game['correct'];
-  game: Pick<Game, 'completedAt' | 'guessedAt' | 'startedAt'>;
+  correct: Game["correct"];
+  game: Pick<Game, "completedAt" | "guessedAt" | "startedAt">;
   isGameOver: boolean;
   isRunning: boolean;
   isWrong: boolean;
@@ -47,30 +47,30 @@ export type MenusProps = {
   // Limited snapshot of game state to restrict what can re-render the Grid
   game: Pick<
     Game,
-    | 'id'
-    | 'attempts'
-    | 'config'
-    | 'correct'
-    | 'challengeCode'
-    | 'challengedBy'
-    | 'results'
-    | 'score'
-    | 'completedAt'
-    | 'guessedAt'
-    | 'startedAt'
+    | "id"
+    | "attempts"
+    | "config"
+    | "correct"
+    | "challengeCode"
+    | "challengedBy"
+    | "results"
+    | "score"
+    | "completedAt"
+    | "guessedAt"
+    | "startedAt"
   > & {
     puzzle: Pick<
       Puzzle,
-      | 'id'
-      | 'createdBy'
-      | 'difficulty'
-      | 'groups'
-      | 'likedAt'
-      | 'maxAttempts'
-      | 'name'
-      | 'numOfLikes'
-      | 'timeAllowed'
-      | 'createdAt'
+      | "id"
+      | "createdBy"
+      | "difficulty"
+      | "groups"
+      | "likedAt"
+      | "maxAttempts"
+      | "name"
+      | "numOfLikes"
+      | "timeAllowed"
+      | "createdAt"
     >;
   };
   isGameOver: boolean;
@@ -83,33 +83,33 @@ export type MenusProps = {
 };
 
 export type ConfigMenuProps = {
-  game: MenusProps['game'];
-  onMenu: MenusProps['onMenu'];
-  onStart: MenusProps['onStart'];
-  onUpdateTimeAllowed: MenusProps['onUpdateTimeAllowed'];
-  setGame: MenusProps['setGame'];
+  game: MenusProps["game"];
+  onMenu: MenusProps["onMenu"];
+  onStart: MenusProps["onStart"];
+  onUpdateTimeAllowed: MenusProps["onUpdateTimeAllowed"];
+  setGame: MenusProps["setGame"];
 };
 
 export type MainMenuProps = {
-  game: MenusProps['game'];
+  game: MenusProps["game"];
   onConfig: () => void;
-  onStart: MenusProps['onStart'];
+  onStart: MenusProps["onStart"];
 };
 
 export type GameOverMenuProps = {
-  game: MenusProps['game'];
-  onContinue: MenusProps['onContinue'];
-  onMenu: MenusProps['onMenu'];
+  game: MenusProps["game"];
+  onContinue: MenusProps["onContinue"];
+  onMenu: MenusProps["onMenu"];
 };
 
 export type ConnectMenuProps = {
-  blocks: MenusProps['blocks'];
-  game: MenusProps['game'];
-  onConnect: MenusProps['onConnect'];
+  blocks: MenusProps["blocks"];
+  game: MenusProps["game"];
+  onConnect: MenusProps["onConnect"];
 };
 
 export type ResultMenuProps = {
-  blocks: MenusProps['blocks'];
-  game: MenusProps['game'];
-  setGame: MenusProps['setGame'];
+  blocks: MenusProps["blocks"];
+  game: MenusProps["game"];
+  setGame: MenusProps["setGame"];
 };

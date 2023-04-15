@@ -1,33 +1,30 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from "react";
 
-import { Box, VStack } from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import shuffle from 'lodash.shuffle';
+import dayjs from "dayjs";
+import shuffle from "lodash.shuffle";
 
-import useGameBlockSelect from '@/hooks/useGameBlockSelect';
-import useGameConnect from '@/hooks/useGameConnect';
-import useGameContinue from '@/hooks/useGameContinue';
-import useGameFocus from '@/hooks/useGameFocus';
-import useGameForfeit from '@/hooks/useGameForfeit';
-import useGameMenu from '@/hooks/useGameMenu';
-import useGameReset from '@/hooks/useGameReset';
-import useGameShuffle from '@/hooks/useGameShuffle';
-import useGameStart from '@/hooks/useGameStart';
-import useGameWrong from '@/hooks/useGameWrong';
-import useMount from '@/hooks/useMount';
-import useTimer from '@/hooks/useTimer';
-import { millisecondsTo } from '@/lib/time';
-import { Game } from '@/types/game';
-import { Block } from '@/types/puzzle';
+import useGameBlockSelect from "@/hooks/useGameBlockSelect";
+import useGameConnect from "@/hooks/useGameConnect";
+import useGameContinue from "@/hooks/useGameContinue";
+import useGameFocus from "@/hooks/useGameFocus";
+import useGameForfeit from "@/hooks/useGameForfeit";
+import useGameMenu from "@/hooks/useGameMenu";
+import useGameReset from "@/hooks/useGameReset";
+import useGameShuffle from "@/hooks/useGameShuffle";
+import useGameStart from "@/hooks/useGameStart";
+import useGameWrong from "@/hooks/useGameWrong";
+import useMount from "@/hooks/useMount";
+import useTimer from "@/hooks/useTimer";
+import { millisecondsTo } from "@/lib/time";
+import type { Game } from "@/types/game";
+import type { Block } from "@/types/puzzle";
 
-import Grid from './Grid';
-import Menus from './Menus';
-import Stats from './Stats';
-import { GameContainerProps } from './types';
+import Grid from "./Grid";
+import Menus from "./Menus";
+import Stats from "./Stats";
+import type { GameContainerProps } from "./types";
 
-const GameContainer = (props: GameContainerProps) => {
-  // Ref for placing Menus portal into Grid
-  // This is useful for optimizing Grid when user is messing with Game configs, etc.
+export function GameContainer(props: GameContainerProps) {
   const gridRef = useRef(null);
 
   /**
@@ -37,7 +34,7 @@ const GameContainer = (props: GameContainerProps) => {
   const [blocks, setBlocks] = useState(
     props.game.puzzle.groups.flatMap((g) => g.blocks)
   );
-  const [correct, setCorrect] = useState<Game['correct']>(() => {
+  const [correct, setCorrect] = useState<Game["correct"]>(() => {
     // If guessedAt is already set then set all Groups (Ordered by correctly guessed first)
     // Otherwise, return an empty array
     if (props.game.startedAt && props.game.guessedAt) {
@@ -76,12 +73,12 @@ const GameContainer = (props: GameContainerProps) => {
     interval: 1000,
     startTime,
     step: 1000,
-    timerType: 'DECREMENTAL',
+    timerType: "DECREMENTAL",
     onTimeOver: () => {
       // Make sure that guessedAt is within timeAllowed
       const newGuessedAt = dayjs(startedAt)
         .tz()
-        .add(timeAllowed, 'milliseconds')
+        .add(timeAllowed, "milliseconds")
         .toDate();
       setGame((prev) => ({
         ...prev,
@@ -91,11 +88,11 @@ const GameContainer = (props: GameContainerProps) => {
       toggleIsGameOver(true);
     },
   });
-  const isRunning = useMemo(() => status === 'RUNNING', [status]);
+  const isRunning = useMemo(() => status === "RUNNING", [status]);
   const { minutes, seconds } = useMemo(
     () => ({
-      minutes: millisecondsTo('minutes', time),
-      seconds: millisecondsTo('seconds', time),
+      minutes: millisecondsTo("minutes", time),
+      seconds: millisecondsTo("seconds", time),
     }),
     [time]
   );
@@ -212,45 +209,42 @@ const GameContainer = (props: GameContainerProps) => {
     timeAllowed,
   });
 
-  /**
-   * Render
-   */
-
   return (
-    <Box w="100%" display="flex" justifyContent="center">
-      <VStack w="100%" spacing="3" maxW="container.md">
+    <div className="flex w-full justify-center">
+      <div className="flex w-full max-w-3xl flex-col gap-3">
         {/* Game stats */}
         <Stats
           game={game}
-          minutes={minutes}
-          seconds={seconds}
-          onReset={onReset}
           isRunning={isRunning}
-          onShuffle={onShuffle}
+          minutes={minutes}
           onForfeit={onForfeit}
+          onReset={onReset}
+          onShuffle={onShuffle}
+          seconds={seconds}
         />
+
         {/* Game grid */}
         <Grid
           ref={gridRef}
           blocks={blocks}
           correct={correct}
-          isWrong={isWrong}
-          selected={selected}
-          isRunning={isRunning}
-          isGameOver={isGameOver}
           game={{
             completedAt: game.completedAt,
             guessedAt: game.guessedAt,
             startedAt: game.startedAt,
           }}
+          isGameOver={isGameOver}
+          isRunning={isRunning}
+          isWrong={isWrong}
           onBlockSelect={onBlockSelect}
+          selected={selected}
         />
+
         {/* Game menu cards */}
         <Menus
           blocks={blocks}
           gridRef={gridRef}
           isGameOver={isGameOver}
-          // States
           game={{
             id: game.id,
             score: game.score,
@@ -277,7 +271,6 @@ const GameContainer = (props: GameContainerProps) => {
             },
           }}
           setGame={setGame}
-          // Callbacks
           onMenu={onMenu}
           onStart={onStart}
           onConnect={onConnect}
@@ -288,9 +281,7 @@ const GameContainer = (props: GameContainerProps) => {
             }
           }}
         />
-      </VStack>
-    </Box>
+      </div>
+    </div>
   );
-};
-
-export default GameContainer;
+}

@@ -1,55 +1,47 @@
-import { useToast } from '@chakra-ui/react';
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from '@tanstack/react-query';
-import { useRouter } from 'next/router';
+import type { InfiniteData } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
-import api from '@/api';
-import APIError, { APIErrorCode } from '@/api/error';
-import useMe from '@/hooks/useMe';
-import { ERR_UNAUTHORIZED } from '@/lib/constants';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import {
+import api from "@/api";
+import APIError, { APIErrorCode } from "@/api/error";
+import useMe from "@/hooks/useMe";
+import { ERR_UNAUTHORIZED } from "@/lib/constants";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type {
   Puzzle,
   PuzzleConnection,
   PuzzleNode,
   PuzzleCreatePayload,
-} from '@/types/puzzle';
-import { UserStats } from '@/types/user';
+} from "@/types/puzzle";
+import type { UserStats } from "@/types/user";
 
-const usePuzzleCreate = () => {
-  const toast = useToast();
+function usePuzzleCreate() {
   const router = useRouter();
   const { data: me } = useMe();
   const queryClient = useQueryClient();
 
-  const createdKey = generateQueryKey.PuzzlesCreated(me?.id || '');
-  const statsKey = generateQueryKey.UsersStats(me?.id || '');
+  const createdKey = generateQueryKey.PuzzlesCreated(me?.id || "");
+  const statsKey = generateQueryKey.UsersStats(me?.id || "");
 
   return useMutation<Puzzle, APIError, PuzzleCreatePayload>(
     async (newPuzzle) => {
       if (!me) {
         throw new APIError(APIErrorCode.Unauthorized, ERR_UNAUTHORIZED);
       }
+
       return api.createPuzzle(newPuzzle);
     },
     {
       retry: false,
       onError: async (err) => {
         if (err.code === APIErrorCode.Unauthorized || !me) {
-          router.push('/login');
+          router.push("/login");
           return;
         }
 
         // Render toast
-        toast({
-          duration: 3000,
-          status: 'error',
-          isClosable: false,
-          title: err.message,
-        });
+        toast.error(err.message);
       },
       onSuccess: async (newPuzzle) => {
         const hasCachedCreated = queryClient.getQueryState<
@@ -71,7 +63,7 @@ const usePuzzleCreate = () => {
 
               const newCursor = Buffer.from(
                 `Cursor:${newPuzzle.createdAt}`
-              ).toString('base64');
+              ).toString("base64");
               const newNode: PuzzleNode = {
                 id: newPuzzle.id,
                 name: newPuzzle.name,
@@ -127,10 +119,10 @@ const usePuzzleCreate = () => {
         );
 
         // Redirect to Profile page
-        router.push('/profile');
+        router.push("/profile");
       },
     }
   );
-};
+}
 
 export default usePuzzleCreate;

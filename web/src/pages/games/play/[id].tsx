@@ -1,18 +1,20 @@
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import isUUID from '@/lib/isUUID';
+import api from "@/api";
+import isUUID from "@/lib/isUUID";
 
-const PlayPage = () => <NextSeo noindex nofollow />;
+function PlayPage() {
+  return <NextSeo noindex nofollow />;
+}
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const puzzleID = ctx.query.id;
-  if (typeof puzzleID !== 'string' || !isUUID(puzzleID)) {
+  if (typeof puzzleID !== "string" || !isUUID(puzzleID)) {
     return {
       redirect: {
         permanent: false,
-        destination: '/puzzles',
+        destination: "/puzzles",
       },
     };
   }
@@ -21,11 +23,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     api.createGame(ctx),
     api.me(ctx.req as NextApiRequest, ctx.res as NextApiResponse),
   ]);
-  if (me.success && me?.payload?.user?.state === 'PENDING') {
+  if (me.success && me?.payload?.user?.state === "PENDING") {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }
@@ -34,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         permanent: false,
-        destination: '/puzzles',
+        destination: "/puzzles",
       },
     };
   }

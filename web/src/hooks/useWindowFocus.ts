@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-const shouldFocus = typeof document !== 'undefined' && document.hasFocus();
+const shouldFocus = typeof document !== "undefined" && document.hasFocus();
 
-const useWindowFocus = () => {
+function useWindowFocus() {
   const [isFocused, toggleIsFocused] = useState(shouldFocus);
 
   useEffect(() => {
@@ -11,16 +11,16 @@ const useWindowFocus = () => {
     const onFocus = () => toggleIsFocused(true);
     const onBlur = () => toggleIsFocused(false);
 
-    window.addEventListener('focus', onFocus);
-    window.addEventListener('blur', onBlur);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
 
     return () => {
-      window.removeEventListener('focus', onFocus);
-      window.removeEventListener('blur', onBlur);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
     };
   }, []);
 
   return isFocused;
-};
+}
 
 export default useWindowFocus;

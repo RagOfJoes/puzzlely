@@ -1,115 +1,120 @@
-import { useMemo } from 'react';
+import type { ElementRef } from "react";
+import { forwardRef, useMemo } from "react";
 
-import {
-  Badge,
-  Box,
-  Button,
-  Heading,
-  HStack,
-  Icon,
-  Text,
-} from '@chakra-ui/react';
-import Link from 'next/link';
-import { IoPlay } from 'react-icons/io5';
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
+import Link from "next/link";
+import { IoPlay } from "react-icons/io5";
 
 import {
   UNLIMITED_MAX_ATTEMPTS,
   UNLIMITED_TIME_ALLOWED,
-} from '@/lib/constants';
-import { difficultyColor } from '@/lib/game';
-import { millisecondsTo } from '@/lib/time';
-import { Puzzle } from '@/types/puzzle';
+} from "@/lib/constants";
+import omit from "@/lib/omit";
+import { millisecondsTo } from "@/lib/time";
 
-export type PuzzleItemProps = Pick<
-  Puzzle,
-  'difficulty' | 'id' | 'maxAttempts' | 'name' | 'timeAllowed'
-> & {
-  createdBy: string;
-};
+import type { PuzzleItemProps } from "./types";
 
-const PuzzleItem = (props: PuzzleItemProps) => {
-  const { createdBy, difficulty, id, maxAttempts, name, timeAllowed } = props;
+export const PuzzleItem = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  PuzzleItemProps
+>((props, ref) => {
+  const {
+    className,
+    createdBy,
+    difficulty,
+    id,
+    maxAttempts,
+    name,
+    timeAllowed,
+  } = omit(props, ["children"]);
 
   const maxAttemptsText = useMemo(() => {
     if (maxAttempts === UNLIMITED_MAX_ATTEMPTS) {
       return <>&infin; attempts</>;
     }
-    return `${maxAttempts} attempt${maxAttempts! > 1 ? 's' : ''}`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return `${maxAttempts} attempt${maxAttempts! > 1 ? "s" : ""}`;
   }, [maxAttempts]);
   const timeAllowedText = useMemo(() => {
     if (timeAllowed === UNLIMITED_TIME_ALLOWED) {
-      return 'No Time Limit';
+      return "No Time Limit";
     }
 
-    const minutes = millisecondsTo('minutes', timeAllowed!);
-    const seconds = millisecondsTo('seconds', timeAllowed!);
+    const minutes = millisecondsTo("minutes", timeAllowed!);
+    const seconds = millisecondsTo("seconds", timeAllowed!);
 
-    const formatMin = `${minutes} min${minutes > 1 ? 's' : ''}`;
-    const formatSec = `${seconds} sec${seconds > 1 ? 's' : ''}`;
-    return `${minutes > 0 ? `${formatMin} ` : ''} ${
-      seconds > 0 ? formatSec : ''
+    const formatMin = `${minutes} min${minutes > 1 ? "s" : ""}`;
+    const formatSec = `${seconds} sec${seconds > 1 ? "s" : ""}`;
+    return `${minutes > 0 ? `${formatMin} ` : ""} ${
+      seconds > 0 ? formatSec : ""
     }`;
   }, [timeAllowed]);
 
   return (
-    <Box w="100%" h="100%" as="article">
-      <HStack w="100%" spacing="0" align="center" justify="space-between">
-        <Box
-          w="100%"
-          display="flex"
-          overflow="hidden"
-          flexDirection="column"
-          alignItems="flex-start"
-        >
-          <HStack w="100%" align="center" overflow="hidden">
-            <Badge px="1" colorScheme={difficultyColor[difficulty]}>
+    <Primitive.div
+      ref={ref}
+      className={clsx(
+        "h-full w-full",
+
+        className
+      )}
+    >
+      <div className="flex w-full items-center justify-between">
+        <div className="flex w-full flex-col items-start gap-1">
+          <div className="flex w-full items-center gap-2">
+            <span
+              className={clsx(
+                "inline-block whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-semibold uppercase text-surface",
+
+                {
+                  "bg-green": difficulty === "Easy",
+                  "bg-yellow": difficulty === "Medium",
+                  "bg-red": difficulty === "Hard",
+                }
+              )}
+            >
               {difficulty}
-            </Badge>
-            <Link passHref href={`/users/${createdBy}`}>
-              <Text
-                as="a"
-                noOfLines={1}
-                fontSize="sm"
-                title={createdBy}
-                fontWeight="medium"
-                display="inline-block"
-              >
-                {createdBy}
-              </Text>
+            </span>
+
+            <Link
+              href={`/users/${createdBy}`}
+              className={clsx(
+                "text-sm font-bold outline-none",
+
+                "focus-visible:ring"
+              )}
+            >
+              {createdBy}
             </Link>
-          </HStack>
+          </div>
 
-          <Text
-            mt="1"
-            fontSize="xs"
-            fontWeight="medium"
-            letterSpacing="wide"
-            color="text.secondary"
-            textTransform="uppercase"
-          >
+          <p className="text-xs font-semibold uppercase tracking-wide text-subtle">
             {maxAttemptsText} &bull; {timeAllowedText}
-          </Text>
+          </p>
 
-          <Heading mt="1" w="100%" size="sm" noOfLines={1} lineHeight="normal">
+          <h3 className="text-md line-clamp-1 text-ellipsis font-heading font-bold leading-normal">
             {name}
-          </Heading>
-        </Box>
+          </h3>
+        </div>
 
-        <Link passHref href={`/games/play/${id}`}>
-          <Button
-            as="a"
-            size="sm"
-            rel="nofollow"
-            flexShrink="0"
-            rightIcon={<Icon as={IoPlay} />}
-          >
-            Play
-          </Button>
+        <Link
+          rel="nofollow"
+          href={`/games/play/${id}`}
+          aria-label={`Play ${name}`}
+          className={clsx(
+            "relative flex h-8 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-3 text-sm font-semibold text-surface outline-none transition",
+
+            "active:bg-cyan/70",
+            "focus-visible:ring focus-visible:ring-cyan/60",
+            "hover:bg-cyan/70"
+          )}
+        >
+          Play
+          <IoPlay />
         </Link>
-      </HStack>
-    </Box>
+      </div>
+    </Primitive.div>
   );
-};
+});
 
-export default PuzzleItem;
+PuzzleItem.displayName = "PuzzleItem";

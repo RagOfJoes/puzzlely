@@ -1,15 +1,20 @@
-import { Icon, IconProps, useTheme } from '@chakra-ui/react';
+import { forwardRef } from "react";
 
-const PuzzlelyIcon = (props: IconProps) => {
-  const { colors } = useTheme();
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
 
+export const PuzzlelyIcon = forwardRef<
+  SVGSVGElement,
+  ComponentPropsWithoutRef<typeof Primitive.svg>
+>((props, ref) => {
   return (
-    <Icon viewBox="0 0 480 480" {...props}>
-      <rect rx="100" width="480" height="480" fill={colors.surface} />
+    <svg viewBox="0 0 480 480" {...props} ref={ref}>
+      <rect rx="100" width="480" height="480" className="fill-surface" />
       <path
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
         d="M132 337C132 325.954 140.954 317 152 317H180C191.046 317 200 325.954 200 337V351C200 369.778 184.778 385 166 385C147.222 385 132 369.778 132 351V337Z"
       />
       <rect
@@ -19,8 +24,7 @@ const PuzzlelyIcon = (props: IconProps) => {
         width="68"
         height="68"
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
       />
       <rect
         rx="20"
@@ -29,13 +33,11 @@ const PuzzlelyIcon = (props: IconProps) => {
         width="68"
         height="68"
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
       />
       <path
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
         d="M132 129C132 110.222 147.222 95 166 95H180C191.046 95 200 103.954 200 115V143C200 154.046 191.046 163 180 163H152C140.954 163 132 154.046 132 143V129Z"
       />
       <rect
@@ -45,13 +47,11 @@ const PuzzlelyIcon = (props: IconProps) => {
         width="68"
         height="68"
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
       />
       <path
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
         d="M280 115C280 103.954 288.954 95 300 95H314C332.778 95 348 110.222 348 129V143C348 154.046 339.046 163 328 163H300C288.954 163 280 154.046 280 143V115Z"
       />
       <rect
@@ -61,8 +61,7 @@ const PuzzlelyIcon = (props: IconProps) => {
         width="68"
         height="68"
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
       />
       <rect
         rx="20"
@@ -71,8 +70,7 @@ const PuzzlelyIcon = (props: IconProps) => {
         width="68"
         height="68"
         strokeWidth="3"
-        stroke={colors.surface}
-        fill={colors.text.primary}
+        className="fill-text stroke-surface"
       />
       <rect
         rx="20"
@@ -81,8 +79,7 @@ const PuzzlelyIcon = (props: IconProps) => {
         width="68"
         height="68"
         strokeWidth="6"
-        fill={colors.primary}
-        stroke={colors.surface}
+        className="fill-cyan stroke-surface"
         transform="rotate(-45 252 263.083)"
       />
       <rect
@@ -91,7 +88,7 @@ const PuzzlelyIcon = (props: IconProps) => {
         y="165.728"
         width="18"
         height="18"
-        fill={colors.primary}
+        className="fill-cyan"
         transform="rotate(-45 265 165.728)"
       />
       <rect
@@ -100,7 +97,7 @@ const PuzzlelyIcon = (props: IconProps) => {
         y="240.728"
         width="18"
         height="18"
-        fill={colors.primary}
+        className="fill-cyan"
         transform="rotate(-45 190 240.728)"
       />
       <rect
@@ -109,11 +106,11 @@ const PuzzlelyIcon = (props: IconProps) => {
         y="165.728"
         width="18"
         height="18"
-        fill={colors.primary}
+        className="fill-cyan"
         transform="rotate(-45 190 165.728)"
       />
-    </Icon>
+    </svg>
   );
-};
+});
 
-export default PuzzlelyIcon;
+PuzzlelyIcon.displayName = "PuzzlelyIcon";

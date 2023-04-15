@@ -1,20 +1,26 @@
-import { useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle } from "react";
 
-import { forwardRef } from '@chakra-ui/react';
+import { Primitive } from "@radix-ui/react-primitive";
 
-import { TagInputProvider } from './Context';
-import { TagInputProps } from './types';
-import useTagInput from './useTagInput';
+import { TagInputProvider } from "./Context";
+import type { TagInputProps, TagInputRefMethods } from "./types";
+import useTagInput from "./useTagInput";
 
-const TagInput = forwardRef<TagInputProps, 'div'>((props, ref) => {
-  const value = useTagInput(props);
-  const { children, removeItem } = value;
+export const TagInput = forwardRef<TagInputRefMethods, TagInputProps>(
+  (props, ref) => {
+    const ctx = useTagInput(props);
+    const { children, removeItem } = ctx;
 
-  useImperativeHandle(ref, () => ({
-    removeItem,
-  }));
+    useImperativeHandle(ref, () => ({
+      removeItem,
+    }));
 
-  return <TagInputProvider value={value}>{children}</TagInputProvider>;
-});
+    return (
+      <TagInputProvider value={ctx}>
+        <Primitive.div className="w-full">{children}</Primitive.div>
+      </TagInputProvider>
+    );
+  }
+);
 
-export default TagInput;
+TagInput.displayName = "TagInput";

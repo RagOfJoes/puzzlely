@@ -1,1 +1,1 @@
-export { default } from './GameMenuCard';
+export * from "./GameMenuCard";

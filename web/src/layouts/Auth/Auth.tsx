@@ -1,131 +1,125 @@
-import { PropsWithChildren } from 'react';
+import { forwardRef } from "react";
 
-import {
-  Box,
-  Container,
-  Heading,
-  HStack,
-  Icon,
-  Link,
-  Text,
-  useColorMode,
-  VStack,
-} from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import { NextSeo } from 'next-seo';
-import { MdCopyright } from 'react-icons/md';
+import clsx from "clsx";
+import dayjs from "dayjs";
+import Link from "next/link";
+import { NextSeo } from "next-seo";
+import { MdCopyright } from "react-icons/md";
 
-import PuzzlelyIcon from '@/components/PuzzlelyIcon';
+import { useColorModeCtx } from "@/components/ColorMode";
+import { PuzzlelyIcon } from "@/components/PuzzlelyIcon";
 
-export type AuthLayoutProps = {
-  caption: string;
-  lead: string;
-};
+import type { AuthLayoutProps } from "./types";
 
-const AuthLayout = (props: PropsWithChildren<AuthLayoutProps>) => {
-  const { caption, lead } = props;
+export const AuthLayout = forwardRef<HTMLElement, AuthLayoutProps>(
+  (props, ref) => {
+    const { caption, children, className, lead, ...other } = props;
 
-  const { colorMode = 'light' } = useColorMode();
+    const { colorMode } = useColorModeCtx();
 
-  return (
-    <>
-      <NextSeo
-        additionalLinkTags={[
-          {
-            rel: 'manifest',
-            href: `/${colorMode}/site.webmanifest`,
-          },
-          {
-            rel: 'icon',
-            href: `/${colorMode}/favicon.ico`,
-          },
-          {
-            rel: 'icon',
-            sizes: '16x16',
-            type: 'image/png',
-            href: `/${colorMode}/favicon-16x16.png`,
-          },
-          {
-            rel: 'icon',
-            sizes: '32x32',
-            type: 'image/png',
-            href: `/${colorMode}/favicon-32x32.png`,
-          },
-          {
-            rel: 'icon',
-            type: 'image/png',
-            sizes: '16x16',
-            href: `/${colorMode}/favicon-16x16.png`,
-          },
-          {
-            sizes: '180x180',
-            rel: 'apple-touch-icon',
-            href: `/${colorMode}/apple-touch-icon.png`,
-          },
-        ]}
-        additionalMetaTags={[
-          {
-            name: 'theme-color',
-            content: colorMode === 'dark' ? '#282c34' : '#f4f4f7',
-          },
-        ]}
-      />
+    return (
+      <>
+        <NextSeo
+          additionalLinkTags={[
+            {
+              rel: "manifest",
+              href: `/${colorMode}/site.webmanifest`,
+            },
+            {
+              rel: "icon",
+              href: `/${colorMode}/favicon.ico`,
+            },
+            {
+              rel: "icon",
+              sizes: "16x16",
+              type: "image/png",
+              href: `/${colorMode}/favicon-16x16.png`,
+            },
+            {
+              rel: "icon",
+              sizes: "32x32",
+              type: "image/png",
+              href: `/${colorMode}/favicon-32x32.png`,
+            },
+            {
+              rel: "icon",
+              type: "image/png",
+              sizes: "16x16",
+              href: `/${colorMode}/favicon-16x16.png`,
+            },
+            {
+              sizes: "180x180",
+              rel: "apple-touch-icon",
+              href: `/${colorMode}/apple-touch-icon.png`,
+            },
+          ]}
+          additionalMetaTags={[
+            {
+              name: "theme-color",
+              content: colorMode === "dark" ? "#282c34" : "#f4f4f7",
+            },
+          ]}
+        />
 
-      <Container
-        py="6"
-        h="100vh"
-        display="flex"
-        flexDir="column"
-        maxW="container.lg"
-        alignItems="flex-start"
-      >
-        <Link
-          href="/"
-          display="flex"
-          textDecor="none"
-          alignItems="center"
-          justifyContent="center"
-          _hover={{
-            textDecor: 'none',
-          }}
-          _focus={{
-            boxShadow: 'none',
-          }}
-        >
-          <Icon w="9" h="9" boxShadow="sm" as={PuzzlelyIcon} />
-          <Heading ms="12px" size="sm">
-            Puzzlely
-          </Heading>
-        </Link>
+        <div className="m-auto flex h-screen max-w-5xl flex-col items-start px-4 py-6">
+          <header>
+            <Link
+              href="/"
+              className={clsx(
+                "flex items-center no-underline outline-none",
 
-        <Box
-          w="100%"
-          h="100%"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Box w="100%" maxWidth="600px">
-            <VStack w="100%" spacing="0.5" align="flex-start">
-              <Heading size="md">{lead}</Heading>
-              <Text fontSize="md" color="text.secondary">
-                {caption}
-              </Text>
-            </VStack>
+                "focus-visible:ring"
+              )}
+            >
+              <PuzzlelyIcon className="h-10 w-10" />
 
-            {props.children}
-          </Box>
-        </Box>
+              <h1
+                className={clsx(
+                  "relative ml-3 font-heading text-xl font-bold",
 
-        <HStack mt="auto" align="center" spacing="1" justify="flex-start">
-          <Icon w="12px" h="12px" as={MdCopyright} color="text.secondary" />
-          <Text fontSize="xs" color="text.secondary" lineHeight="short">
-            Puzzlely {dayjs().tz().year()}
-          </Text>
-        </HStack>
-      </Container>
-    </>
-  );
-};
+                  'before:absolute before:bottom-1 before:left-0 before:right-2.5 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
+                )}
+              >
+                Puzzlely
+              </h1>
+            </Link>
+          </header>
 
-export default AuthLayout;
+          <main
+            {...other}
+            ref={ref}
+            className={clsx(
+              "flex h-full w-full items-center justify-center",
+
+              className
+            )}
+          >
+            <article className="w-full max-w-xl">
+              <div className="flex flex-col items-start gap-1">
+                <h2 className="font-heading text-xl font-bold leading-none">
+                  {lead}
+                </h2>
+                <p className="font-medium leading-none text-subtle">
+                  {caption}
+                </p>
+              </div>
+
+              {children}
+            </article>
+          </main>
+
+          <footer>
+            <div className="flex items-center justify-start gap-1 text-subtle">
+              <MdCopyright size={12} />
+              <p className="text-xs leading-none">
+                Puzzlely {dayjs().tz().year()}
+              </p>
+            </div>
+          </footer>
+        </div>
+      </>
+    );
+  }
+);
+
+AuthLayout.displayName = "AuthLayout";

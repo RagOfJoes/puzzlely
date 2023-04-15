@@ -1,31 +1,31 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from "react";
 
-import { Portal, useDisclosure } from '@chakra-ui/react';
-import { AnimatePresence } from 'framer-motion';
+import * as Portal from "@radix-ui/react-portal";
+import { AnimatePresence } from "framer-motion";
 
-import { MenusProps } from '../types';
-import Config from './Config';
-import Connect from './Connect';
-import GameOver from './GameOver';
-import MainMenu from './MainMenu';
-import Result from './Result';
+import Config from "./Config";
+import Connect from "./Connect";
+import GameOver from "./GameOver";
+import MainMenu from "./MainMenu";
+import Result from "./Result";
+import type { MenusProps } from "../types";
 
-const Menus = (props: MenusProps) => {
+function Menus(props: MenusProps) {
   const {
     blocks,
     game,
     gridRef,
     isGameOver,
-    onMenu,
-    onStart,
     onConnect,
     onContinue,
+    onMenu,
+    onStart,
     onUpdateTimeAllowed,
     setGame,
   } = props;
   const { completedAt, guessedAt, startedAt } = game;
 
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [isOpen, toggleIsOpen] = useState(false);
 
   const Menu = useMemo(() => {
     if (isOpen) {
@@ -33,16 +33,18 @@ const Menus = (props: MenusProps) => {
         <Config
           key="Game.ConfigMenu"
           game={game}
-          setGame={setGame}
-          onUpdateTimeAllowed={onUpdateTimeAllowed}
           onMenu={() => {
             onMenu();
-            onClose();
+
+            toggleIsOpen(false);
           }}
           onStart={() => {
             onStart();
-            onClose();
+
+            toggleIsOpen(false);
           }}
+          onUpdateTimeAllowed={onUpdateTimeAllowed}
+          setGame={setGame}
         />
       );
     }
@@ -51,8 +53,8 @@ const Menus = (props: MenusProps) => {
         <MainMenu
           key="Game.MainMenu"
           game={game}
+          onConfig={() => toggleIsOpen(true)}
           onStart={onStart}
-          onConfig={() => onOpen()}
         />
       );
     }
@@ -61,8 +63,8 @@ const Menus = (props: MenusProps) => {
         <GameOver
           key="Game.GameOverMenu"
           game={game}
-          onMenu={onMenu}
           onContinue={onContinue}
+          onMenu={onMenu}
         />
       );
     }
@@ -70,8 +72,8 @@ const Menus = (props: MenusProps) => {
       return (
         <Result
           key="Game.ResultMenu"
-          game={game}
           blocks={blocks}
+          game={game}
           setGame={setGame}
         />
       );
@@ -80,8 +82,8 @@ const Menus = (props: MenusProps) => {
       return (
         <Connect
           key="Game.ConnectMenu"
-          game={game}
           blocks={blocks}
+          game={game}
           onConnect={onConnect}
         />
       );
@@ -92,10 +94,10 @@ const Menus = (props: MenusProps) => {
   }, [blocks, game, isGameOver, isOpen]);
 
   return (
-    <Portal containerRef={gridRef}>
+    <Portal.Root container={gridRef.current}>
       <AnimatePresence>{Menu}</AnimatePresence>
-    </Portal>
+    </Portal.Root>
   );
-};
+}
 
 export default Menus;

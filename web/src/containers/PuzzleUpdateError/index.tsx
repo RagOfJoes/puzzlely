@@ -1,2 +1,2 @@
-export * from './PuzzleUpdateError';
-export { default } from './PuzzleUpdateError';
+export * from "./types";
+export * from "./PuzzleUpdateError";

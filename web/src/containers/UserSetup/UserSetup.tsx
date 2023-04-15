@@ -1,32 +1,16 @@
-import { VStack } from '@chakra-ui/react';
+import { UserSetupForm } from "@/components/UserSetupForm";
+import useUserUpdate from "@/hooks/useUserUpdate";
 
-import UserSetupForm from '@/components/UserSetupForm';
-import useUserUpdate from '@/hooks/useUserUpdate';
-
-const UserSetupContainer = () => {
+export function UserSetupContainer() {
   const { mutate } = useUserUpdate();
 
   return (
-    <VStack mt="6" w="100%" align="flex-start">
+    <div className="mt-6 flex w-full items-start justify-center">
       <UserSetupForm
-        onSubmit={(values, { setErrors, setSubmitting }) => {
-          setSubmitting(true);
-
-          mutate(
-            { updates: values },
-            {
-              onError: (error) => {
-                setErrors({ username: error.message });
-              },
-              onSettled: () => {
-                setSubmitting(false);
-              },
-            }
-          );
+        onSubmit={(values) => {
+          mutate({ updates: values });
         }}
       />
-    </VStack>
+    </div>
   );
-};
-
-export default UserSetupContainer;
+}

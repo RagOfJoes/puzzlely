@@ -1,11 +1,20 @@
-import { IntersectionOptions, useInView } from 'react-intersection-observer';
+import type { ElementRef } from "react";
+import { forwardRef } from "react";
 
-export type WaypointProps = IntersectionOptions;
+import type { Primitive } from "@radix-ui/react-primitive";
+import { useInView } from "react-intersection-observer";
 
-const Waypoint = (props: WaypointProps) => {
-  const { ref } = useInView(props);
+import { mergeRefs } from "@/hooks/useMergeRefs";
 
-  return <div ref={ref} />;
-};
+import type { WaypointProps } from "./types";
 
-export default Waypoint;
+export const Waypoint = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  WaypointProps
+>((props, ref) => {
+  const { ref: inViewRef } = useInView(props);
+
+  return <div ref={mergeRefs(inViewRef, ref)} />;
+});
+
+Waypoint.displayName = "Waypoint";

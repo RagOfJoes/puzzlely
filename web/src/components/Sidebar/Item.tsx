@@ -1,63 +1,63 @@
-import React from 'react';
+import type { ElementRef, ReactNode } from "react";
+import React, { useMemo, Children, forwardRef } from "react";
 
-import {
-  Button,
-  Flex,
-  Heading,
-  Text,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import Link from 'next/link';
+import clsx from "clsx";
+import Link from "next/link";
 
-import styles from './styles';
-import { SidebarItemProps } from './types';
+import type { SidebarItemProps } from "./types";
 
-const SidebarItem = (props: SidebarItemProps) => {
-  const { href, icon, isActive, isSection, name, passHref } = props;
+export const SidebarItem = forwardRef<
+  ElementRef<typeof Link>,
+  SidebarItemProps
+>((props, ref) => {
+  const { children, href, isActive } = props;
 
-  const boxShadow = '0px 7px 11px rgba(0, 0, 0, 0.04)';
-  const buttonHoverBg = useColorModeValue('gray.200', 'whiteAlpha.50');
-  const iconBoxShadow = useColorModeValue('sm', '');
+  const { icon, other } = useMemo(() => {
+    const c: {
+      icon?: ReactNode;
+      other: ReactNode[];
+    } = { other: [] };
 
-  if (isSection) {
-    return <Heading {...(styles.itemSection as any)}>{name}</Heading>;
-  }
+    Children.toArray(children).forEach((child: any) => {
+      switch (child?.type?.displayName) {
+        case "SidebarIcon":
+          c.icon = child;
+          break;
+        default:
+          c.other = [...c.other, child];
+      }
+    });
+
+    return c;
+  }, [children]);
 
   return (
-    <Link href={href ?? ''} passHref={passHref}>
-      <Button
-        {...(styles.itemButton as any)}
-        as="a"
-        boxShadow={isActive ? boxShadow : 'none'}
-        bgColor={isActive ? 'surface' : 'transparent'}
-        _hover={{
-          bg: !isActive && buttonHoverBg,
-        }}
-        _focus={{
-          bg: !isActive && buttonHoverBg,
-          boxShadow: isActive ? boxShadow : 'none',
-        }}
-      >
-        {icon && (
-          <Flex
-            {...(styles.itemIcon as any)}
-            bg={isActive ? 'primary' : 'surface'}
-            color={isActive ? 'surface' : 'primary'}
-            boxShadow={isActive ? '' : iconBoxShadow}
-          >
-            {icon}
-          </Flex>
-        )}
+    <Link
+      ref={ref}
+      href={href ?? ""}
+      aria-current={isActive && "page"}
+      className={clsx(
+        "group flex h-16 w-full cursor-pointer select-none appearance-none items-center justify-start gap-3 whitespace-nowrap rounded-2xl px-4 py-3 outline-none transition duration-150 ease-linear",
 
-        <Text
-          {...(styles.itemText as any)}
-          color={isActive ? 'text.primary' : 'text.secondary'}
-        >
-          {name}
-        </Text>
-      </Button>
+        "aria-[current=page]:bg-surface",
+        "dark:aria-[current=page]:shadow",
+        "focus:bg-muted/10 focus:ring",
+        "hover:bg-muted/10"
+      )}
+    >
+      {icon}
+
+      <p
+        className={clsx(
+          "my-auto text-sm font-semibold text-subtle",
+
+          "group-aria-[current=page]:text-text"
+        )}
+      >
+        {other}
+      </p>
     </Link>
   );
-};
+});
 
-export default SidebarItem;
+SidebarItem.displayName = "SidebarItem";

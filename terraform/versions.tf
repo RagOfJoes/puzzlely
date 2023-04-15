@@ -7,5 +7,9 @@ terraform {
     digitalocean = {
       source = "digitalocean/digitalocean"
     }
+
+    vercel = {
+      source  = "vercel/vercel"
+    }
   }
 }

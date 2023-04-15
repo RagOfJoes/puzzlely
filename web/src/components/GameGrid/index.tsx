@@ -1,3 +1,4 @@
-export * from './types';
-export { default as GameGridBlock } from './Block';
-export { default } from './GameGrid';
+export * from "./types";
+export * from "./GameGrid";
+export * from "./Block";
+export * from "./Overlay";

@@ -1,4 +1,2 @@
-export * from './types';
-export { default as schema } from './schema';
-
-export { default } from './PuzzleCreateForm';
+export * from "./types";
+export * from "./PuzzleCreateForm";

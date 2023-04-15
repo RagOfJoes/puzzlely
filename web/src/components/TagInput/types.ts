@@ -1,7 +1,17 @@
-import { Dispatch, ReactNode, RefObject, SetStateAction } from 'react';
+import type { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 
-import { InputProps, TagProps } from '@chakra-ui/react';
-import { MaybeRenderProp } from '@chakra-ui/react-utils';
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
+
+import type { InputProps } from "@/components/Input";
+
+export type TagInputRefMethods =
+  | {
+      removeItem: UseTagInput["removeItem"];
+    }
+  | undefined;
 
 export type TagInputProps = {
   children: ReactNode;
@@ -13,30 +23,27 @@ export type TagInputProps = {
   value?: string[];
 };
 
-export type TagInputRefMethods =
-  | {
-      removeItem: UseTagInput['removeItem'];
-    }
-  | undefined;
+export type TagInputFieldProps = Omit<InputProps, "children"> & {
+  children?: ReactNode | ((props: TagInputItemProps[]) => ReactNode);
+};
 
-export interface TagInputFieldProps extends Omit<InputProps, 'children'> {
-  children?: MaybeRenderProp<{ tagProps: UseTagInput['tagProps'] }>;
-}
-
-export interface TagInputTagProps extends TagProps {
+export type TagInputItemProps = Omit<
+  ComponentPropsWithoutRef<typeof Primitive.span>,
+  "children"
+> & {
+  children: string;
   disabled?: boolean;
-  label: string;
   onRemove: () => void;
-}
+};
 
 export type UseTagInput = {
   children: ReactNode;
   inputRef: RefObject<HTMLInputElement>;
-  inputWrapperRef: RefObject<HTMLDivElement>;
+  inputWrapperRef: RefObject<HTMLUListElement>;
   query: string;
   removeItem: (valueToRemove?: string) => void;
   setQuery: Dispatch<SetStateAction<string>>;
   setValue: Dispatch<SetStateAction<string[]>>;
-  tagProps: TagInputTagProps[];
+  tagProps: TagInputItemProps[];
   value: string[];
 };

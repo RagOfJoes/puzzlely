@@ -1,36 +1,41 @@
-import { forwardRef, Grid } from '@chakra-ui/react';
+import type { ElementRef } from "react";
+import { Children, forwardRef, useMemo } from "react";
 
-import { GameGridProps } from './types';
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
 
-const GameGrid = forwardRef<GameGridProps, 'div'>((props, ref) => {
-  const { children } = props;
+import type { GameGridProps } from "./types";
+
+export const GameGrid = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  GameGridProps
+>((props, ref) => {
+  const { children, className, ...other } = props;
+
+  const filtered = useMemo(() => {
+    return Children.toArray(children).filter((child: any) => {
+      return (
+        child?.type?.displayName === "GameGridBlock" ||
+        child?.type?.displayName === "GameGridOverlay"
+      );
+    });
+  }, [children]);
 
   return (
-    <Grid
-      gap="2"
-      w="100%"
+    <Primitive.div
+      {...other}
       ref={ref}
-      borderRadius="lg"
-      position="relative"
-      templateRows="repeat(4, 1fr)"
-      templateColumns="repeat(4, minmax(0, 1fr))"
-      css={{
-        '&:before': {
-          width: 0,
-          content: '""',
-          gridRow: '1 / 1',
-          gridColumn: '1 / 1',
-          paddingBottom: '100%',
-        },
-        '& > *:first-of-type': {
-          gridRow: '1 / 1',
-          gridColumn: '1 / 1',
-        },
-      }}
+      className={clsx(
+        "relative grid w-full grid-cols-4 grid-rows-4 gap-2 rounded-lg",
+
+        'before:col-start-1 before:col-end-1 before:row-start-1 before:row-end-1 before:w-0 before:pb-[100%] before:content-[""]',
+
+        className
+      )}
     >
-      {children}
-    </Grid>
+      {filtered}
+    </Primitive.div>
   );
 });
 
-export default GameGrid;
+GameGrid.displayName = "GameGrid";

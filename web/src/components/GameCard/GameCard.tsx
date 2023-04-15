@@ -1,46 +1,25 @@
-import { useMemo } from 'react';
+import type { ElementRef } from "react";
+import { forwardRef, useMemo } from "react";
 
-import {
-  Badge,
-  Box,
-  Button,
-  Heading,
-  HStack,
-  Icon,
-  Text,
-  useClipboard,
-  VStack,
-} from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import Link from 'next/link';
-import { IoCheckbox, IoPlay, IoReader, IoRocket } from 'react-icons/io5';
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
+import dayjs from "dayjs";
+import Link from "next/link";
+import { IoCheckbox, IoPlay, IoReader, IoRocket } from "react-icons/io5";
 
+import useClipboard from "@/hooks/useClipboard";
 import {
   UNLIMITED_MAX_ATTEMPTS,
   UNLIMITED_TIME_ALLOWED,
-} from '@/lib/constants';
-import { difficultyColor } from '@/lib/game';
-import { millisecondsTo } from '@/lib/time';
-import { Game } from '@/types/game';
-import { Puzzle } from '@/types/puzzle';
+} from "@/lib/constants";
+import { millisecondsTo } from "@/lib/time";
 
-export type GameCardProps = {
-  attempts: number;
-  completedAt: Date;
-  createdBy: string;
-  difficulty: Puzzle['difficulty'];
-  challengeCode: Game['challengeCode'];
-  id: string;
-  isPlayable?: boolean;
-  maxAttempts: number;
-  maxScore: number;
-  name: string;
-  score: number;
-  startedAt: Date;
-  timeAllowed: number;
-};
+import type { GameCardProps } from "./types";
 
-const GameCard = (props: GameCardProps) => {
+export const GameCard = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  GameCardProps
+>((props, ref) => {
   const {
     attempts,
     completedAt,
@@ -64,23 +43,22 @@ const GameCard = (props: GameCardProps) => {
 
   const maxAttemptsText = useMemo(() => {
     if (maxAttempts === UNLIMITED_MAX_ATTEMPTS) {
-      return 'Unlimited Attempts';
+      return "Unlimited Attempts";
     }
-    return `${maxAttempts} attempt${maxAttempts! > 1 ? 's' : ''}`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return `${maxAttempts} attempt${maxAttempts! > 1 ? "s" : ""}`;
   }, [maxAttempts]);
   const timeAllowedText = useMemo(() => {
     if (timeAllowed === UNLIMITED_TIME_ALLOWED) {
-      return 'No Time Limit';
+      return "No Time Limit";
     }
 
-    const minutes = millisecondsTo('minutes', timeAllowed!);
-    const seconds = millisecondsTo('seconds', timeAllowed!);
+    const minutes = millisecondsTo("minutes", timeAllowed!);
+    const seconds = millisecondsTo("seconds", timeAllowed!);
 
-    const formatMin = `${minutes} min${minutes > 1 ? 's' : ''}`;
-    const formatSec = `${seconds} sec${seconds > 1 ? 's' : ''}`;
-    return `${minutes > 0 ? `${formatMin} ` : ''} ${
-      seconds > 0 ? formatSec : ''
+    const formatMin = `${minutes} min${minutes > 1 ? "s" : ""}`;
+    const formatSec = `${seconds} sec${seconds > 1 ? "s" : ""}`;
+    return `${minutes > 0 ? `${formatMin} ` : ""} ${
+      seconds > 0 ? formatSec : ""
     }`;
   }, [timeAllowed]);
   const timeElapsed = useMemo(() => {
@@ -91,138 +69,151 @@ const GameCard = (props: GameCardProps) => {
   }, [completedAt, startedAt]);
 
   return (
-    <Box p="4" bg="surface" as="article" boxShadow="sm" borderRadius="lg">
-      <HStack w="100%" justify="space-between">
-        <VStack w="100%" spacing="0" align="flex-start">
-          <Link passHref href={`/users/${createdBy}`}>
-            <Text as="a" fontSize="sm" fontWeight="semibold">
-              {createdBy}
-            </Text>
-          </Link>
-          <Text
-            fontSize="xs"
-            fontWeight="medium"
-            letterSpacing="wide"
-            color="text.secondary"
-            textTransform="uppercase"
+    <Primitive.div ref={ref} className="rounded-lg bg-surface p-4">
+      <div className="flex w-full items-center justify-between gap-2">
+        <div className="flex flex-col items-start gap-0">
+          <Link
+            href={`/users/${createdBy}/`}
+            className={clsx(
+              "text-sm font-bold outline-none",
+
+              "focus-visible:ring"
+            )}
           >
+            {createdBy}
+          </Link>
+
+          <p className="text-xs font-semibold uppercase tracking-wide text-subtle">
             {maxAttemptsText} &bull; {timeAllowedText}
-          </Text>
-        </VStack>
+          </p>
+        </div>
 
-        <Badge colorScheme={difficultyColor[difficulty]}>{difficulty}</Badge>
-      </HStack>
+        <span
+          className={clsx(
+            "inline-block whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-semibold uppercase text-surface",
 
-      <Heading mt="2" size="sm" noOfLines={1} lineHeight="normal">
+            {
+              "bg-green": difficulty === "Easy",
+              "bg-yellow": difficulty === "Medium",
+              "bg-red": difficulty === "Hard",
+            }
+          )}
+        >
+          {difficulty}
+        </span>
+      </div>
+
+      <h3 className="text-md mt-2 line-clamp-1 text-ellipsis font-heading font-bold leading-normal">
         {name}
-      </Heading>
+      </h3>
 
-      <VStack mt="2" w="100%" align="start" spacing="1">
-        <HStack w="100%" justify="space-between">
-          <Text fontSize="xs" fontWeight="medium" color="text.secondary">
-            Score
-          </Text>
-          <Text fontSize="xs" fontWeight="medium">
+      <div className="mt-2 flex flex-col items-start justify-center gap-1">
+        <div className="flex w-full items-center justify-between">
+          <p className="text-xs font-semibold text-subtle">Score</p>
+
+          <p className="text-xs font-semibold">
             {score}
-            <Text
-              as="small"
-              fontSize="xs"
-              fontWeight="medium"
-              color="text.secondary"
-            >
-              {' / '}
+
+            <small className="text-xs font-semibold text-subtle">
+              {" / "}
               {maxScore}
-            </Text>
-          </Text>
-        </HStack>
-        <HStack w="100%" justify="space-between">
-          <Text fontSize="xs" color="text.secondary" fontWeight="medium">
-            Attempts
-          </Text>
-          <Text fontSize="xs" fontWeight="medium">
+            </small>
+          </p>
+        </div>
+
+        <div className="flex w-full items-center justify-between">
+          <p className="text-xs font-semibold text-subtle">Attempts</p>
+
+          <p className="text-xs font-semibold">
             {attempts}
-            <Text
-              as="small"
-              fontSize="xs"
-              fontWeight="medium"
-              color="text.secondary"
-            >
-              {' / '}
+
+            <small className="text-xs font-semibold text-subtle">
+              {" / "}
               {maxAttempts}
-            </Text>
-          </Text>
-        </HStack>
-        <HStack w="100%" justify="space-between">
-          <Text fontSize="xs" color="text.secondary" fontWeight="medium">
-            Total Time
-          </Text>
-          <Text
-            as="time"
-            fontSize="xs"
-            fontWeight="medium"
+            </small>
+          </p>
+        </div>
+
+        <div className="flex w-full items-center justify-between">
+          <p className="text-xs font-semibold text-subtle">Total Time</p>
+
+          <time
+            className="text-xs font-semibold"
             dateTime={timeElapsed.toISOString()}
           >
-            {timeElapsed.format('HH:mm:ss')}
-          </Text>
-        </HStack>
-      </VStack>
+            {timeElapsed.format("HH:mm:ss")}
+          </time>
+        </div>
+      </div>
 
-      <HStack mt="4" w="100%" justify="end">
+      <div className="mt-4 flex w-full justify-end gap-2">
         {isPlayable ? (
           <>
-            <Link passHref href={`/games/challenge/${challengeCode}`}>
-              <Button
-                as="a"
-                w="100%"
-                size="sm"
-                rel="nofollow"
-                variant="outline"
-                colorScheme="gray"
-                leftIcon={<Icon as={IoRocket} />}
-              >
-                Challenge
-              </Button>
+            <Link
+              rel="nofollow"
+              href={`/games/challenge/${challengeCode}`}
+              className={clsx(
+                "relative flex h-8 w-full shrink-0 basis-1/2 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md border px-3 text-sm font-semibold outline-none transition",
+
+                "focus-visible:ring",
+                "hover:bg-muted/10"
+              )}
+            >
+              <IoRocket />
+              Challenge
             </Link>
-            <Link passHref href={`/games/play/${id}`}>
-              <Button
-                as="a"
-                w="100%"
-                size="sm"
-                rel="nofollow"
-                rightIcon={<Icon as={IoPlay} />}
-              >
-                Play
-              </Button>
+
+            <Link
+              rel="nofollow"
+              href={`/games/play/${id}`}
+              aria-label={`Play ${name}`}
+              className={clsx(
+                "relative flex h-8 w-full shrink-0 basis-1/2 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-3 text-sm font-semibold text-surface outline-none transition",
+
+                "active:bg-cyan/70",
+                "focus-visible:ring focus-visible:ring-cyan/60",
+                "hover:bg-cyan/70"
+              )}
+            >
+              Play
+              <IoPlay />
             </Link>
           </>
         ) : (
           <>
-            <Button
-              w="100%"
-              size="sm"
-              variant="outline"
-              colorScheme="gray"
-              leftIcon={<Icon as={hasCopied ? IoCheckbox : IoRocket} />}
+            <button
               onClick={() => onCopy()}
+              className={clsx(
+                "relative flex h-8 w-full shrink-0 basis-1/2 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md border px-3 text-sm font-semibold outline-none transition",
+
+                "focus-visible:ring",
+                "hover:bg-muted/10"
+              )}
             >
-              {hasCopied ? 'Copied!' : 'Challenge'}
-            </Button>
-            <Link passHref href={`/games/${id}`}>
-              <Button
-                as="a"
-                w="100%"
-                size="sm"
-                rel="nofollow"
-                rightIcon={<Icon as={IoReader} />}
-              >
-                View
-              </Button>
+              {hasCopied ? <IoCheckbox /> : <IoRocket />}
+              {hasCopied ? "Copied!" : "Challenge"}
+            </button>
+
+            <Link
+              rel="nofollow"
+              href={`/games/${id}`}
+              aria-label={`View ${name}`}
+              className={clsx(
+                "relative flex h-8 w-full shrink-0 basis-1/2 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-3 text-sm font-semibold text-surface outline-none transition",
+
+                "active:bg-cyan/70",
+                "focus-visible:ring focus-visible:ring-cyan/60",
+                "hover:bg-cyan/70"
+              )}
+            >
+              View
+              <IoReader />
             </Link>
           </>
         )}
-      </HStack>
-    </Box>
+      </div>
+    </Primitive.div>
   );
-};
+});
 
-export default GameCard;
+GameCard.displayName = "GameCard";

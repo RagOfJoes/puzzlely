@@ -1,21 +1,22 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
-import groupBy from '@/lib/groupBy';
-import { Game } from '@/types/game';
-import { Block } from '@/types/puzzle';
+import groupBy from "@/lib/groupBy";
+import type { Game } from "@/types/game";
+import type { Block } from "@/types/puzzle";
 
-import useGameGuess from './useGameGuess';
+import useGameGuess from "./useGameGuess";
 
 export type UseGameForfeitParam = {
   blocks: Block[];
-  correct: Game['correct'];
+  correct: Game["correct"];
   game: Game;
   isGameOver: boolean;
   pause: () => void;
   setBlocks: Dispatch<SetStateAction<Block[]>>;
-  setCorrect: Dispatch<SetStateAction<Game['correct']>>;
+  setCorrect: Dispatch<SetStateAction<Game["correct"]>>;
   setGame: Dispatch<SetStateAction<Game>>;
   setSelected: Dispatch<SetStateAction<Block[]>>;
   toggleIsGameOver: Dispatch<SetStateAction<boolean>>;
@@ -25,7 +26,7 @@ export type UseGameForfeitParam = {
 /**
  * When User forfeits trying to link Blocks together
  */
-const useGameForfeit = (args: UseGameForfeitParam) => {
+function useGameForfeit(args: UseGameForfeitParam) {
   const {
     blocks,
     correct,
@@ -113,6 +114,6 @@ const useGameForfeit = (args: UseGameForfeitParam) => {
     score,
     startedAt,
   ]);
-};
+}
 
 export default useGameForfeit;

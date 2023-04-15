@@ -1,30 +1,31 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 
-import dayjs from 'dayjs';
-import shuffle from 'lodash.shuffle';
+import dayjs from "dayjs";
+import shuffle from "lodash.shuffle";
 
-import { UNLIMITED_TIME_ALLOWED } from '@/lib/constants';
-import { Game } from '@/types/game';
-import { Block } from '@/types/puzzle';
+import { UNLIMITED_TIME_ALLOWED } from "@/lib/constants";
+import type { Game } from "@/types/game";
+import type { Block } from "@/types/puzzle";
 
 export type UseGameResetParams = {
   blocks: Block[];
-  completedAt: Game['completedAt'];
-  guessedAt: Game['guessedAt'];
+  completedAt: Game["completedAt"];
+  guessedAt: Game["guessedAt"];
   reset: () => void;
   setBlocks: Dispatch<SetStateAction<Block[]>>;
-  setCorrect: Dispatch<SetStateAction<Game['correct']>>;
+  setCorrect: Dispatch<SetStateAction<Game["correct"]>>;
   setGame: Dispatch<SetStateAction<Game>>;
   setSelected: Dispatch<SetStateAction<Block[]>>;
   start: () => void;
-  startedAt: Game['startedAt'];
-  timeAllowed: Game['config']['timeAllowed'];
+  startedAt: Game["startedAt"];
+  timeAllowed: Game["config"]["timeAllowed"];
 };
 
 /**
  * When User retries during the Game.
  */
-const useGameReset = (args: UseGameResetParams) => {
+function useGameReset(args: UseGameResetParams) {
   const {
     blocks,
     completedAt,
@@ -68,6 +69,6 @@ const useGameReset = (args: UseGameResetParams) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeAllowed, completedAt, guessedAt, startedAt]);
-};
+}
 
 export default useGameReset;

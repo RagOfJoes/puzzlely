@@ -1,14 +1,13 @@
-import { useToast } from '@chakra-ui/react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import { ERR_FAILED_UPDATE_GAME } from '@/lib/constants';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { Game, GameUpdatePayload, GameUpdateResponse } from '@/types/game';
+import api from "@/api";
+import type APIError from "@/api/error";
+import { ERR_FAILED_UPDATE_GAME } from "@/lib/constants";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { Game, GameUpdatePayload, GameUpdateResponse } from "@/types/game";
 
-const useGameGuess = (id: string) => {
-  const toast = useToast();
+function useGameGuess(id: string) {
   const queryClient = useQueryClient();
 
   const gameKey = generateQueryKey.Game(id);
@@ -27,12 +26,7 @@ const useGameGuess = (id: string) => {
       queryClient.setQueryData(gameKey, () => context?.previous);
 
       // Render toast
-      toast({
-        duration: 3000,
-        status: 'error',
-        isClosable: false,
-        title: ERR_FAILED_UPDATE_GAME,
-      });
+      toast.error(ERR_FAILED_UPDATE_GAME);
     },
     onMutate: async ({ game, update }) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
@@ -46,12 +40,17 @@ const useGameGuess = (id: string) => {
           return old;
         }
 
-        return { ...game, ...update };
+        return {
+          ...game,
+          ...update,
+        };
       });
 
-      return { previous };
+      return {
+        previous,
+      };
     },
   });
-};
+}
 
 export default useGameGuess;

@@ -1,16 +1,20 @@
-import { Heading } from '@chakra-ui/react';
+import { JoinBanner } from "@/components/JoinBanner";
+import useMe from "@/hooks/useMe";
 
-import JoinBanner from '@/components/JoinBanner';
-import useMe from '@/hooks/useMe';
-
-const Banner = () => {
+function Banner() {
   const { data: me } = useMe();
 
   if (!me) {
-    return <JoinBanner />;
+    return (
+      <section>
+        <JoinBanner />
+      </section>
+    );
   }
 
-  return <Heading size="lg">Welcome back {me.username}!</Heading>;
-};
+  return (
+    <h2 className="font-heading text-3xl font-bold">Welcome {me.username}!</h2>
+  );
+}
 
 export default Banner;

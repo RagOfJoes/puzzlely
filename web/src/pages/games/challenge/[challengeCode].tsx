@@ -1,17 +1,19 @@
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
+import api from "@/api";
 
-const ChallengePage = () => <NextSeo noindex nofollow />;
+function ChallengePage() {
+  return <NextSeo noindex nofollow />;
+}
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const challengeCode = ctx.query.challengeCode;
-  if (typeof challengeCode !== 'string') {
+  if (typeof challengeCode !== "string") {
     return {
       redirect: {
         permanent: false,
-        destination: '/puzzles',
+        destination: "/puzzles",
       },
     };
   }
@@ -20,11 +22,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     api.createGameWithChallenge(ctx),
     api.me(ctx.req as NextApiRequest, ctx.res as NextApiResponse),
   ]);
-  if (me.success && me?.payload?.user?.state === 'PENDING') {
+  if (me.success && me?.payload?.user?.state === "PENDING") {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }
@@ -33,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     return {
       redirect: {
         permanent: false,
-        destination: '/puzzles',
+        destination: "/puzzles",
       },
     };
   }

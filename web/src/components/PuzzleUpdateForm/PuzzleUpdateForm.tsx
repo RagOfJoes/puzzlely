@@ -1,58 +1,74 @@
-import { useMemo } from 'react';
+import type { ElementRef } from "react";
+import { forwardRef } from "react";
 
-import { Box, forwardRef } from '@chakra-ui/react';
-import { Form, Formik } from 'formik';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
+import { FormProvider, useForm } from "react-hook-form";
 
-import { PuzzleUpdatePayload } from '@/types/puzzle';
+import type { PuzzleUpdatePayload } from "@/types/puzzle";
 
-import Groups from './Groups';
-import Meta from './Meta';
-import schema from './schema';
-import Settings from './Settings';
-import Submit from './Submit';
-import { PuzzleUpdateFormProps } from './types';
+import Groups from "./Groups";
+import Meta from "./Meta";
+import { puzzleUpdateSchema } from "./schema";
+import Settings from "./Settings";
+import Submit from "./Submit";
+import type { PuzzleUpdateFormProps } from "./types";
 
-const PuzzleUpdateForm = forwardRef<PuzzleUpdateFormProps, 'form'>(
-  (props, ref) => {
-    const {
-      isDeleting,
-      onDelete = () => {},
-      onSubmit = () => {},
-      puzzle,
-    } = props;
+export const PuzzleUpdateForm = forwardRef<
+  ElementRef<typeof Primitive.form>,
+  PuzzleUpdateFormProps
+>((props, ref) => {
+  const {
+    className,
+    isDeleted,
+    isDeleting,
+    onDelete = () => {},
+    onEdit = () => {},
+    puzzle,
+    ...other
+  } = props;
 
-    const initialValues: PuzzleUpdatePayload = useMemo(
-      () => ({
-        name: puzzle.name,
-        description: puzzle.description,
-        difficulty: puzzle.difficulty,
-        groups: puzzle.groups.map((group) => ({
-          id: group.id,
-          description: group.description,
-        })),
-      }),
+  const formCtx = useForm<PuzzleUpdatePayload>({
+    defaultValues: {
+      description: puzzle.description,
+      difficulty: puzzle.difficulty,
+      groups: puzzle.groups.map((group) => ({
+        id: group.id,
+        description: group.description,
+      })),
+      name: puzzle.name,
+    },
+    mode: "onBlur",
+    resolver: zodResolver(puzzleUpdateSchema),
+  });
+  const { handleSubmit } = formCtx;
 
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      []
-    );
+  return (
+    <FormProvider {...formCtx}>
+      <Primitive.form
+        {...other}
+        ref={ref}
+        className={clsx(
+          "flex w-full flex-col gap-6",
 
-    return (
-      <Formik
-        validateOnBlur
-        validateOnChange={false}
-        validationSchema={schema}
-        initialValues={initialValues}
-        onSubmit={onSubmit}
+          className
+        )}
+        onSubmit={(e) => {
+          handleSubmit(onEdit)(e);
+        }}
       >
-        <Box ref={ref} as={Form} w="100%">
-          <Meta />
-          <Settings puzzle={puzzle} />
-          <Groups puzzle={puzzle} />
-          <Submit isDeleting={isDeleting} onDelete={onDelete} />
-        </Box>
-      </Formik>
-    );
-  }
-);
+        <Meta />
+        <Settings puzzle={puzzle} />
+        <Groups puzzle={puzzle} />
+        <Submit
+          isDeleted={isDeleted}
+          isDeleting={isDeleting}
+          onDelete={onDelete}
+        />
+      </Primitive.form>
+    </FormProvider>
+  );
+});
 
-export default PuzzleUpdateForm;
+PuzzleUpdateForm.displayName = "PuzzleUpdateForm";

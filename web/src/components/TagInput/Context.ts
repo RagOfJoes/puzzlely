@@ -1,10 +1,9 @@
-import { createContext } from '@chakra-ui/react-utils';
+import createContext from "@/lib/createContext";
 
-import { UseTagInput } from './types';
+import type { UseTagInput } from "./types";
 
-export const [TagInputProvider, useTagInputContext] =
-  createContext<UseTagInput>({
-    name: 'TagInputContext',
-    errorMessage:
-      'useTagInputContext: `context` is undefined. Seems you forgot to wrap all taginput components within `<TagInput />`',
-  });
+export const [TagInputProvider, useTagInputCtx] = createContext<UseTagInput>({
+  hookName: "useTagInputCtx",
+  name: "TagInputContext",
+  providerName: "TagInputProvider",
+});

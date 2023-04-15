@@ -1,32 +1,43 @@
-import { Box, BoxProps, Divider, Heading, Text } from '@chakra-ui/react';
-import { forwardRef } from '@chakra-ui/system';
+import type { ElementRef } from "react";
+import { forwardRef } from "react";
 
-export type PuzzleFormCardProps = Omit<BoxProps, 'title'> & {
-  caption?: string;
-  hideDivider?: boolean;
-  title?: string;
-};
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
 
-const PuzzleFormCard = forwardRef<PuzzleFormCardProps, 'div'>((props, ref) => {
-  const { caption, children, hideDivider = false, title, ...other } = props;
+import type { PuzzleFormCardProps } from "./types";
+
+export const PuzzleFormCard = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  PuzzleFormCardProps
+>((props, ref) => {
+  const {
+    caption,
+    children,
+    className,
+    hideDivider = false,
+    title,
+    ...other
+  } = props;
 
   return (
-    <Box {...other} p="4" ref={ref} bg="surface" borderRadius="lg">
-      {title && (
-        <Heading as="h4" size="md">
-          {title}
-        </Heading>
+    <Primitive.div
+      {...other}
+      ref={ref}
+      className={clsx(
+        "rounded-lg bg-surface p-4 shadow",
+
+        className
       )}
-      {caption && (
-        <Text fontSize="md" color="text.secondary">
-          {caption}
-        </Text>
-      )}
-      {!hideDivider && <Divider mt="2" mb="4" />}
+    >
+      {title && <h3 className="font-heading text-xl font-bold">{title}</h3>}
+
+      {caption && <p className="text-sm font-medium text-subtle">{caption}</p>}
+
+      {!hideDivider && <hr className="mb-4 mt-2 h-[1px] w-full bg-muted/20" />}
 
       {children}
-    </Box>
+    </Primitive.div>
   );
 });
 
-export default PuzzleFormCard;
+PuzzleFormCard.displayName = "PuzzleFormCard";

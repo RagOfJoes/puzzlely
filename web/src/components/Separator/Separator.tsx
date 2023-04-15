@@ -1,17 +1,18 @@
-import { Flex, FlexProps } from '@chakra-ui/react';
+import { forwardRef } from "react";
 
-const Separator = (props: FlexProps) => {
-  const { children, ...rest } = props;
-  return (
-    <Flex
-      h="1px"
-      w="100%"
-      bgGradient="linear(to-r, background 0%, text.secondary 49.52%, background 100%)"
-      {...rest}
-    >
-      {children}
-    </Flex>
-  );
-};
+import type { SeparatorProps } from "./types";
 
-export default Separator;
+export const Separator = forwardRef<HTMLHRElement, SeparatorProps>(
+  (props, ref) => {
+    return (
+      <hr
+        {...props}
+        ref={ref}
+        role="separator"
+        className="h-[1px] w-full bg-gradient-to-r from-base via-subtle to-base"
+      />
+    );
+  }
+);
+
+Separator.displayName = "Separator";

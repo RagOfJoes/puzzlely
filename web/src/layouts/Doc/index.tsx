@@ -1,2 +1,2 @@
-export * from './Doc';
-export { default } from './Doc';
+export * from "./types";
+export * from "./Doc";

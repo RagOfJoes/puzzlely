@@ -1,19 +1,19 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo, SiteLinksSearchBoxJsonLd } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo, SiteLinksSearchBoxJsonLd } from "next-seo";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import HomeContainer from '@/containers/Home';
-import MainLayout from '@/layouts/Main';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError from "@/api/error";
+import { HomeContainer } from "@/containers/Home";
+import { MainLayout } from "@/layouts/Main";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { User } from "@/types/user";
 
-const HomePage = () => {
+function HomePage() {
   return (
     <>
-      <MainLayout breadcrumbLinks={[{ path: '/', title: 'Home' }]}>
+      <MainLayout breadcrumbLinks={[{ path: "/", title: "Home" }]}>
         <HomeContainer />
       </MainLayout>
 
@@ -23,13 +23,13 @@ const HomePage = () => {
         potentialActions={[
           {
             target: `${process.env.NEXT_PUBLIC_HOST_URL}/search?term`,
-            queryInput: 'search_term_string',
+            queryInput: "search_term_string",
           },
         ]}
       />
     </>
   );
-};
+}
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const key = generateQueryKey.Me();
@@ -48,11 +48,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   });
 
   const me = queryClient.getQueryData<User>(key);
-  if (me && me.state === 'PENDING') {
+  if (me && me.state === "PENDING") {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }

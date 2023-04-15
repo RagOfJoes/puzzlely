@@ -1,71 +1,92 @@
-import { HamburgerIcon } from '@chakra-ui/icons';
-import {
-  HStack,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  IconButton,
-} from '@chakra-ui/react';
-import Link from 'next/link';
+import { forwardRef } from "react";
 
-import Search from './Search';
-import Settings from './Settings';
-import { TopbarProps } from './types';
+import clsx from "clsx";
+import Link from "next/link";
+import { IoMenu } from "react-icons/io5";
 
-const Topbar = (props: TopbarProps) => {
-  const { links, onSearch, open, toggleOpen } = props;
+import omit from "@/lib/omit";
+
+import { Search } from "./Search";
+import { Settings } from "./Settings";
+import type { TopbarProps } from "./types";
+
+export const Topbar = forwardRef<HTMLElement, TopbarProps>((props, ref) => {
+  const { className, links, isOpen, toggleIsOpen } = omit(props, ["children"]);
 
   return (
-    <HStack
-      w="100%"
-      p="20px"
-      pt="12px"
-      zIndex="1"
-      as="header"
-      align="center"
-      justify="space-between"
+    <header
+      ref={ref}
+      className={clsx(
+        "z-[1] flex w-full items-center justify-between p-5 pt-3",
+
+        className
+      )}
     >
-      <IconButton
-        variant="ghost"
-        colorScheme="gray"
-        icon={<HamburgerIcon />}
-        onClick={() => toggleOpen(!open)}
-        display={{ sm: 'flex', lg: 'none' }}
+      <button
+        onClick={() => toggleIsOpen(!isOpen)}
         aria-label={
-          open ? 'Close Side Navigation Bar' : 'Open Side Navigation Bar'
+          isOpen ? "Close Side Navigation Bar" : "Open Side Navigation Bar"
         }
-      />
+        className={clsx(
+          "mr-2 hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface text-subtle outline-none transition",
 
-      <Breadcrumb
-        spacing="8px"
-        separator="/"
-        fontWeight="400"
-        display={{ base: 'none', lg: 'block' }}
-        ms={{ base: '2', lg: '0px !important' }}
+          "focus:ring",
+          "hover:bg-muted/10",
+          "max-lg:flex"
+        )}
       >
-        {links.map((link) => {
-          const { path, title } = link;
-          return (
-            <BreadcrumbItem
-              key={path}
-              fontSize="md"
-              fontWeight="medium"
-              color="text.secondary"
-            >
-              <Link passHref href={path}>
-                <BreadcrumbLink rel="nofollow">{title}</BreadcrumbLink>
-              </Link>
-            </BreadcrumbItem>
-          );
-        })}
-      </Breadcrumb>
+        <IoMenu />
+      </button>
 
-      <HStack>
-        <Search onSearch={onSearch} />
+      <nav aria-label="breadcrumb">
+        <ol
+          className={clsx(
+            "flex items-center",
+
+            "max-lg:hidden"
+          )}
+        >
+          {links.map((link, i) => {
+            const { path, title } = link;
+
+            const isLast = i === links.length - 1;
+
+            return (
+              <li
+                key={path}
+                className="inline-flex items-center justify-center font-medium text-subtle outline-none"
+              >
+                <Link
+                  href={path}
+                  rel="nofollow"
+                  className={clsx(
+                    "outline-none",
+
+                    "focus-visible:ring",
+                    "hover:underline"
+                  )}
+                  aria-current={isLast && "page"}
+                >
+                  {title}
+                </Link>
+
+                {!isLast && (
+                  <p role="presentation" className="mx-2">
+                    /
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+
+      <div className="flex gap-2">
+        <Search />
         <Settings />
-      </HStack>
-    </HStack>
+      </div>
+    </header>
   );
-};
+});
 
-export default Topbar;
+Topbar.displayName = "Topbar";

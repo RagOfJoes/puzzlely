@@ -16,11 +16,11 @@ resource "digitalocean_vpc" "vpc" {
 # Firewall Rules for our Webserver Droplets                                    #
 ################################################################################
 resource "digitalocean_firewall" "firewall" {
-  # The name we give our firewall for ease of use                            #    
+  # The name we give our firewall for ease of use                            #
   name = "puzzlely-firewall"
 
   # The droplets to apply this firewall to                                   #
-  droplet_ids = concat(digitalocean_droplet.api.*.id, digitalocean_droplet.web.*.id)
+  droplet_ids = digitalocean_droplet.api.*.id
 
   #--------------------------------------------------------------------------#
   # Internal VPC Rules. We have to let ourselves talk to each other          #

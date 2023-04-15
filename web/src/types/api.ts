@@ -1,4 +1,4 @@
-import APIError from '@/api/error';
+import type APIError from "@/api/error";
 
 export type Response<T> = {
   success: boolean;

@@ -1,2 +1,2 @@
-export * from './types';
-export { default } from './Game';
+export * from "./types";
+export * from "./Game";

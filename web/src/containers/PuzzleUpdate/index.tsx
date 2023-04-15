@@ -1,2 +1,2 @@
-export * from './PuzzleUpdate';
-export { default } from './PuzzleUpdate';
+export * from "./types";
+export * from "./PuzzleUpdate";

@@ -1,4 +1,5 @@
-export * from './types';
-export { default as styles } from './styles';
-export { default as SidebarItem } from './Item';
-export { default as Sidebar } from './Sidebar';
+export * from "./types";
+export * from "./Sidebar";
+export * from "./Heading";
+export * from "./Item";
+export * from "./Icon";

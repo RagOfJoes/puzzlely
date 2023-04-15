@@ -1,89 +1,144 @@
-import { Grid, GridItem } from '@chakra-ui/react';
-import { useFormikContext } from 'formik';
+import clsx from "clsx";
+import { Controller, useFormContext } from "react-hook-form";
 
-import FormikInputControl from '@/components/FormikInputControl';
-import FormikSelectControl from '@/components/FormikSelectControl';
-import FormikTextareaControl from '@/components/FormikTextareaControl';
-import PuzzleFormCard from '@/components/PuzzleFormCard';
-import { PUZZLE_DIFFICULTIES } from '@/lib/constants';
+import {
+  FormControl,
+  FormControlError,
+  FormControlHelper,
+  FormControlLabel,
+} from "@/components/FormControl";
+import { Input } from "@/components/Input";
+import { PuzzleFormCard } from "@/components/PuzzleFormCard";
+import {
+  Select,
+  SelectList,
+  SelectListItem,
+  SelectTrigger,
+} from "@/components/Select";
+import { Textarea } from "@/components/Textarea";
+import { PUZZLE_DIFFICULTIES } from "@/lib/constants";
 import {
   maxAttemptsFromDifficulty,
   timeAllowedFromDifficulty,
-} from '@/lib/game';
-import { PuzzleCreatePayload } from '@/types/puzzle';
+} from "@/lib/game";
+import omit from "@/lib/omit";
+import type { Puzzle, PuzzleCreatePayload } from "@/types/puzzle";
 
-const Meta = () => {
-  const { touched, setFieldValue } = useFormikContext<PuzzleCreatePayload>();
+function Meta() {
+  const { control, formState, register, setValue } =
+    useFormContext<PuzzleCreatePayload>();
+  const { errors, touchedFields } = formState;
 
   return (
     <PuzzleFormCard
-      title="Meta"
       caption="Fields that can either help or trick the player."
+      title="Meta"
     >
-      <Grid w="100%" gap="2" templateColumns="repeat(4, 1fr)">
-        <GridItem colSpan={{ base: 4, sm: 3 }}>
-          <FormikInputControl
-            isRequired
-            name="name"
-            label="Name"
-            helperText="Use proper words to improve the searchability of your puzzle."
-            inputProps={{
-              autoComplete: 'off',
-              placeholder: 'Add a name...',
-            }}
-          />
-        </GridItem>
-        <GridItem colSpan={{ base: 4, sm: 1 }}>
-          <FormikSelectControl
-            isRequired
-            name="difficulty"
-            label="Difficulty"
-            mt={{ base: '4', sm: '0' }}
-            selectProps={{
-              width: '100%',
-              onChange: (e) => {
-                setFieldValue('difficulty', e.target.value);
+      <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-4 gap-4">
+          <FormControl
+            className={clsx(
+              "col-span-3",
 
-                if (!touched.maxAttempts) {
-                  setFieldValue(
-                    'maxAttempts',
-                    maxAttemptsFromDifficulty[
-                      e.target.value as PuzzleCreatePayload['difficulty']
-                    ]
-                  );
-                }
-                if (!touched.timeAllowed) {
-                  setFieldValue(
-                    'timeAllowed',
-                    timeAllowedFromDifficulty[
-                      e.target.value as PuzzleCreatePayload['difficulty']
-                    ]
-                  );
-                }
-              },
-            }}
+              "max-md:col-span-4"
+            )}
+            invalid={!!errors.name?.message}
+            required
           >
-            {PUZZLE_DIFFICULTIES.map((value) => (
-              <option value={value} key={`difficulty_${value}`}>
-                {value}
-              </option>
-            ))}
-          </FormikSelectControl>
-        </GridItem>
-      </Grid>
+            <FormControlLabel>Name</FormControlLabel>
 
-      <FormikTextareaControl
-        mt="4"
-        name="description"
-        label="Description"
-        textareaProps={{
-          size: 'md',
-          resize: 'none',
-          placeholder: 'Add a description...',
-        }}
-      />
+            <Input
+              {...register("name")}
+              autoComplete="off"
+              placeholder="Add a name..."
+            />
+
+            <FormControlError>{errors.name?.message}</FormControlError>
+
+            <FormControlHelper>
+              Use proper words to improve the searchability of your puzzle.
+            </FormControlHelper>
+          </FormControl>
+
+          <Controller
+            control={control}
+            name="difficulty"
+            render={({ field, fieldState }) => (
+              <FormControl
+                className={clsx(
+                  "col-span-1",
+
+                  "max-md:col-span-4"
+                )}
+                invalid={fieldState.invalid}
+                required
+              >
+                <FormControlLabel>Difficulty</FormControlLabel>
+
+                <Select
+                  {...omit(field, ["onBlur", "onChange", "ref"])}
+                  onValueChange={(newValue) => {
+                    setValue("difficulty", newValue as Puzzle["difficulty"]);
+
+                    if (!touchedFields.maxAttempts) {
+                      setValue(
+                        "maxAttempts",
+                        maxAttemptsFromDifficulty[
+                          newValue as PuzzleCreatePayload["difficulty"]
+                        ]
+                      );
+                    }
+                    if (!touchedFields.timeAllowed) {
+                      setValue(
+                        "timeAllowed",
+                        timeAllowedFromDifficulty[
+                          newValue as PuzzleCreatePayload["difficulty"]
+                        ]
+                      );
+                    }
+                  }}
+                  value={field.value?.toString()}
+                >
+                  <SelectTrigger
+                    ref={field.ref}
+                    className="w-full justify-between border border-muted/20"
+                    onBlur={field.onBlur}
+                    placeholder="Select a difficulty..."
+                  />
+
+                  <SelectList
+                    className="border"
+                    onCloseAutoFocus={() => {
+                      field.onBlur();
+                    }}
+                  >
+                    {PUZZLE_DIFFICULTIES.map((difficulty) => (
+                      <SelectListItem key={difficulty} value={difficulty}>
+                        {difficulty}
+                      </SelectListItem>
+                    ))}
+                  </SelectList>
+                </Select>
+
+                <FormControlError>{fieldState.error?.message}</FormControlError>
+              </FormControl>
+            )}
+          />
+        </div>
+
+        <FormControl invalid={!!errors.description?.message}>
+          <FormControlLabel>Description</FormControlLabel>
+
+          <Textarea
+            {...register("description")}
+            placeholder="Add a description..."
+          />
+
+          <FormControlError>{errors.description?.message}</FormControlError>
+        </FormControl>
+      </div>
     </PuzzleFormCard>
   );
-};
+}
 
 export default Meta;

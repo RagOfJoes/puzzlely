@@ -1,5 +1,4 @@
-export * from './types';
-
-export { default as TagInputField } from './Field';
-export { default as TagInputTag } from './Tag';
-export { default } from './TagInput';
+export * from "./types";
+export * from "./TagInput";
+export * from "./Field";
+export * from "./Item";

@@ -1,68 +1,63 @@
-import { useMemo } from 'react';
+import type { ElementRef } from "react";
+import { forwardRef, useMemo } from "react";
 
-import {
-  Divider,
-  HStack,
-  Icon,
-  Text,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { IoHeart, IoHeartOutline } from 'react-icons/io5';
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
+import { IoHeart, IoHeartOutline } from "react-icons/io5";
 
-import abbreviateNumber from '@/lib/abbreviateNumber';
+import abbreviateNumber from "@/lib/abbreviateNumber";
+import omit from "@/lib/omit";
 
-export type LikeButtonProps = {
-  isLiked?: boolean;
-  numOfLikes?: number;
-  onLike?: () => void | Promise<void>;
-};
+import type { LikeButtonProps } from "./types";
 
-const LikeButton = (props: LikeButtonProps) => {
-  const { isLiked, numOfLikes, onLike = () => {} } = props;
+export const LikeButton = forwardRef<
+  ElementRef<typeof Primitive.button>,
+  LikeButtonProps
+>((props, ref) => {
+  const {
+    className,
+    isLiked,
+    numOfLikes,
+    onLike = () => {},
+    ...other
+  } = omit(props, ["children"]);
 
   const formattedNumOfLikes = useMemo(
     () => abbreviateNumber(numOfLikes || 0),
     [numOfLikes]
   );
 
-  const hoverBg = useColorModeValue('gray.100', 'whiteAlpha.200');
-
   return (
-    <HStack
-      px="2"
-      h="28px"
-      as="button"
-      bg="background"
-      borderRadius="md"
-      transition="0.2s linear"
-      transitionProperty="box-shadow"
-      _focus={{
-        outline: 'none',
-        boxShadow: 'outline',
-      }}
-      _hover={{
-        bg: hoverBg,
-      }}
+    <Primitive.button
+      {...other}
+      ref={ref}
       onClick={onLike}
-    >
-      <Icon
-        color={isLiked ? 'red.300' : 'text.secondary'}
-        as={isLiked ? IoHeart : IoHeartOutline}
-      />
-      <Text fontSize="sm" fontWeight="medium" color="text.secondary">
-        {isLiked ? 'Liked' : 'Like'}
-      </Text>
-      <Divider orientation="vertical" />
-      <Text
-        fontSize="xs"
-        lineHeight="shorter"
-        fontWeight="semibold"
-        color="text.secondary"
-      >
-        {formattedNumOfLikes}
-      </Text>
-    </HStack>
-  );
-};
+      className={clsx(
+        "flex h-7 items-center justify-center gap-2 rounded-md border border-muted/20 bg-base px-2 outline-none transition",
 
-export default LikeButton;
+        "focus-visible:ring",
+        "hover:bg-muted/30",
+
+        className
+      )}
+    >
+      {isLiked ? (
+        <IoHeart className="text-red" />
+      ) : (
+        <IoHeartOutline className="text-subtle" />
+      )}
+
+      <p className="text-sm font-medium text-subtle">
+        {isLiked ? "Liked" : "Like"}
+      </p>
+
+      <hr className="h-full w-[1px] bg-muted/20" />
+
+      <p className="text-xs font-semibold leading-tight text-subtle">
+        {formattedNumOfLikes}
+      </p>
+    </Primitive.button>
+  );
+});
+
+LikeButton.displayName = "LikeButton";

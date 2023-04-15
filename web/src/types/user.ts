@@ -4,7 +4,7 @@
 
 export type User = {
   id: string;
-  state: 'PENDING' | 'COMPLETE';
+  state: "PENDING" | "COMPLETE";
   username: string;
   createdAt: Date;
   updatedAt?: Date | null;

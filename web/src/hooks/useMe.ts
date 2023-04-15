@@ -1,14 +1,11 @@
-import {
-  useQuery,
-  useQueryClient,
-  UseQueryResult,
-} from '@tanstack/react-query';
+import type { UseQueryResult } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import APIError, { APIErrorCode } from '@/api/error';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { User } from '@/types/user';
+import APIError, { APIErrorCode } from "@/api/error";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { User } from "@/types/user";
 
-const useMe = (): UseQueryResult<User, APIError> => {
+function useMe(): UseQueryResult<User, APIError> {
   const queryClient = useQueryClient();
 
   const key = generateQueryKey.Me();
@@ -17,7 +14,7 @@ const useMe = (): UseQueryResult<User, APIError> => {
     async ({ queryKey }) => {
       const cached = queryClient.getQueryData<User>(queryKey);
       if (!cached) {
-        throw new APIError(APIErrorCode.Unauthorized, 'No active session.');
+        throw new APIError(APIErrorCode.Unauthorized, "No active session.");
       }
       return cached;
     },
@@ -42,6 +39,6 @@ const useMe = (): UseQueryResult<User, APIError> => {
       },
     }
   );
-};
+}
 
 export default useMe;

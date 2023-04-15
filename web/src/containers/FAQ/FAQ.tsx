@@ -1,43 +1,35 @@
-import { Fragment } from 'react';
+import { Fragment } from "react";
 
-import { Box, Heading, Text } from '@chakra-ui/react';
+import clsx from "clsx";
 
-import { FAQ } from '@/lib/constants';
+import { FAQ } from "@/lib/constants";
 
-const FAQContainer = () => {
+export function FAQContainer() {
   return (
     <>
       {FAQ.map((section) => (
         <Fragment key={section.title}>
-          <Heading
-            mt="12"
-            size="md"
-            display="inline-block"
-            bgGradient="linear(359deg, primary 24%, transparent 0)"
+          <h2
+            className={clsx(
+              "relative mt-12 inline-block font-heading text-xl font-bold leading-none",
+
+              'before:absolute before:bottom-0 before:left-0 before:right-0 before:z-[-1] before:h-1.5 before:bg-cyan before:opacity-80 before:content-[""]'
+            )}
           >
             {section.title}
-          </Heading>
-          {section.questions.map((object) => (
-            <Box
-              p="4"
-              mt="6"
-              borderRadius="lg"
-              border="1px solid"
-              borderColor="inherit"
-              key={`${section.title}__${object.question}__${object.answer}`}
+          </h2>
+
+          {section.questions.map((question) => (
+            <div
+              className="mt-6 rounded-lg border p-4"
+              key={`${section.title}__${question.question}__${question.answer}`}
             >
-              <Text fontSize="md" fontWeight="bold">
-                {object.question}
-              </Text>
-              <Text mt="2" fontSize="md">
-                {object.answer}
-              </Text>
-            </Box>
+              <p className="font-bold">{question.question}</p>
+              <p className="mt-2 font-medium">{question.answer}</p>
+            </div>
           ))}
         </Fragment>
       ))}
     </>
   );
-};
-
-export default FAQContainer;
+}

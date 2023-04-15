@@ -1,46 +1,28 @@
-import { memo, useMemo } from 'react';
+import type { ElementRef } from "react";
+import { forwardRef, useMemo } from "react";
 
-import {
-  Badge,
-  Box,
-  Button,
-  Heading,
-  HStack,
-  Icon,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
-import dayjs from 'dayjs';
-import Link from 'next/link';
-import { IoPlay } from 'react-icons/io5';
+import { Primitive } from "@radix-ui/react-primitive";
+import clsx from "clsx";
+import dayjs from "dayjs";
+import Link from "next/link";
+import { IoPlay } from "react-icons/io5";
 
-import LikeButton from '@/components/LikeButton';
+import { LikeButton } from "@/components/LikeButton";
 import {
   UNLIMITED_MAX_ATTEMPTS,
   UNLIMITED_TIME_ALLOWED,
-} from '@/lib/constants';
-import { difficultyColor } from '@/lib/game';
-import { millisecondsTo } from '@/lib/time';
-import { Puzzle } from '@/types/puzzle';
+} from "@/lib/constants";
+import omit from "@/lib/omit";
+import { millisecondsTo } from "@/lib/time";
 
-export type PuzzleCardProps = Pick<
-  Puzzle,
-  | 'createdAt'
-  | 'difficulty'
-  | 'id'
-  | 'likedAt'
-  | 'maxAttempts'
-  | 'name'
-  | 'numOfLikes'
-  | 'timeAllowed'
-> & {
-  createdBy: string;
-  isEditable?: boolean;
-  onLike?: () => void | Promise<void>;
-};
+import type { PuzzleCardProps } from "./types";
 
-const PuzzleCard = (props: PuzzleCardProps) => {
+export const PuzzleCard = forwardRef<
+  ElementRef<typeof Primitive.div>,
+  PuzzleCardProps
+>((props, ref) => {
   const {
+    className,
     createdAt,
     createdBy,
     difficulty,
@@ -52,116 +34,128 @@ const PuzzleCard = (props: PuzzleCardProps) => {
     numOfLikes,
     onLike = () => {},
     timeAllowed,
-  } = props;
+    ...other
+  } = omit(props, ["children"]);
 
   const maxAttemptsText = useMemo(() => {
     if (maxAttempts === UNLIMITED_MAX_ATTEMPTS) {
       return <>&infin; attempts</>;
     }
-    return `${maxAttempts} attempt${maxAttempts! > 1 ? 's' : ''}`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return `${maxAttempts} attempt${maxAttempts! > 1 ? "s" : ""}`;
   }, [maxAttempts]);
   const timeAllowedText = useMemo(() => {
     if (timeAllowed === UNLIMITED_TIME_ALLOWED) {
-      return 'No Time Limit';
+      return "No Time Limit";
     }
 
-    const minutes = millisecondsTo('minutes', timeAllowed!);
-    const seconds = millisecondsTo('seconds', timeAllowed!);
+    const minutes = millisecondsTo("minutes", timeAllowed!);
+    const seconds = millisecondsTo("seconds", timeAllowed!);
 
-    const formatMin = `${minutes} min${minutes > 1 ? 's' : ''}`;
-    const formatSec = `${seconds} sec${seconds > 1 ? 's' : ''}`;
-    return `${minutes > 0 ? `${formatMin} ` : ''} ${
-      seconds > 0 ? formatSec : ''
+    const formatMin = `${minutes} min${minutes > 1 ? "s" : ""}`;
+    const formatSec = `${seconds} sec${seconds > 1 ? "s" : ""}`;
+    return `${minutes > 0 ? `${formatMin} ` : ""} ${
+      seconds > 0 ? formatSec : ""
     }`;
   }, [timeAllowed]);
 
   return (
-    <Box
-      p="4"
-      w="100%"
-      h="100%"
-      bg="surface"
-      as="article"
-      boxShadow="sm"
-      borderRadius="lg"
+    <Primitive.div
+      {...other}
+      ref={ref}
+      className={clsx(
+        "h-full w-full rounded-lg bg-surface p-4",
+
+        className
+      )}
     >
-      <HStack w="100%" align="start" justify="space-between">
-        <VStack w="100%" spacing="1" align="flex-start">
-          <HStack>
-            <Badge colorScheme={difficultyColor[difficulty]}>
+      <div className="flex w-full items-start justify-between gap-2">
+        <div className="flex w-full flex-col items-start justify-center gap-1">
+          <div className="flex items-center gap-2">
+            <span
+              className={clsx(
+                "inline-block whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-semibold uppercase text-surface",
+
+                {
+                  "bg-green": difficulty === "Easy",
+                  "bg-yellow": difficulty === "Medium",
+                  "bg-red": difficulty === "Hard",
+                }
+              )}
+            >
               {difficulty}
-            </Badge>
-            <Link passHref href={`/users/${createdBy}`}>
-              <Text as="a" fontSize="sm" fontWeight="semibold">
-                {createdBy}
-              </Text>
+            </span>
+
+            <Link
+              href={`/users/${createdBy}`}
+              className={clsx(
+                "text-sm font-bold outline-none",
+
+                "focus-visible:ring"
+              )}
+            >
+              {createdBy}
             </Link>
-          </HStack>
-          <Text
-            fontSize="xs"
-            fontWeight="medium"
-            letterSpacing="wide"
-            color="text.secondary"
-            textTransform="uppercase"
-          >
+          </div>
+
+          <p className="text-xs font-semibold uppercase tracking-wide text-subtle">
             {maxAttemptsText} &bull; {timeAllowedText}
-          </Text>
-        </VStack>
+          </p>
+        </div>
 
         <LikeButton
           isLiked={!!likedAt}
           numOfLikes={numOfLikes}
           onLike={onLike}
         />
-      </HStack>
+      </div>
 
-      <Heading mt="2" size="sm" noOfLines={1} lineHeight="normal">
+      <h3 className="text-md mt-2 line-clamp-1 text-ellipsis font-heading font-bold leading-normal">
         {name}
-      </Heading>
+      </h3>
 
-      <HStack mt="4" w="100%" align="center" justify="space-between">
-        <Text
-          w="100%"
-          as="time"
-          fontSize="xs"
-          noOfLines={1}
-          fontWeight="medium"
-          letterSpacing="wide"
-          color="text.secondary"
+      <div className="mt-4 flex w-full items-center justify-between gap-2">
+        <time
           dateTime={dayjs(createdAt).tz().toISOString()}
+          className="line-clamp-1 w-full text-ellipsis text-xs font-semibold tracking-wide text-muted"
         >
-          {dayjs(createdAt).tz().format('MMM DD, YYYY')}
-        </Text>
+          {dayjs(createdAt).tz().format("MMM DD, YYYY")}
+        </time>
 
         {isEditable && (
-          <Link passHref href={`/puzzles/update/${id}`}>
-            <Button
-              as="a"
-              size="sm"
-              rel="nofollow"
-              variant="link"
-              flexShrink="0"
-              colorScheme="gray"
-            >
-              Edit
-            </Button>
+          <Link
+            rel="nofollow"
+            aria-label={`Edit ${name}`}
+            href={`/puzzles/update/${id}`}
+            className={clsx(
+              "relative flex h-8 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 text-sm font-semibold outline-none transition",
+
+              "active:text-text/60",
+              "focus-visible:ring focus-visible:ring-cyan/60",
+              "hover:underline"
+            )}
+          >
+            Edit
           </Link>
         )}
-        <Link passHref href={`/games/play/${id}`}>
-          <Button
-            as="a"
-            size="sm"
-            rel="nofollow"
-            flexShrink="0"
-            rightIcon={<Icon as={IoPlay} />}
-          >
-            Play
-          </Button>
-        </Link>
-      </HStack>
-    </Box>
-  );
-};
 
-export default memo(PuzzleCard);
+        <Link
+          rel="nofollow"
+          href={`/games/play/${id}`}
+          aria-label={`Play ${name}`}
+          className={clsx(
+            "relative flex h-8 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-cyan px-3 text-sm font-semibold text-surface outline-none transition",
+
+            "active:bg-cyan/70",
+            "focus-visible:ring focus-visible:ring-cyan/60",
+            "hover:bg-cyan/70"
+          )}
+        >
+          Play
+          <IoPlay />
+        </Link>
+      </div>
+    </Primitive.div>
+  );
+});
+
+PuzzleCard.displayName = "PuzzleCard";

@@ -1,5 +1,5 @@
-import { Puzzle, PuzzleNode } from './puzzle';
-import { User } from './user';
+import type { Puzzle, PuzzleNode } from "./puzzle";
+import type { User } from "./user";
 
 /**
  * Base
@@ -94,14 +94,14 @@ export type Game = {
 
 export type GameUpdatePayload = Pick<
   Game,
-  | 'attempts'
-  | 'completedAt'
-  | 'config'
-  | 'correct'
-  | 'guessedAt'
-  | 'results'
-  | 'score'
-  | 'startedAt'
+  | "attempts"
+  | "completedAt"
+  | "config"
+  | "correct"
+  | "guessedAt"
+  | "results"
+  | "score"
+  | "startedAt"
 >;
 
 /**
@@ -110,7 +110,7 @@ export type GameUpdatePayload = Pick<
 
 export type GameNode = Omit<
   Game,
-  'attempts' | 'correct' | 'challengedBy' | 'puzzle' | 'results'
+  "attempts" | "correct" | "challengedBy" | "puzzle" | "results"
 > & {
   attempts: number;
   puzzle: PuzzleNode;
@@ -131,4 +131,4 @@ export type GameConnection = {
  * Misc.
  */
 
-export type GameUpdateResponse = Omit<Game, 'puzzle'>;
+export type GameUpdateResponse = Omit<Game, "puzzle">;

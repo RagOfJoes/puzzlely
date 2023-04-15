@@ -1,28 +1,24 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import { Grid, GridItem, Heading } from '@chakra-ui/react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from "@tanstack/react-query";
+import clsx from "clsx";
 
-import PuzzleCard from '@/components/PuzzleCard';
-import Waypoint from '@/components/Waypoint';
-import useMe from '@/hooks/useMe';
-import usePuzzleLike from '@/hooks/usePuzzleLike';
-import usePuzzlesCreated from '@/hooks/usePuzzlesCreated';
+import { PuzzleCard } from "@/components/PuzzleCard";
+import { Waypoint } from "@/components/Waypoint";
+import useMe from "@/hooks/useMe";
+import usePuzzleLike from "@/hooks/usePuzzleLike";
+import usePuzzlesCreated from "@/hooks/usePuzzlesCreated";
 import {
   toggleLikePuzzleConnection,
   toggleLikePuzzlePages,
-} from '@/lib/puzzleConnection';
-import { generateQueryKey, queryKeys } from '@/lib/queryKeys';
-import { PuzzleConnection, PuzzleEdge } from '@/types/puzzle';
-import { User } from '@/types/user';
+} from "@/lib/puzzleConnection";
+import { generateQueryKey, queryKeys } from "@/lib/queryKeys";
+import type { PuzzleConnection, PuzzleEdge } from "@/types/puzzle";
+import type { User } from "@/types/user";
 
-import Loading from './Loading';
+import Loading from "./Loading";
 
-type PuzzlesProps = {
-  user: User;
-};
-
-const Puzzles = (props: PuzzlesProps) => {
+function Puzzles(props: { user: User }) {
   const { user } = props;
 
   const { data: me } = useMe();
@@ -42,15 +38,15 @@ const Puzzles = (props: PuzzlesProps) => {
       return {
         edges: [],
         pageInfo: {
-          cursor: '',
+          cursor: "",
           hasNextPage: false,
         },
       };
     }
 
-    const pageInfo: PuzzleConnection['pageInfo'] = puzzles.pages[
+    const pageInfo: PuzzleConnection["pageInfo"] = puzzles.pages[
       puzzles.pages.length - 1
-    ]?.pageInfo || { cursor: '', hasNextPage: false };
+    ]?.pageInfo || { cursor: "", hasNextPage: false };
     const edges: PuzzleEdge[] = puzzles.pages
       .filter((page) => page.edges.length > 0)
       .flatMap((page) => page.edges);
@@ -63,22 +59,20 @@ const Puzzles = (props: PuzzlesProps) => {
 
   if (connection.edges.length === 0 && isFetched) {
     return (
-      <Heading size="sm" color="text.secondary">
+      <h3 className="px-5 font-heading font-bold text-subtle">
         No puzzles created.
-      </Heading>
+      </h3>
     );
   }
 
   return (
-    <Grid
-      gap="4"
-      w="100%"
-      templateColumns={{
-        base: 'repeat(1, 1fr)',
-        sm: 'repeat(1, 1fr)',
-        md: 'repeat(2, 1fr)',
-        xl: 'repeat(3, 1fr)',
-      }}
+    <div
+      className={clsx(
+        "grid w-full grid-cols-3 gap-4",
+
+        "max-xl:grid-cols-2",
+        "max-md:grid-cols-1"
+      )}
     >
       {!isFetched && isLoading && <Loading />}
 
@@ -89,7 +83,7 @@ const Puzzles = (props: PuzzlesProps) => {
           const { cursor, node } = edge;
 
           return (
-            <GridItem colSpan={1} rowSpan={1} key={cursor}>
+            <div key={cursor} className="col-span-1 row-span-1">
               <PuzzleCard
                 id={node.id}
                 name={node.name}
@@ -137,7 +131,7 @@ const Puzzles = (props: PuzzlesProps) => {
                   });
                 }}
               />
-            </GridItem>
+            </div>
           );
         })}
 
@@ -153,8 +147,8 @@ const Puzzles = (props: PuzzlesProps) => {
           }}
         />
       )}
-    </Grid>
+    </div>
   );
-};
+}
 
 export default Puzzles;

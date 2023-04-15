@@ -1,18 +1,18 @@
-import { FormikHelpers } from 'formik';
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
+import type { SubmitHandler } from "react-hook-form";
 
-import { Group, Puzzle, PuzzleUpdatePayload } from '@/types/puzzle';
+import type { Puzzle, PuzzleUpdatePayload } from "@/types/puzzle";
 
-export type PuzzleUpdateFormGroupProps = {
-  group: Group;
-  index: number;
-};
-
-export type PuzzleUpdateFormProps = {
+export type PuzzleUpdateFormProps = Omit<
+  ComponentPropsWithoutRef<typeof Primitive.form>,
+  "children" | "defaultValue" | "onSubmit"
+> & {
+  isDeleted?: boolean;
   isDeleting?: boolean;
   onDelete?: () => void | Promise<void>;
-  onSubmit?: (
-    values: PuzzleUpdatePayload,
-    helpers: FormikHelpers<PuzzleUpdatePayload>
-  ) => void | Promise<void>;
+  onEdit?: SubmitHandler<PuzzleUpdatePayload>;
   puzzle: Puzzle;
 };

@@ -1,17 +1,18 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useCallback } from "react";
 
-import useGameGuess from '@/hooks/useGameGuess';
-import groupBy from '@/lib/groupBy';
-import { Game } from '@/types/game';
-import { Block } from '@/types/puzzle';
+import useGameGuess from "@/hooks/useGameGuess";
+import groupBy from "@/lib/groupBy";
+import type { Game } from "@/types/game";
+import type { Block } from "@/types/puzzle";
 
 export type UseGameContinueParam = {
   blocks: Block[];
-  correct: Game['correct'];
+  correct: Game["correct"];
   game: Game;
   isGameOver: boolean;
   setBlocks: Dispatch<SetStateAction<Block[]>>;
-  setCorrect: Dispatch<SetStateAction<Game['correct']>>;
+  setCorrect: Dispatch<SetStateAction<Game["correct"]>>;
   setSelected: Dispatch<SetStateAction<Block[]>>;
   toggleIsGameOver: Dispatch<SetStateAction<boolean>>;
   toggleIsWrong: Dispatch<SetStateAction<boolean>>;
@@ -20,7 +21,7 @@ export type UseGameContinueParam = {
 /**
  * When User continues from GameOver screen
  */
-const useGameContinue = (args: UseGameContinueParam) => {
+function useGameContinue(args: UseGameContinueParam) {
   const {
     blocks,
     correct,
@@ -88,6 +89,6 @@ const useGameContinue = (args: UseGameContinueParam) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attempts, config, correct, guessedAt, isGameOver, score, startedAt]);
-};
+}
 
 export default useGameContinue;

@@ -1,16 +1,16 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query';
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
-import { NextSeo } from 'next-seo';
+import { dehydrate, QueryClient } from "@tanstack/react-query";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { NextSeo } from "next-seo";
 
-import api from '@/api';
-import APIError from '@/api/error';
-import SearchContainer from '@/containers/Search';
-import useSearch from '@/hooks/useSearch';
-import MainLayout from '@/layouts/Main';
-import getColorModeCookie from '@/lib/getColorModeCookie';
-import { generateQueryKey } from '@/lib/queryKeys';
-import { PuzzleConnection } from '@/types/puzzle';
-import { User } from '@/types/user';
+import api from "@/api";
+import APIError from "@/api/error";
+import { SearchContainer } from "@/containers/Search";
+import useSearch from "@/hooks/useSearch";
+import { MainLayout } from "@/layouts/Main";
+import getColorModeCookie from "@/lib/getColorModeCookie";
+import { generateQueryKey } from "@/lib/queryKeys";
+import type { PuzzleConnection } from "@/types/puzzle";
+import type { User } from "@/types/user";
 
 export type SearchPageProps = {
   search: string;
@@ -25,7 +25,7 @@ const SearchPage = (props: SearchPageProps) => {
     <>
       <MainLayout
         breadcrumbLinks={[
-          { path: `/search`, title: 'Search' },
+          { path: "/puzzles", title: "Search" },
           { path: `/search?term=${search}`, title: search },
         ]}
       >
@@ -34,7 +34,7 @@ const SearchPage = (props: SearchPageProps) => {
           result={
             result || {
               edges: [],
-              pageInfo: { cursor: '', hasNextPage: false },
+              pageInfo: { cursor: "", hasNextPage: false },
             }
           }
         />
@@ -49,11 +49,11 @@ export const getServerSideProps: GetServerSideProps<SearchPageProps> = async (
   ctx
 ) => {
   const term = ctx.query.term;
-  if (typeof term !== 'string') {
+  if (typeof term !== "string") {
     return {
       redirect: {
         permanent: false,
-        destination: '/puzzles',
+        destination: "/puzzles",
       },
     };
   }
@@ -88,11 +88,11 @@ export const getServerSideProps: GetServerSideProps<SearchPageProps> = async (
   await Promise.all([meQuery, searchQuery]);
 
   const me = queryClient.getQueryData<User>(meKey);
-  if (me && me.state === 'PENDING') {
+  if (me && me.state === "PENDING") {
     return {
       redirect: {
         permanent: false,
-        destination: '/profile',
+        destination: "/profile",
       },
     };
   }

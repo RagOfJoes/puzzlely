@@ -1,43 +1,33 @@
-import { Button, HStack } from '@chakra-ui/react';
-import NextLink from 'next/link';
+import clsx from "clsx";
+import Link from "next/link";
 
-const NotFoundContainer = () => {
+export function NotFoundContainer() {
   return (
-    <HStack mt="2" w="100%" align="flex-start">
-      <NextLink href="/">
-        <Button
-          size="lg"
-          width="100%"
-          bg="surface"
-          boxShadow="sm"
-          variant="solid"
-          borderRadius="lg"
-          colorScheme="gray"
-          color="text.primary"
-          _hover={{ bg: 'surface' }}
-          _active={{ bg: 'surface' }}
-        >
-          Take me home
-        </Button>
-      </NextLink>
-      <NextLink href="/puzzles">
-        <Button
-          size="lg"
-          width="100%"
-          bg="surface"
-          boxShadow="sm"
-          variant="solid"
-          borderRadius="lg"
-          colorScheme="gray"
-          color="text.primary"
-          _hover={{ bg: 'surface' }}
-          _active={{ bg: 'surface' }}
-        >
-          See all Puzzles
-        </Button>
-      </NextLink>
-    </HStack>
-  );
-};
+    <div className="flex w-full items-start gap-2">
+      <Link
+        href="/"
+        className={clsx(
+          "relative flex h-12 w-full shrink-0 basis-1/2 select-none appearance-none items-center justify-center whitespace-nowrap rounded-md bg-surface px-6 text-lg font-semibold shadow outline-none transition",
 
-export default NotFoundContainer;
+          "active:bg-muted/20",
+          "focus-visible:ring",
+          "hover:bg-muted/10"
+        )}
+      >
+        Take me home
+      </Link>
+      <Link
+        href="/puzzles"
+        className={clsx(
+          "relative flex h-12 w-full shrink-0 basis-1/2 select-none appearance-none items-center justify-center whitespace-nowrap rounded-md bg-surface px-6 text-lg font-semibold shadow outline-none transition",
+
+          "active:bg-muted/20",
+          "focus-visible:ring",
+          "hover:bg-muted/10"
+        )}
+      >
+        See all Puzzles
+      </Link>
+    </div>
+  );
+}

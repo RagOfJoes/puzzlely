@@ -1,2 +1,2 @@
-export * from './types';
-export { default } from './useTimer';
+export * from "./types";
+export { default } from "./useTimer";

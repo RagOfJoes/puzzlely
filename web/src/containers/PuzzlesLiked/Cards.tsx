@@ -1,18 +1,10 @@
-import { memo } from 'react';
+import { PuzzleCard } from "@/components/PuzzleCard";
+import useMe from "@/hooks/useMe";
+import type { PuzzleEdge } from "@/types/puzzle";
 
-import { GridItem } from '@chakra-ui/react';
+import { usePuzzleLike } from "./utils";
 
-import PuzzleCard from '@/components/PuzzleCard';
-import useMe from '@/hooks/useMe';
-import { PuzzleEdge } from '@/types/puzzle';
-
-import { usePuzzleLike } from './utils';
-
-type CardProps = {
-  edges: PuzzleEdge[];
-};
-
-const Cards = (props: CardProps) => {
+function Cards(props: { edges: PuzzleEdge[] }) {
   const { edges } = props;
 
   const { data: me } = useMe();
@@ -28,7 +20,7 @@ const Cards = (props: CardProps) => {
         }
 
         return (
-          <GridItem colSpan={1} rowSpan={1} key={cursor}>
+          <div key={cursor} className="col-span-1 row-span-1">
             <PuzzleCard
               id={node.id}
               name={node.name}
@@ -42,11 +34,11 @@ const Cards = (props: CardProps) => {
               isEditable={node.createdBy.id === me?.id}
               onLike={() => mutate(node)}
             />
-          </GridItem>
+          </div>
         );
       })}
     </>
   );
-};
+}
 
-export default memo(Cards);
+export default Cards;

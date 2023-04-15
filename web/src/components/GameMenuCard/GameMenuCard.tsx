@@ -1,59 +1,56 @@
-import { Box, BoxProps } from '@chakra-ui/react';
-import { motion, Variants } from 'framer-motion';
+import { forwardRef } from "react";
+
+import clsx from "clsx";
+import type { HTMLMotionProps, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 
 const variants: Variants = {
-  initial: {
-    y: -40,
-    opacity: 0,
-  },
   animate: {
-    y: 0,
     opacity: 1,
     transition: {
       duration: 0.2,
     },
+    y: 0,
   },
   exit: {
-    y: 40,
     opacity: 0,
     transition: {
       duration: 0.2,
     },
+    y: 40,
+  },
+  initial: {
+    opacity: 0,
+    y: -40,
   },
 };
 
-const GameMenuCard = (props: BoxProps) => {
-  return (
-    <Box
-      top="0"
-      w="100%"
-      h="100%"
-      display="flex"
-      alignItems="center"
-      position="absolute"
-      justifyContent="center"
-    >
-      <Box
-        p="5"
-        w="90%"
-        maxH="90%"
-        maxW="350px"
-        bg="surface"
-        boxShadow="lg"
-        as={motion.div}
-        overflowY="auto"
-        borderRadius="lg"
-        // Animations
-        exit="exit"
-        animate="animate"
-        initial="initial"
-        variants={variants}
-        {...props}
-      >
-        {props.children}
-      </Box>
-    </Box>
-  );
-};
+export const GameMenuCard = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
+  (props, ref) => {
+    const { children, className, ...other } = props;
 
-export default GameMenuCard;
+    return (
+      <div className="absolute top-0 flex h-full w-full items-center justify-center">
+        <motion.div
+          {...other}
+          ref={ref}
+          animate="animate"
+          className={clsx(
+            "max-h-[90%] w-[90%] max-w-sm overflow-y-auto rounded-lg bg-surface p-5 shadow outline-none transition-shadow",
+
+            "focus-visible:ring",
+
+            className
+          )}
+          exit="exit"
+          initial="initial"
+          variants={variants}
+        >
+          {children}
+        </motion.div>
+      </div>
+    );
+  }
+);
+
+GameMenuCard.displayName = "GameMenuCard";

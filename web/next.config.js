@@ -6,47 +6,52 @@ const ContentSecurityPolicy = `
   connect-src api.puzzlely.io www.puzzlely.io api.panelbear.com;
   script-src 'self';
   style-src 'self' 'unsafe-inline';
-  font-src 'self';  
+  font-src 'self';
 `;
 
 const securityHeaders = [
   {
-    key: 'X-XSS-PROTECTION',
-    value: '1; mode=block',
+    key: "Content-Security-Policy",
+    value: ContentSecurityPolicy.replace(/\s{2,}/g, " ").trim(),
   },
   {
-    key: 'X-Frame-Options',
-    value: 'SAMEORIGIN',
+    key: "X-Content-Type-Options",
+    value: "nosniff",
   },
   {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
+    key: "X-DNS-Prefetch-Control",
+    value: "on",
   },
   {
-    key: 'Content-Security-Policy',
-    value: ContentSecurityPolicy.replace(/\s{2,}/g, ' ').trim(),
+    key: "X-Frame-Options",
+    value: "SAMEORIGIN",
+  },
+  {
+    key: "X-XSS-PROTECTION",
+    value: "1; mode=block",
   },
 ];
 
 module.exports = {
-  // The starter code load resources from `public` folder with `router.basePath` in React components.
-  // So, the source code is "basePath-ready".
-  // You can remove `basePath` if you don't need it.
-  basePath: '',
-  output: 'standalone',
+  // The starter code load resources from `public` folder with `router.basePath`
+  // in React components. So, the source code is "basePath-ready". You can
+  // remove `basePath` if you don't need it.
+  basePath: "",
+  output: "standalone",
   poweredByHeader: false,
   swcMinify: true,
   trailingSlash: true,
   reactStrictMode: true,
 
   headers: async () => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       return [];
     }
+
     return [
       {
         // Apply these headers to all routes
-        source: '/:path*',
+        source: "/:path*",
         headers: securityHeaders,
       },
     ];
@@ -54,8 +59,8 @@ module.exports = {
   rewrites: async () => {
     return [
       {
-        source: '/bear.js',
-        destination: 'https://cdn.panelbear.com/analytics.js',
+        source: "/bear.js",
+        destination: "https://cdn.panelbear.com/analytics.js",
       },
     ];
   },

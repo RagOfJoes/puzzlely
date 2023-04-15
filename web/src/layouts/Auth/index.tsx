@@ -1,2 +1,2 @@
-export * from './Auth';
-export { default } from './Auth';
+export * from "./types";
+export * from "./Auth";

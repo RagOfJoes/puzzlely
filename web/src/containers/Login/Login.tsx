@@ -1,57 +1,53 @@
-import {
-  Button,
-  Icon,
-  Link,
-  Text,
-  useColorModeValue,
-  VStack,
-} from '@chakra-ui/react';
-import NextLink from 'next/link';
-import { IoLogoDiscord, IoLogoGithub, IoLogoGoogle } from 'react-icons/io5';
+import clsx from "clsx";
+import Link from "next/link";
+import { IoLogoDiscord, IoLogoGithub, IoLogoGoogle } from "react-icons/io5";
 
-const LoginContainer = () => {
-  const buttonBgHover = useColorModeValue('gray.200', 'slate');
-  const buttonBgActive = useColorModeValue('blackAlpha.200', 'whiteAlpha.300');
-
+export function LoginContainer() {
   return (
     <>
-      <VStack mt="6" spacing="4" align="flex-start">
+      <div className="mt-6 flex flex-col items-start gap-4">
         {[
           {
-            title: 'Discord',
+            title: "Discord",
             icon: IoLogoDiscord,
-            path: '/api/auth/discord/',
+            path: "/api/auth/discord/",
           },
-          { title: 'GitHub', icon: IoLogoGithub, path: '/api/auth/github' },
-          { title: 'Google', icon: IoLogoGoogle, path: '/api/auth/google' },
+          { title: "GitHub", icon: IoLogoGithub, path: "/api/auth/github" },
+          { title: "Google", icon: IoLogoGoogle, path: "/api/auth/google" },
         ].map((p) => {
           return (
-            <NextLink href={p.path || ''} key={p.title}>
-              <Button
-                size="lg"
-                width="100%"
-                bg="surface"
-                boxShadow="md"
-                color="text.primary"
-                leftIcon={<Icon as={p.icon} />}
-                _hover={{ bg: buttonBgHover }}
-                _active={{ bg: buttonBgActive }}
-              >
-                Log in with {p.title}
-              </Button>
-            </NextLink>
+            <Link
+              href={p.path}
+              key={p.title}
+              className={clsx(
+                "relative flex h-12 w-full shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-surface px-6 text-lg font-semibold shadow outline-none transition",
+
+                "active:bg-muted/20",
+                "focus-visible:ring",
+                "hover:bg-muted/10"
+              )}
+            >
+              {p.icon({ size: 20 })}
+              Log in with {p.title}
+            </Link>
           );
         })}
-      </VStack>
+      </div>
 
-      <Text mt="4" fontSize="sm" color="text.secondary">
-        Don&apos;t have an account?{' '}
-        <Link href="/signup" color="primary">
-          <Text as="strong">Sign up</Text>
+      <p className="mt-4 text-sm font-medium text-muted">
+        Dont&apos;t have an account?{" "}
+        <Link
+          href="/signup"
+          className={clsx(
+            "font-bold text-cyan outline-none transition",
+
+            "focus-visible:ring focus-visible:ring-cyan/60",
+            "hover:underline"
+          )}
+        >
+          Sign up
         </Link>
-      </Text>
+      </p>
     </>
   );
-};
-
-export default LoginContainer;
+}

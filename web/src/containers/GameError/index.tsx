@@ -1,2 +1,2 @@
-export * from './GameError';
-export { default } from './GameError';
+export * from "./types";
+export * from "./GameError";

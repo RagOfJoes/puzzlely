@@ -1,20 +1,17 @@
-import { UrlObject } from 'url';
+import type {
+  ComponentPropsWithoutRef,
+  Primitive,
+} from "@radix-ui/react-primitive";
+import type Link from "next/link";
 
-import { ReactNode } from 'react';
-
-import { BoxProps } from '@chakra-ui/react';
-
-export type SidebarProps = BoxProps & {
-  containerProps?: BoxProps;
-  icon?: JSX.Element;
-  name: string;
+export type SidebarProps = ComponentPropsWithoutRef<typeof Primitive.nav> & {
+  isOpen?: boolean;
 };
 
-export type SidebarItemProps = {
-  href?: string | UrlObject;
-  icon?: ReactNode;
+export type SidebarHeadingProps = ComponentPropsWithoutRef<typeof Primitive.h3>;
+
+export type SidebarItemProps = ComponentPropsWithoutRef<typeof Link> & {
   isActive?: boolean;
-  isSection?: boolean;
-  name: string;
-  passHref?: boolean;
 };
+
+export type SidebarIconProps = ComponentPropsWithoutRef<typeof Primitive.div>;
