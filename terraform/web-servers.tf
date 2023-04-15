@@ -25,7 +25,7 @@ resource "vercel_project_domain" "web_root" {
 resource "vercel_project_domain" "web_www" {
   domain     = "${var.web_subdomain}.${var.domain}"
   git_branch = "main"
-  project_id = vercel_project.example.id
+  project_id = vercel_project.web.id
 }
 
 ################################################################################
@@ -35,7 +35,7 @@ resource "vercel_project_domain" "web_root_redirect" {
   domain     = var.domain
   project_id = vercel_project.web.id
 
-  redirect             = vercel_project_domain.web_www
+  redirect             = vercel_project_domain.web_www.domain
   redirect_status_code = 308
 }
 
