@@ -1,12 +1,12 @@
 ################################################################################
-# Create n api servers with nginx installed and a custom message on main page  #
+# Create n api servers                                                         #
 ################################################################################
 resource "digitalocean_droplet" "api" {
   # How many droplet(s) do we want. Taken from our variables
   count = var.droplet_count
 
   # Which image to use. Taken from our variables
-  image = var.image
+  image = var.droplet_image
 
   # The human friendly name of our droplet. Combination of api, region, and 
   # count index. 

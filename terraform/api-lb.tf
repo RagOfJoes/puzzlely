@@ -105,3 +105,22 @@ resource "digitalocean_loadbalancer" "api" {
     create_before_destroy = true
   }
 }
+
+################################################################################
+# Create Cloudflare records to proxy to api's digitalocean loadbalancer        #
+################################################################################
+resource "cloudflare_record" "api_root" {
+  name    = "@"
+  proxied = true
+  type    = "A"
+  value   = digitalocean_loadbalancer.api.ip
+  zone_id = var.cloudflare_zone_id
+}
+
+resource "cloudflare_record" "api" {
+  name    = "api"
+  proxied = true
+  type    = "A"
+  value   = digitalocean_loadbalancer.api.ip
+  zone_id = var.cloudflare_zone_id
+}

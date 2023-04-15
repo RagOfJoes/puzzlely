@@ -7,16 +7,22 @@
 # Provider credentials                                                     #
 #--------------------------------------------------------------------------#
 # Our DigitalOcean API token.
-variable "do_token" {}
+variable "digitalocean_token" {}
 
 # Our Cloudflare Email
-variable "cf_email" {}
+variable "cloudflare_email" {}
 
 # Our Cloudflare API Key
-variable "cf_key" {}
+variable "cloudflare_key" {}
 
 # Our Cloudflare Origin CA Key
-variable "cf_origin_key" {}
+variable "cloudflare_origin_key" {}
+
+# Our Cloudflare Zone ID
+variable "cloudflare_zone_id" {}
+
+# Our Vercel API Token
+variable "vercel_token" {}
 
 # Name of SSH key as it appears in the DigitalOcean dashboard
 variable "ssh_key" {
@@ -77,7 +83,7 @@ variable "droplet_size" {
 
 # The operating system image we want to use. 
 # Can view slugs (valid options) https://slugs.do-api.dev/
-variable "image" {
+variable "droplet_image" {
   type    = string
   default = "ubuntu-20-04-x64"
 }
