@@ -8,6 +8,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Analytics } from "@vercel/analytics/react";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -42,19 +43,11 @@ function App({
     }
   }, []);
 
-  // usePanelbear(process.env.NEXT_PUBLIC_PANELBEAR_ID || "", {
-  //   scriptSrc: "/bear.js",
-  //   debug: process.env.NODE_ENV === "development",
-  //   enabled: process.env.NODE_ENV === "production",
-  // });
   const [queryClient] = useState(() => new QueryClient());
 
   return (
     <>
       <DefaultSeo
-        defaultTitle="Puzzlely"
-        titleTemplate="%s - Puzzlely"
-        description="An online puzzle game that's inspired by the BBC's Only Connect game show. Play user created puzzles or create your own to challenge your friends and other users."
         additionalMetaTags={[
           {
             name: "application-name",
@@ -79,6 +72,8 @@ function App({
             ].join(","),
           },
         ]}
+        defaultTitle="Puzzlely"
+        description="An online puzzle game that's inspired by the BBC's Only Connect game show. Play user created puzzles or create your own to challenge your friends and other users."
         openGraph={{
           type: "website",
           locale: "en_US",
@@ -94,6 +89,7 @@ function App({
             },
           ],
         }}
+        titleTemplate="%s - Puzzlely"
       />
 
       <QueryClientProvider client={queryClient}>
@@ -124,6 +120,8 @@ function App({
 
         <ReactQueryDevtools />
       </QueryClientProvider>
+
+      <Analytics />
     </>
   );
 }
