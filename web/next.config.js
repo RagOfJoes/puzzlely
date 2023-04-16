@@ -3,7 +3,7 @@
 const ContentSecurityPolicy = `
   default-src 'self' www.puzzlely.io api.puzzlely.io;
   child-src puzzlely.io;
-  connect-src api.puzzlely.io www.puzzlely.io api.panelbear.com;
+  connect-src api.puzzlely.io www.puzzlely.io;
   script-src 'self';
   style-src 'self' 'unsafe-inline';
   font-src 'self';
@@ -32,16 +32,16 @@ const securityHeaders = [
   },
 ];
 
+/** @type {import('next').NextConfig} */
 module.exports = {
   // The starter code load resources from `public` folder with `router.basePath`
   // in React components. So, the source code is "basePath-ready". You can
   // remove `basePath` if you don't need it.
   basePath: "",
-  output: "standalone",
   poweredByHeader: false,
+  reactStrictMode: true,
   swcMinify: true,
   trailingSlash: true,
-  reactStrictMode: true,
 
   headers: async () => {
     if (process.env.NODE_ENV === "development") {
@@ -53,14 +53,6 @@ module.exports = {
         // Apply these headers to all routes
         source: "/:path*",
         headers: securityHeaders,
-      },
-    ];
-  },
-  rewrites: async () => {
-    return [
-      {
-        source: "/bear.js",
-        destination: "https://cdn.panelbear.com/analytics.js",
       },
     ];
   },
