@@ -2,9 +2,9 @@
   "name": "Puzzlely",
   "short_name": "Puzzlely",
   "start_url": "https://www.puzzlely.io/",
-  "background_color": "#282c34",
+  "background_color": "#191724",
   "display": "standalone",
-  "theme_color": "#282c34",
+  "theme_color": "#191724",
   "icons": [
     {
       "src": "/dark/apple-touch-icon.png",
