@@ -16,23 +16,32 @@ resource "vercel_project" "web" {
 ################################################################################
 # Use our own domain with project                                              #
 ################################################################################
-resource "vercel_project_domain" "web_root" {
-  domain     = var.domain
-  git_branch = "main"
-  project_id = vercel_project.web.id
-}
-
 resource "vercel_project_domain" "web_www" {
   domain     = "${var.web_subdomain}.${var.domain}"
-  git_branch = "main"
   project_id = vercel_project.web.id
 }
 
 ################################################################################
-# Redirect puzzlely.io -> www.puzzlely.io                                      #
+# Redirects vercel domains -> www.puzzlely.io                                  #
 ################################################################################
-resource "vercel_project_domain" "web_root_redirect" {
-  domain     = var.domain
+resource "vercel_project_domain" "web_git_redirect" {
+  domain     = "puzzlely-git-main-ragofjoes.vercel.app"
+  project_id = vercel_project.web.id
+
+  redirect             = vercel_project_domain.web_www.domain
+  redirect_status_code = 308
+}
+
+resource "vercel_project_domain" "web_git_vercel_redirect" {
+  domain     = "puzzlely-ragofjoes.vercel.app"
+  project_id = vercel_project.web.id
+
+  redirect             = vercel_project_domain.web_www.domain
+  redirect_status_code = 308
+}
+
+resource "vercel_project_domain" "web_vercel_redirect" {
+  domain     = "puzzlely.vercel.app"
   project_id = vercel_project.web.id
 
   redirect             = vercel_project_domain.web_www.domain
