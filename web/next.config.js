@@ -3,7 +3,7 @@
 const ContentSecurityPolicy = `
   default-src 'self' www.puzzlely.io api.puzzlely.io;
   child-src puzzlely.io;
-  connect-src api.puzzlely.io www.puzzlely.io;
+  connect-src api.puzzlely.io www.puzzlely.io vitals.vercel-insights.com;
   script-src 'self';
   style-src 'self' 'unsafe-inline';
   font-src 'self';
@@ -13,6 +13,10 @@ const securityHeaders = [
   {
     key: "Content-Security-Policy",
     value: ContentSecurityPolicy.replace(/\s{2,}/g, " ").trim(),
+  },
+  {
+    key: "Referrer-Policy",
+    value: "origin-when-cross-origin",
   },
   {
     key: "X-Content-Type-Options",
