@@ -18,6 +18,7 @@ These are the prerequisites for local development:
 - Go 1.7 or later
 - MySQL (You can choose to host your own or set one up with PlanetScale)
 - Docker
+- Vercel account
 - OAuth2 credentials:
   - Discord
   - GitHub
@@ -30,6 +31,7 @@ These are the prerequisites for production:
 - Cloudflare
 - DigitalOcean account
 - Container registry (Example: Docker Hub, GitHub Container Registry, or, DigitalOcean Container Registry)
+- Vercel account
 - Terraform (w/ Terraform cloud)
 
 ## Folder Structure
@@ -43,49 +45,54 @@ These are the prerequisites for production:
 ## Architecture
 
 ```
-                                        https
-                                          |
-                                          |
-                                          |
-                                          |
-                                          |
-                                  +-------+------+
-                                  |              |
-                                  |  Cloudflare  |
-                                  |              |
-                                  +-------+------+
-                                          |
-                    +---------------------+-----------------------+
-                    |                                             |
-            +-------+------+                              +-------+------+
-            |      API     |                              |      Web     |
-            | Loadbalancer |                              | Loadbalancer |
-+-----------+--------------+------------------------------+--------------+------------+
-|VPC        |              |                              |              |            |
-|           +-------+------+                              +-------+------+            |
-|                   |                                             |                   |
-|                   |                                             |                   |
-|      +-----------http----------+                   +-----------http----------+      |
-|      |            |            |                   |            |            |      |
-| +----+----+  +----+----+  +----+----+         +----+----+  +----+----+  +----+----+ |
-| | Droplet |  | Droplet |  | Droplet |         | Droplet |  | Droplet |  | Droplet | |
-| +----+----+  +----+----+  +----+----+         +---------+  +---------+  +---------+ |
-|      |            |            |                                                    |
-|      |            |            |                                                    |
-|      |            |            |                                                    |
-|      |            |            |                                                    |
-|      |            |            |                                                    |
-|      |            |            |                                                    |
-+------+------------+------------+----------------------------------------------------+
-       |            |            |
-       +------------+------------+
-                    |
-            +-------+-------+
-            |               |
-            |  PlanetScale  |
-            |     MySQL     |
-            |               |
-            +---------------+
+                          https
+                            |
+                            |
+                    API     |     Web
+              +-------------+-------------+
+              |                           |
+              |                           |
+              |                           |
+       +------+-------+            +------+-------+
+       |              |            |              |
+       |  Cloudflare  |            |    Vercel    |
+       |              |            |              |
+       +------+-------+            +--------------+
+              |
+              |
+              |
+       +------+-------+
+       |              |
+       |              |
+       | Loadbalancer |
++------+--------------+------+
+| VPC  |              |      |
+|      +------+-------+      |
+|             |              |
+|             |              |
+|             |              |
+|            http            |
+|             |              |
+|             |              |
+|             |              |
+|        +----+----+         |
+|        |         |         |
+|        | Droplet |         |
+|        |         |         |
+|        +----+----+         |
+|             |              |
+|             |              |
++-------------+--------------+
+              |
+              |
+              |
+              |
+       +------+------+
+       |             |
+       | Planetscale |
+       |    MySQL    |
+       |             |
+       +-------------+
 ```
 
 ## Contributions
