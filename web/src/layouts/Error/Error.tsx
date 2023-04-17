@@ -56,7 +56,7 @@ export const ErrorLayout = forwardRef<HTMLElement, ErrorLayoutProps>(
           additionalMetaTags={[
             {
               name: "theme-color",
-              content: colorMode === "dark" ? "#282c34" : "#f4f4f7",
+              content: colorMode === "dark" ? "#191724" : "#faf4ed",
             },
           ]}
         />
