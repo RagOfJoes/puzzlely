@@ -11,12 +11,16 @@ resource "vercel_project" "web" {
     repo = "RagOfJoes/puzzlely"
     type = "github"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 ################################################################################
 # Use our own domain with project                                              #
 ################################################################################
-resource "vercel_project_domain" "web_www" {
+resource "vercel_project_domain" "web" {
   domain     = "${var.web_subdomain}.${var.domain}"
   project_id = vercel_project.web.id
 }
@@ -28,7 +32,7 @@ resource "vercel_project_domain" "web_git_redirect" {
   domain     = "puzzlely-git-main-ragofjoes.vercel.app"
   project_id = vercel_project.web.id
 
-  redirect             = vercel_project_domain.web_www.domain
+  redirect             = vercel_project_domain.web.domain
   redirect_status_code = 308
 }
 
@@ -36,7 +40,7 @@ resource "vercel_project_domain" "web_git_vercel_redirect" {
   domain     = "puzzlely-ragofjoes.vercel.app"
   project_id = vercel_project.web.id
 
-  redirect             = vercel_project_domain.web_www.domain
+  redirect             = vercel_project_domain.web.domain
   redirect_status_code = 308
 }
 
@@ -44,7 +48,7 @@ resource "vercel_project_domain" "web_vercel_redirect" {
   domain     = "puzzlely.vercel.app"
   project_id = vercel_project.web.id
 
-  redirect             = vercel_project_domain.web_www.domain
+  redirect             = vercel_project_domain.web.domain
   redirect_status_code = 308
 }
 
@@ -55,4 +59,8 @@ resource "vercel_deployment" "web" {
   production = true
   project_id = vercel_project.web.id
   ref        = "main"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
