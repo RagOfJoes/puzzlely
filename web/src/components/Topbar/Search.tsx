@@ -44,11 +44,7 @@ export function Search() {
         className="w-full"
         invalid={!!errors.search?.message}
       >
-        <Input
-          {...register("search")}
-          placeholder="Search"
-          className="border-transparent text-sm"
-        >
+        <Input {...register("search")} placeholder="Search" className="text-sm">
           <InputLeftIcon>
             <IoSearch />
           </InputLeftIcon>

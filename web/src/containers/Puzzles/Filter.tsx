@@ -79,12 +79,12 @@ function Filter(props: FilterProps) {
                 <span
                   key={key}
                   className={clsx(
-                    "flex h-6 items-center gap-1.5 rounded-md bg-muted/10 px-2 text-subtle outline-none",
+                    "flex h-6 items-center gap-1.5 rounded-md border bg-muted/10 px-2 py-1 text-subtle outline-none",
 
                     "dark:bg-muted/20"
                   )}
                 >
-                  <p className="line-clamp-1 text-ellipsis text-sm font-medium capitalize leading-none">
+                  <p className="line-clamp-1 text-ellipsis text-sm font-medium capitalize leading-snug">
                     {filter.label}: {filters[typedKey]}
                   </p>
 
@@ -120,7 +120,7 @@ function Filter(props: FilterProps) {
             <button
               aria-label="Open Filters"
               className={clsx(
-                "relative flex h-10 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-surface px-4 font-medium text-subtle outline-none transition",
+                "relative flex h-10 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md border bg-surface px-4 font-medium text-subtle outline-none transition",
 
                 "active:bg-muted/20",
                 "focus-visible:ring",
@@ -136,9 +136,9 @@ function Filter(props: FilterProps) {
             <Popover.Content
               align="end"
               sideOffset={8}
-              className="z-10 w-80 rounded-lg border border-muted/20 bg-surface shadow"
+              className="z-10 w-80 rounded-lg border bg-surface shadow"
             >
-              <header className="border-b border-b-muted/20 px-3 py-4 font-semibold">
+              <header className="border-b px-3 py-4 font-semibold">
                 Filters
               </header>
 
@@ -167,9 +167,9 @@ function Filter(props: FilterProps) {
                             onFilterSelect(typedKey, newValue);
                           }}
                         >
-                          <SelectTrigger className="w-full justify-between border border-muted/20" />
+                          <SelectTrigger className="w-full justify-between" />
 
-                          <SelectList className="border">
+                          <SelectList>
                             {filter.options.map((option) => (
                               <SelectListItem
                                 key={`${key}-${option.label}`}

@@ -22,17 +22,17 @@ function Cards(props: { edges: PuzzleEdge[] }) {
         return (
           <div key={cursor} className="col-span-1 row-span-1">
             <PuzzleCard
-              id={node.id}
-              name={node.name}
-              likedAt={node.likedAt}
               createdAt={node.createdAt}
-              difficulty={node.difficulty}
-              numOfLikes={node.numOfLikes}
-              maxAttempts={node.maxAttempts}
-              timeAllowed={node.timeAllowed}
               createdBy={node.createdBy.username}
+              difficulty={node.difficulty}
+              id={node.id}
               isEditable={node.createdBy.id === me?.id}
+              likedAt={node.likedAt}
+              maxAttempts={node.maxAttempts}
+              name={node.name}
+              numOfLikes={node.numOfLikes}
               onLike={() => mutate(node)}
+              timeAllowed={node.timeAllowed}
             />
           </div>
         );

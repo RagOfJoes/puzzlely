@@ -85,16 +85,15 @@ function Puzzles(props: { user: User }) {
           return (
             <div key={cursor} className="col-span-1 row-span-1">
               <PuzzleCard
-                id={node.id}
-                name={node.name}
-                likedAt={node.likedAt}
                 createdAt={node.createdAt}
-                difficulty={node.difficulty}
-                numOfLikes={node.numOfLikes}
-                maxAttempts={node.maxAttempts}
-                timeAllowed={node.timeAllowed}
                 createdBy={node.createdBy.username}
+                difficulty={node.difficulty}
+                id={node.id}
                 isEditable={node.createdBy.id === me?.id}
+                likedAt={node.likedAt}
+                maxAttempts={node.maxAttempts}
+                name={node.name}
+                numOfLikes={node.numOfLikes}
                 onLike={async () => {
                   await toggleLikePuzzlePages(node.id, queryClient, {
                     exact: true,
@@ -130,6 +129,7 @@ function Puzzles(props: { user: User }) {
                     },
                   });
                 }}
+                timeAllowed={node.timeAllowed}
               />
             </div>
           );

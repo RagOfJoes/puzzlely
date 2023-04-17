@@ -26,7 +26,7 @@ export const SelectList = forwardRef<
         {...other}
         ref={ref}
         className={clsx(
-          "z-10 overflow-hidden rounded-md bg-surface shadow",
+          "z-10 overflow-hidden rounded-md border bg-surface shadow",
 
           className
         )}

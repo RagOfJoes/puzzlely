@@ -19,7 +19,7 @@ export const NumberInputField = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "relative h-10 w-full min-w-0 appearance-none rounded-lg border border-muted/20 bg-surface px-4 outline-none transition",
+        "relative h-10 w-full min-w-0 appearance-none rounded-lg border bg-surface px-4 outline-none transition",
 
         "aria-[invalid=true]:enabled::border-red",
         "disabled:cursor-not-allowed disabled:bg-muted/10 disabled:text-muted/60 disabled:placeholder:text-muted",

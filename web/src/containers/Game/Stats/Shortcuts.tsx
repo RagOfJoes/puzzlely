@@ -67,7 +67,7 @@ function Shortcuts(props: ShortcutsProps) {
           <button
             aria-label="Restart game"
             className={clsx(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent bg-surface outline-none transition",
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-surface outline-none transition",
 
               "disabled:cursor-not-allowed",
               "focus:enabled:ring",
@@ -81,7 +81,7 @@ function Shortcuts(props: ShortcutsProps) {
           <button
             aria-label="Shuffle blocks"
             className={clsx(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent bg-surface outline-none transition",
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-surface outline-none transition",
 
               "disabled:cursor-not-allowed",
               "focus:enabled:ring",
@@ -95,7 +95,7 @@ function Shortcuts(props: ShortcutsProps) {
           <button
             aria-label="Forfeit"
             className={clsx(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent bg-surface outline-none transition",
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-surface outline-none transition",
 
               "disabled:cursor-not-allowed",
               "focus:enabled:ring",
@@ -118,7 +118,7 @@ function Shortcuts(props: ShortcutsProps) {
 
           <Dialog.Content
             className={clsx(
-              "fixed left-1/2 top-1/2 z-10 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border border-muted/20 bg-surface p-6",
+              "fixed left-1/2 top-1/2 z-10 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-surface p-6",
 
               "focus:outline-none"
             )}

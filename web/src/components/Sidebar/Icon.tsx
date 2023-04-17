@@ -17,9 +17,9 @@ export const SidebarIcon = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "flex h-7 w-7 items-center justify-center rounded-lg bg-surface text-cyan",
+        "flex h-7 w-7 items-center justify-center rounded-lg border bg-surface text-cyan",
 
-        "group-aria-[current=page]:bg-cyan group-aria-[current=page]:text-surface group-aria-[current=page]:shadow-sm",
+        "group-aria-[current=page]:border-none group-aria-[current=page]:bg-cyan group-aria-[current=page]:text-surface group-aria-[current=page]:shadow-sm",
 
         className
       )}

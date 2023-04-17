@@ -21,7 +21,7 @@ export const JoinBanner = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "relative flex rounded-lg bg-surface px-12 py-6 shadow",
+        "relative flex rounded-lg border bg-surface px-12 py-6",
 
         "max-lg:px-6",
         "max-md:px-4",

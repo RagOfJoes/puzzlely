@@ -36,7 +36,7 @@ export const GameMenuCard = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
           ref={ref}
           animate="animate"
           className={clsx(
-            "max-h-[90%] w-[90%] max-w-sm overflow-y-auto rounded-lg bg-surface p-5 shadow outline-none transition-shadow",
+            "max-h-[90%] w-[90%] max-w-sm overflow-y-auto rounded-lg border bg-surface p-5 outline-none",
 
             "focus-visible:ring",
 

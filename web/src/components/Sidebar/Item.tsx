@@ -39,8 +39,7 @@ export const SidebarItem = forwardRef<
       className={clsx(
         "group flex h-16 w-full cursor-pointer select-none appearance-none items-center justify-start gap-3 whitespace-nowrap rounded-2xl px-4 py-3 outline-none transition duration-150 ease-linear",
 
-        "aria-[current=page]:bg-surface",
-        "dark:aria-[current=page]:shadow",
+        "aria-[current=page]:border aria-[current=page]:bg-surface",
         "focus:bg-muted/10 focus:ring",
         "hover:bg-muted/10"
       )}

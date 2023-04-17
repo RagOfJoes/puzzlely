@@ -101,13 +101,12 @@ function Meta() {
                 >
                   <SelectTrigger
                     ref={field.ref}
-                    className="w-full justify-between border border-muted/20"
+                    className="w-full justify-between"
                     onBlur={field.onBlur}
                     placeholder="Select a difficulty..."
                   />
 
                   <SelectList
-                    className="border"
                     onCloseAutoFocus={() => {
                       field.onBlur();
                     }}

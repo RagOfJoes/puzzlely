@@ -19,14 +19,14 @@ function Loading() {
           <Skeleton key={`Puzzles__Loading__${idx}`}>
             <div className="invisible col-span-1 row-span-1 h-full w-full overflow-hidden">
               <PuzzleCard
-                id=""
-                numOfLikes={0}
-                maxAttempts={0}
-                timeAllowed={0}
                 createdAt={today}
-                difficulty="Easy"
                 createdBy="Lorem"
+                difficulty="Easy"
+                id=""
+                maxAttempts={0}
                 name="Lorem Ipsum"
+                numOfLikes={0}
+                timeAllowed={0}
               />
             </div>
           </Skeleton>

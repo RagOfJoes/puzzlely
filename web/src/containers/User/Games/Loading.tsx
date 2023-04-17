@@ -19,18 +19,18 @@ function Loading() {
           <Skeleton key={`Games__Loading__${idx}`}>
             <div className="invisible col-span-1 row-span-1 h-full w-full overflow-hidden">
               <GameCard
-                id=""
-                score={0}
                 attempts={0}
-                maxScore={0}
-                timeAllowed={0}
-                maxAttempts={0}
                 challengeCode=""
-                createdBy="Lorem"
-                startedAt={today}
-                name="Puzzle name"
                 completedAt={today}
+                createdBy="Lorem"
                 difficulty="Medium"
+                id=""
+                maxAttempts={0}
+                maxScore={0}
+                name="Puzzle name"
+                score={0}
+                startedAt={today}
+                timeAllowed={0}
               />
             </div>
           </Skeleton>

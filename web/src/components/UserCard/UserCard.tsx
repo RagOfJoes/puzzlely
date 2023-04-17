@@ -47,7 +47,7 @@ export const UserCard = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "rounded-lg bg-surface p-4",
+        "rounded-lg border bg-surface p-4",
 
         className
       )}

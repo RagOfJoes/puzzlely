@@ -44,7 +44,12 @@ const PuzzleUpdatePage = (props: PuzzleUpdatePageProps) => {
 
   return (
     <>
-      <MainLayout breadcrumbLinks={[{ path: "/puzzles", title: "Puzzles" }]}>
+      <MainLayout
+        breadcrumbLinks={[
+          { path: "/puzzles", title: "Puzzles" },
+          { path: `/puzzles/update/${data.id}`, title: data.name },
+        ]}
+      >
         <PuzzleUpdateContainer puzzle={data} />
       </MainLayout>
 

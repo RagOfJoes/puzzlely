@@ -22,7 +22,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {...omit(ctx, ["invalid"])}
         ref={ref}
         className={clsx(
-          "relative h-10 min-h-[5rem] w-full min-w-0 resize-none appearance-none rounded-lg border border-muted/20 bg-surface px-4 py-2 font-medium outline-none transition",
+          "relative h-10 min-h-[5rem] w-full min-w-0 resize-none appearance-none rounded-lg border bg-surface px-4 py-2 font-medium outline-none transition",
 
           "aria-[invalid=true]:enabled:border-red",
           "disabled:cursor-not-allowed disabled:bg-muted/10 disabled:text-muted/60 disabled:placeholder:text-muted",

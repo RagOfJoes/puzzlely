@@ -17,7 +17,7 @@ export const GameStatCard = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "flex w-full items-center justify-between gap-2 rounded-lg bg-surface px-3 py-4",
+        "flex w-full items-center justify-between gap-2 rounded-lg border bg-surface px-3 py-4",
 
         className
       )}

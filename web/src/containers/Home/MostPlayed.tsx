@@ -55,20 +55,19 @@ function MostPlayed() {
 
             return (
               <div
-                className="col-span-1 row-span-1"
                 key={`PuzzlesMostPlayed__Puzzle__${cursor}`}
+                className="col-span-1 row-span-1"
               >
                 <PuzzleCard
-                  id={node.id}
-                  name={node.name}
-                  likedAt={node.likedAt}
                   createdAt={node.createdAt}
-                  difficulty={node.difficulty}
-                  numOfLikes={node.numOfLikes}
-                  maxAttempts={node.maxAttempts}
-                  timeAllowed={node.timeAllowed}
                   createdBy={node.createdBy.username}
+                  difficulty={node.difficulty}
+                  id={node.id}
                   isEditable={node.createdBy.id === me?.id}
+                  likedAt={node.likedAt}
+                  maxAttempts={node.maxAttempts}
+                  name={node.name}
+                  numOfLikes={node.numOfLikes}
                   onLike={async () => {
                     const key = generateQueryKey.PuzzlesMostPlayed();
 
@@ -113,6 +112,7 @@ function MostPlayed() {
                       },
                     });
                   }}
+                  timeAllowed={node.timeAllowed}
                 />
               </div>
             );
@@ -123,14 +123,14 @@ function MostPlayed() {
             <Skeleton key={`PuzzlesMostPlayed__Loading__${index}`}>
               <div className="invisible col-span-1 row-span-1">
                 <PuzzleCard
-                  id=""
-                  numOfLikes={0}
-                  maxAttempts={0}
-                  timeAllowed={0}
-                  difficulty="Easy"
-                  createdBy="Lorem"
-                  name="Puzzle Name"
                   createdAt={loadingTime}
+                  createdBy="Lorem"
+                  difficulty="Easy"
+                  id=""
+                  maxAttempts={0}
+                  name="Puzzle Name"
+                  numOfLikes={0}
+                  timeAllowed={0}
                 />
               </div>
             </Skeleton>

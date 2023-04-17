@@ -69,7 +69,7 @@ export const GameCard = forwardRef<
   }, [completedAt, startedAt]);
 
   return (
-    <Primitive.div ref={ref} className="rounded-lg bg-surface p-4">
+    <Primitive.div ref={ref} className="rounded-lg border bg-surface p-4">
       <div className="flex w-full items-center justify-between gap-2">
         <div className="flex flex-col items-start gap-0">
           <Link
