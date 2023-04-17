@@ -90,7 +90,6 @@ async function auth(req: NextApiRequest, res: NextApiResponse) {
         opts.scope = ["read:user"];
         break;
       case "google":
-        opts.prompt = "none";
         opts.scope = ["profile"];
         break;
     }
