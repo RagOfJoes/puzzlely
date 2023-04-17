@@ -84,13 +84,11 @@ async function auth(req: NextApiRequest, res: NextApiResponse) {
     switch (provider) {
       case "discord":
         opts.scope = ["identify"];
-        opts.prompt = "consent";
         break;
       case "github":
         opts.scope = ["read:user"];
         break;
       case "google":
-        opts.prompt = "select_account";
         opts.scope = ["profile"];
         break;
     }
