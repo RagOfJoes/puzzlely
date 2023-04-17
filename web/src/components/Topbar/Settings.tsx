@@ -15,7 +15,7 @@ export function Settings() {
         <button
           aria-label="Open Settings"
           className={clsx(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-transparent bg-surface text-subtle outline-none transition",
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-surface text-subtle outline-none transition",
 
             "focus:ring",
             "hover:bg-muted/10"
@@ -29,11 +29,9 @@ export function Settings() {
         <Popover.Content
           align="end"
           sideOffset={8}
-          className="z-10 w-80 rounded-lg border border-muted/20 bg-surface shadow"
+          className="z-10 w-80 rounded-lg border bg-surface shadow"
         >
-          <header className="border-b border-b-muted/20 px-3 py-4 font-semibold">
-            Settings
-          </header>
+          <header className="border-b px-3 py-4 font-semibold">Settings</header>
 
           <div className="px-4 py-6">
             <p className="text-sm font-medium">Appearance</p>
@@ -71,7 +69,7 @@ export function Settings() {
             </ToggleGroup.Root>
           </div>
 
-          <footer className="border-t border-t-muted/20 p-4">
+          <footer className="border-t p-4">
             <ul className="flex items-center justify-center gap-1">
               <Link
                 href="/faq"

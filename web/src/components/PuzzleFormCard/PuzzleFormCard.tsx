@@ -24,7 +24,7 @@ export const PuzzleFormCard = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "rounded-lg bg-surface p-4 shadow",
+        "rounded-lg border bg-surface p-4",
 
         className
       )}

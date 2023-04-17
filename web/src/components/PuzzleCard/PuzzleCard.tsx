@@ -63,7 +63,7 @@ export const PuzzleCard = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "h-full w-full rounded-lg bg-surface p-4",
+        "h-full w-full rounded-lg border bg-surface p-4",
 
         className
       )}
@@ -130,7 +130,7 @@ export const PuzzleCard = forwardRef<
               "relative flex h-8 shrink-0 select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 text-sm font-semibold outline-none transition",
 
               "active:text-text/60",
-              "focus-visible:ring focus-visible:ring-cyan/60",
+              "focus-visible:ring",
               "hover:underline"
             )}
           >

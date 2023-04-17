@@ -20,20 +20,20 @@ export const TagInputItem = forwardRef<
         ref={ref}
         aria-disabled={disabled}
         className={clsx(
-          "group inline-flex w-full items-center rounded-md bg-muted/20 px-2 text-sm font-medium",
+          "group inline-flex w-full items-center rounded-md bg-muted/20 px-2 py-1 text-sm font-medium",
 
           className
         )}
       >
-        <span
+        <p
           className={clsx(
-            "line-clamp-1 inline-block text-ellipsis whitespace-nowrap",
+            "line-clamp-1 inline-block text-ellipsis whitespace-nowrap leading-snug",
 
             "group-aria-disabled:opacity-40"
           )}
         >
           {children}
-        </span>
+        </p>
 
         <button
           aria-label="Close"

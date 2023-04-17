@@ -33,7 +33,7 @@ export const LikeButton = forwardRef<
       ref={ref}
       onClick={onLike}
       className={clsx(
-        "flex h-7 items-center justify-center gap-2 rounded-md border border-muted/20 bg-base px-2 outline-none transition",
+        "flex h-7 items-center justify-center gap-2 rounded-md border bg-base px-2 outline-none transition",
 
         "focus-visible:ring",
         "hover:bg-muted/30",

@@ -13,11 +13,8 @@ export function PuzzleCreateContainer() {
       <div className="mx-auto block max-w-3xl">
         <PuzzleCreateForm
           defaultValues={{
-            name: "",
             description: "",
             difficulty: "Easy",
-            maxAttempts: maxAttemptsFromDifficulty.Easy,
-            timeAllowed: timeAllowedFromDifficulty.Easy,
             groups: [
               {
                 answers: [],
@@ -40,6 +37,9 @@ export function PuzzleCreateContainer() {
                 description: "",
               },
             ],
+            maxAttempts: maxAttemptsFromDifficulty.Easy,
+            name: "",
+            timeAllowed: timeAllowedFromDifficulty.Easy,
           }}
           onSubmit={async (data) => {
             try {

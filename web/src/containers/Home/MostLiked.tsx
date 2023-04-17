@@ -10,7 +10,7 @@ function MostLiked() {
   const { data, isFetched, isLoading } = usePuzzlesMostLiked();
 
   return (
-    <section className="mt-10 rounded-md bg-surface p-6">
+    <section className="mt-10 rounded-md border bg-surface p-6">
       <h2 className="font-heading text-xl font-bold">Most Liked Puzzles</h2>
 
       <div
@@ -34,16 +34,16 @@ function MostLiked() {
 
             return (
               <div
-                className="col-span-1 row-span-1"
                 key={`PuzzlesMostLiked__Puzzle__${cursor}`}
+                className="col-span-1 row-span-1"
               >
                 <PuzzleItem
-                  id={node.id}
-                  name={node.name}
-                  difficulty={node.difficulty}
-                  maxAttempts={node.maxAttempts}
-                  timeAllowed={node.timeAllowed}
                   createdBy={node.createdBy.username}
+                  difficulty={node.difficulty}
+                  id={node.id}
+                  maxAttempts={node.maxAttempts}
+                  name={node.name}
+                  timeAllowed={node.timeAllowed}
                 />
               </div>
             );
@@ -54,12 +54,12 @@ function MostLiked() {
             <Skeleton key={`PuzzlesMostLiked__Loading__${index}`}>
               <div className="invisible col-span-1 row-span-1">
                 <PuzzleItem
-                  id=""
-                  name="Lorem"
-                  maxAttempts={0}
-                  timeAllowed={0}
-                  difficulty="Easy"
                   createdBy="Lorem"
+                  difficulty="Easy"
+                  id=""
+                  maxAttempts={0}
+                  name="Lorem"
+                  timeAllowed={0}
                 />
               </div>
             </Skeleton>

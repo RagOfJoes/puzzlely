@@ -55,7 +55,7 @@ const Details = (props: { user: User }) => {
       </div>
 
       <div className="col-span-1 row-span-1">
-        <div className="h-full w-full rounded-lg bg-surface p-4">
+        <div className="h-full w-full rounded-lg border bg-surface p-4">
           <h2 className="font-heading font-bold">Achievements</h2>
 
           <div className="flex h-full flex-col items-center justify-center gap-2">

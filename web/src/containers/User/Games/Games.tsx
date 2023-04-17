@@ -80,19 +80,19 @@ function Games(props: { user: User }) {
           return (
             <div key={cursor} className="col-span-1 row-span-1">
               <GameCard
-                id={node.id}
-                maxScore={8}
-                score={node.score}
-                isPlayable={isPlayable}
-                name={node.puzzle.name}
                 attempts={node.attempts}
-                startedAt={node.startedAt!}
-                completedAt={node.completedAt!}
                 challengeCode={node.challengeCode}
-                difficulty={node.puzzle.difficulty}
-                maxAttempts={node.config.maxAttempts}
-                timeAllowed={node.config.timeAllowed}
+                completedAt={node.completedAt!}
                 createdBy={node.puzzle.createdBy.username}
+                difficulty={node.puzzle.difficulty}
+                id={node.id}
+                isPlayable={isPlayable}
+                maxAttempts={node.config.maxAttempts}
+                maxScore={8}
+                name={node.puzzle.name}
+                score={node.score}
+                startedAt={node.startedAt!}
+                timeAllowed={node.config.timeAllowed}
               />
             </div>
           );

@@ -9,7 +9,7 @@ export const Separator = forwardRef<HTMLHRElement, SeparatorProps>(
         {...props}
         ref={ref}
         role="separator"
-        className="h-[1px] w-full bg-gradient-to-r from-base via-subtle to-base"
+        className="h-[2px] w-full bg-gradient-to-r from-base via-muted/20 to-base"
       />
     );
   }

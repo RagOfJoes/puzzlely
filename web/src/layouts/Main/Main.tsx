@@ -156,7 +156,7 @@ export const MainLayout = forwardRef<HTMLDivElement, MainLayoutProps>(
 
               <main
                 className={clsx(
-                  "px-5 pt-[calc(34px+0.5rem)]",
+                  "px-5 pt-[calc(1px+2.25rem)]",
 
                   className
                 )}

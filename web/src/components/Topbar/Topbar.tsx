@@ -28,7 +28,7 @@ export const Topbar = forwardRef<HTMLElement, TopbarProps>((props, ref) => {
           isOpen ? "Close Side Navigation Bar" : "Open Side Navigation Bar"
         }
         className={clsx(
-          "mr-2 hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface text-subtle outline-none transition",
+          "mr-2 hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-surface text-subtle outline-none transition",
 
           "focus:ring",
           "hover:bg-muted/10",

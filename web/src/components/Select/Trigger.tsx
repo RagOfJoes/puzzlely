@@ -19,10 +19,10 @@ export const SelectTrigger = forwardRef<
       {...other}
       ref={ref}
       className={clsx(
-        "group flex h-10 items-center gap-2 rounded-md bg-surface px-4 font-medium outline-none transition",
+        "group flex h-10 items-center gap-2 rounded-md border bg-surface px-4 font-medium outline-none transition",
 
         "active:enabled:ring",
-        'aria-[invalid="true"]:border aria-[invalid="true"]:border-red',
+        'aria-[invalid="true"]:border-red',
         "data-[placeholder]:enabled:text-subtle",
         "disabled:cursor-not-allowed disabled:text-muted",
         "focus:enabled:ring",

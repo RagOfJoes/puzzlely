@@ -52,16 +52,16 @@ function Groups(props: Pick<PuzzleUpdateFormProps, "puzzle">) {
                       key={`groups.${g}.blocks.${block.id}`}
                       className="flex items-start truncate"
                     >
-                      <span className="group inline-flex w-full items-center rounded-md bg-muted/20 px-2 text-sm font-medium">
-                        <span
+                      <span className="group inline-flex w-full items-center rounded-md bg-muted/20 px-2 py-1 text-sm font-medium">
+                        <p
                           className={clsx(
-                            "line-clamp-1 inline-block text-ellipsis whitespace-nowrap",
+                            "line-clamp-1 inline-block text-ellipsis whitespace-nowrap leading-snug",
 
                             "group-aria-disabled:opacity-40"
                           )}
                         >
                           {block.value}
-                        </span>
+                        </p>
                       </span>
                     </li>
                   ))}
@@ -77,16 +77,16 @@ function Groups(props: Pick<PuzzleUpdateFormProps, "puzzle">) {
                       key={`groups.${g}.answer.${answer}`}
                       className="flex items-start truncate"
                     >
-                      <span className="group inline-flex w-full items-center rounded-md bg-muted/20 px-2 text-sm font-medium">
-                        <span
+                      <span className="group inline-flex w-full items-center rounded-md bg-muted/20 px-2 py-1 text-sm font-medium">
+                        <p
                           className={clsx(
-                            "line-clamp-1 inline-block text-ellipsis whitespace-nowrap",
+                            "line-clamp-1 inline-block text-ellipsis whitespace-nowrap leading-snug",
 
                             "group-aria-disabled:opacity-40"
                           )}
                         >
                           {answer}
-                        </span>
+                        </p>
                       </span>
                     </li>
                   ))}

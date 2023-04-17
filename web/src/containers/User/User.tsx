@@ -29,7 +29,6 @@ export function UserContainer(props: UserContainerProps) {
 
         <section>
           <Tabs.Root
-            value={tab}
             className="flex flex-col"
             onValueChange={(newValue) => {
               if (newValue !== "games" && newValue !== "puzzles") {
@@ -42,51 +41,46 @@ export function UserContainer(props: UserContainerProps) {
                 shallow: true,
               });
             }}
+            value={tab}
           >
             <Tabs.List className="flex shrink-0">
-              <Tabs.Trigger
-                value="puzzles"
-                className={clsx(
-                  "flex h-10 select-none items-center justify-center rounded-lg px-4 font-semibold leading-none text-muted outline-none transition",
+              {[
+                { label: "Puzzles", value: "puzzles" },
+                { label: "Games", value: "games" },
+              ].map((trigger) => (
+                <Tabs.Trigger
+                  key={trigger.value}
+                  className={clsx(
+                    "flex h-10 select-none items-center justify-center rounded-lg px-4 font-semibold leading-none text-muted outline-none transition",
 
-                  "data-[state=active]:bg-surface data-[state=active]:text-text",
-                  "data-[state=active]:focus:relative data-[state=active]:focus:ring",
-                  "hover:bg-muted/10"
-                )}
-              >
-                Puzzles
-              </Tabs.Trigger>
-              <Tabs.Trigger
-                value="games"
-                className={clsx(
-                  "flex h-10 select-none items-center justify-center rounded-lg px-4 font-semibold leading-none text-muted outline-none transition",
-
-                  "data-[state=active]:bg-surface data-[state=active]:text-text",
-                  "data-[state=active]:focus:relative data-[state=active]:focus:ring",
-                  "hover:bg-muted/10"
-                )}
-              >
-                Games
-              </Tabs.Trigger>
+                    "data-[state=active]:border data-[state=active]:bg-surface data-[state=active]:text-text",
+                    "data-[state=active]:focus:relative data-[state=active]:focus:ring",
+                    "hover:bg-muted/10"
+                  )}
+                  value={trigger.value}
+                >
+                  {trigger.label}
+                </Tabs.Trigger>
+              ))}
             </Tabs.List>
 
             <Tabs.Content
-              value="puzzles"
               className={clsx(
                 "grow py-4 outline-none",
 
                 "focus-visible:ring"
               )}
+              value="puzzles"
             >
               <Puzzles user={user} />
             </Tabs.Content>
             <Tabs.Content
-              value="games"
               className={clsx(
                 "grow py-4 outline-none",
 
                 "focus-visible:ring"
               )}
+              value="games"
             >
               <Games user={user} />
             </Tabs.Content>
