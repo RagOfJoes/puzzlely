@@ -83,12 +83,14 @@ async function auth(req: NextApiRequest, res: NextApiResponse) {
     // eslint-disable-next-line default-case
     switch (provider) {
       case "discord":
+        opts.prompt = "none";
         opts.scope = ["identify"];
         break;
       case "github":
         opts.scope = ["read:user"];
         break;
       case "google":
+        opts.prompt = "none";
         opts.scope = ["profile"];
         break;
     }
