@@ -24,12 +24,13 @@ export const UserSetupForm = forwardRef<
 >((props, ref) => {
   const { className, defaultValues, onSubmit = () => {}, ...other } = props;
 
-  const { formState, handleSubmit, register } = useForm<UserUpdatePayload>({
-    defaultValues,
-    mode: "onChange",
-    reValidateMode: "onChange",
-    resolver: zodResolver(userSetupSchema),
-  });
+  const { formState, handleSubmit, register, setError } =
+    useForm<UserUpdatePayload>({
+      defaultValues,
+      mode: "onChange",
+      reValidateMode: "onChange",
+      resolver: zodResolver(userSetupSchema),
+    });
 
   return (
     <Primitive.form
@@ -40,8 +41,21 @@ export const UserSetupForm = forwardRef<
 
         className
       )}
-      onSubmit={(e) => {
-        handleSubmit(onSubmit)(e);
+      onSubmit={(event) => {
+        handleSubmit(async (data, ev) => {
+          try {
+            await onSubmit(data, ev);
+          } catch (error) {
+            setError(
+              "username",
+              {
+                type: "400",
+                message: (error as Error).message,
+              },
+              { shouldFocus: true }
+            );
+          }
+        })(event);
       }}
     >
       <FormControl required invalid={!!formState.errors.username?.message}>
