@@ -17,7 +17,7 @@ export const Topbar = forwardRef<HTMLElement, TopbarProps>((props, ref) => {
     <header
       ref={ref}
       className={clsx(
-        "z-[1] flex w-full items-center justify-between p-5 pt-3",
+        "z-[1] flex w-full items-center justify-between p-5",
 
         className
       )}
