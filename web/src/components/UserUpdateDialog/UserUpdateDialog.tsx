@@ -1,5 +1,5 @@
 import type { ElementRef } from "react";
-import { Children, forwardRef, useMemo } from "react";
+import { forwardRef } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -41,12 +41,6 @@ export const UserUpdateDialog = forwardRef<
       resolver: zodResolver(userUpdateSchema),
     });
 
-  const trigger = useMemo(() => {
-    return Children.toArray(children).find((child: any) => {
-      return child?.type?.displayName === "DialogTrigger";
-    });
-  }, [children]);
-
   return (
     <Dialog.Root
       open={isOpen}
@@ -58,7 +52,7 @@ export const UserUpdateDialog = forwardRef<
         toggleIsOpen(isNewOpen);
       }}
     >
-      {trigger}
+      {children}
 
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-10 bg-base/50" />
