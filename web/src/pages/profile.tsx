@@ -45,7 +45,7 @@ const ProfilePage = (props: ProfilePageProps) => {
           { path: `/users/${user.username}`, title: user.username },
         ]}
       >
-        <UserContainer user={user} />
+        <UserContainer user={me ?? user} />
       </MainLayout>
 
       <NextSeo noindex nofollow title="Profile" />
