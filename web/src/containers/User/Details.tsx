@@ -13,11 +13,16 @@ import type { User } from "@/types/user";
 const Details = (props: { user: User }) => {
   const { user } = props;
 
+  const [isOpen, toggleIsOpen] = useState(false);
+
   const { data: me } = useMe();
   const { mutate } = useUserUpdate();
-  const [isOpen, toggleIsOpen] = useState(false);
   const {
-    data: stats = { gamesPlayed: 0, puzzlesCreated: 0, puzzlesLiked: 0 },
+    data: stats = {
+      gamesPlayed: 0,
+      puzzlesCreated: 0,
+      puzzlesLiked: 0,
+    },
     isLoading,
   } = useUserStats(user.id);
 
