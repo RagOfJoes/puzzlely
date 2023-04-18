@@ -67,13 +67,13 @@ export const UserCard = forwardRef<
           <p className="text-lg font-bold">{username}</p>
         </div>
 
-        {isEditable && (
-          <UserUpdateDialog
-            defaultValues={{ username }}
-            isOpen={isOpen}
-            onSubmit={onEdit}
-            toggleIsOpen={togglsIsOpen}
-          >
+        <UserUpdateDialog
+          defaultValues={{ username }}
+          isOpen={isOpen}
+          onSubmit={onEdit}
+          toggleIsOpen={togglsIsOpen}
+        >
+          {isEditable && (
             <Dialog.Trigger asChild>
               <button
                 className={clsx(
@@ -88,8 +88,8 @@ export const UserCard = forwardRef<
                 Edit
               </button>
             </Dialog.Trigger>
-          </UserUpdateDialog>
-        )}
+          )}
+        </UserUpdateDialog>
       </div>
 
       <div className="mt-4 flex flex-col gap-2">
