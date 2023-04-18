@@ -4,7 +4,7 @@ import type { SubmitHandler } from "react-hook-form";
 
 import type { UserUpdatePayload } from "@/types/user";
 
-export type UserUpdateModalProps = Omit<
+export type UserUpdateDialogProps = Omit<
   ComponentPropsWithoutRef<typeof Dialog.Content>,
   "onSubmit"
 > & {
