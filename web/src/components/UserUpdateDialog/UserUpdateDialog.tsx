@@ -17,11 +17,11 @@ import { Input } from "@/components/Input";
 import type { UserUpdatePayload } from "@/types/user";
 
 import { userUpdateSchema } from "./schema";
-import type { UserUpdateModalProps } from "./types";
+import type { UserUpdateDialogProps } from "./types";
 
-export const UserUpdateModal = forwardRef<
+export const UserUpdateDialog = forwardRef<
   ElementRef<typeof Dialog.Content>,
-  UserUpdateModalProps
+  UserUpdateDialogProps
 >((props, ref) => {
   const {
     children,
@@ -145,4 +145,4 @@ export const UserUpdateModal = forwardRef<
   );
 });
 
-UserUpdateModal.displayName = "UserUpdateModal";
+UserUpdateDialog.displayName = "UserUpdateDialog";

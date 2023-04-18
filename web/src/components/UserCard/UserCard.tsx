@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { IoCreate } from "react-icons/io5";
 
 import { Skeleton } from "@/components/Skeleton";
-import { UserUpdateModal } from "@/components/UserUpdateModal";
+import { UserUpdateDialog } from "@/components/UserUpdateDialog";
 import { LOADING_DATE_PLACEHOLDER } from "@/lib/constants";
 
 import type { UserCardProps } from "./types";
@@ -56,9 +56,9 @@ export const UserCard = forwardRef<
         <div className="flex items-center gap-2">
           <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan to-magenta">
             <div
-              role="img"
               aria-label={username}
               className="text-xl font-medium text-surface"
+              role="img"
             >
               {username[0]}
             </div>
@@ -68,7 +68,7 @@ export const UserCard = forwardRef<
         </div>
 
         {isEditable && (
-          <UserUpdateModal
+          <UserUpdateDialog
             defaultValues={{ username }}
             isOpen={isOpen}
             onSubmit={onEdit}
@@ -76,19 +76,19 @@ export const UserCard = forwardRef<
           >
             <Dialog.Trigger asChild>
               <button
-                onClick={() => togglsIsOpen(true)}
                 className={clsx(
                   "relative inline-flex select-none appearance-none items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold outline-none transition",
 
                   "focus-visible:ring",
                   "hover:underline"
                 )}
+                onClick={() => togglsIsOpen(true)}
               >
                 <IoCreate />
                 Edit
               </button>
             </Dialog.Trigger>
-          </UserUpdateModal>
+          </UserUpdateDialog>
         )}
       </div>
 
