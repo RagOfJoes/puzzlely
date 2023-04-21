@@ -63,7 +63,7 @@ func New(cfg config.Configuration) *chi.Mux {
 		render.Render(w, r, NotFound(internal.NewErrorf(internal.ErrorCodeNotFound, "Hmmm... Seems you're a bit lost.")))
 	})
 	// Custom DefaultResponder
-	render.Respond = func(w http.ResponseWriter, r *http.Request, v interface{}) {
+	render.Respond = func(w http.ResponseWriter, r *http.Request, v any) {
 		if e, ok := v.(error); ok {
 			internalErr := InternalServerError(internal.WrapErrorf(e, internal.ErrorCodeInternal, "Oops! Something went wrong. Please try again later."))
 

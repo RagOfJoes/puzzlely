@@ -34,7 +34,7 @@ func (g *game) Create(ctx context.Context, newGame entities.Game) (*entities.Gam
 
 	gameQuery, gameArgs, err := squirrel.
 		Insert(GameTable).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"id":             gameModel.ID,
 			"challenge_code": gameModel.ChallengeCode,
 			"challenged_by":  gameModel.ChallengedBy,
@@ -51,7 +51,7 @@ func (g *game) Create(ctx context.Context, newGame entities.Game) (*entities.Gam
 
 	configQuery, configArgs, err := squirrel.
 		Insert(GameConfigTable).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"id":           configModel.ID,
 			"max_attempts": configModel.MaxAttempts,
 			"time_allowed": configModel.TimeAllowed,
@@ -356,7 +356,7 @@ func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.
 	gameQuery, gameArgs, err := squirrel.
 		Update(GameTable).
 		Where("id = ?", gameModel.ID).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"score":        gameModel.Score,
 			"started_at":   gameModel.StartedAt,
 			"guessed_at":   gameModel.GuessedAt,
@@ -369,7 +369,7 @@ func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.
 
 	configQuery, configArgs, err := squirrel.
 		Insert(GameConfigTable).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"id":           configModel.ID,
 			"max_attempts": configModel.MaxAttempts,
 			"time_allowed": configModel.TimeAllowed,

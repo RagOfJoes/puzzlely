@@ -58,7 +58,7 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle entities.Puzzle) (*entiti
 
 	puzzleQuery, puzzleArgs, err := squirrel.
 		Insert(PuzzleTable).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"id":           puzzleModel.ID,
 			"name":         puzzleModel.Name,
 			"description":  puzzleModel.Description,
@@ -522,7 +522,7 @@ func (p *puzzle) Update(ctx context.Context, updatePuzzle entities.Puzzle) (*ent
 	puzzleQuery, puzzleArgs, err := squirrel.
 		Update(PuzzleTable).
 		Where("id = ? AND deleted_at IS NULL", puzzleModel.ID).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"name":        puzzleModel.Name,
 			"difficulty":  puzzleModel.Difficulty,
 			"description": puzzleModel.Description,
@@ -585,7 +585,7 @@ func (p *puzzle) Delete(ctx context.Context, id uuid.UUID) error {
 	query, args, err := squirrel.
 		Update(PuzzleTable).
 		Where("id = ? AND user_id = ? AND deleted_at IS NULL", id, user.ID).
-		SetMap(map[string]interface{}{"deleted_at": time.Now()}).
+		SetMap(map[string]any{"deleted_at": time.Now()}).
 		ToSql()
 	if err != nil {
 		return err

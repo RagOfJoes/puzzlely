@@ -47,7 +47,7 @@ func CursorFromString(str string) (Cursor, error) {
 }
 
 // NewCursor creates a new cursor by using a node's field and encodes it with base64
-func NewCursor(key string, node interface{}) (Cursor, error) {
+func NewCursor(key string, node any) (Cursor, error) {
 	cursor := ""
 	value := internal.UnwrapReflectValue(reflect.ValueOf(node))
 

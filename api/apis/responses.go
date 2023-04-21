@@ -12,10 +12,10 @@ var _ render.Renderer = (*Response)(nil)
 type Response struct {
 	status int `json:"-"`
 
-	Success bool        `json:"success"`
-	Message string      `json:"message,omitempty"`
-	Payload interface{} `json:"payload,omitempty"`
-	Error   error       `json:"error,omitempty"`
+	Success bool   `json:"success"`
+	Message string `json:"message,omitempty"`
+	Payload any    `json:"payload,omitempty"`
+	Error   error  `json:"error,omitempty"`
 }
 
 func (r *Response) Render(w http.ResponseWriter, req *http.Request) error {
@@ -24,7 +24,7 @@ func (r *Response) Render(w http.ResponseWriter, req *http.Request) error {
 }
 
 // Ok creates a response with a HTTP 200 status
-func Ok(msg string, payload interface{}) render.Renderer {
+func Ok(msg string, payload any) render.Renderer {
 	return &Response{
 		status: http.StatusOK,
 
@@ -35,7 +35,7 @@ func Ok(msg string, payload interface{}) render.Renderer {
 }
 
 // Created creates a response with a HTTP 201 status
-func Created(msg string, payload interface{}) render.Renderer {
+func Created(msg string, payload any) render.Renderer {
 	return &Response{
 		status: http.StatusCreated,
 

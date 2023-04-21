@@ -26,7 +26,7 @@ type Error struct {
 }
 
 // Wraps error
-func WrapErrorf(src error, code ErrorCode, msg string, args ...interface{}) error {
+func WrapErrorf(src error, code ErrorCode, msg string, args ...any) error {
 	return &Error{
 		err: src,
 
@@ -36,7 +36,7 @@ func WrapErrorf(src error, code ErrorCode, msg string, args ...interface{}) erro
 }
 
 // NewErrorf instantiates a new error
-func NewErrorf(code ErrorCode, msg string, a ...interface{}) error {
+func NewErrorf(code ErrorCode, msg string, a ...any) error {
 	return WrapErrorf(nil, code, msg, a...)
 }
 
@@ -65,5 +65,6 @@ func (e *Error) Render(w http.ResponseWriter, r *http.Request) error {
 	default:
 		render.Status(r, http.StatusInternalServerError)
 	}
+
 	return nil
 }

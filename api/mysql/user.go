@@ -39,7 +39,7 @@ func (u *user) Create(ctx context.Context, newConnection entities.Connection, ne
 
 	userQuery, userArgs, err := squirrel.
 		Insert(UserTable).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"id":         userModel.ID,
 			"state":      userModel.State,
 			"username":   userModel.Username,
@@ -54,7 +54,7 @@ func (u *user) Create(ctx context.Context, newConnection entities.Connection, ne
 
 	connectionQuery, connectionArgs, err := squirrel.
 		Insert(ConnectionTable).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"id":       connectionModel.ID,
 			"provider": connectionModel.Provider,
 			"sub":      connectionModel.Sub,
@@ -224,7 +224,7 @@ func (u *user) Update(ctx context.Context, updateUser entities.User) (*entities.
 
 	query, args, err := squirrel.Update(UserTable).
 		Where("id = ? AND deleted_at IS NULL", model.ID).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"state":      model.State,
 			"username":   model.Username,
 			"updated_at": model.UpdatedAt,
@@ -247,7 +247,7 @@ func (u *user) Delete(ctx context.Context, id uuid.UUID) error {
 	query, args, err := squirrel.
 		Update(UserTable).
 		Where("id = ? AND deleted_at IS NULL").
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"deleted_at": time.Now(),
 		}).
 		ToSql()

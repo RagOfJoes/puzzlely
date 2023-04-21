@@ -107,7 +107,7 @@ func (p *puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.Puzzle
 		query, args, err := squirrel.
 			Update(PuzzleLikeTable).
 			Where("puzzle_id = ? AND user_id = ?", id, user.ID).
-			SetMap(map[string]interface{}{
+			SetMap(map[string]any{
 				"active":     !likeModel.Active,
 				"updated_at": now,
 			}).
@@ -129,7 +129,7 @@ func (p *puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.Puzzle
 		newID := uuid.New()
 		query, args, err := squirrel.
 			Insert(PuzzleLikeTable).
-			SetMap(map[string]interface{}{
+			SetMap(map[string]any{
 				"id":         newID,
 				"active":     true,
 				"created_at": now,
