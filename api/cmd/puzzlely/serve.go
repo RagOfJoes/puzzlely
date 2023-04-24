@@ -6,6 +6,7 @@ import (
 
 	"github.com/RagOfJoes/puzzlely/apis"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/mysql"
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/sirupsen/logrus"
@@ -31,6 +32,13 @@ func serve() {
 		logrus.Fatal(err)
 	}
 	defer mySQL.Close()
+
+	// Setup Telemetry
+	telemetryShutdown, err := telemetry.Start(cfg)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+	defer telemetryShutdown()
 
 	// Setup Repositories
 	logrus.Info("Setting up Repositories...")

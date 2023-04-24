@@ -31,6 +31,7 @@ type Configuration struct {
 	Session   Session
 	Database  Database
 	Providers Providers
+	Telemetry Telemetry
 }
 
 func SetBinds(v *viper.Viper) {
@@ -39,9 +40,21 @@ func SetBinds(v *viper.Viper) {
 	// Logger
 	v.BindEnv("Logger.Level", "LOGGER_LEVEL")
 	v.BindEnv("Logger.ReportCaller", "LOGGER_REPORTCALLER")
+
 	// Database
 	v.BindEnv("Database.Driver", "DATABASE_DRIVER")
 	v.BindEnv("Database.DSN", "DATABASE_DSN")
+	// Providers
+	v.BindEnv("Providers.Discord.URL", "PROVIDERS_DISCORD_URL")
+	v.BindEnv("Providers.Discord.ClientID", "PROVIDERS_DISCORD_CLIENTID")
+	v.BindEnv("Providers.Discord.ClientSecret", "PROVIDERS_DISCORD_CLIENTSECRET")
+	v.BindEnv("Providers.GitHub.URL", "PROVIDERS_GITHUB_URL")
+	v.BindEnv("Providers.GitHub.ClientID", "PROVIDERS_GITHUB_CLIENTID")
+	v.BindEnv("Providers.GitHub.ClientSecret", "PROVIDERS_GITHUB_CLIENTSECRET")
+	v.BindEnv("Providers.Google.URL", "PROVIDERS_GOOGLE_URL")
+	v.BindEnv("Providers.Google.ClientID", "PROVIDERS_GOOGLE_CLIENTID")
+	v.BindEnv("Providers.Google.ClientSecret", "PROVIDERS_GOOGLE_CLIENTSECRET")
+
 	// Server
 	v.BindEnv("Server.Port", "SERVER_PORT")
 	v.BindEnv("Server.Host", "SERVER_HOST")
@@ -94,16 +107,9 @@ func SetBinds(v *viper.Viper) {
 	v.BindEnv("Session.Cookie.HttpOnly", "SESSION_COOKIE_HTTPONLY")
 	v.BindEnv("Session.Cookie.SameSite", "SESSION_COOKIE_SAMESITE")
 	v.BindEnv("Session.Cookie.Secrets", "SESSION_COOKIE_SECRETS")
-	// Providers
-	v.BindEnv("Providers.Discord.URL.", "PROVIDERS_DISCORD_URL")
-	v.BindEnv("Providers.Discord.ClientID", "PROVIDERS_DISCORD_CLIENTID")
-	v.BindEnv("Providers.Discord.ClientSecret", "PROVIDERS_DISCORD_CLIENTSECRET")
-	v.BindEnv("Providers.GitHub.URL.", "PROVIDERS_GITHUB_URL")
-	v.BindEnv("Providers.GitHub.ClientID", "PROVIDERS_GITHUB_CLIENTID")
-	v.BindEnv("Providers.GitHub.ClientSecret", "PROVIDERS_GITHUB_CLIENTSECRET")
-	v.BindEnv("Providers.Google.URL.", "PROVIDERS_GOOGLE_URL")
-	v.BindEnv("Providers.Google.ClientID", "PROVIDERS_GOOGLE_CLIENTID")
-	v.BindEnv("Providers.Google.ClientSecret", "PROVIDERS_GOOGLE_CLIENTSECRET")
+	// Telemetry
+	v.BindEnv("Telemetry.APIKey", "TELEMETRY_APIKEY")
+	v.BindEnv("Telemetry.ServiceName", "TELEMETRY_SERVICENAME")
 }
 
 func SetDefaults(v *viper.Viper) {
@@ -112,13 +118,7 @@ func SetDefaults(v *viper.Viper) {
 	// Logger
 	v.SetDefault("LOGGER_LEVEL", int(logrus.InfoLevel))
 	v.SetDefault("LOGGER_REPORTCALLER", false)
-	// Session
-	v.SetDefault("SESSION_LIFETIME", time.Hour*336)
-	v.SetDefault("SESSION_COOKIE_PATH", "/")
-	v.SetDefault("SESSION_COOKIE_PERSIST", true)
-	v.SetDefault("SESSION_COOKIE_HTTP_ONLY", true)
-	v.SetDefault("SESSION_COOKIE_NAME", "puzzlely_sid")
-	v.SetDefault("SESSION_COOKIE_SAMESITE", http.SameSiteLaxMode)
+
 	// Server
 	v.SetDefault("SERVER_PORT", 443)
 	v.SetDefault("SERVER_HOST", "api.puzzlely.io")
@@ -132,6 +132,13 @@ func SetDefaults(v *viper.Viper) {
 	v.SetDefault("SERVER_SECURITY_ISDEVELOPMENT", false)
 	v.SetDefault("SERVER_SECURITY_REFERRERPOLICY", "same-origin")
 	v.SetDefault("SERVER_SECURITY_HOSTSPROXYHEADERS", []string{"X-Forwarded-Hosts"})
+	// Session
+	v.SetDefault("SESSION_LIFETIME", time.Hour*336)
+	v.SetDefault("SESSION_COOKIE_PATH", "/")
+	v.SetDefault("SESSION_COOKIE_PERSIST", true)
+	v.SetDefault("SESSION_COOKIE_HTTP_ONLY", true)
+	v.SetDefault("SESSION_COOKIE_NAME", "puzzlely_sid")
+	v.SetDefault("SESSION_COOKIE_SAMESITE", http.SameSiteLaxMode)
 }
 
 func New(v *viper.Viper, logger *logrus.Logger) (*Configuration, error) {
@@ -166,5 +173,6 @@ func New(v *viper.Viper, logger *logrus.Logger) (*Configuration, error) {
 	if err := SetupLogger(config, logger); err != nil {
 		return nil, err
 	}
+
 	return &config, nil
 }

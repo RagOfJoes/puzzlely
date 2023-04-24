@@ -111,6 +111,7 @@ func SetupServer(config *Configuration) error {
 		if server.AccessControl.MaxAge == 0 {
 			server.AccessControl.MaxAge = 86400
 		}
+
 		// Security header defaults
 		security.FrameDeny = true
 		security.SSLRedirect = false

@@ -15,6 +15,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
+	"github.com/riandyrn/otelchi"
 	"github.com/sirupsen/logrus"
 	"github.com/unrolled/secure"
 )
@@ -48,6 +49,9 @@ func New(cfg config.Configuration) *chi.Mux {
 	}))
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.Recoverer)
+	// Opentelemetry middleware
+	// Traces incoming requests
+	router.Use(otelchi.Middleware(cfg.Telemetry.ServiceName, otelchi.WithChiRoutes(router)))
 
 	// Set a timeout value on the request context (ctx), that will signal
 	// through ctx.Done() that the request has timed out and further
