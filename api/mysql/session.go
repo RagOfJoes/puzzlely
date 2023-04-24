@@ -7,15 +7,22 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/RagOfJoes/puzzlely/dtos"
 	"github.com/RagOfJoes/puzzlely/entities"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	sessionTracer = "mysql.session"
 )
 
 type session struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	tracer trace.Tracer
 }
 
 // NewSession creates a new MySQL session repository
@@ -23,11 +30,15 @@ func NewSession(db *sqlx.DB) repositories.Session {
 	logrus.Info("Created Session MySQL Repository")
 
 	return &session{
-		db: db,
+		db:     db,
+		tracer: telemetry.Tracer(sessionTracer),
 	}
 }
 
 func (s *session) Create(ctx context.Context, newSession entities.Session) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "Create")
+	defer span.End()
+
 	sessionModel := dtos.Session().ToModel(newSession)
 
 	query, args, err := squirrel.
@@ -54,14 +65,23 @@ func (s *session) Create(ctx context.Context, newSession entities.Session) (*ent
 }
 
 func (s *session) Get(ctx context.Context, id uuid.UUID) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "Get")
+	defer span.End()
+
 	return s.find(ctx, "id", id.String())
 }
 
 func (s *session) GetWithToken(ctx context.Context, token string) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "GetWithToken")
+	defer span.End()
+
 	return s.find(ctx, "token", token)
 }
 
 func (s *session) Update(ctx context.Context, updateSession entities.Session) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "Update")
+	defer span.End()
+
 	sessionModel := dtos.Session().ToModel(updateSession)
 
 	query, args, err := squirrel.
@@ -86,6 +106,9 @@ func (s *session) Update(ctx context.Context, updateSession entities.Session) (*
 }
 
 func (s *session) Delete(ctx context.Context, id uuid.UUID) error {
+	ctx, span := s.tracer.Start(ctx, "Delete")
+	defer span.End()
+
 	query, args, err := squirrel.Delete(SessionTable).Where("id = ?", id).ToSql()
 	if err != nil {
 		return err
@@ -99,6 +122,9 @@ func (s *session) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 func (s *session) find(ctx context.Context, column, value string) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "find")
+	defer span.End()
+
 	query, args, err := squirrel.
 		Select(
 			"session.id",

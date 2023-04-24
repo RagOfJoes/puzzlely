@@ -8,16 +8,23 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/RagOfJoes/puzzlely/dtos"
 	"github.com/RagOfJoes/puzzlely/entities"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	gameTracer = "mysql.game"
 )
 
 type game struct {
 	db     *sqlx.DB
 	puzzle repositories.Puzzle
+	tracer trace.Tracer
 }
 
 func NewGame(db *sqlx.DB, puzzle repositories.Puzzle) repositories.Game {
@@ -26,10 +33,14 @@ func NewGame(db *sqlx.DB, puzzle repositories.Puzzle) repositories.Game {
 	return &game{
 		db:     db,
 		puzzle: puzzle,
+		tracer: telemetry.Tracer(gameTracer),
 	}
 }
 
 func (g *game) Create(ctx context.Context, newGame entities.Game) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Create")
+	defer span.End()
+
 	gameModel := dtos.Game().ToModel(newGame)
 
 	gameQuery, gameArgs, err := squirrel.
@@ -84,11 +95,17 @@ func (g *game) Create(ctx context.Context, newGame entities.Game) (*entities.Gam
 }
 
 func (g *game) Get(ctx context.Context, id uuid.UUID) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Get")
+	defer span.End()
+
 	return g.find(ctx, "id", id.String())
 }
 
 // TODO: Bring this out into a general function similar to puzzle
 func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user entities.User) ([]entities.GameNode, error) {
+	ctx, span := g.tracer.Start(ctx, "GetPlayed")
+	defer span.End()
+
 	cursor, err := params.Cursor.Decode()
 	if err != nil {
 		return nil, err
@@ -305,10 +322,16 @@ func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user e
 }
 
 func (g *game) GetWithChallengeCode(ctx context.Context, challengeCode string) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "GetWithChallengeCode")
+	defer span.End()
+
 	return g.find(ctx, "challenge_code", challengeCode)
 }
 
 func (g *game) Update(ctx context.Context, updateGame entities.Game) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Update")
+	defer span.End()
+
 	// Create models from entity
 	gameModel := dtos.Game().ToModel(updateGame)
 	configModel := dtos.GameConfig().ToModel(updateGame.Config)

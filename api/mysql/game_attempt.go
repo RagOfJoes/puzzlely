@@ -12,6 +12,9 @@ import (
 
 // Helper function that retrieves failed attempts for a game
 func (g *game) attempts(ctx context.Context, game models.Game) ([][]uuid.UUID, error) {
+	ctx, span := g.tracer.Start(ctx, "attempts")
+	defer span.End()
+
 	query, args, err := squirrel.
 		Select("attempt.order", "attempt.puzzle_block_id").
 		From(fmt.Sprintf("%s attempt", GameAttemptTable)).

@@ -9,26 +9,37 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/RagOfJoes/puzzlely/dtos"
 	"github.com/RagOfJoes/puzzlely/entities"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	puzzleTracer = "mysql.puzzle"
 )
 
 type puzzle struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	tracer trace.Tracer
 }
 
 func NewPuzzle(db *sqlx.DB) repositories.Puzzle {
 	logrus.Info("Created Puzzle MySQL Repository")
 
 	return &puzzle{
-		db: db,
+		db:     db,
+		tracer: telemetry.Tracer(puzzleTracer),
 	}
 }
 
 func (p *puzzle) Create(ctx context.Context, newPuzzle entities.Puzzle) (*entities.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Create")
+	defer span.End()
+
 	puzzleModel := dtos.Puzzle().ToModel(newPuzzle)
 
 	var groupModels []models.PuzzleGroup
@@ -133,6 +144,9 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle entities.Puzzle) (*entiti
 }
 
 func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Get")
+	defer span.End()
+
 	builder := squirrel.Select(
 		"puzzle.id",
 		"puzzle.name",
@@ -271,6 +285,9 @@ func (p *puzzle) Get(ctx context.Context, id uuid.UUID) (*entities.Puzzle, error
 }
 
 func (p *puzzle) GetCreated(ctx context.Context, params entities.Pagination, userID uuid.UUID) ([]entities.PuzzleNode, error) {
+	ctx, span := p.tracer.Start(ctx, "GetCreated")
+	defer span.End()
+
 	cursor, err := params.Cursor.Decode()
 	if err != nil {
 		return nil, err
@@ -310,6 +327,9 @@ func (p *puzzle) GetCreated(ctx context.Context, params entities.Pagination, use
 }
 
 func (p *puzzle) GetLiked(ctx context.Context, params entities.Pagination) ([]entities.PuzzleNode, error) {
+	ctx, span := p.tracer.Start(ctx, "GetLiked")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 	if user == nil {
 		return nil, ErrUserNotFound
@@ -353,6 +373,9 @@ func (p *puzzle) GetLiked(ctx context.Context, params entities.Pagination) ([]en
 }
 
 func (p *puzzle) GetMostLiked(ctx context.Context, params entities.Pagination) ([]entities.PuzzleNode, error) {
+	ctx, span := p.tracer.Start(ctx, "GetMostLiked")
+	defer span.End()
+
 	// TODO: Update this when more users join
 	var likesLimit uint16 = 1
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{
@@ -370,6 +393,9 @@ func (p *puzzle) GetMostLiked(ctx context.Context, params entities.Pagination) (
 }
 
 func (p *puzzle) GetMostPlayed(ctx context.Context, params entities.Pagination) ([]entities.PuzzleNode, error) {
+	ctx, span := p.tracer.Start(ctx, "GetMostPlayed")
+	defer span.End()
+
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
 	// Select
 	builder = builder.Column("COUNT(game.id) AS num_of_games")
@@ -468,6 +494,9 @@ func (p *puzzle) GetMostPlayed(ctx context.Context, params entities.Pagination) 
 }
 
 func (p *puzzle) GetRecent(ctx context.Context, params entities.Pagination, filters entities.PuzzleFilters) ([]entities.PuzzleNode, error) {
+	ctx, span := p.tracer.Start(ctx, "GetRecent")
+	defer span.End()
+
 	cursor, err := params.Cursor.Decode()
 	if err != nil {
 		return nil, err
@@ -503,6 +532,9 @@ func (p *puzzle) GetRecent(ctx context.Context, params entities.Pagination, filt
 }
 
 func (p *puzzle) Search(ctx context.Context, params entities.Pagination, search string) ([]entities.PuzzleNode, error) {
+	ctx, span := p.tracer.Start(ctx, "Search")
+	defer span.End()
+
 	builder := p.listBuilder(ctx, params, entities.PuzzleFilters{})
 	// Where
 	builder = builder.Where("MATCH (puzzle.name, puzzle.description) AGAINST (? IN BOOLEAN MODE)", fmt.Sprintf("*'%s'*", search))
@@ -516,6 +548,9 @@ func (p *puzzle) Search(ctx context.Context, params entities.Pagination, search 
 }
 
 func (p *puzzle) Update(ctx context.Context, updatePuzzle entities.Puzzle) (*entities.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Update")
+	defer span.End()
+
 	puzzleModel := dtos.Puzzle().ToModel(updatePuzzle)
 	puzzleModel.RefreshUpdated()
 
@@ -577,6 +612,9 @@ func (p *puzzle) Update(ctx context.Context, updatePuzzle entities.Puzzle) (*ent
 }
 
 func (p *puzzle) Delete(ctx context.Context, id uuid.UUID) error {
+	ctx, span := p.tracer.Start(ctx, "Delete")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 	if user == nil {
 		return ErrUserNotFound

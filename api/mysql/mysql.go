@@ -36,8 +36,11 @@ func Connect(cfg config.Configuration) (*sqlx.DB, error) {
 	db, err := sqlx.Connect("mysql", cfg.Database.DSN)
 	if err != nil {
 		logrus.Errorf("Failed to connect to MySQL: %s", err)
+
 		return nil, err
 	}
+
 	logrus.WithFields(fields).Info("Successfully connected to MySQL\n\n")
+
 	return db, nil
 }
