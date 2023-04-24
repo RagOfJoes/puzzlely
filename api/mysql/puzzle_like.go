@@ -14,6 +14,9 @@ import (
 )
 
 func (p *puzzle) GetLikedAt(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID]*time.Time, error) {
+	ctx, span := p.tracer.Start(ctx, "GetLikedAt")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 
 	if user == nil {
@@ -77,6 +80,9 @@ func (p *puzzle) GetLikedAt(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID
 }
 
 func (p *puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error) {
+	ctx, span := p.tracer.Start(ctx, "ToggleLike")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 	if user == nil {
 		return nil, ErrUserNotFound

@@ -84,6 +84,9 @@ func (p *puzzle) listBuilder(ctx context.Context, params entities.Pagination, fi
 
 // Runs query that fetches a list of puzzle nodes
 func (p *puzzle) listQuery(ctx context.Context, builder squirrel.SelectBuilder) ([]entities.PuzzleNode, error) {
+	ctx, span := p.tracer.Start(ctx, "listQuery")
+	defer span.End()
+
 	query, args, err := builder.ToSql()
 	if err != nil {
 		return nil, err

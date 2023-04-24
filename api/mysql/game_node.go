@@ -14,6 +14,9 @@ import (
 
 // Retrieves ChallengedBy field for a game
 func (g *game) challengedBy(ctx context.Context, game models.Game) (*entities.GameNode, error) {
+	ctx, span := g.tracer.Start(ctx, "challengedBy")
+	defer span.End()
+
 	if game.ChallengedBy == nil {
 		return nil, nil
 	}

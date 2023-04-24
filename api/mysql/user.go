@@ -10,11 +10,17 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/RagOfJoes/puzzlely/dtos"
 	"github.com/RagOfJoes/puzzlely/entities"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/models"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	userTracer = "mysql.user"
 )
 
 // Errors
@@ -23,18 +29,23 @@ var (
 )
 
 type user struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	tracer trace.Tracer
 }
 
 func NewUser(db *sqlx.DB) repositories.User {
 	logrus.Info("Created User MySQL Repository")
 
 	return &user{
-		db: db,
+		db:     db,
+		tracer: telemetry.Tracer(userTracer),
 	}
 }
 
 func (u *user) Create(ctx context.Context, newConnection entities.Connection, newUser entities.User) (*entities.User, error) {
+	ctx, span := u.tracer.Start(ctx, "Create")
+	defer span.End()
+
 	userModel := dtos.User().ToModel(newUser)
 
 	userQuery, userArgs, err := squirrel.
@@ -87,6 +98,9 @@ func (u *user) Create(ctx context.Context, newConnection entities.Connection, ne
 }
 
 func (u *user) Get(ctx context.Context, search string) (*entities.User, error) {
+	ctx, span := u.tracer.Start(ctx, "Get")
+	defer span.End()
+
 	query, args, err := squirrel.Select(
 		"id",
 		"state",
@@ -119,6 +133,9 @@ func (u *user) Get(ctx context.Context, search string) (*entities.User, error) {
 }
 
 func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, error) {
+	ctx, span := u.tracer.Start(ctx, "GetStats")
+	defer span.End()
+
 	// TODO: There has to be a better way to handle this
 	puzzleQuery, puzzleArgs, err := squirrel.
 		Select("COUNT(id)").
@@ -170,6 +187,9 @@ func (u *user) GetStats(ctx context.Context, id uuid.UUID) (*entities.Stats, err
 }
 
 func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*entities.User, error) {
+	ctx, span := u.tracer.Start(ctx, "GetWithConnection")
+	defer span.End()
+
 	connectionQuery, connectionArgs, err := squirrel.Select("user_id").
 		From(ConnectionTable).
 		Where("provider = ? AND sub = ?", provider, sub).
@@ -219,6 +239,9 @@ func (u *user) GetWithConnection(ctx context.Context, provider, sub string) (*en
 }
 
 func (u *user) Update(ctx context.Context, updateUser entities.User) (*entities.User, error) {
+	ctx, span := u.tracer.Start(ctx, "Update")
+	defer span.End()
+
 	model := dtos.User().ToModel(updateUser)
 	model.RefreshUpdated()
 
@@ -244,6 +267,9 @@ func (u *user) Update(ctx context.Context, updateUser entities.User) (*entities.
 }
 
 func (u *user) Delete(ctx context.Context, id uuid.UUID) error {
+	ctx, span := u.tracer.Start(ctx, "Delete")
+	defer span.End()
+
 	query, args, err := squirrel.
 		Update(UserTable).
 		Where("id = ? AND deleted_at IS NULL").

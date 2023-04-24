@@ -21,5 +21,6 @@ func SetupLogger(config Configuration, logger *logrus.Logger) error {
 		FullTimestamp:    true,
 		TimestampFormat:  time.RFC3339,
 	})
+
 	return nil
 }

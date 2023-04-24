@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,12 +14,15 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
+	authTracer       = "apis.auth"
 	discordAvatarURL = "https://media.discordapp.net/avatars/"
 )
 
@@ -34,6 +38,7 @@ var (
 type auth struct {
 	config  config.Configuration
 	session session
+	tracer  trace.Tracer
 	user    services.User
 }
 
@@ -42,6 +47,7 @@ func Auth(cfg config.Configuration, sess session, user services.User, router *ch
 	a := auth{
 		config:  cfg,
 		session: sess,
+		tracer:  telemetry.Tracer(authTracer),
 		user:    user,
 	}
 
@@ -90,7 +96,7 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bits, err := getResponse(provider, url, clientID, clientSecret, header)
+	bits, err := a.getProfile(ctx, provider, url, clientID, clientSecret, header)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
@@ -153,8 +159,11 @@ func (a *auth) logout(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, Ok("", nil))
 }
 
-// Retrieves response from OAuth2 provider
-func getResponse(provider, url, clientID, clientSecret, bearerToken string) ([]byte, error) {
+// Retrieves profile from OAuth2 provider using Bearer Token
+func (a *auth) getProfile(ctx context.Context, provider, url, clientID, clientSecret, bearerToken string) ([]byte, error) {
+	ctx, span := a.tracer.Start(ctx, "getProfile")
+	defer span.End()
+
 	timeout := time.Duration(10 * time.Second)
 	client := http.Client{
 		Timeout: timeout,

@@ -9,9 +9,12 @@ import (
 	"github.com/RagOfJoes/puzzlely/internal/config"
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/gorilla/sessions"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
+	sessionTracer = "apis.session"
 	tokenStoreKey = "_session"
 )
 
@@ -99,6 +102,14 @@ func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticate
 
 	if session.IsAuthenticated() {
 		ctx = entities.UserNewContext(ctx, *session.User)
+
+		// NOTE: Telemetry
+		// Set `user.id` attribute to span
+		trace.SpanFromContext(ctx).SetAttributes(attribute.KeyValue{
+			Key:   "user.id",
+			Value: attribute.StringValue(session.User.ID.String()),
+		})
+
 		// Update request with updated context
 		*r = *r.WithContext(ctx)
 	}

@@ -7,9 +7,15 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	sessionTracer = "services.session"
 )
 
 // Errors
@@ -26,6 +32,7 @@ var (
 type Session struct {
 	config     config.Configuration
 	repository repositories.Session
+	tracer     trace.Tracer
 }
 
 // NewSession instantiates a session service
@@ -35,11 +42,15 @@ func NewSession(config config.Configuration, repositry repositories.Session) Ses
 	return Session{
 		config:     config,
 		repository: repositry,
+		tracer:     telemetry.Tracer(sessionTracer),
 	}
 }
 
 // New creates a new session
 func (s *Session) New(ctx context.Context, newSession entities.Session) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "New")
+	defer span.End()
+
 	if err := newSession.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalid)
 	}
@@ -54,6 +65,9 @@ func (s *Session) New(ctx context.Context, newSession entities.Session) (*entiti
 
 // FindByID retrieves a session with its id
 func (s *Session) FindByID(ctx context.Context, id uuid.UUID) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "FindByID")
+	defer span.End()
+
 	session, err := s.repository.Get(ctx, id)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalidID)
@@ -68,6 +82,9 @@ func (s *Session) FindByID(ctx context.Context, id uuid.UUID) (*entities.Session
 
 // FindByToken retrieves a session with its token
 func (s *Session) FindByToken(ctx context.Context, token string) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "FindByToken")
+	defer span.End()
+
 	session, err := s.repository.GetWithToken(ctx, token)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalidToken)
@@ -82,6 +99,9 @@ func (s *Session) FindByToken(ctx context.Context, token string) (*entities.Sess
 
 // Update updates a session
 func (s *Session) Update(ctx context.Context, updateSession entities.Session) (*entities.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "Update")
+	defer span.End()
+
 	if err := updateSession.Validate(); err != nil {
 		return nil, err
 	}
@@ -97,6 +117,9 @@ func (s *Session) Update(ctx context.Context, updateSession entities.Session) (*
 
 // Delete deletes a session
 func (s *Session) Delete(ctx context.Context, id uuid.UUID) error {
+	ctx, span := s.tracer.Start(ctx, "Delete")
+	defer span.End()
+
 	if err := s.repository.Delete(ctx, id); err != nil {
 		return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionDelete)
 	}

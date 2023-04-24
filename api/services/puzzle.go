@@ -8,10 +8,16 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	puzzleTracer = "services.puzzle"
 )
 
 // Errors
@@ -32,6 +38,7 @@ var (
 type Puzzle struct {
 	config     config.Configuration
 	repository repositories.Puzzle
+	tracer     trace.Tracer
 }
 
 // NewPuzzle instantiates a puzzle service
@@ -41,11 +48,15 @@ func NewPuzzle(config config.Configuration, repository repositories.Puzzle) Puzz
 	return Puzzle{
 		config:     config,
 		repository: repository,
+		tracer:     telemetry.Tracer(puzzleTracer),
 	}
 }
 
 // New creates a new puzzle
 func (p *Puzzle) New(ctx context.Context, newPuzzle entities.Puzzle) (*entities.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "New")
+	defer span.End()
+
 	if err := newPuzzle.Validate(); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
@@ -65,6 +76,9 @@ func (p *Puzzle) New(ctx context.Context, newPuzzle entities.Puzzle) (*entities.
 
 // Find finds a puzzle. If strict is set to true only the puzzle that belongs to the current user will be returned
 func (p *Puzzle) Find(ctx context.Context, id uuid.UUID, strict bool) (*entities.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Find")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 	if strict && user == nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleNotAuthorized)
@@ -86,6 +100,9 @@ func (p *Puzzle) Find(ctx context.Context, id uuid.UUID, strict bool) (*entities
 
 // FindCreated finds a list of puzzles that a user has created
 func (p *Puzzle) FindCreated(ctx context.Context, params entities.Pagination, user entities.User) (*entities.PuzzleConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindCreated")
+	defer span.End()
+
 	if err := params.Validate(entities.PuzzleReflectType); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
@@ -112,6 +129,9 @@ func (p *Puzzle) FindCreated(ctx context.Context, params entities.Pagination, us
 
 // FindLiked finds a list of puzzles that the current user has liked
 func (p *Puzzle) FindLiked(ctx context.Context, params entities.Pagination) (*entities.PuzzleConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindLiked")
+	defer span.End()
+
 	if err := params.Validate(entities.PuzzleReflectType); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
@@ -138,6 +158,9 @@ func (p *Puzzle) FindLiked(ctx context.Context, params entities.Pagination) (*en
 
 // FindMostLiked finds a list of most likes puzzles
 func (p *Puzzle) FindMostLiked(ctx context.Context) (*entities.PuzzleConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindMostLiked")
+	defer span.End()
+
 	params := entities.Pagination{
 		Cursor:    "",
 		Limit:     20,
@@ -166,6 +189,9 @@ func (p *Puzzle) FindMostLiked(ctx context.Context) (*entities.PuzzleConnection,
 
 // FindMostPlayed finds a list of most played puzzles
 func (p *Puzzle) FindMostPlayed(ctx context.Context) (*entities.PuzzleConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindMostPlayed")
+	defer span.End()
+
 	params := entities.Pagination{
 		Cursor:    "",
 		Limit:     20,
@@ -188,6 +214,9 @@ func (p *Puzzle) FindMostPlayed(ctx context.Context) (*entities.PuzzleConnection
 
 // FindRecent finds a list of puzzles sorted from newest to oldest and filtered with provided filters
 func (p *Puzzle) FindRecent(ctx context.Context, params entities.Pagination, filters entities.PuzzleFilters) (*entities.PuzzleConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindRecent")
+	defer span.End()
+
 	// Validate pagination params
 	if err := params.Validate(entities.PuzzleReflectType); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
@@ -241,6 +270,9 @@ func (p *Puzzle) FindRecent(ctx context.Context, params entities.Pagination, fil
 
 // Search searches for puzzles with a similar name or description as search term
 func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "Search")
+	defer span.End()
+
 	if err := validate.CheckPartial(entities.Puzzle{Name: search}, "Name"); err != nil {
 		fixedErr := errors.New(strings.Replace(err.Error(), "name", "Search term", 1))
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", fixedErr)
@@ -271,6 +303,9 @@ func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleCon
 
 // ToggleLike toggles a user's likhe status on a puzzle
 func (p *Puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error) {
+	ctx, span := p.tracer.Start(ctx, "ToggleLike")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 	if user == nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
@@ -292,6 +327,9 @@ func (p *Puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.Puzzle
 
 // Update updates an existing puzzles
 func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Puzzle) (*entities.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Update")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 	if user == nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
@@ -342,6 +380,9 @@ func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Pu
 
 // Delete deletes an existing puzzle
 func (p *Puzzle) Delete(ctx context.Context, id uuid.UUID) error {
+	ctx, span := p.tracer.Start(ctx, "Delete")
+	defer span.End()
+
 	if entities.UserFromContext(ctx) == nil {
 		return internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
 	}

@@ -18,6 +18,7 @@ These are the prerequisites for local development:
 - Go 1.7 or later
 - MySQL (You can choose to host your own or set one up with PlanetScale)
 - Docker
+- Honeycomb.io account
 - OAuth2 credentials (For at least one of the following):
   - Discord
   - GitHub
@@ -44,54 +45,54 @@ These are the prerequisites for production:
 ## Architecture
 
 ```
-                          https
-                            |
-                            |
-                    API     |     Web
-              +-------------+-------------+
-              |                           |
-              |                           |
-              |                           |
-       +------+-------+            +------+-------+
-       |              |            |              |
-       |  Cloudflare  |            |    Vercel    |
-       |              |            |              |
-       +------+-------+            +--------------+
-              |
-              |
-              |
-       +------+-------+
-       |              |
-       |              |
-       | Loadbalancer |
-+------+--------------+------+
-| VPC  |              |      |
-|      +------+-------+      |
-|             |              |
-|             |              |
-|             |              |
-|            http            |
-|             |              |
-|             |              |
-|             |              |
-|        +----+----+         |
-|        |         |         |
-|        | Droplet |         |
-|        |         |         |
-|        +----+----+         |
-|             |              |
-|             |              |
-+-------------+--------------+
-              |
-              |
-              |
-              |
-       +------+------+
-       |             |
-       | Planetscale |
-       |    MySQL    |
-       |             |
-       +-------------+
+                              https
+                                |
+                                |
+                        API     |     Web
+                  +-------------+-------------+
+                  |                           |
+                  |                           |
+                  |                           |
+           +------+-------+            +------+-------+
+           |              |            |              |
+           |  Cloudflare  |            |    Vercel    |
+           |              |            |              |
+           +------+-------+            +--------------+
+                  |
+                  |
+                  |
+           +------+-------+
+           |              |
+           |              |
+           | Loadbalancer |
+    +------+--------------+------+
+    | VPC  |              |      |
+    |      +------+-------+      |
+    |             |              |
+    |             |              |
+    |             |              |
+    |            http            |
+    |             |              |
+    |             |              |
+    |             |              |
+    |        +----+----+         |
+    |        |         |         |
+    |        | Droplet |         |
+    |        |         |         |
+    |        +----+----+         |
+    |             |              |
+    |             |              |
+    +-------------+--------------+
+                  |
+       +----------+-----------+
+       |                      |
+       |                      |
++------+------+        +------+------+
+|             |        |             |
+| Planetscale |        |  Honeycomb  |
+|    MySQL    |        |             |
+|             |        +-------------+
++-------------+
 ```
 
 ## Contributions

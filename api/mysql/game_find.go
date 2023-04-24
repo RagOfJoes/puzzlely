@@ -15,6 +15,9 @@ import (
 
 // Helper function that retrieves a detailed game using a specific column and its value
 func (g *game) find(ctx context.Context, column, search string) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "find")
+	defer span.End()
+
 	builder := squirrel.Select(
 		"game.id",
 		"game.score",
