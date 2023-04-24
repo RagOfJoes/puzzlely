@@ -8,9 +8,15 @@ import (
 	"github.com/RagOfJoes/puzzlely/entities"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
+)
+
+const (
+	gameTracer = "services.game"
 )
 
 // Errors
@@ -37,6 +43,7 @@ var (
 type Game struct {
 	config     config.Configuration
 	repository repositories.Game
+	tracer     trace.Tracer
 }
 
 func NewGame(config config.Configuration, repository repositories.Game) Game {
@@ -45,10 +52,14 @@ func NewGame(config config.Configuration, repository repositories.Game) Game {
 	return Game{
 		config:     config,
 		repository: repository,
+		tracer:     telemetry.Tracer(gameTracer),
 	}
 }
 
 func (g *Game) New(ctx context.Context, puzzle entities.Puzzle) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "New")
+	defer span.End()
+
 	if err := puzzle.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
 	}
@@ -72,6 +83,9 @@ func (g *Game) New(ctx context.Context, puzzle entities.Puzzle) (*entities.Game,
 }
 
 func (g *Game) Challenge(ctx context.Context, challengeCode string) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Challenge")
+	defer span.End()
+
 	oldGame, err := g.repository.GetWithChallengeCode(ctx, challengeCode)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameInvalidChallengeCode)
@@ -106,6 +120,9 @@ func (g *Game) Challenge(ctx context.Context, challengeCode string) (*entities.G
 }
 
 func (g *Game) Find(ctx context.Context, id uuid.UUID) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Find")
+	defer span.End()
+
 	game, err := g.repository.Get(ctx, id)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameNotFound)
@@ -125,6 +142,9 @@ func (g *Game) Find(ctx context.Context, id uuid.UUID) (*entities.Game, error) {
 }
 
 func (g *Game) FindPlayed(ctx context.Context, params entities.Pagination, user entities.User) (*entities.GameConnection, error) {
+	ctx, span := g.tracer.Start(ctx, "FindPlayed")
+	defer span.End()
+
 	if err := params.Validate(entities.GameReflectType); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
@@ -144,6 +164,9 @@ func (g *Game) FindPlayed(ctx context.Context, params entities.Pagination, user 
 }
 
 func (g *Game) Complete(ctx context.Context, oldGame, updateGame entities.Game) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Complete")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 
 	if !updateGame.IsUpdateValid(oldGame, user) {
@@ -200,6 +223,9 @@ func (g *Game) Complete(ctx context.Context, oldGame, updateGame entities.Game) 
 }
 
 func (g *Game) Guess(ctx context.Context, oldGame, updateGame entities.Game) (*entities.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Guess")
+	defer span.End()
+
 	user := entities.UserFromContext(ctx)
 
 	if !updateGame.IsUpdateValid(oldGame, user) {
