@@ -26,11 +26,13 @@ type Configuration struct {
 	// Essentials
 	//
 
-	Logger    Logger
-	Server    Server
-	Session   Session
+	Logger Logger
+
 	Database  Database
 	Providers Providers
+
+	Server    Server
+	Session   Session
 	Telemetry Telemetry
 }
 
