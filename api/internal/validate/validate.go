@@ -30,7 +30,7 @@ func init() {
 // Check validates a structs exposed fields, and automatically validates nested structs, unless otherwise specified.
 //
 // It returns InvalidValidationError for bad values passed in and nil or ValidationErrors as error otherwise. You will need to assert the error if it's not nil eg. err.(validator.ValidationErrors) to access the array of errors.
-func Check(o interface{}) error {
+func Check(o any) error {
 	e := validate.Struct(o)
 	if e != nil {
 		for _, ev := range e.(validator.ValidationErrors) {
@@ -47,7 +47,7 @@ func Check(o interface{}) error {
 //
 // It returns InvalidValidationError for bad values passed in and nil or ValidationErrors as error otherwise.
 // You will need to assert the error if it's not nil eg. err.(validator.ValidationErrors) to access the array of errors.
-func CheckPartial(o interface{}, fields ...string) error {
+func CheckPartial(o any, fields ...string) error {
 	err := validate.StructPartial(o, fields...)
 	if err != nil {
 		for _, ev := range err.(validator.ValidationErrors) {
@@ -63,7 +63,7 @@ func CheckPartial(o interface{}, fields ...string) error {
 // WARNING: a struct can be passed for validation eg. time.Time is a struct or if you have a custom type and have registered a custom type handler, so must allow it; however unforeseen validations will occur if trying to validate a struct that is meant to be passed to 'validate.Struct'
 //
 // It returns InvalidValidationError for bad values passed in and nil or ValidationErrors as error otherwise. You will need to assert the error if it's not nil eg. err.(validator.ValidationErrors) to access the array of errors. validate Array, Slice and maps fields which may contain more than one error
-func Var(o interface{}, tag string) error {
+func Var(o any, tag string) error {
 	err := validate.Var(o, tag)
 	if err != nil {
 		for _, ev := range err.(validator.ValidationErrors) {

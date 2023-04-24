@@ -181,7 +181,7 @@ func (g *Game) Complete(ctx context.Context, oldGame, updateGame entities.Game) 
 	for _, result := range updateGame.Results {
 		resultIDs = append(resultIDs, result.PuzzleGroupID)
 	}
-	if !internal.IsUniqueUUIDSlice(resultIDs) || !internal.IsUUIDEvery(groupIDs, resultIDs) {
+	if unique := internal.Unique(resultIDs); len(unique) != len(resultIDs) && !internal.Every(groupIDs, resultIDs) {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrGameInvalidResults)
 	}
 
@@ -234,8 +234,8 @@ func (g *Game) Guess(ctx context.Context, oldGame, updateGame entities.Game) (*e
 	}
 
 	// Retrieve Group and Blocks IDs
-	groupIDs := []uuid.UUID{}
-	blockIDs := []uuid.UUID{}
+	var groupIDs = make([]uuid.UUID, 0, len(oldGame.Puzzle.Groups))
+	var blockIDs = make([]uuid.UUID, 0, 16)
 	for _, group := range oldGame.Puzzle.Groups {
 		groupIDs = append(groupIDs, group.ID)
 		for _, block := range group.Blocks {
@@ -243,7 +243,7 @@ func (g *Game) Guess(ctx context.Context, oldGame, updateGame entities.Game) (*e
 		}
 	}
 	// Correct must have unique values and must have proper GroupIDs
-	if !internal.IsUniqueUUIDSlice(updateGame.Correct) || !internal.IsUUIDEvery(groupIDs, updateGame.Correct) {
+	if unique := internal.Unique(groupIDs); len(unique) != len(updateGame.Correct) && !internal.Every(groupIDs, updateGame.Correct) {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrGameInvalidCorrect)
 	}
 	// Attempts must be within Config parameters
@@ -256,7 +256,7 @@ func (g *Game) Guess(ctx context.Context, oldGame, updateGame entities.Game) (*e
 			if len(attempts) != 4 {
 				return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrGameInvalidAttempts)
 			}
-			if !internal.IsUniqueUUIDSlice(attempts) || !internal.IsUUIDEvery(blockIDs, attempts) {
+			if unique := internal.Unique(attempts); len(unique) != len(attempts) && !internal.Every(blockIDs, attempts) {
 				return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrGameInvalidAttempts)
 			}
 		}

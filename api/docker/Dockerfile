@@ -3,7 +3,7 @@
 ############################
 # STEP 1 build executable binary
 ############################
-FROM golang:1.17.8-alpine as builder
+FROM golang:1.19.6-alpine as builder
 
 # Install git + SSL ca certificates.
 # Git is required for fetching the dependencies.
@@ -16,13 +16,13 @@ ENV UID=10001
 
 # See https://stackoverflow.com/a/55757473/12429735
 RUN adduser \
-	--disabled-password \
-	--gecos "" \
-	--home "/nonexistent" \
-	--shell "/sbin/nologin" \
-	--no-create-home \
-	--uid "${UID}" \
-	"${USER}"
+  --disabled-password \
+  --gecos "" \
+  --home "/nonexistent" \
+  --shell "/sbin/nologin" \
+  --no-create-home \
+  --uid "${UID}" \
+  "${USER}"
 WORKDIR $GOPATH/src/github.com/RagOfJoes/puzzlely/
 
 # Copy go modules then download and verify
@@ -34,8 +34,8 @@ COPY . .
 
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-	-ldflags='-w -s -extldflags "-static"' -a \
-	-o /go/bin/puzzlely cmd/main.go
+  -ldflags='-w -s -extldflags "-static"' -a \
+  -o /go/bin/puzzlely cmd/main.go
 
 ############################
 # STEP 2 build a small image

@@ -63,7 +63,7 @@ func (g *game) ToModel(entity entities.Game) models.Game {
 }
 
 // ToNode transforms game model or entity to a game node
-func (g *game) ToNode(object interface{}) entities.GameNode {
+func (g *game) ToNode(object any) entities.GameNode {
 	switch object.(type) {
 	case entities.Game:
 		entity := object.(entities.Game)

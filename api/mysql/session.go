@@ -32,7 +32,7 @@ func (s *session) Create(ctx context.Context, newSession entities.Session) (*ent
 
 	query, args, err := squirrel.
 		Insert(SessionTable).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"id":               sessionModel.ID,
 			"state":            sessionModel.State,
 			"token":            sessionModel.Token,
@@ -67,7 +67,7 @@ func (s *session) Update(ctx context.Context, updateSession entities.Session) (*
 	query, args, err := squirrel.
 		Update(SessionTable).
 		Where("id = ?", sessionModel.ID).
-		SetMap(map[string]interface{}{
+		SetMap(map[string]any{
 			"state":            sessionModel.State,
 			"expires_at":       sessionModel.ExpiresAt,
 			"authenticated_at": sessionModel.AuthenticatedAt,

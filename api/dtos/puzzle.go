@@ -59,7 +59,7 @@ func (p *puzzle) ToModel(entity entities.Puzzle) models.Puzzle {
 }
 
 // ToNode transforms puzzle model or entity to a puzzle node
-func (p *puzzle) ToNode(object interface{}) entities.PuzzleNode {
+func (p *puzzle) ToNode(object any) entities.PuzzleNode {
 	switch object.(type) {
 	case entities.Puzzle:
 		entity := object.(entities.Puzzle)
