@@ -36,8 +36,12 @@ func New(cfg config.Configuration) *chi.Mux {
 	// Default Middlewares
 	router.Use(middleware.RequestID)
 	router.Use(middleware.RealIP)
-	router.Use(render.SetContentType(render.ContentTypeJSON))
 	router.Use(Logger)
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.StripSlashes)
+
+	// Security Headers Middlewares
+	router.Use(render.SetContentType(render.ContentTypeJSON))
 	router.Use(secure.New(cfg.Server.Security).Handler)
 	router.Use(cors.Handler(cors.Options{
 		AllowCredentials: cfg.Server.AccessControl.AllowCredentials,
@@ -47,8 +51,7 @@ func New(cfg config.Configuration) *chi.Mux {
 		ExposedHeaders:   cfg.Server.AccessControl.ExposeHeaders,
 		MaxAge:           int(cfg.Server.AccessControl.MaxAge),
 	}))
-	router.Use(middleware.StripSlashes)
-	router.Use(middleware.Recoverer)
+
 	// Opentelemetry middleware
 	// Traces incoming requests
 	router.Use(otelchi.Middleware(cfg.Telemetry.ServiceName, otelchi.WithChiRoutes(router)))
@@ -72,27 +75,28 @@ func New(cfg config.Configuration) *chi.Mux {
 			internalErr := InternalServerError(internal.WrapErrorf(e, internal.ErrorCodeInternal, "Oops! Something went wrong. Please try again later."))
 
 			var err *internal.Error
-			if errors.As(e, &err) {
-				logrus.Debugf("Actual error: %+v", errors.Unwrap(err))
-
-				switch err.Code {
-				case internal.ErrorCodeBadRequest:
-					render.Render(w, r, BadRequest(err))
-				case internal.ErrorCodeUnauthorized:
-					render.Render(w, r, Unauthorized(err))
-				case internal.ErrorCodeForbidden:
-					render.Render(w, r, Forbidden(err))
-				case internal.ErrorCodeNotFound:
-					render.Render(w, r, NotFound(err))
-				case internal.ErrorCodeMethodNotAllowed:
-					render.Render(w, r, MethodNotAllowed(err))
-				default:
-					render.Render(w, r, internalErr)
-				}
+			if !errors.As(e, &err) {
+				render.Render(w, r, internalErr)
 				return
 			}
 
-			render.Render(w, r, internalErr)
+			logrus.Debugf("Actual error: %+v", errors.Unwrap(err))
+
+			switch err.Code {
+			case internal.ErrorCodeBadRequest:
+				render.Render(w, r, BadRequest(err))
+			case internal.ErrorCodeUnauthorized:
+				render.Render(w, r, Unauthorized(err))
+			case internal.ErrorCodeForbidden:
+				render.Render(w, r, Forbidden(err))
+			case internal.ErrorCodeNotFound:
+				render.Render(w, r, NotFound(err))
+			case internal.ErrorCodeMethodNotAllowed:
+				render.Render(w, r, MethodNotAllowed(err))
+			default:
+				render.Render(w, r, internalErr)
+			}
+
 			return
 		}
 
