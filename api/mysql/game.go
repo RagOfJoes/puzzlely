@@ -207,7 +207,7 @@ func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user e
 	uIntMap := map[uuid.UUID]uint{}
 	configMap := map[uuid.UUID]models.GameConfig{}
 	puzzleMap := map[uuid.UUID]models.Puzzle{}
-	var createdByModel models.User
+	userMap := map[uuid.UUID]models.User{}
 
 	for rows.Next() {
 		var gameModel models.Game
@@ -217,9 +217,6 @@ func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user e
 		var puzzleModel models.Puzzle
 
 		var userModel models.User
-		var usernameModel sql.NullString
-		var userStateModel sql.NullString
-		var userCreatedAtModel sql.NullTime
 
 		if err := rows.Scan(
 			&gameModel.ID,
@@ -246,9 +243,9 @@ func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user e
 			&puzzleModel.UpdatedAt,
 			&puzzleModel.UserID,
 			&userModel.ID,
-			&userStateModel,
-			&usernameModel,
-			&userCreatedAtModel,
+			&userModel.State,
+			&userModel.Username,
+			&userModel.CreatedAt,
 			&userModel.UpdatedAt,
 			&numOfAttempts,
 			&numOfLikes,
@@ -273,12 +270,8 @@ func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user e
 			puzzleIDs = append(puzzleIDs, gameModel.PuzzleID)
 			puzzleMap[gameModel.PuzzleID] = puzzleModel
 		}
-		if userModel.ID != uuid.Nil {
-			createdByModel.ID = userModel.ID
-			createdByModel.State = userStateModel.String
-			createdByModel.Username = usernameModel.String
-			createdByModel.CreatedAt = userCreatedAtModel.Time
-			createdByModel.UpdatedAt = userModel.UpdatedAt
+		if _, ok := userMap[puzzleModel.UserID]; !ok {
+			userMap[puzzleModel.UserID] = userModel
 		}
 	}
 
@@ -305,13 +298,15 @@ func (g *game) GetPlayed(ctx context.Context, params entities.Pagination, user e
 		}
 		if puzzle, ok := puzzleMap[gameModel.PuzzleID]; ok {
 			game.Puzzle = dtos.Puzzle().ToNode(puzzle)
-			game.Puzzle.CreatedBy = dtos.User().ToEntity(createdByModel)
 
 			if numOfLikes, ok := uIntMap[gameModel.ID]; ok {
 				game.Puzzle.NumOfLikes = numOfLikes
 			}
 			if likedAt, ok := likedAtMap[gameModel.PuzzleID]; ok {
 				game.Puzzle.LikedAt = likedAt
+			}
+			if createdBy, ok := userMap[puzzle.UserID]; ok {
+				game.Puzzle.CreatedBy = dtos.User().ToEntity(createdBy)
 			}
 		}
 
