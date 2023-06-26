@@ -48,6 +48,7 @@ func Start(cfg config.Configuration) (func(), error) {
 		sdktrace.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
+				semconv.HTTPHostKey.String(cfg.Server.Host),
 				semconv.ServiceNameKey.String(cfg.Telemetry.ServiceName),
 			),
 		),
