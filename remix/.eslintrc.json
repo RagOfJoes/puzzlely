@@ -1,0 +1,83 @@
+{
+	"root": true,
+	"extends": ["airbnb-base", "prettier"],
+	"plugins": ["unused-imports"],
+	"rules": {
+		"import/order": [
+			"error",
+			{
+				"groups": ["builtin", "external", "internal"],
+				"pathGroups": [
+					{
+						"pattern": "react",
+						"group": "external",
+						"position": "before"
+					},
+					{
+						"group": "internal",
+						"pattern": "@/**"
+					}
+				],
+				"pathGroupsExcludedImportTypes": ["react"],
+				"newlines-between": "always",
+				"alphabetize": {
+					"order": "asc",
+					"caseInsensitive": true
+				}
+			}
+		],
+		"unused-imports/no-unused-imports": "error",
+		"unused-imports/no-unused-vars": [
+			"error",
+			{
+				"argsIgnorePattern": "^_"
+			}
+		]
+	},
+	"overrides": [
+		{
+			"files": ["**/*.js"],
+			"rules": {
+				"indent": "off",
+				"no-tabs": "off",
+				"quotes": "off"
+			}
+		},
+
+		{
+			"files": ["**/*.ts", "**/*.tsx"],
+			"plugins": ["@typescript-eslint", "react", "jsx-a11y"],
+			"extends": ["airbnb-typescript", "plugin:react-hooks/recommended"],
+			"parserOptions": {
+				"project": "**/tsconfig.json"
+			},
+			"rules": {
+				"@typescript-eslint/consistent-type-assertions": "error",
+				"@typescript-eslint/consistent-type-imports": "error",
+				"@typescript-eslint/indent": "off",
+				"@typescript-eslint/no-unused-vars": "off",
+				"@typescript-eslint/quotes": "off",
+				"class-methods-use-this": "off",
+				"import/extensions": "off",
+				"import/prefer-default-export": "off",
+				"jsx-a11y/anchor-is-valid": "off",
+				"no-restricted-exports": "off",
+				"no-tabs": "off",
+				"prefer-destructuring": "off",
+				"react/destructuring-assignment": "off",
+				"react/jsx-props-no-spreading": "off",
+				"react/require-default-props": "off"
+			},
+			"settings": {
+				"react": {
+					"version": "detect"
+				},
+				"formComponents": ["Form"],
+				"linkComponents": [
+					{ "name": "Link", "linkAttribute": "to" },
+					{ "name": "NavLink", "linkAttribute": "to" }
+				]
+			}
+		}
+	]
+}

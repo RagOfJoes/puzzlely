@@ -1,0 +1,217 @@
+import type { ElementRef } from "react";
+import { forwardRef, useMemo, useState } from "react";
+
+import * as Portal from "@radix-ui/react-portal";
+import { Primitive } from "@radix-ui/react-primitive";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, PartyPopper, Skull } from "lucide-react";
+
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger,
+} from "@/components/accordion";
+import { Button } from "@/components/button";
+import type { UseGame } from "@/hooks/use-game";
+import { arePuzzleBlocksSameGroup } from "@/lib/are-puzzle-blocks-same-group";
+import { cn } from "@/lib/cn";
+import { getPuzzleBlocksFromAttempts } from "@/lib/get-puzzle-blocks-from-attempts";
+import { omit } from "@/lib/omit";
+
+export type GridMenuProps = Portal.PortalProps & {
+	blocks: UseGame[0]["blocks"];
+	game: UseGame[0]["game"];
+	isSuccess: boolean;
+};
+
+export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>((props, ref) => {
+	const { blocks, game, isSuccess, ...other } = props;
+
+	const [isHidden, toggleIsHidden] = useState(false);
+
+	const attempts = useMemo(() => {
+		const joined = getPuzzleBlocksFromAttempts(blocks, game);
+
+		return joined.map((attempt) => ({
+			blocks: attempt,
+			isCorrect: arePuzzleBlocksSameGroup(attempt),
+		}));
+	}, [blocks, game]);
+
+	return (
+		<Portal.Root {...omit(other, ["children", "className"])} ref={ref}>
+			<Primitive.div className="absolute top-0 flex h-full w-full items-center justify-center">
+				<AnimatePresence>
+					{isHidden && (
+						<Button
+							asChild
+							className={cn(
+								"absolute bottom-4 left-4 z-10 border border-primary bg-primary/10 uppercase text-primary",
+
+								"hover:enabled:bg-primary/20",
+							)}
+							onClick={() => toggleIsHidden(false)}
+							size="icon"
+						>
+							<motion.button
+								animate="animate"
+								exit="exit"
+								initial="initial"
+								variants={{
+									animate: {
+										opacity: 1,
+										transition: {
+											duration: 0.2,
+										},
+										scale: 1,
+									},
+									exit: {
+										opacity: 0,
+										transition: {
+											duration: 0.2,
+										},
+										scale: 0.8,
+									},
+									initial: {
+										opacity: 0,
+										scale: 0.8,
+									},
+								}}
+							>
+								<ArrowUpRight className="h-4 w-4" />
+							</motion.button>
+						</Button>
+					)}
+
+					{!isHidden && (
+						<>
+							<motion.div
+								animate="animate"
+								className={cn(
+									"z-10 max-h-[90%] w-[90%] max-w-sm overflow-y-auto border bg-muted p-5 outline-none",
+
+									"focus-visible:ring",
+								)}
+								exit="exit"
+								initial="initial"
+								ref={ref}
+								variants={{
+									animate: {
+										opacity: 1,
+										transition: {
+											duration: 0.2,
+										},
+										scale: 1,
+									},
+									exit: {
+										opacity: 0,
+										transition: {
+											duration: 0.2,
+										},
+										scale: 0.8,
+									},
+									initial: {
+										opacity: 0,
+										scale: 0.8,
+									},
+								}}
+							>
+								<div className="flex w-full items-center justify-between">
+									<div className="flex flex-col items-start justify-center">
+										<p className="text-sm font-bold outline-none">Score: {game.score}</p>
+									</div>
+
+									<div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-primary/10 text-primary">
+										{isSuccess ? (
+											<PartyPopper className="h-4 w-4" />
+										) : (
+											<Skull className="h-4 w-4" />
+										)}
+									</div>
+								</div>
+
+								<h3 className="font-heading mt-2 line-clamp-1 text-ellipsis font-bold leading-normal">
+									{isSuccess ? "Congratulations!" : "Game Over!"}
+								</h3>
+
+								<p className="line-clamp-1 w-full text-ellipsis text-sm font-semibold tracking-wide text-muted-foreground">
+									{isSuccess
+										? "You have successfully completed the puzzle!"
+										: "You have run out of attempts."}
+								</p>
+
+								<div className="mt-4 w-full items-center">
+									<Accordion defaultValue={["attempts"]} type="multiple">
+										<AccordionItem className="w-full border-b-0" value="attempts">
+											<AccordionTrigger
+												className={cn(
+													"w-full",
+
+													"hover:no-underline",
+												)}
+											>
+												<div className="text-sm font-bold leading-tight">
+													Attempts{" "}
+													<span className="text-muted-foreground">({game.attempts.length})</span>
+												</div>
+											</AccordionTrigger>
+
+											<AccordionContent>
+												<div className="flex w-full flex-col items-center justify-center gap-2">
+													{attempts.map((attempt, index) => (
+														<div
+															className={cn(
+																"group/attempt w-full border border-destructive-foreground/40 bg-destructive p-2",
+
+																"data-[is-correct='true']:border-secondary/40 data-[is-correct='true']:bg-secondary/10",
+															)}
+															data-is-correct={attempt.isCorrect}
+															key={`${attempt.blocks.map((block) => block.id).join("")}__${index}`}
+														>
+															<div className="flex w-full items-center">
+																{attempt.blocks.map((block) => (
+																	<p
+																		className={cn(
+																			"w-full basis-1/4 select-none truncate px-2 text-center text-sm font-medium text-destructive-foreground",
+
+																			"[&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-destructive-foreground/40",
+																			"group-data-[is-correct='true']/attempt:text-secondary",
+																			"group-data-[is-correct='true']/attempt:[&:not(:last-child)]:border-r-secondary/40",
+																		)}
+																		key={block.id}
+																	>
+																		{block.value}
+																	</p>
+																))}
+															</div>
+														</div>
+													))}
+												</div>
+											</AccordionContent>
+										</AccordionItem>
+									</Accordion>
+								</div>
+
+								<Button
+									className={cn(
+										"w-full border border-primary bg-primary/10 uppercase text-primary",
+
+										"hover:enabled:bg-primary/20",
+									)}
+									onClick={() => toggleIsHidden(true)}
+									variant="default"
+								>
+									Hide
+								</Button>
+							</motion.div>
+
+							<div className="absolute top-0 h-full w-full bg-background/50" />
+						</>
+					)}
+				</AnimatePresence>
+			</Primitive.div>
+		</Portal.Root>
+	);
+});
+GridMenu.displayName = "GridMenu";

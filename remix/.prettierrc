@@ -1,0 +1,11 @@
+{
+	"pluginSearchDirs": false,
+	"plugins": ["prettier-plugin-tailwindcss"],
+
+	"endOfLine": "auto",
+	"printWidth": 100,
+	"singleQuote": false,
+	"tabWidth": 2,
+	"tailwindFunctions": ["clsx", "cn", "cva"],
+	"useTabs": true
+}
