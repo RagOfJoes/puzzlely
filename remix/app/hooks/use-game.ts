@@ -92,24 +92,34 @@ export function useGame(props: UseGameProps): UseGame {
 	 */
 
 	useMount(() => {
-		if (game.correct.length > 0) {
-			// 1. Filter blocks so only blocks that belong to a correct group is returned
-			// 2. Group by `groupID`
-			// 3. Flatten array
-			const grouped = groupBy(
-				blocks.filter((b) => game.correct.includes(b.group_id)),
-				(b) => b.group_id,
-			).flat();
+		// If the `started_at` field is empty, then set it to the current date
+		if (!game.started_at) {
+			setGame((prev) => ({
+				...prev,
 
-			// 1. Order blocks by putting correctly guessed on top
-			// 2. Remove duplicates
-			const shuffled = shuffle(blocks);
-			setBlocks(uniqueBy([...grouped, ...shuffled], (item) => item.id));
+				started_at: new Date(),
+			}));
 
 			return;
 		}
 
-		setBlocks((prev) => shuffle(prev));
+		if (game.correct.length === 0) {
+			setBlocks((prev) => shuffle(prev));
+			return;
+		}
+
+		// 1. Filter blocks so only blocks that belong to a correct group is returned
+		// 2. Group by `groupID`
+		// 3. Flatten array
+		const grouped = groupBy(
+			blocks.filter((b) => game.correct.includes(b.group_id)),
+			(b) => b.group_id,
+		).flat();
+
+		// 1. Order blocks by putting correctly guessed on top
+		// 2. Remove duplicates
+		const shuffled = shuffle(blocks);
+		setBlocks(uniqueBy([...grouped, ...shuffled], (item) => item.id));
 	});
 
 	// When `isWrong` is true, reset it to false and clear `selected` after 300ms to play the animation
