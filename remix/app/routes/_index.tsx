@@ -1,182 +1,154 @@
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useMemo } from "react";
+
+import type { LoaderFunctionArgs, TypedResponse } from "@remix-run/node";
+import { json, Link, useLoaderData } from "@remix-run/react";
 import dayjs from "dayjs";
-import { ChevronLeft, ChevronRight, Flag, Heart, RotateCcw, Shuffle, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, Flag, Heart, RotateCcw, Shuffle, Star } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { Grid, GridBlock, GridBlocks, GridGroup, GridMenu } from "@/components/grid";
 import { Header } from "@/components/header";
 import { GameProvider, useGame } from "@/hooks/use-game";
+import { useIsMounted } from "@/hooks/use-is-mounted";
 import { cn } from "@/lib/cn";
+import { createGame } from "@/lib/create-game";
 import { hydrateGame } from "@/lib/hydrate-game";
+import { hydrateUser } from "@/lib/hydrate-user";
+import { isNumber } from "@/lib/is-number";
+import { API } from "@/services/api.server";
 import type { Game } from "@/types/game";
-import type { Puzzle } from "@/types/puzzle";
+import type { User } from "@/types/user";
 
-export async function loader() {
-	const puzzle: Puzzle = {
-		id: "91fc7014-016c-4068-85f4-4f274bd51570",
-		difficulty: "Easy",
-		max_attempts: 3,
-		num_of_likes: 0,
-		created_at: new Date(),
-		groups: [
-			{
-				id: "5e4c7397-fb77-4d92-923a-3cb9ea8c12d8",
-				blocks: [
-					{
-						id: "619b8716-b36d-46a5-9b8d-876679021a81",
-						group_id: "5e4c7397-fb77-4d92-923a-3cb9ea8c12d8",
-						value: "SNAP",
-					},
-					{
-						id: "4696f4a7-2290-4039-ac41-12e6f5cd9c67",
-						group_id: "5e4c7397-fb77-4d92-923a-3cb9ea8c12d8",
-						value: "CLAP",
-					},
-					{
-						id: "08ceab5e-8392-401d-9c67-eefef19725ba",
-						group_id: "5e4c7397-fb77-4d92-923a-3cb9ea8c12d8",
-						value: "BOB",
-					},
-					{
-						id: "6da27eac-237f-4d9a-b621-65b8d1038028",
-						group_id: "5e4c7397-fb77-4d92-923a-3cb9ea8c12d8",
-						value: "TAP",
-					},
-				],
-				description: "Keep rhythm with music",
-			},
-			{
-				id: "e8d69f3b-1190-49e4-a632-355ef47a758d",
-				blocks: [
-					{
-						id: "f73e5412-b721-4d85-9cc7-43f5df6b9994",
-						group_id: "e8d69f3b-1190-49e4-a632-355ef47a758d",
-						value: "WRAP",
-					},
-					{
-						id: "7ca490d6-eb9b-4d3c-89e1-4134ccb36e21",
-						group_id: "e8d69f3b-1190-49e4-a632-355ef47a758d",
-						value: "BUN",
-					},
-					{
-						id: "86c87a4e-88a8-41d7-b872-3865ca7986d7",
-						group_id: "e8d69f3b-1190-49e4-a632-355ef47a758d",
-						value: "HERO",
-					},
-					{
-						id: "fc8478c8-2168-438d-88df-f4a19e3b6a33",
-						group_id: "e8d69f3b-1190-49e4-a632-355ef47a758d",
-						value: "ROLL",
-					},
-				],
-				description: "Deli bread options",
-			},
-			{
-				id: "9f1edee0-f8d7-4a7b-a8f8-0a963f23df8f",
-				blocks: [
-					{
-						id: "6b6e6320-3ea0-40ce-8b74-3d74f26438c4",
-						group_id: "9f1edee0-f8d7-4a7b-a8f8-0a963f23df8f",
-						value: "FUNDING",
-					},
-					{
-						id: "ab6f1de8-263c-483b-aab1-ef608c63e8eb",
-						group_id: "9f1edee0-f8d7-4a7b-a8f8-0a963f23df8f",
-						value: "GOLF",
-					},
-					{
-						id: "43b9e1ee-6b86-404c-bcdc-d62844d9c7fd",
-						group_id: "9f1edee0-f8d7-4a7b-a8f8-0a963f23df8f",
-						value: "DRINKS",
-					},
-					{
-						id: "d02010df-60fe-4077-ae7a-c29ad811b7ad",
-						group_id: "9f1edee0-f8d7-4a7b-a8f8-0a963f23df8f",
-						value: "APPLAUSE",
-					},
-				],
-				description: "Round of _____",
-			},
-			{
-				id: "d117cb32-3330-4e9e-af7c-d9a1c8a55e80",
-				blocks: [
-					{
-						id: "e9c835aa-0bf2-4df3-9dab-11c4a75cb9ba",
-						group_id: "d117cb32-3330-4e9e-af7c-d9a1c8a55e80",
-						value: "TRAP",
-					},
-					{
-						id: "3952bc87-c79b-498a-b076-bba13964038f",
-						group_id: "d117cb32-3330-4e9e-af7c-d9a1c8a55e80",
-						value: "YAP",
-					},
-					{
-						id: "38982c9c-cd84-403d-be2a-e3b35a40e094",
-						group_id: "d117cb32-3330-4e9e-af7c-d9a1c8a55e80",
-						value: "CHOPS",
-					},
-					{
-						id: "0fdee481-2540-47f1-a71d-eb94833a2c9a",
-						group_id: "d117cb32-3330-4e9e-af7c-d9a1c8a55e80",
-						value: "KISSER",
-					},
-				],
-				description: "Slang for mouth",
-			},
-		],
+// Exptected response from the loader
+type LoaderResponse = {
+	game: Game;
+	me?: User;
+	pageInfo: {
+		current: number;
+		cursor: string;
+		length: number;
+	};
+};
 
-		created_by: {
-			id: "33363900-42eb-4431-bbaf-d82b608e4348",
-			state: "COMPLETE",
-			username: "JohnDoe",
-			created_at: new Date(),
+// TODO: Pull from some sort of storage to check if the user has an active game
+export async function loader({
+	request,
+}: LoaderFunctionArgs): Promise<TypedResponse<LoaderResponse>> {
+	const [me, puzzles] = await Promise.all([API.me(request), API.puzzles.recent(request)]);
+
+	if (!puzzles.success || !puzzles.payload) {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw new Response("Failed to fetch puzzles!", { status: 500 });
+	}
+
+	const firstPuzzle = puzzles.payload.edges[0]?.node;
+	if (!firstPuzzle) {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw new Response("Failed to fetch puzzles!", { status: 500 });
+	}
+
+	const { searchParams } = new URL(request.url);
+
+	const cursor = searchParams.get("cursor");
+
+	const currentParam = searchParams.get("current");
+	const current = isNumber(currentParam) ? Number(currentParam) : 0;
+	if (
+		!currentParam ||
+		currentParam === "" ||
+		current < 0 ||
+		current > puzzles.payload.edges.length - 1
+	) {
+		return json({
+			game: createGame({
+				me: me.payload?.user,
+				puzzle: firstPuzzle,
+			}),
+			me: me.payload?.user,
+			pageInfo: {
+				current: 0,
+				cursor: cursor ?? "",
+				length: puzzles.payload.edges.length,
+			},
+		});
+	}
+
+	const edge = puzzles.payload.edges[current];
+	if (!edge) {
+		return json({
+			game: createGame({
+				me: me.payload?.user,
+				puzzle: firstPuzzle,
+			}),
+			me: me.payload?.user,
+			pageInfo: {
+				current: 0,
+				cursor: cursor ?? "",
+				length: puzzles.payload.edges.length,
+			},
+		});
+	}
+
+	return json({
+		game: createGame({
+			me: me.payload?.user,
+			puzzle: edge.node,
+		}),
+		me: me.payload?.user,
+		pageInfo: {
+			current,
+			cursor: cursor ?? "",
+			length: puzzles.payload.edges.length,
 		},
-	};
-
-	const game: Game = {
-		id: "0906bdfc-ad75-4ab2-be49-60c6ae0c8b90",
-		attempts: [],
-		challenge_code: "",
-		correct: [],
-		puzzle,
-		score: 0,
-
-		created_at: new Date(),
-	};
-
-	return json<Game>(game);
+	});
 }
 
+// TODO: Create different view depending on the result of the loader
 export default function Index() {
-	const data = useLoaderData<typeof loader>();
+	const data = useLoaderData<LoaderResponse>();
+
+	// Setup game context
 	const ctx = useGame({
-		game: hydrateGame(data),
+		game: hydrateGame(data.game),
 	});
 	const [
 		{ blocks, game, isGameOver, isWinnerWinnerChickenDinner, isWrong, selected, wrongAttempts },
-		{ onBlockSelect, onShuffle },
+		{ onBlockSelect, onGiveUp, onShuffle },
 	] = ctx;
+
+	// Check if the component is mounted
+	const isMounted = useIsMounted();
+
+	// Hydrate currently authenticated user to pass to the header component
+	const me = useMemo<undefined | User>(
+		() => (data.me ? hydrateUser(data.me) : undefined),
+		[data.me],
+	);
+
+	// Pagination helpers
+	const hasNextPage = data.pageInfo.current < data.pageInfo.length - 1;
+	const hasPreviousPage = data.pageInfo.current > 0;
+	const isLatest = data.pageInfo.cursor === "";
 
 	return (
 		<>
-			<Header />
+			<Header me={me} />
 
-			<main className="mx-auto h-[calc(100dvh-var(--header-height))] max-w-screen-md px-5 pb-5">
+			<main
+				className={cn(
+					"mx-auto h-[calc(100dvh-var(--header-height))] max-w-screen-md px-5 pb-2",
+
+					"max-lg:min-h-[700px]",
+				)}
+			>
 				<div className="flex h-full w-full max-w-3xl flex-col gap-1">
-					<div
-						className={cn(
-							"grid w-full grid-cols-4 gap-1 transition-opacity",
-
-							"max-md:grid-rows-2",
-						)}
-					>
+					<div className="grid w-full grid-cols-4 gap-1 transition-opacity">
 						<div
 							className={cn(
 								"col-span-1",
 
 								"data-[is-game-over='true']:opacity-50",
-								"max-md:col-span-4 max-md:row-start-2",
+								"max-md:col-span-2 max-md:row-start-1",
 								"md:col-start-1",
 							)}
 							data-is-game-over={isGameOver || isWinnerWinnerChickenDinner}
@@ -186,11 +158,11 @@ export default function Index() {
 									<h3 className="text-sm font-medium tracking-tight">Attempts Left</h3>
 
 									<div className="mt-2 text-2xl font-bold leading-none">
-										{data.puzzle.max_attempts - wrongAttempts}
+										{game.puzzle.max_attempts - wrongAttempts}
 									</div>
 
 									<div className="text-xs text-muted-foreground">
-										out of {data.puzzle.max_attempts}
+										out of {game.puzzle.max_attempts}
 									</div>
 								</div>
 
@@ -204,13 +176,18 @@ export default function Index() {
 							className={cn(
 								"col-span-1 flex h-full w-full flex-col gap-1",
 
-								"max-md:col-span-2 max-md:col-start-3 max-md:row-start-1",
+								"max-md:col-span-4 max-md:h-auto max-md:flex-row",
 							)}
 						>
 							<Button
 								aria-label="Give up"
-								className="h-full w-full gap-2"
+								className={cn(
+									"h-full w-full gap-2",
+
+									"max-md:h-11 max-md:basis-1/2",
+								)}
 								disabled={isGameOver || isWinnerWinnerChickenDinner}
+								onClick={onGiveUp}
 								variant="outline"
 							>
 								<Flag className="h-3 w-3" />
@@ -223,7 +200,11 @@ export default function Index() {
 
 							<Button
 								aria-label="Shuffle"
-								className="h-full w-full gap-2"
+								className={cn(
+									"h-full w-full gap-2",
+
+									"max-md:h-11 max-md:basis-1/2",
+								)}
 								disabled={isGameOver || isWinnerWinnerChickenDinner}
 								onClick={onShuffle}
 								variant="outline"
@@ -243,27 +224,33 @@ export default function Index() {
 								"col-span-1",
 
 								"data-[is-game-over='true']:opacity-50",
-								"max-md:col-span-2 max-md:col-start-1 max-md:row-start-1",
+								"max-md:col-span-2 max-md:col-start-3 max-md:row-start-1",
 								"md:col-start-4",
 							)}
 							data-is-game-over={isGameOver || isWinnerWinnerChickenDinner}
 						>
 							<div className="flex h-full w-full items-center justify-between border bg-muted px-4 py-2">
 								<div className="flex flex-col items-start justify-end">
-									<h3 className="text-sm font-medium tracking-tight">Created By</h3>
+									<h3 className="text-sm font-medium tracking-tight">Likes</h3>
 
-									<div className="mt-2 text-lg font-bold leading-none">
-										{data.puzzle.created_by.username}
-									</div>
-
-									<div className="text-xs text-muted-foreground">
-										{dayjs(data.puzzle.created_at).format("MMM D, YYYY")}
+									<div className="line-clamp-2 text-lg font-bold leading-none">
+										{game.puzzle.num_of_likes}
 									</div>
 								</div>
 
-								<div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-primary/10 text-primary">
-									<User className="h-4 w-4" />
-								</div>
+								<Button
+									className={cn(
+										"border border-primary bg-primary/10 text-primary",
+
+										"data-[is-liked=true]:text-primary",
+										"hover:enabled:bg-primary/20",
+										"[&>svg]:data-[is-liked=true]:fill-current",
+									)}
+									data-is-liked={!!game.puzzle.liked_at}
+									size="icon"
+								>
+									<Star className="h-4 w-4" />
+								</Button>
 							</div>
 						</div>
 					</div>
@@ -273,7 +260,7 @@ export default function Index() {
 							<GridBlocks>
 								{/* Render correct group first */}
 								{game.correct.map((group_id) => {
-									const group = data.puzzle.groups.find((g) => g.id === group_id);
+									const group = game.puzzle.groups.find((g) => g.id === group_id);
 									if (!group) {
 										return null;
 									}
@@ -283,7 +270,7 @@ export default function Index() {
 
 								{/* Render rest of blocks */}
 								{blocks.map((block) => {
-									const isCorrect = game.correct.includes(block.group_id);
+									const isCorrect = game.correct.includes(block.puzzle_group_id);
 									const isSelected = selected.findIndex((b) => b.id === block.id) !== -1;
 
 									if (isCorrect) {
@@ -292,11 +279,11 @@ export default function Index() {
 
 									return (
 										<GridBlock
-											disabled={isGameOver || isWinnerWinnerChickenDinner}
+											disabled={isGameOver || !isMounted() || isWinnerWinnerChickenDinner}
 											hasCorrect={game.correct.length > 0}
 											isError={isSelected && isWrong}
 											isSelected={isSelected && !isWrong}
-											key={`${block.group_id}-${block.value}`}
+											key={`${block.puzzle_group_id}-${block.value}`}
 											onClick={() => onBlockSelect(block)}
 										>
 											{block.value}
@@ -313,35 +300,127 @@ export default function Index() {
 
 					<div className="grid w-full grid-cols-4 gap-1 transition-opacity">
 						<div className="col-span-4 flex h-full gap-1">
-							<Button
-								aria-label="Go to latest puzzles"
-								className="basis-1/2"
-								size="lg"
-								variant="ghost"
-							>
-								<RotateCcw className="h-4 w-4" />
+							<Link
+								aria-disabled={isLatest}
+								className={cn(
+									"h-full w-full basis-1/2",
 
-								<div className="ml-2">Go to latest</div>
-							</Button>
+									"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
+								)}
+								reloadDocument
+								tabIndex={-1}
+								to={{
+									search: "",
+								}}
+							>
+								<Button
+									aria-label="Go to latest puzzles"
+									className="w-full"
+									disabled={isLatest}
+									size="lg"
+									variant="ghost"
+								>
+									<RotateCcw className="h-4 w-4" />
+
+									<div className="ml-2">Go to latest</div>
+								</Button>
+							</Link>
 
 							<div className="flex h-full w-full basis-1/2 items-center gap-1">
-								<Button
-									aria-label="Go to previous game"
-									className="h-full w-full"
-									size="lg"
-									variant="outline"
-								>
-									<ChevronLeft className="h-4 w-4" />
-								</Button>
+								<Link
+									aria-disabled={!hasPreviousPage}
+									className={cn(
+										"h-full w-full",
 
-								<Button
-									aria-label="Go to next game"
-									className="h-full w-full"
-									size="lg"
-									variant="outline"
+										"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
+									)}
+									reloadDocument
+									tabIndex={-1}
+									to={{
+										search: `?current=${hasPreviousPage ? data.pageInfo.current - 1 : 0}`,
+									}}
 								>
-									<ChevronRight className="h-4 w-4" />
-								</Button>
+									<Button
+										aria-label="Go to previous game"
+										className="h-full w-full"
+										disabled={!hasPreviousPage}
+										size="lg"
+										variant="outline"
+									>
+										<ChevronLeft className="h-4 w-4" />
+									</Button>
+								</Link>
+
+								<Link
+									aria-disabled={!hasNextPage}
+									className={cn(
+										"h-full w-full",
+
+										"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
+									)}
+									reloadDocument
+									tabIndex={-1}
+									to={{
+										search: `?current=${hasNextPage ? data.pageInfo.current + 1 : data.pageInfo.current}`,
+									}}
+								>
+									<Button
+										aria-label="Go to next game"
+										className="h-full w-full"
+										disabled={!hasNextPage}
+										size="lg"
+										variant="outline"
+									>
+										<ChevronRight className="h-4 w-4" />
+									</Button>
+								</Link>
+							</div>
+						</div>
+					</div>
+
+					<div className="flex gap-1">
+						<div className="w-full min-w-0 basis-1/2">
+							<h3 className="text-sm font-medium tracking-tight">Difficulty</h3>
+
+							<div
+								className={cn(
+									"mt-2 inline-flex min-w-0 items-center px-2 py-1",
+
+									"data-[difficulty='EASY']:bg-secondary data-[difficulty='EASY']:text-secondary-foreground",
+									"data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
+									"data-[difficulty='MEDIUM']:bg-primary data-[difficulty='MEDIUM']:text-primary-foreground",
+								)}
+								data-difficulty={game.puzzle.difficulty}
+							>
+								<p className="w-full truncate text-lg font-bold leading-none">
+									{game.puzzle.difficulty}
+								</p>
+							</div>
+						</div>
+
+						<div className="w-full min-w-0 basis-1/2 ">
+							<div className="flex h-full w-full flex-col items-end justify-center text-end">
+								<h3 className="text-sm font-medium tracking-tight">Created By</h3>
+
+								<Link
+									className={cn(
+										"mt-2 w-full min-w-0 no-underline outline-none ring-offset-background transition-all",
+
+										"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+									)}
+									to={`/users/${game.puzzle.created_by.id}`}
+								>
+									<p className="w-full truncate text-lg font-bold leading-none">
+										{game.puzzle.created_by.username}
+									</p>
+								</Link>
+
+								<time
+									className="text-xs text-muted-foreground"
+									dateTime={dayjs(game.puzzle.created_at).toISOString()}
+								>
+									{dayjs(game.puzzle.created_at).format("MMMM DD, YYYY")}
+								</time>
 							</div>
 						</div>
 					</div>

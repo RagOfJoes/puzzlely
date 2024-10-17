@@ -38,6 +38,8 @@ export type UseGame = [
 		// When the user selects a block
 		// NOTE: A majority of the game logic is handled here
 		onBlockSelect: (block: PuzzleBlock) => void;
+		// When the user either presses the give up key or clicks the give up button
+		onGiveUp: () => void;
 		// When the user either presses the shuffle key or clicks the shuffle button
 		onShuffle: () => void;
 	},
@@ -92,17 +94,6 @@ export function useGame(props: UseGameProps): UseGame {
 	 */
 
 	useMount(() => {
-		// If the `started_at` field is empty, then set it to the current date
-		if (!game.started_at) {
-			setGame((prev) => ({
-				...prev,
-
-				started_at: new Date(),
-			}));
-
-			return;
-		}
-
 		if (game.correct.length === 0) {
 			setBlocks((prev) => shuffle(prev));
 			return;
@@ -112,8 +103,8 @@ export function useGame(props: UseGameProps): UseGame {
 		// 2. Group by `groupID`
 		// 3. Flatten array
 		const grouped = groupBy(
-			blocks.filter((b) => game.correct.includes(b.group_id)),
-			(b) => b.group_id,
+			blocks.filter((b) => game.correct.includes(b.puzzle_group_id)),
+			(b) => b.puzzle_group_id,
 		).flat();
 
 		// 1. Order blocks by putting correctly guessed on top
@@ -180,7 +171,7 @@ export function useGame(props: UseGameProps): UseGame {
 			const newAttempts = [...game.attempts, newSelected.map((select) => select.id)];
 
 			// If any of the Blocks are wrong
-			if (newSelected.some((select) => select.group_id !== block.group_id)) {
+			if (newSelected.some((select) => select.puzzle_group_id !== block.puzzle_group_id)) {
 				// Check if reached `maxAttempts`
 				const isMaxAttempt = wrongAttempts + 1 >= game.puzzle.max_attempts;
 
@@ -204,7 +195,7 @@ export function useGame(props: UseGameProps): UseGame {
 			}
 
 			// Clone `correct` state then append `groupID`
-			const newCorrect = [...game.correct, block.group_id];
+			const newCorrect = [...game.correct, block.puzzle_group_id];
 
 			// If User has linked all Groups correctly
 			const isGuessedAll = newCorrect.length === game.puzzle.groups.length - 1;
@@ -224,8 +215,8 @@ export function useGame(props: UseGameProps): UseGame {
 			// 2. Group by `groupID`
 			// 3. Flatten array
 			const grouped = groupBy(
-				blocks.filter((b) => newCorrect.includes(b.group_id)),
-				(b) => b.group_id,
+				blocks.filter((b) => newCorrect.includes(b.puzzle_group_id)),
+				(b) => b.puzzle_group_id,
 			).flat();
 
 			// 1. Order blocks by putting correctly guessed on top
@@ -266,12 +257,22 @@ export function useGame(props: UseGameProps): UseGame {
 		],
 	);
 
+	const onGiveUp = () => {
+		setSelected([]);
+
+		toggleIsGameOver(true);
+		setGame((prev) => ({
+			...prev,
+			completed_at: new Date(),
+		}));
+	};
+
 	const onShuffle = () => {
 		const correctBlocks: PuzzleBlock[] = [];
 		const incorrectBlocks: PuzzleBlock[] = [];
 
 		blocks.forEach((block) => {
-			if (game.correct.includes(block.group_id)) {
+			if (game.correct.includes(block.puzzle_group_id)) {
 				correctBlocks.push(block);
 				return;
 			}
@@ -292,13 +293,7 @@ export function useGame(props: UseGameProps): UseGame {
 			return;
 		}
 
-		setSelected([]);
-
-		toggleIsGameOver(true);
-		setGame((prev) => ({
-			...prev,
-			completed_at: new Date(),
-		}));
+		onGiveUp();
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isGivenUp]);
@@ -326,6 +321,7 @@ export function useGame(props: UseGameProps): UseGame {
 		},
 		{
 			onBlockSelect,
+			onGiveUp,
 			onShuffle,
 		},
 	];

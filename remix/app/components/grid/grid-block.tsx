@@ -1,7 +1,6 @@
-import type { ElementRef } from "react";
+import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
-import type { ComponentPropsWithoutRef } from "@radix-ui/react-primitive";
 import { motion } from "framer-motion";
 import type { MotionProps } from "framer-motion";
 
@@ -21,7 +20,7 @@ export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>((props
 		<motion.button
 			{...other}
 			className={cn(
-				"col-span-1 row-span-1 inline-flex appearance-none items-center justify-center whitespace-normal border bg-muted text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color]",
+				"col-span-1 row-span-1 inline-flex appearance-none items-center justify-center whitespace-normal border bg-muted text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color] [word-break:break-word]",
 
 				"data-[error=true]:border-destructive data-[error=true]:bg-destructive data-[error=true]:text-destructive-foreground data-[error=true]:hover:bg-destructive/90",
 				"data-[has-correct=false]:first-of-type:col-start-1 data-[has-correct=false]:first-of-type:col-end-1 data-[has-correct=false]:first-of-type:row-start-1 data-[has-correct=false]:first-of-type:row-end-1",
@@ -33,7 +32,6 @@ export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>((props
 
 				className,
 			)}
-			data-disabled={disabled}
 			data-error={isError}
 			data-has-correct={hasCorrect}
 			data-selected={isSelected}
@@ -47,7 +45,14 @@ export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>((props
 			ref={ref}
 		>
 			<div className="flex h-full w-full items-center justify-center p-2">
-				<p className="line-clamp-4 select-none text-center font-medium leading-tight">
+				<p
+					className={cn(
+						"line-clamp-4 select-none text-center font-medium leading-tight",
+
+						"max-md:text-[0.9em]",
+						"max-sm:text-[0.8em]",
+					)}
+				>
 					{disabled ? "_".repeat(children?.toString().length || 0) : children}
 				</p>
 			</div>

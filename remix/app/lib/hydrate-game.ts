@@ -12,7 +12,6 @@ export function hydrateGame(json: SerializeFrom<Game>): Game {
 
 		completed_at: json.completed_at ? new Date(json.completed_at) : undefined,
 		created_at: new Date(json.created_at),
-		started_at: json.started_at ? new Date(json.started_at) : undefined,
 
 		user: json.user ? hydrateUser(json.user) : undefined,
 	};

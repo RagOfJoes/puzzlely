@@ -8,7 +8,7 @@ export type PuzzleBlock = {
 	/**
 	 * Unique identifier of the group that this block belongs to
 	 */
-	group_id: string;
+	puzzle_group_id: string;
 	/**
 	 * Text that will be displayed in the UI
 	 */

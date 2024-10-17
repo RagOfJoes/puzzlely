@@ -27,10 +27,6 @@ export type Game = {
 	 */
 	created_at: Date;
 	/**
-	 * When the game has started
-	 */
-	started_at?: Date | null;
-	/**
 	 * This is set when the user has either given up, run out of lives, or, the user has made all the proper connections
 	 */
 	completed_at?: Date | null;

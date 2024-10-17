@@ -6,5 +6,5 @@ export function arePuzzleBlocksSameGroup(attempt: PuzzleBlock[]): boolean {
 		return false;
 	}
 
-	return attempt.every((block) => block.group_id === firstAttempt.group_id);
+	return attempt.every((block) => block.puzzle_group_id === firstAttempt.puzzle_group_id);
 }
