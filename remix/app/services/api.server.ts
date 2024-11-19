@@ -1,4 +1,5 @@
 import { SUPPORTED_PROVIDERS } from "@/lib/constants";
+import { getSession } from "@/services/session.server";
 import type { GameConnection } from "@/types/game-connection";
 import type { PuzzleConnection } from "@/types/puzzle-connection";
 import type { Response } from "@/types/response";
@@ -18,27 +19,23 @@ export class API {
 	 * @returns The cookie from the API and the newly created session
 	 */
 	static async auth(
-		request: Request,
+		_: Request,
 		{ provider, token }: { provider: string; token: string },
-	): Promise<{ cookie: string; response: Response<Session> }> {
+	): Promise<Response<Session>> {
 		if (!SUPPORTED_PROVIDERS.includes(provider)) {
 			throw new Error("Provider not supported");
 		}
 
 		const res = await fetch(`${process.env.API_URL}/auth/${provider}`, {
-			method: "POST",
 			credentials: "include",
 			headers: {
 				Authorization: `Bearer ${token}`,
-				Cookie: request.headers.get("cookie") ?? "",
 			},
+			method: "POST",
 		});
 
 		const response: Response<Session> = await res.json();
-		return {
-			cookie: res.headers.get("set-cookie") ?? "",
-			response,
-		};
+		return response;
 	}
 
 	/**
@@ -50,10 +47,12 @@ export class API {
 	 * @returns Whether the user was successfully logged out
 	 */
 	static async logout(request: Request): Promise<Response<boolean>> {
+		const session = await getSession(request.headers.get("Cookie"));
+
 		const res = await fetch(`${API.URL}/logout`, {
 			credentials: "include",
 			headers: {
-				Cookie: request.headers.get("cookie") ?? "",
+				Authorization: `Bearer ${session.get("id") ?? ""}`,
 			},
 			method: "DELETE",
 		});
@@ -71,10 +70,12 @@ export class API {
 	 * @returns Currently authenticated user's session
 	 */
 	static async me(request: Request): Promise<Response<Session>> {
+		const session = await getSession(request.headers.get("Cookie"));
+
 		const res = await fetch(`${API.URL}/me`, {
 			credentials: "include",
 			headers: {
-				Cookie: request.headers.get("cookie") ?? "",
+				Authorization: `Bearer ${session.get("id") ?? ""}`,
 			},
 			method: "GET",
 		});

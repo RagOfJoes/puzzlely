@@ -215,10 +215,6 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 		render.Respond(w, r, err)
 		return
 	}
-	if err := a.session.SetCookie(w, r, *session); err != nil {
-		render.Respond(w, r, err)
-		return
-	}
 
 	session.User = user
 	if status == http.StatusCreated {

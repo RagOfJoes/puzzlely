@@ -1,9 +1,11 @@
 import querystring from "querystring";
 
 import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
+import dayjs from "dayjs";
 
 import { API } from "@/services/api.server";
 import { state } from "@/services/cookies.server";
+import { commitSession, getSession } from "@/services/session.server";
 
 type TokenResponse = {
 	access_token: string;
@@ -16,40 +18,51 @@ type TokenResponse = {
 export async function loader({ request }: LoaderFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success && me.payload) {
-		const session = me.payload;
-		if (session.user?.state !== "COMPLETE") {
+	if (me.success) {
+		if (me.data.user?.state !== "COMPLETE") {
 			return redirect("/profile");
 		}
 
 		return redirect("/");
 	}
 
+	const session = await getSession(request.headers.get("Cookie"));
+
 	const cookie = (await state.parse(request.headers.get("cookie"))) as null | string;
 	if (!cookie) {
+		const [serializedState, committedSession] = await Promise.all([
+			// Remove state cookie just to be safe ;)
+			state.serialize(cookie, {
+				maxAge: -1,
+			}),
+			commitSession(session),
+		]);
 		return redirect("/login", {
-			headers: {
-				// Remove state cookie just to be safe ;)
-				"Set-Cookie": await state.serialize(cookie, {
-					maxAge: -1,
-				}),
-			},
-			status: 400,
+			headers: [
+				["Set-Cookie", committedSession],
+				["Set-Cookie", serializedState],
+			],
+			status: 302,
 			statusText: "Failed to retrieve state.",
 		});
 	}
 
 	const retrievedState = new URL(request.url).searchParams.get("state");
 	if (retrievedState !== cookie) {
+		const [serializedState, committedSession] = await Promise.all([
+			// Remove state cookie just to be safe ;)
+			state.serialize(cookie, {
+				maxAge: -1,
+			}),
+			commitSession(session),
+		]);
 		return redirect("/login", {
-			headers: {
-				// Remove state cookie
-				"Set-Cookie": await state.serialize(cookie, {
-					maxAge: -1,
-				}),
-			},
-			status: 400,
-			statusText: "Invalid state.",
+			headers: [
+				["Set-Cookie", committedSession],
+				["Set-Cookie", serializedState],
+			],
+			status: 302,
+			statusText: "Failed to retrieve state.",
 		});
 	}
 
@@ -75,17 +88,45 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		token: token.access_token,
 	});
 
-	const headers = new Headers();
-	// Set the session cookie from API
-	headers.append("Set-Cookie", auth.cookie);
-	// Remove state cookie
-	headers.append(
-		"Set-Cookie",
-		await state.serialize(cookie, {
+	if (!auth.success) {
+		const [serializedState, committedSession] = await Promise.all([
+			// Remove state cookie just to be safe ;)
+			state.serialize(cookie, {
+				maxAge: -1,
+			}),
+			commitSession(session),
+		]);
+		return redirect("/login", {
+			headers: [
+				["Set-Cookie", committedSession],
+				["Set-Cookie", serializedState],
+			],
+			status: 302,
+			statusText: "Failed to retrieve state.",
+		});
+	}
+
+	session.set("id", auth.data.id);
+	session.set("state", auth.data.state);
+	session.set("authenticated_at", auth.data.authenticated_at);
+	session.set("created_at", auth.data.created_at);
+	session.set("expires_at", auth.data.expires_at);
+	session.set("user", auth.data.user);
+
+	const [committedSession, serializedState] = await Promise.all([
+		commitSession(session, {
+			expires: dayjs(auth.data.expires_at).toDate(),
+		}),
+		// Remove state cookie just to be safe ;)
+		state.serialize(cookie, {
 			maxAge: -1,
 		}),
-	);
+	]);
+
 	return redirect("/login", {
-		headers,
+		headers: [
+			["Set-Cookie", committedSession],
+			["Set-Cookie", serializedState],
+		],
 	});
 }

@@ -8,8 +8,6 @@ require (
 	github.com/go-chi/render v1.0.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-sql-driver/mysql v1.8.1
-	github.com/gorilla/securecookie v1.1.2
-	github.com/gorilla/sessions v1.4.0
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/riandyrn/otelchi v0.9.0
 	github.com/sirupsen/logrus v1.9.3

@@ -1,9 +1,7 @@
 package config
 
 import (
-	"net/http"
 	"os"
-	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/sirupsen/logrus"
@@ -62,13 +60,6 @@ func SetDefaults(v *viper.Viper) {
 	v.SetDefault("SERVER_SECURITY_ISDEVELOPMENT", false)
 	v.SetDefault("SERVER_SECURITY_REFERRERPOLICY", "same-origin")
 	v.SetDefault("SERVER_SECURITY_HOSTSPROXYHEADERS", []string{"X-Forwarded-Hosts"})
-	// Session
-	v.SetDefault("SESSION_LIFETIME", time.Hour*336)
-	v.SetDefault("SESSION_COOKIE_PATH", "/")
-	v.SetDefault("SESSION_COOKIE_PERSIST", true)
-	v.SetDefault("SESSION_COOKIE_HTTP_ONLY", true)
-	v.SetDefault("SESSION_COOKIE_NAME", "puzzlely_sid")
-	v.SetDefault("SESSION_COOKIE_SAMESITE", http.SameSiteLaxMode)
 }
 
 func New() (Configuration, error) {
