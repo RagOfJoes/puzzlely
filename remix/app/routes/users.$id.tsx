@@ -42,8 +42,7 @@ export default function User() {
 						</div>
 
 						<div className="flex items-center">
-							{/* <p className="text-lg font-bold">{me.username}</p> */}
-							<p className="text-lg font-semibold">test-user</p>
+							<p className="text-lg font-bold">{user.username}</p>
 						</div>
 					</div>
 

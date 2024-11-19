@@ -1,7 +1,6 @@
-import type { ElementRef } from "react";
+import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { Children, forwardRef, useMemo } from "react";
 
-import type { ComponentPropsWithoutRef } from "@radix-ui/react-primitive";
 import { Primitive } from "@radix-ui/react-primitive";
 
 import { cn } from "@/lib/cn";

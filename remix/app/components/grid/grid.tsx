@@ -1,7 +1,6 @@
-import type { ElementRef } from "react";
+import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { Children, cloneElement, forwardRef, isValidElement, useMemo, useRef } from "react";
 
-import type { ComponentPropsWithoutRef } from "@radix-ui/react-primitive";
 import { Primitive } from "@radix-ui/react-primitive";
 
 import { mergeRefs } from "@/hooks/use-merge-refs";

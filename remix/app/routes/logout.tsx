@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import cookie from "cookie";
 
@@ -6,7 +6,7 @@ import { API } from "@/services/api.server";
 
 const SID_COOKIE = "puzzlely_sid";
 
-export async function action({ request }: LoaderFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	// Make sure the request is a DELETE request
 	if (request.method.toUpperCase() !== "DELETE") {
 		return redirect("/profile");

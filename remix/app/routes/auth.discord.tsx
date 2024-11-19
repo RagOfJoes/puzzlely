@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 
 import { API } from "@/services/api.server";
@@ -43,7 +43,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	return redirect(`https://discord.com/oauth2/authorize?${params.toString()}`, {});
 }
 
-export async function action({ request }: LoaderFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
 	if (me.success && me.payload) {

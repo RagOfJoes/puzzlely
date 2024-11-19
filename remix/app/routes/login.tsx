@@ -24,9 +24,9 @@ export default function Login() {
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col items-center justify-center">
 					<div className="flex w-full flex-col items-start gap-1">
-						<h2 className="font-heading text-xl font-bold leading-none">
+						<h1 className="font-heading text-xl font-bold leading-none">
 							Welcome back to Puzzlely.
-						</h2>
+						</h1>
 						<p className="font-medium leading-none text-muted-foreground">
 							Log in with one of the options below to continue.
 						</p>
