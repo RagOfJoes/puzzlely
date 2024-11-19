@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, json, Link, redirect } from "@remix-run/react";
+import { Form, Link, redirect } from "@remix-run/react";
 
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
@@ -9,11 +9,11 @@ import { API } from "@/services/api.server";
 export async function loader({ request }: LoaderFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success && me.payload && me.payload.user) {
+	if (me.success) {
 		return redirect("/profile");
 	}
 
-	return json({});
+	return {};
 }
 
 export default function Login() {

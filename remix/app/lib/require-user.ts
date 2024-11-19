@@ -5,7 +5,7 @@ import type { User } from "@/types/user";
 
 export async function requireUser(request: Request): Promise<User> {
 	const me = await API.me(request);
-	if (!me.success || !me.payload || !me.payload.user) {
+	if (!me.success || !me.data || !me.data.user) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
 		throw redirect("/login", {
 			status: 302,
@@ -13,5 +13,5 @@ export async function requireUser(request: Request): Promise<User> {
 		});
 	}
 
-	return me.payload.user;
+	return me.data.user;
 }

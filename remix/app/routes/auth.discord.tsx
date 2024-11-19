@@ -9,9 +9,8 @@ import { state } from "@/services/cookies.server";
 export async function loader({ request }: LoaderFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success && me.payload) {
-		const session = me.payload;
-		if (session.user?.state !== "COMPLETE") {
+	if (me.success) {
+		if (me.data.user?.state !== "COMPLETE") {
 			return redirect("/profile");
 		}
 
@@ -46,9 +45,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success && me.payload) {
-		const session = me.payload;
-		if (session.user?.state !== "COMPLETE") {
+	if (me.success) {
+		if (me.data.user?.state !== "COMPLETE") {
 			return redirect("/profile");
 		}
 

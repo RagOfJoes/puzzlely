@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import dayjs from "dayjs";
 import { Heart, History, Puzzle } from "lucide-react";
@@ -10,19 +10,35 @@ import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { API } from "@/services/api.server";
+import { commitSession, getSession } from "@/services/session.server";
 
 export type ValidTabs = "created" | "liked" | "history";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-	const [me, user] = await Promise.all([
+	const [me, user, session] = await Promise.all([
 		API.me(request),
 		API.users.get(request, { id: params.id ?? "" }),
+		getSession(request.headers.get("Cookie")),
 	]);
+	if (!user.success) {
+		return redirect("/", {
+			headers: {
+				"Set-Cookie": await commitSession(session),
+			},
+		});
+	}
 
-	return json({
-		me: me.payload?.user,
-		user: user.payload!,
-	});
+	return json(
+		{
+			me: me.success ? me.data?.user : undefined,
+			user: user.data!,
+		},
+		{
+			headers: {
+				"Set-Cookie": await commitSession(session),
+			},
+		},
+	);
 }
 
 export default function User() {

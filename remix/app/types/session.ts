@@ -5,7 +5,7 @@ export type Session = {
 	state: "Unauthenticated" | "Authenticated";
 
 	created_at: Date;
-	expires_t?: Date;
+	expires_at?: Date;
 	authenticated_at?: Date;
 
 	user?: User;

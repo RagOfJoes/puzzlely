@@ -10,14 +10,24 @@ import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
+import { commitSession, getSession } from "@/services/session.server";
 
 export type ValidTabs = "created" | "liked" | "history";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const me = await requireUser(request);
-	return json({
-		me,
-	});
+	const session = await getSession(request.headers.get("Cookie"));
+
+	return json(
+		{
+			me,
+		},
+		{
+			headers: {
+				"Set-Cookie": await commitSession(session),
+			},
+		},
+	);
 }
 
 export default function Profile() {

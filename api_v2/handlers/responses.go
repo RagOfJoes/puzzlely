@@ -14,7 +14,7 @@ type Response struct {
 
 	Success bool   `json:"success"`
 	Message string `json:"message,omitempty"`
-	Payload any    `json:"payload,omitempty"`
+	Data    any    `json:"data,omitempty"`
 	Error   error  `json:"error,omitempty"`
 }
 
@@ -24,35 +24,35 @@ func (r *Response) Render(w http.ResponseWriter, req *http.Request) error {
 }
 
 // Ok creates a response with a HTTP 200 status
-func Ok(msg string, payload any) render.Renderer {
+func Ok(msg string, data any) render.Renderer {
 	return &Response{
 		status: http.StatusOK,
 
 		Success: true,
 		Message: msg,
-		Payload: payload,
+		Data:    data,
 	}
 }
 
 // Created creates a response with a HTTP 201 status
-func Created(msg string, payload any) render.Renderer {
+func Created(msg string, data any) render.Renderer {
 	return &Response{
 		status: http.StatusCreated,
 
 		Success: true,
 		Message: msg,
-		Payload: payload,
+		Data:    data,
 	}
 }
 
 // NoContent creates a response with a HTTP 204 status
-func NoContent(msg string, payload any) render.Renderer {
+func NoContent(msg string, data any) render.Renderer {
 	return &Response{
 		status: http.StatusNoContent,
 
 		Success: true,
 		Message: msg,
-		Payload: payload,
+		Data:    data,
 	}
 }
 

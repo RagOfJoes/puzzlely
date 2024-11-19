@@ -36,12 +36,14 @@ export async function loader({
 }: LoaderFunctionArgs): Promise<TypedResponse<LoaderResponse>> {
 	const [me, puzzles] = await Promise.all([API.me(request), API.puzzles.recent(request)]);
 
-	if (!puzzles.success || !puzzles.payload) {
+	// TODO: Render proper error page
+	if (!puzzles.success || !puzzles.data) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
 		throw new Response("Failed to fetch puzzles!", { status: 500 });
 	}
 
-	const firstPuzzle = puzzles.payload.edges[0]?.node;
+	// TODO: Render proper error page
+	const firstPuzzle = puzzles.data.edges[0]?.node;
 	if (!firstPuzzle) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
 		throw new Response("Failed to fetch puzzles!", { status: 500 });
@@ -61,44 +63,37 @@ export async function loader({
 	) {
 		return json({
 			game: createGame({
-				me: me.payload?.user,
+				me: me.data?.user,
 				puzzle: firstPuzzle,
 			}),
-			me: me.payload?.user,
+			me: me.data?.user,
 			pageInfo: {
-				current: 0,
 				cursor: cursor ?? "",
-				length: puzzles.payload.edges.length,
+				length: puzzles.data.edges.length,
+				next: puzzles.data.edges[1]?.node.id,
 			},
 		});
 	}
 
-	const edge = puzzles.payload.edges[current];
+	const edge = puzzles.data.edges.find((e) => e.node.id === current);
+	const edgeIndex = puzzles.data.edges.findIndex((e) => e.node.id === current);
+	// If current is not on the page, then, redirect to remove it from the URL
 	if (!edge) {
-		return json({
-			game: createGame({
-				me: me.payload?.user,
-				puzzle: firstPuzzle,
-			}),
-			me: me.payload?.user,
-			pageInfo: {
-				current: 0,
-				cursor: cursor ?? "",
-				length: puzzles.payload.edges.length,
-			},
-		});
+		return redirect(cursor ? `/?cursor=${cursor}` : "/");
 	}
 
 	return json({
 		game: createGame({
-			me: me.payload?.user,
+			me: me.data?.user,
 			puzzle: edge.node,
 		}),
-		me: me.payload?.user,
+		me: me.data?.user,
 		pageInfo: {
 			current,
 			cursor: cursor ?? "",
-			length: puzzles.payload.edges.length,
+			length: puzzles.data.edges.length,
+			next: puzzles.data.edges?.[edgeIndex + 1]?.node.id,
+			previous: puzzles.data.edges?.[edgeIndex - 1]?.node.id,
 		},
 	});
 }
