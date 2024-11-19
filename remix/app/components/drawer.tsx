@@ -53,6 +53,7 @@ export const DrawerContent = forwardRef<
 			className={cn(
 				"group fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col",
 
+				"data-[vaul-drawer-direction=left]:inset-x-auto data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:bottom-2 data-[vaul-drawer-direction=left]:left-2 data-[vaul-drawer-direction=left]:top-2 data-[vaul-drawer-direction=left]:mt-0 data-[vaul-drawer-direction=left]:w-[310px] data-[vaul-drawer-direction=left]:flex-row",
 				"data-[vaul-drawer-direction=right]:inset-x-auto data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:bottom-2 data-[vaul-drawer-direction=right]:right-2 data-[vaul-drawer-direction=right]:top-2 data-[vaul-drawer-direction=right]:mt-0 data-[vaul-drawer-direction=right]:w-[310px] data-[vaul-drawer-direction=right]:flex-row",
 
 				className,
@@ -72,8 +73,8 @@ export const DrawerDragHandler = ({ className, ...props }: HTMLAttributes<HTMLDi
 		className={cn(
 			"mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted-foreground/40",
 
+			"group-data-[vaul-drawer-direction=left]:hidden",
 			"group-data-[vaul-drawer-direction=right]:hidden",
-			// "group-data-[vaul-drawer-direction=right]:my-auto group-data-[vaul-drawer-direction=right]:ml-2 group-data-[vaul-drawer-direction=right]:mr-0 group-data-[vaul-drawer-direction=right]:h-[100px] group-data-[vaul-drawer-direction=right]:w-2",
 
 			className,
 		)}

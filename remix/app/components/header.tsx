@@ -1,22 +1,39 @@
-import type { ComponentProps, ElementRef } from "react";
+import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
+import { Primitive } from "@radix-ui/react-primitive";
 import { Form, Link } from "@remix-run/react";
-import { LogOut, User as UserIcon } from "lucide-react";
+import {
+	LogInIcon,
+	LogOutIcon,
+	MenuIcon,
+	PlusIcon,
+	TrendingUpIcon,
+	UserIcon,
+	UserPlusIcon,
+} from "lucide-react";
 
 import { PuzzlelyIcon } from "@/components/puzzlely-icon";
 import { cn } from "@/lib/cn";
 import type { User } from "@/types/user";
 
 import { Button } from "./button";
+import {
+	Drawer,
+	DrawerContent,
+	DrawerDescription,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger,
+} from "./drawer";
 
-export type HeaderProps = Omit<ComponentProps<"header">, "children"> & {
+export type HeaderProps = Omit<ComponentPropsWithoutRef<typeof Primitive.nav>, "children"> & {
 	me?: User;
 };
 
-export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
+export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 	({ className, me, ...props }, ref) => (
-		<header
+		<Primitive.nav
 			className={cn(
 				"z-[1] mx-auto flex h-[var(--header-height)] w-full max-w-screen-md items-center justify-between px-5",
 
@@ -25,42 +42,167 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 			ref={ref}
 			{...props}
 		>
-			<Link
-				to="/"
-				className={cn(
-					"flex items-center no-underline outline-none ring-offset-background transition-all",
+			<div className="flex gap-1">
+				<Drawer direction="left">
+					<DrawerTrigger asChild>
+						<Button aria-label="Open menu" className="h-11 w-11" size="icon" variant="outline">
+							<MenuIcon className="h-4 w-4" />
+						</Button>
+					</DrawerTrigger>
 
-					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-				)}
-			>
-				<div className="flex h-11 w-11 items-center justify-center border bg-muted">
+					<DrawerContent>
+						<div className="flex w-full border bg-muted">
+							<div className="flex w-full flex-col">
+								<DrawerHeader className=" w-full">
+									<DrawerTitle>
+										<Link
+											aria-label="Go home"
+											to="/"
+											className={cn(
+												"flex items-center no-underline outline-none ring-offset-background transition-all",
+
+												"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+											)}
+										>
+											<PuzzlelyIcon className="h-11 w-11" />
+
+											<h1 className="font-heading relative select-none text-xl font-bold">
+												Puzzlely
+											</h1>
+										</Link>
+									</DrawerTitle>
+									<DrawerDescription className="sr-only">Menu</DrawerDescription>
+								</DrawerHeader>
+
+								<hr className="h-1 w-full bg-muted" />
+
+								<div className="mt-4 flex w-full flex-col gap-1 px-4">
+									<Link tabIndex={-1} to="/puzzles/create">
+										<Button
+											className={cn(
+												"w-full gap-1 border border-primary bg-primary/10 text-primary",
+
+												"data-[is-liked=true]:text-primary",
+												"hover:enabled:bg-primary/20",
+												"[&>svg]:data-[is-liked=true]:fill-current",
+											)}
+											size="lg"
+										>
+											<PlusIcon className="h-4 w-4" />
+											Create a puzzle
+										</Button>
+									</Link>
+								</div>
+
+								<div className="mt-8 flex w-full flex-col gap-1 px-4 pb-4">
+									<h2 className="text-sm font-semibold uppercase">Menu</h2>
+
+									<Link tabIndex={-1} to="/popular">
+										<Button className="w-full justify-start gap-2 px-2" size="lg" variant="ghost">
+											<div className="flex h-8 w-8 items-center justify-center border border-primary bg-primary/10 p-2 text-primary">
+												<TrendingUpIcon className="h-4 w-4" />
+											</div>
+											Popular
+										</Button>
+									</Link>
+								</div>
+
+								<div className="mt-auto flex w-full flex-col gap-1 px-4 pb-4">
+									<h2 className="text-sm font-semibold uppercase">Account</h2>
+
+									{me ? (
+										<>
+											<Link tabIndex={-1} to="/profile">
+												<Button
+													className="w-full justify-start gap-2 px-2"
+													size="lg"
+													variant="ghost"
+												>
+													<div className="flex h-8 w-8 items-center justify-center border border-primary bg-primary/10 p-2 text-primary">
+														<UserIcon className="h-4 w-4" />
+													</div>
+													Profile
+												</Button>
+											</Link>
+
+											<Form method="delete" action="/logout">
+												<Button
+													className="w-full justify-start gap-2 px-2"
+													size="lg"
+													variant="ghost"
+												>
+													<div className="flex h-8 w-8 items-center justify-center border border-primary bg-primary/10 p-2 text-primary">
+														<LogOutIcon className="h-4 w-4" />
+													</div>
+													Logout
+												</Button>
+											</Form>
+										</>
+									) : (
+										<>
+											<Link tabIndex={-1} to="/signup">
+												<Button
+													className="w-full justify-start gap-2 px-2"
+													size="lg"
+													variant="ghost"
+												>
+													<div className="flex h-8 w-8 items-center justify-center border border-primary bg-primary/10 p-2 text-primary">
+														<UserPlusIcon className="h-4 w-4" />
+													</div>
+													Sign Up
+												</Button>
+											</Link>
+
+											<Link tabIndex={-1} to="/login">
+												<Button
+													className="w-full justify-start gap-2 px-2"
+													size="lg"
+													variant="ghost"
+												>
+													<div className="flex h-8 w-8 items-center justify-center border border-primary bg-primary/10 p-2 text-primary">
+														<LogInIcon className="h-4 w-4" />
+													</div>
+													Login
+												</Button>
+											</Link>
+										</>
+									)}
+								</div>
+							</div>
+						</div>
+					</DrawerContent>
+				</Drawer>
+
+				<Link
+					aria-label="Go home"
+					className={cn(
+						"flex h-11 w-11 items-center justify-center no-underline outline-none ring-offset-background transition-all",
+
+						"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+					)}
+					to="/"
+				>
 					<PuzzlelyIcon className="h-9 w-9" />
-				</div>
-
-				<h1 className="font-heading relative ml-3 select-none text-xl font-bold">Puzzlely</h1>
-			</Link>
+				</Link>
+			</div>
 
 			{me ? (
 				<div className="flex gap-1">
-					<Link tabIndex={-1} to="/profile">
-						<Button className="h-11 w-11" size="icon" variant="outline">
-							<UserIcon className="h-4 w-4" />
-						</Button>
-					</Link>
-
 					<Form method="delete" action="/logout">
-						<Button className="h-11 w-11 gap-2" size="icon" variant="outline">
-							<LogOut className="h-4 w-4" />
+						<Button className="h-11 w-11" size="icon" variant="outline">
+							<LogOutIcon className="h-4 w-4" />
 						</Button>
 					</Form>
 				</div>
 			) : (
-				<Link tabIndex={-1} to="/login">
-					<Button size="lg" variant="outline">
-						Log In
-					</Button>
-				</Link>
+				<div className="flex gap-1">
+					<Link tabIndex={-1} to="/login">
+						<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="outline">
+							<LogInIcon className="h-4 w-4" />
+						</Button>
+					</Link>
+				</div>
 			)}
-		</header>
+		</Primitive.nav>
 	),
 );
