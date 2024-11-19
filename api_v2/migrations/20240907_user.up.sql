@@ -3,7 +3,7 @@ CREATE TABLE `users` (
     `id` VARCHAR(26) NOT NULL,
     PRIMARY KEY(`id`),
     `state` VARCHAR(8) NOT NULL,
-    `username` VARCHAR(24) NOT NULL,
+    `username` VARCHAR(64) NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `updated_at` TIMESTAMP NULL DEFAULT NULL,
     `deleted_at` TIMESTAMP NULL DEFAULT NULL

@@ -22,7 +22,7 @@ INSERT
     ('01J4CTSVYFZYXMMJG2HKDVRXHN', 'Slang for mouth.', '01J4CTP7K48Y424NJVCS82G15R'),
     ('01J4CV2RN890NJVEPTX8KWN863', 'Round of _____', '01J4CTP7K48Y424NJVCS82G15R'),
     ('01J4CVAE95Q32NGBDSE1PGK08E', 'Deli bread options', '01J4CTP7K48Y424NJVCS82G15R'),
-    ('01J4CVFHE0P5M415HYMNF6MWKG', 'Keep rhythm with music', '01J4CTP7K48Y424NJVCS82G15R')
+    ('01J4CVFHE0P5M415HYMNF6MWKG', 'Keep rhythm with music', '01J4CTP7K48Y424NJVCS82G15R'),
   -- Second puzzle groups --
     ('01J7F0FTXTQ7946G7S2JSBRGK0', 'Can be represented as "C".', '01J7F0DACH0M4N4S05K7892FTS'),
     ('01J7F0H12BGF0RDGVYTN0EQGZ2', 'Related to "cease": To "cease" is to come to an end, "Cease" and desist, To cancel something is to "cease" it, and, "Cease" fire.', '01J7F0DACH0M4N4S05K7892FTS'),
