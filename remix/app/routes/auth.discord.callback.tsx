@@ -115,7 +115,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const [committedSession, serializedState] = await Promise.all([
 		commitSession(session, {
-			expires: dayjs(auth.data.expires_at).toDate(),
+			maxAge: dayjs(auth.data.expires_at).diff(undefined, "minutes"),
 		}),
 		// Remove state cookie just to be safe ;)
 		state.serialize(cookie, {
