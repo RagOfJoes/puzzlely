@@ -13,6 +13,7 @@ import (
 
 // Errors
 var (
+	ErrPuzzleNew      = errors.New("Failed to create new puzzle.")
 	ErrPuzzleNotFound = errors.New("Puzzle not found.")
 	ErrPuzzleRecent   = errors.New("Failed to get recent puzzles.")
 )
@@ -31,6 +32,22 @@ func NewPuzzle(d PuzzleDependencies) Puzzle {
 	return Puzzle{
 		repository: d.Repository,
 	}
+}
+
+func (p *Puzzle) New(ctx context.Context, newPuzzle domains.Puzzle) (*domains.Puzzle, error) {
+	if err := newPuzzle.Validate(); err != nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
+	}
+
+	created, err := p.repository.Create(ctx, newPuzzle)
+	if err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleNew)
+	}
+	if err := created.Validate(); err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleNew)
+	}
+
+	return *&created, nil
 }
 
 func (p *Puzzle) Find(ctx context.Context, id ulid.ULID) (*domains.Puzzle, error) {

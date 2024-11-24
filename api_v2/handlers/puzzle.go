@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/RagOfJoes/puzzlely/domains"
@@ -9,6 +10,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/oklog/ulid/v2"
+)
+
+// Errors
+var (
+	ErrPuzzleCursorPaginationOpts = errors.New("Invalid cursor pagination options provided.")
+	ErrPuzzleInvalidCreatePayload = errors.New("Invalid new puzzle provided.")
 )
 
 type puzzle struct {
@@ -31,6 +38,11 @@ func Puzzle(dependencies PuzzleDependencies, router *chi.Mux) {
 	}
 
 	router.Route("/puzzles", func(r chi.Router) {
+		// Create
+		//
+
+		r.Post("/create", p.create)
+
 		// Read
 		//
 
@@ -38,6 +50,40 @@ func Puzzle(dependencies PuzzleDependencies, router *chi.Mux) {
 		r.Get("/created/{user_id}", p.created)
 		r.Get("/recent", p.recent)
 	})
+}
+
+func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
+	var payload domains.PuzzleCreatePayload
+	if err := render.Bind(r, &payload); err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidCreatePayload))
+		return
+	}
+	if err := payload.Validate(); err != nil {
+		render.Respond(w, r, err)
+		return
+	}
+
+	session, err := p.session.Get(w, r, true)
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
+		return
+	}
+
+	newPuzzle := payload.ToPuzzle()
+	newPuzzle.CreatedBy = *session.User
+	newPuzzle.UserID = session.User.ID
+	if err := newPuzzle.Validate(); err != nil {
+		render.Respond(w, r, err)
+		return
+	}
+
+	created, err := p.service.New(r.Context(), newPuzzle)
+	if err != nil {
+		render.Respond(w, r, err)
+		return
+	}
+
+	render.Render(w, r, Created("", created))
 }
 
 func (p *puzzle) created(w http.ResponseWriter, r *http.Request) {
