@@ -12,6 +12,8 @@ export function IndexHeader() {
 
 	const navigation = useNavigation();
 
+	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
+
 	return (
 		<div
 			className={cn(
@@ -21,7 +23,7 @@ export function IndexHeader() {
 				"data-[is-loading='true']:animate-pulse",
 			)}
 			data-is-game-over={state.isGameOver || state.isWinnerWinnerChickenDinner}
-			data-is-loading={navigation.state === "loading"}
+			data-is-loading={isLoading}
 		>
 			<div
 				className={cn(
@@ -36,7 +38,7 @@ export function IndexHeader() {
 						<h3 className="text-sm font-medium tracking-tight">Attempts Left</h3>
 
 						<div className="mt-2 text-2xl font-bold leading-none">
-							{navigation.state === "loading" ? (
+							{isLoading ? (
 								<Skeleton className="bg-foreground/10 text-transparent">10</Skeleton>
 							) : (
 								state.game.puzzle.max_attempts - state.wrongAttempts
@@ -44,7 +46,7 @@ export function IndexHeader() {
 						</div>
 
 						<div className="text-xs text-muted-foreground">
-							{navigation.state === "loading" ? (
+							{isLoading ? (
 								<Skeleton className="bg-foreground/10 text-transparent">out of 10</Skeleton>
 							) : (
 								`out of ${state.game.puzzle.max_attempts}`
@@ -73,10 +75,8 @@ export function IndexHeader() {
 						"disabled:opacity-100",
 						"max-md:h-11 max-md:basis-1/2",
 					)}
-					data-is-loading={navigation.state === "loading"}
-					disabled={
-						navigation.state === "loading" || state.isGameOver || state.isWinnerWinnerChickenDinner
-					}
+					data-is-loading={isLoading}
+					disabled={isLoading || state.isGameOver || state.isWinnerWinnerChickenDinner}
 					onClick={actions.onGiveUp}
 					variant="outline"
 				>
@@ -96,10 +96,8 @@ export function IndexHeader() {
 						"disabled:opacity-100",
 						"max-md:h-11 max-md:basis-1/2",
 					)}
-					data-is-loading={navigation.state === "loading"}
-					disabled={
-						navigation.state === "loading" || state.isGameOver || state.isWinnerWinnerChickenDinner
-					}
+					data-is-loading={isLoading}
+					disabled={isLoading || state.isGameOver || state.isWinnerWinnerChickenDinner}
 					onClick={actions.onShuffle}
 					variant="outline"
 				>
@@ -126,7 +124,7 @@ export function IndexHeader() {
 						<h3 className="text-sm font-medium tracking-tight">Likes</h3>
 
 						<div className="line-clamp-2 text-lg font-bold leading-none">
-							{navigation.state === "loading" ? (
+							{isLoading ? (
 								<Skeleton className="bg-foreground/10 text-transparent">10</Skeleton>
 							) : (
 								abbreviateNumber(state.game.puzzle.num_of_likes)
@@ -144,7 +142,7 @@ export function IndexHeader() {
 							"[&>svg]:data-[is-liked=true]:fill-current",
 						)}
 						data-is-liked={!!state.game.puzzle.liked_at}
-						disabled={navigation.state === "loading"}
+						disabled={isLoading}
 						size="icon"
 					>
 						<StarIcon className="h-4 w-4" />

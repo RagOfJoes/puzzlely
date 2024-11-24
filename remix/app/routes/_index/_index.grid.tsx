@@ -8,9 +8,11 @@ export function IndexGrid() {
 
 	const navigation = useNavigation();
 
+	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
+
 	return (
 		<Grid>
-			{(navigation.state === "loading" || state.blocks.length === 0) && (
+			{(isLoading || state.blocks.length === 0) && (
 				<GridBlocks>
 					{Array.from({ length: 16 }).map((_, i) => (
 						<GridBlock
@@ -25,7 +27,7 @@ export function IndexGrid() {
 				</GridBlocks>
 			)}
 
-			{navigation.state !== "loading" && state.blocks.length > 0 && (
+			{!isLoading && state.blocks.length > 0 && (
 				<GridBlocks>
 					{state.game.correct.map((group_id) => {
 						const group = state.game.puzzle.groups.find((g) => g.id === group_id);
@@ -60,14 +62,13 @@ export function IndexGrid() {
 				</GridBlocks>
 			)}
 
-			{navigation.state !== "loading" &&
-				(state.isGameOver || state.isWinnerWinnerChickenDinner) && (
-					<GridMenu
-						blocks={state.blocks}
-						game={state.game}
-						isSuccess={state.isWinnerWinnerChickenDinner}
-					/>
-				)}
+			{!isLoading && (state.isGameOver || state.isWinnerWinnerChickenDinner) && (
+				<GridMenu
+					blocks={state.blocks}
+					game={state.game}
+					isSuccess={state.isWinnerWinnerChickenDinner}
+				/>
+			)}
 		</Grid>
 	);
 }

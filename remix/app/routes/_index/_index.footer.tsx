@@ -18,6 +18,8 @@ export function IndexFooter() {
 	const navigation = useNavigation();
 	const [searchParams] = useSearchParams();
 
+	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
+
 	return (
 		<>
 			<div
@@ -26,11 +28,11 @@ export function IndexFooter() {
 
 					"data-[is-loading='true']:animate-pulse",
 				)}
-				data-is-loading={navigation.state === "loading"}
+				data-is-loading={isLoading}
 			>
 				<div className="col-span-4 flex h-full gap-1">
 					<Link
-						aria-disabled={navigation.state === "loading" || !searchParams.has("cursor")}
+						aria-disabled={isLoading}
 						className={cn(
 							"h-full w-full basis-1/2",
 
@@ -50,8 +52,8 @@ export function IndexFooter() {
 
 								"data-[is-loading='true']:disabled:opacity-100",
 							)}
-							data-is-loading={navigation.state === "loading"}
-							disabled={navigation.state === "loading" || !searchParams.has("cursor")}
+							data-is-loading={isLoading}
+							disabled={isLoading || !searchParams.has("cursor")}
 							size="lg"
 							variant="ghost"
 						>
@@ -63,7 +65,7 @@ export function IndexFooter() {
 
 					<div className="flex h-full w-full basis-1/2 items-center gap-1">
 						<Link
-							aria-disabled={!data.pageInfo.has_previous_page || navigation.state === "loading"}
+							aria-disabled={!data.pageInfo.has_previous_page || isLoading}
 							className={cn(
 								"h-full w-full",
 
@@ -86,8 +88,8 @@ export function IndexFooter() {
 
 									"data-[is-loading='true']:disabled:opacity-100",
 								)}
-								data-is-loading={navigation.state === "loading"}
-								disabled={!data.pageInfo.has_previous_page || navigation.state === "loading"}
+								data-is-loading={isLoading}
+								disabled={!data.pageInfo.has_previous_page || isLoading}
 								size="lg"
 								variant="outline"
 							>
@@ -96,7 +98,7 @@ export function IndexFooter() {
 						</Link>
 
 						<Link
-							aria-disabled={!data.pageInfo.has_next_page || navigation.state === "loading"}
+							aria-disabled={!data.pageInfo.has_next_page || isLoading}
 							className={cn(
 								"h-full w-full",
 
@@ -119,8 +121,8 @@ export function IndexFooter() {
 
 									"data-[is-loading='true']:disabled:opacity-100",
 								)}
-								data-is-loading={navigation.state === "loading"}
-								disabled={!data.pageInfo.has_next_page || navigation.state === "loading"}
+								data-is-loading={isLoading}
+								disabled={!data.pageInfo.has_next_page || isLoading}
 								size="lg"
 								variant="outline"
 							>
@@ -133,7 +135,7 @@ export function IndexFooter() {
 
 			<div className="flex gap-1">
 				<div className="w-full min-w-0 basis-1/2">
-					{navigation.state === "loading" ? (
+					{isLoading ? (
 						<Skeleton className="mt-2 inline-flex min-w-0 select-none items-center px-2 py-1 text-transparent">
 							<p className="w-full truncate text-lg font-bold leading-none">EASY</p>
 						</Skeleton>
@@ -157,7 +159,7 @@ export function IndexFooter() {
 
 				<div className="w-full min-w-0 basis-1/2 ">
 					<div className="flex h-full w-full flex-col items-end justify-center text-end">
-						{navigation.state === "loading" ? (
+						{isLoading ? (
 							<div className="mt-2 min-w-0">
 								<Skeleton className="w-auto text-transparent">
 									<p className="w-full text-lg font-bold leading-none">Username</p>
@@ -166,7 +168,7 @@ export function IndexFooter() {
 						) : (
 							<Link
 								className={cn(
-									"mt-2 w-full min-w-0 no-underline outline-none ring-offset-background transition-all",
+									"mt-2 min-w-0 no-underline outline-none ring-offset-background transition-all",
 
 									"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 								)}
@@ -178,7 +180,7 @@ export function IndexFooter() {
 							</Link>
 						)}
 
-						{navigation.state === "loading" ? (
+						{isLoading ? (
 							<Skeleton className="text-transparent">
 								<p className="text-xs">{dayjs().format("MMMM DD, YYYY")}</p>
 							</Skeleton>
