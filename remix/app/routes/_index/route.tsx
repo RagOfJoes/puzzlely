@@ -18,7 +18,7 @@ import { IndexFooter } from "./_index.footer";
 import { IndexGrid } from "./_index.grid";
 import { IndexHeader } from "./_index.header";
 
-// Exptected response from the loader
+// Expected response from the loader
 type LoaderResponse = {
 	game: Game;
 	me?: User;

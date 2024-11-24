@@ -1,6 +1,7 @@
+import type { ComponentPropsWithoutRef } from "react";
 import { forwardRef } from "react";
 
-import type { ComponentPropsWithoutRef, Primitive } from "@radix-ui/react-primitive";
+import type { Primitive } from "@radix-ui/react-primitive";
 
 export type PuzzlelyIconProps = ComponentPropsWithoutRef<typeof Primitive.svg>;
 
@@ -106,3 +107,4 @@ export const PuzzlelyIcon = forwardRef<SVGSVGElement, PuzzlelyIconProps>((props,
 		/>
 	</svg>
 ));
+PuzzlelyIcon.displayName = "PuzzlelyIcon";

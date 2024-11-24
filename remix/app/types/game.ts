@@ -19,10 +19,6 @@ export type Game = {
 	 */
 	correct: string[];
 	/**
-	 * Code that other users can use to copy `config` and compete with one another
-	 */
-	challenge_code: string;
-	/**
 	 * When game was created
 	 */
 	created_at: Date;
