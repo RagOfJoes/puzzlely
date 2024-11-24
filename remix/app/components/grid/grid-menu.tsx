@@ -4,7 +4,7 @@ import { forwardRef, useMemo, useState } from "react";
 import * as Portal from "@radix-ui/react-portal";
 import { Primitive } from "@radix-ui/react-primitive";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, PartyPopper, Skull } from "lucide-react";
+import { ArrowUpRightIcon, PartyPopperIcon, SkullIcon } from "lucide-react";
 
 import {
 	Accordion,
@@ -79,7 +79,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>((props, ref
 									},
 								}}
 							>
-								<ArrowUpRight className="h-4 w-4" />
+								<ArrowUpRightIcon className="h-4 w-4" />
 							</motion.button>
 						</Button>
 					)}
@@ -124,9 +124,9 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>((props, ref
 
 									<div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-primary/10 text-primary">
 										{isSuccess ? (
-											<PartyPopper className="h-4 w-4" />
+											<PartyPopperIcon className="h-4 w-4" />
 										) : (
-											<Skull className="h-4 w-4" />
+											<SkullIcon className="h-4 w-4" />
 										)}
 									</div>
 								</div>
@@ -162,7 +162,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>((props, ref
 													{attempts.map((attempt, index) => (
 														<div
 															className={cn(
-																"group/attempt w-full border border-destructive-foreground/40 bg-destructive p-2",
+																"group/attempt w-full border border-destructive bg-destructive/10 p-2",
 
 																"data-[is-correct='true']:border-secondary/40 data-[is-correct='true']:bg-secondary/10",
 															)}
@@ -173,9 +173,9 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>((props, ref
 																{attempt.blocks.map((block) => (
 																	<p
 																		className={cn(
-																			"w-full basis-1/4 select-none truncate px-2 text-center text-sm font-medium text-destructive-foreground",
+																			"w-full basis-1/4 select-none truncate px-2 text-center text-sm font-medium text-destructive",
 
-																			"[&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-destructive-foreground/40",
+																			"[&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-destructive",
 																			"group-data-[is-correct='true']/attempt:text-secondary",
 																			"group-data-[is-correct='true']/attempt:[&:not(:last-child)]:border-r-secondary/40",
 																		)}

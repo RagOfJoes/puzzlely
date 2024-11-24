@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 export type GridBlocksProps = ComponentPropsWithoutRef<typeof Primitive.div>;
 
 export const GridBlocks = forwardRef<ElementRef<typeof Primitive.div>, GridBlocksProps>(
-	(props, ref) => {
+	({ className, ...props }, ref) => {
 		const children = useMemo(
 			() =>
 				Children.toArray(props.children).filter(
@@ -26,7 +26,7 @@ export const GridBlocks = forwardRef<ElementRef<typeof Primitive.div>, GridBlock
 
 					'before:col-start-1 before:col-end-1 before:row-start-1 before:row-end-1 before:w-0 before:content-[""]',
 
-					props.className,
+					className,
 				)}
 				ref={ref}
 			>

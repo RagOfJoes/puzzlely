@@ -13,12 +13,10 @@ export type GridBlockProps = ComponentPropsWithoutRef<"button"> &
 		isSelected?: boolean;
 	};
 
-export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>((props, ref) => {
-	const { children, className, disabled, hasCorrect, isError, isSelected, ...other } = props;
-
-	return (
+export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>(
+	({ children, className, disabled, hasCorrect, isError, isSelected, ...props }, ref) => (
 		<motion.button
-			{...other}
+			{...props}
 			className={cn(
 				"col-span-1 row-span-1 inline-flex appearance-none items-center justify-center whitespace-normal border bg-muted text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color] [word-break:break-word]",
 
@@ -53,10 +51,10 @@ export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>((props
 						"max-sm:text-[0.8em]",
 					)}
 				>
-					{disabled ? "_".repeat(children?.toString().length || 0) : children}
+					{children}
 				</p>
 			</div>
 		</motion.button>
-	);
-});
+	),
+);
 GridBlock.displayName = "GridBlock";
