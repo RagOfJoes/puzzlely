@@ -31,9 +31,11 @@ func Puzzle(dependencies PuzzleDependencies, router *chi.Mux) {
 	}
 
 	router.Route("/puzzles", func(r chi.Router) {
+		// Read
+		//
+
 		r.Get("/{id}", p.puzzle)
 		r.Get("/created/{user_id}", p.created)
-		r.Get("/popular", p.popular)
 		r.Get("/recent", p.recent)
 	})
 }
@@ -55,13 +57,17 @@ func (p *puzzle) created(w http.ResponseWriter, r *http.Request) {
 	// Get the session from the request and pass result, if any, to the context
 	p.session.Get(w, r, false)
 
-	foundConnection, err := p.service.FindCreated(r.Context(), userID.String(), cursor)
+	opts := domains.PuzzleCursorPaginationOpts{
+		Cursor: cursor,
+		Limit:  30,
+	}
+	connection, err := p.service.FindCreated(r.Context(), userID.String(), opts)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Ok("", foundConnection))
+	render.Render(w, r, Ok("", connection))
 }
 
 func (p *puzzle) puzzle(w http.ResponseWriter, r *http.Request) {
@@ -80,24 +86,6 @@ func (p *puzzle) puzzle(w http.ResponseWriter, r *http.Request) {
 	render.Render(w, r, Ok("", puzzle))
 }
 
-func (p *puzzle) popular(w http.ResponseWriter, r *http.Request) {
-	cursor, err := domains.CursorFromString(r.URL.Query().Get("cursor"))
-	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", domains.ErrCursorInvalid))
-		return
-	}
-
-	p.session.Get(w, r, false)
-
-	foundConnection, err := p.service.FindPopular(r.Context(), cursor)
-	if err != nil {
-		render.Respond(w, r, err)
-		return
-	}
-
-	render.Render(w, r, Ok("", foundConnection))
-}
-
 func (p *puzzle) recent(w http.ResponseWriter, r *http.Request) {
 	cursor, err := domains.CursorFromString(r.URL.Query().Get("cursor"))
 	if err != nil {
@@ -107,11 +95,16 @@ func (p *puzzle) recent(w http.ResponseWriter, r *http.Request) {
 
 	p.session.Get(w, r, false)
 
-	foundConnection, err := p.service.FindRecent(r.Context(), cursor)
+	opts := domains.PuzzleCursorPaginationOpts{
+		Cursor:    cursor,
+		Direction: r.URL.Query().Get("direction"),
+		Limit:     1,
+	}
+	connection, err := p.service.FindRecent(r.Context(), opts)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Ok("", foundConnection))
+	render.Render(w, r, Ok("", connection))
 }

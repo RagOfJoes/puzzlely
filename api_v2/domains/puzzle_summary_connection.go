@@ -4,10 +4,6 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
-const (
-	puzzleSummaryConnectionLimit = 2
-)
-
 var _ Domain = (*PuzzleSummaryConnection)(nil)
 
 type PuzzleSummaryConnection struct {
@@ -15,33 +11,24 @@ type PuzzleSummaryConnection struct {
 	PageInfo PageInfo            `json:"page_info"`
 }
 
-func BuildPuzzleSummaryConnection(sortKey string, nodes []PuzzleSummary) (*PuzzleSummaryConnection, error) {
-	var edges []PuzzleSummaryEdge
+func BuildPuzzleSummaryConnection(nodes []PuzzleSummary, limit int) (*PuzzleSummaryConnection, error) {
+	edges := make([]PuzzleSummaryEdge, 0)
 	for _, node := range nodes {
-		cursor, err := NewCursor(sortKey, node)
-		if err != nil {
-			return nil, err
-		}
-
 		edges = append(edges, PuzzleSummaryEdge{
-			Cursor: cursor,
+			Cursor: NewCursor(node.CreatedAt.String()),
 			Node:   node,
 		})
 	}
 
-	hasNextPage := len(edges) > puzzleSummaryConnectionLimit-1
 	pageInfo := PageInfo{
-		Cursor:      "",
-		HasNextPage: hasNextPage,
+		HasNextPage:     len(edges) > limit,
+		HasPreviousPage: false,
+		NextCursor:      "",
+		PreviousCursor:  "",
 	}
-	if hasNextPage {
-		pageInfo.Cursor = edges[len(edges)-1].Cursor
+	if pageInfo.HasNextPage {
+		pageInfo.NextCursor = edges[len(edges)-1].Cursor
 		edges = edges[:len(edges)-1]
-	}
-
-	// If edges were not initialized then do so here to not trigger validation error
-	if edges == nil {
-		edges = []PuzzleSummaryEdge{}
 	}
 
 	connection := PuzzleSummaryConnection{

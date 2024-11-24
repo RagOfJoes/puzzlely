@@ -51,8 +51,7 @@ func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticate
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalidID)
 	}
 
-	ctx := r.Context()
-	session, err := s.service.FindByID(ctx, id)
+	session, err := s.service.FindByID(r.Context(), id)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrSessionNotFound)
 	}
@@ -61,10 +60,8 @@ func (s *session) Get(w http.ResponseWriter, r *http.Request, mustBeAuthenticate
 	}
 
 	if session.IsAuthenticated() {
-		ctx = domains.SessionNewContext(ctx, *session)
-
 		// Update request with updated context
-		*r = *r.WithContext(ctx)
+		*r = *r.WithContext(domains.SessionNewContext(r.Context(), *session))
 	}
 
 	return session, nil

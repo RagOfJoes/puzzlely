@@ -16,24 +16,19 @@ type GameConnection struct {
 func BuildGameConnection(sortKey string, nodes []GameSummary) (*GameConnection, error) {
 	var edges []GameEdge
 	for _, node := range nodes {
-		cursor, err := NewCursor(sortKey, node)
-		if err != nil {
-			return nil, err
-		}
-
 		edges = append(edges, GameEdge{
-			Cursor: cursor,
+			Cursor: NewCursor(node.CreatedAt.String()),
 			Node:   node,
 		})
 	}
 
 	hasNextPage := len(edges) > gameConnectionLimit-1
 	pageInfo := PageInfo{
-		Cursor:      "",
+		// Cursor:      "",
 		HasNextPage: hasNextPage,
 	}
 	if hasNextPage {
-		pageInfo.Cursor = edges[len(edges)-1].Cursor
+		// pageInfo.Cursor = edges[len(edges)-1].Cursor
 		edges = edges[:len(edges)-1]
 	}
 

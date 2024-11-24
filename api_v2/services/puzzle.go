@@ -34,55 +34,62 @@ func NewPuzzle(d PuzzleDependencies) Puzzle {
 }
 
 func (p *Puzzle) Find(ctx context.Context, id ulid.ULID) (*domains.Puzzle, error) {
-	foundPuzzle, err := p.repository.Get(ctx, id.String())
+	puzzle, err := p.repository.Get(ctx, id.String())
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
 	}
-	if err := foundPuzzle.Validate(); err != nil {
+	if err := puzzle.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
 	}
 
-	return foundPuzzle, nil
+	return puzzle, nil
 }
 
-func (p *Puzzle) FindCreated(ctx context.Context, userID string, cursor domains.Cursor) (*domains.PuzzleSummaryConnection, error) {
-	foundPuzzles, err := p.repository.GetCreated(ctx, userID, cursor)
+func (p *Puzzle) FindCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleSummaryConnection, error) {
+	puzzles, err := p.repository.GetCreated(ctx, userID, opts)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 	}
 
-	builtConnection, err := domains.BuildPuzzleSummaryConnection("CreatedAt", foundPuzzles)
+	connection, err := domains.BuildPuzzleSummaryConnection(puzzles, opts.Limit)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 	}
 
-	return builtConnection, nil
+	return connection, nil
 }
 
-func (p *Puzzle) FindPopular(ctx context.Context, cursor domains.Cursor) (*domains.PuzzleConnection, error) {
-	foundPuzzles, err := p.repository.GetPopular(ctx, cursor)
+func (p *Puzzle) FindRecent(ctx context.Context, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleConnection, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+	}
+
+	puzzles, err := p.repository.GetRecent(ctx, opts)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 	}
 
-	builtConnection, err := domains.BuildPuzzleConnection("ID", foundPuzzles)
+	connection, err := domains.BuildPuzzleConnection(puzzles, opts.Limit)
+	if err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+	}
+	if len(connection.Edges) == 0 {
+		return connection, nil
+	}
+
+	decoded, err := connection.Edges[0].Cursor.Decode()
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 	}
 
-	return builtConnection, nil
-}
-
-func (p *Puzzle) FindRecent(ctx context.Context, cursor domains.Cursor) (*domains.PuzzleConnection, error) {
-	foundPuzzles, err := p.repository.GetRecent(ctx, cursor)
+	hasPreviousPage, err := p.repository.HasPreviousForRecent(ctx, decoded)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 	}
-
-	builtConnection, err := domains.BuildPuzzleConnection("CreatedAt", foundPuzzles)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+	if hasPreviousPage {
+		connection.PageInfo.HasPreviousPage = hasPreviousPage
+		connection.PageInfo.PreviousCursor = connection.Edges[0].Cursor
 	}
 
-	return builtConnection, nil
+	return connection, nil
 }

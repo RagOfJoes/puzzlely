@@ -15,17 +15,14 @@ var _ Domain = (*Game)(nil)
 type Game struct {
 	bun.BaseModel
 
-	ID    string `bun:"type:varchar(26),pk,notnull" json:"id"`
-	Score uint8  `bun:",notnull" json:"score"`
-	// ChallengeCode sql.NullString `bun:"type:varchar(26)" json:"challenge_code"`
+	ID       string     `bun:"type:varchar(26),pk,notnull" json:"id"`
+	Score    uint8      `bun:",notnull" json:"score"`
 	Attempts [][]string `bun:"-" json:"attempts"`
 	Correct  []string   `bun:"-" json:"correct"`
 
 	CreatedAt   time.Time    `bun:",nullzero,notnull,default:current_timestamp" json:"created_at"`
 	CompletedAt bun.NullTime `bun:",nullzero,default:NULL" json:"completed_at"`
 
-	// GameID       sql.NullString `bun:"type:varchar(26)" json:"-"`
-	// ChallengedBy GameNode       `bun:"rel:has-one,join:game_id=id" json:"challenged_by"`
 	PuzzleID string         `bun:"type:varchar(26),notnull" json:"-"`
 	Puzzle   Puzzle         `bun:"rel:has-one,join:puzzle_id=id" json:"puzzle"`
 	UserID   sql.NullString `bun:"type:varchar(26)" json:"-"`

@@ -13,11 +13,9 @@ type Puzzle interface {
 	// Get gets the puzzle with the given id
 	Get(ctx context.Context, id string) (*domains.Puzzle, error)
 	// GetCreated gets the puzzles created by the given user
-	GetCreated(ctx context.Context, userID string, cursor domains.Cursor) ([]domains.PuzzleSummary, error)
-	// TODO: Figure out a way to make this work
-	//
-	// GetPopular gets the popular puzzles
-	GetPopular(ctx context.Context, cursor domains.Cursor) ([]domains.Puzzle, error)
+	GetCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error)
 	// GetRecent gets the recent puzzles
-	GetRecent(ctx context.Context, cursor domains.Cursor) ([]domains.Puzzle, error)
+	GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginationOpts) ([]domains.Puzzle, error)
+	// HasPreviousForRecent checks if `GetRecent` has a previous page
+	HasPreviousForRecent(ctx context.Context, cursor string) (bool, error)
 }
