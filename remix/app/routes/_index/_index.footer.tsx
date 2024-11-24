@@ -1,8 +1,9 @@
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { Link, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
 import dayjs from "dayjs";
 import { ChevronLeftIcon, ChevronRightIcon, RotateCcwIcon } from "lucide-react";
 
 import { Button } from "@/components/button";
+import { Skeleton } from "@/components/skeleton";
 import { useGameContext } from "@/hooks/use-game";
 import { cn } from "@/lib/cn";
 import { setSearchParams } from "@/lib/set-search-params";
@@ -14,29 +15,43 @@ export function IndexFooter() {
 
 	const [state] = useGameContext();
 
+	const navigation = useNavigation();
 	const [searchParams] = useSearchParams();
 
 	return (
 		<>
-			<div className="grid w-full grid-cols-4 gap-1 transition-opacity">
+			<div
+				className={cn(
+					"grid w-full grid-cols-4 gap-1 transition-opacity",
+
+					"data-[is-loading='true']:animate-pulse",
+				)}
+				data-is-loading={navigation.state === "loading"}
+			>
 				<div className="col-span-4 flex h-full gap-1">
 					<Link
-						// aria-disabled={isLatest}
+						aria-disabled={navigation.state === "loading" || !searchParams.has("cursor")}
 						className={cn(
 							"h-full w-full basis-1/2",
 
 							"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
 						)}
-						reloadDocument
+						preventScrollReset
 						tabIndex={-1}
 						to={{
 							search: "",
 						}}
+						viewTransition
 					>
 						<Button
 							aria-label="Go to latest puzzles"
-							className="w-full"
-							// disabled={isLatest}
+							className={cn(
+								"w-full",
+
+								"data-[is-loading='true']:disabled:opacity-100",
+							)}
+							data-is-loading={navigation.state === "loading"}
+							disabled={navigation.state === "loading" || !searchParams.has("cursor")}
 							size="lg"
 							variant="ghost"
 						>
@@ -48,13 +63,13 @@ export function IndexFooter() {
 
 					<div className="flex h-full w-full basis-1/2 items-center gap-1">
 						<Link
-							aria-disabled={!data.pageInfo.has_previous_page}
+							aria-disabled={!data.pageInfo.has_previous_page || navigation.state === "loading"}
 							className={cn(
 								"h-full w-full",
 
 								"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
 							)}
-							reloadDocument
+							preventScrollReset
 							tabIndex={-1}
 							to={{
 								search: setSearchParams(searchParams, {
@@ -62,11 +77,17 @@ export function IndexFooter() {
 									direction: "B",
 								}),
 							}}
+							viewTransition
 						>
 							<Button
 								aria-label="Go to previous game"
-								className="h-full w-full"
-								disabled={!data.pageInfo.has_previous_page}
+								className={cn(
+									"w-full",
+
+									"data-[is-loading='true']:disabled:opacity-100",
+								)}
+								data-is-loading={navigation.state === "loading"}
+								disabled={!data.pageInfo.has_previous_page || navigation.state === "loading"}
 								size="lg"
 								variant="outline"
 							>
@@ -75,13 +96,13 @@ export function IndexFooter() {
 						</Link>
 
 						<Link
-							aria-disabled={!data.pageInfo.has_next_page}
+							aria-disabled={!data.pageInfo.has_next_page || navigation.state === "loading"}
 							className={cn(
 								"h-full w-full",
 
 								"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
 							)}
-							reloadDocument
+							preventScrollReset
 							tabIndex={-1}
 							to={{
 								search: setSearchParams(searchParams, {
@@ -89,11 +110,17 @@ export function IndexFooter() {
 									direction: "F",
 								}),
 							}}
+							viewTransition
 						>
 							<Button
 								aria-label="Go to next game"
-								className="h-full w-full"
-								disabled={!data.pageInfo.has_next_page}
+								className={cn(
+									"w-full",
+
+									"data-[is-loading='true']:disabled:opacity-100",
+								)}
+								data-is-loading={navigation.state === "loading"}
+								disabled={!data.pageInfo.has_next_page || navigation.state === "loading"}
 								size="lg"
 								variant="outline"
 							>
@@ -106,47 +133,63 @@ export function IndexFooter() {
 
 			<div className="flex gap-1">
 				<div className="w-full min-w-0 basis-1/2">
-					<h3 className="text-sm font-medium tracking-tight">Difficulty</h3>
+					{navigation.state === "loading" ? (
+						<Skeleton className="mt-2 inline-flex min-w-0 select-none items-center px-2 py-1 text-transparent">
+							<p className="w-full truncate text-lg font-bold leading-none">EASY</p>
+						</Skeleton>
+					) : (
+						<div
+							className={cn(
+								"mt-2 inline-flex min-w-0 items-center px-2 py-1",
 
-					<div
-						className={cn(
-							"mt-2 inline-flex min-w-0 items-center px-2 py-1",
-
-							"data-[difficulty='EASY']:bg-secondary data-[difficulty='EASY']:text-secondary-foreground",
-							"data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
-							"data-[difficulty='MEDIUM']:bg-primary data-[difficulty='MEDIUM']:text-primary-foreground",
-						)}
-						data-difficulty={state.game.puzzle.difficulty}
-					>
-						<p className="w-full truncate text-lg font-bold leading-none">
-							{state.game.puzzle.difficulty}
-						</p>
-					</div>
+								"data-[difficulty='EASY']:animate-none data-[difficulty='EASY']:bg-secondary data-[difficulty='EASY']:text-secondary-foreground",
+								"data-[difficulty='HARD']:animate-none data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
+								"data-[difficulty='MEDIUM']animate-none data-[difficulty='MEDIUM']:bg-primary data-[difficulty='MEDIUM']:text-primary-foreground",
+							)}
+							data-difficulty={state.game.puzzle.difficulty}
+						>
+							<p className="w-full truncate text-lg font-bold leading-none">
+								{state.game.puzzle.difficulty}
+							</p>
+						</div>
+					)}
 				</div>
 
 				<div className="w-full min-w-0 basis-1/2 ">
 					<div className="flex h-full w-full flex-col items-end justify-center text-end">
-						<h3 className="text-sm font-medium tracking-tight">Created By</h3>
+						{navigation.state === "loading" ? (
+							<div className="mt-2 min-w-0">
+								<Skeleton className="w-auto text-transparent">
+									<p className="w-full text-lg font-bold leading-none">Username</p>
+								</Skeleton>
+							</div>
+						) : (
+							<Link
+								className={cn(
+									"mt-2 w-full min-w-0 no-underline outline-none ring-offset-background transition-all",
 
-						<Link
-							className={cn(
-								"mt-2 w-full min-w-0 no-underline outline-none ring-offset-background transition-all",
+									"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+								)}
+								to={`/users/${state.game.puzzle.created_by.id}`}
+							>
+								<p className="w-full truncate text-lg font-bold leading-none">
+									{state.game.puzzle.created_by.username}
+								</p>
+							</Link>
+						)}
 
-								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-							)}
-							to={`/users/${state.game.puzzle.created_by.id}`}
-						>
-							<p className="w-full truncate text-lg font-bold leading-none">
-								{state.game.puzzle.created_by.username}
-							</p>
-						</Link>
-
-						<time
-							className="text-xs text-muted-foreground"
-							dateTime={dayjs(state.game.puzzle.created_at).toISOString()}
-						>
-							{dayjs(state.game.puzzle.created_at).format("MMMM DD, YYYY")}
-						</time>
+						{navigation.state === "loading" ? (
+							<Skeleton className="text-transparent">
+								<p className="text-xs">{dayjs().format("MMMM DD, YYYY")}</p>
+							</Skeleton>
+						) : (
+							<time
+								className="text-xs text-muted-foreground"
+								dateTime={dayjs(state.game.puzzle.created_at).toISOString()}
+							>
+								{dayjs(state.game.puzzle.created_at).format("MMMM DD, YYYY")}
+							</time>
+						)}
 					</div>
 				</div>
 			</div>

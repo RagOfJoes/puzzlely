@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import type { LoaderFunctionArgs, TypedResponse } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction, TypedResponse } from "@remix-run/node";
 import { json, useLoaderData } from "@remix-run/react";
 
 import { Header } from "@/components/header";
@@ -45,23 +45,48 @@ export async function loader({
 	return json({
 		game: createGame({
 			me: me.success ? me.data.user : undefined,
-			puzzle: edge.node,
+			puzzle: {
+				...edge.node,
+				groups: edge.node.groups.map((group) => ({
+					...group,
+					blocks: group.blocks.map((block) => ({
+						...block,
+						value: btoa(block.value),
+					})),
+				})),
+			},
 		}),
 		me: me.success ? me.data.user : undefined,
 		pageInfo: puzzles.data.page_info,
 	});
 }
 
+export const meta: MetaFunction<typeof loader> = () => [
+	{
+		title: "Puzzlely",
+	},
+];
+
 // TODO: Create different view depending on the result of the loader
 export default function Index() {
 	const data = useLoaderData<LoaderResponse>();
 
-	// Setup game context
 	const ctx = useGame({
-		game: hydrateGame(data.game),
+		game: hydrateGame({
+			...data.game,
+			puzzle: {
+				...data.game.puzzle,
+				groups: data.game.puzzle.groups.map((group) => ({
+					...group,
+					blocks: group.blocks.map((block) => ({
+						...block,
+						value: atob(block.value),
+					})),
+				})),
+			},
+		}),
 	});
 
-	// Hydrate currently authenticated user to pass to the header component
 	const me = useMemo<undefined | User>(
 		() => (data.me ? hydrateUser(data.me) : undefined),
 		[data.me],
