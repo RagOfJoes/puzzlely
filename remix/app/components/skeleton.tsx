@@ -18,6 +18,9 @@ export const Skeleton = forwardRef<
 			className={cn(
 				"animate-pulse bg-muted",
 
+				"after:invisible",
+				"before:invisible",
+
 				className,
 			)}
 			ref={ref}
