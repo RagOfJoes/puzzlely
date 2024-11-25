@@ -14,6 +14,8 @@ type Puzzle interface {
 	Get(ctx context.Context, id string) (*domains.Puzzle, error)
 	// GetCreated gets the puzzles created by the given user
 	GetCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error)
+	// GetLiked gets the puzzles liked by the given user
+	GetLiked(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error)
 	// GetRecent gets the recent puzzles
 	GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginationOpts) ([]domains.Puzzle, error)
 	// GetNextForRecent gets the potential next puzzle for `GetRecent`

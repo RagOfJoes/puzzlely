@@ -14,6 +14,8 @@ import (
 
 // Errors
 var (
+	ErrPuzzleCreated  = errors.New("Failed to get created puzzles.")
+	ErrPuzzleLiked    = errors.New("Failed to get liked puzzles.")
 	ErrPuzzleNew      = errors.New("Failed to create new puzzle.")
 	ErrPuzzleNotFound = errors.New("Puzzle not found.")
 	ErrPuzzleRecent   = errors.New("Failed to get recent puzzles.")
@@ -66,12 +68,26 @@ func (p *Puzzle) Find(ctx context.Context, id ulid.ULID) (*domains.Puzzle, error
 func (p *Puzzle) FindCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleSummaryConnection, error) {
 	puzzles, err := p.repository.GetCreated(ctx, userID, opts)
 	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreated)
 	}
 
 	connection, err := domains.BuildPuzzleSummaryConnection(puzzles, opts.Limit)
 	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreated)
+	}
+
+	return connection, nil
+}
+
+func (p *Puzzle) FindLiked(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleSummaryConnection, error) {
+	puzzles, err := p.repository.GetLiked(ctx, userID, opts)
+	if err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLiked)
+	}
+
+	connection, err := domains.BuildPuzzleSummaryConnection(puzzles, opts.Limit)
+	if err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLiked)
 	}
 
 	return connection, nil

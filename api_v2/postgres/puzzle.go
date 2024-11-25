@@ -100,7 +100,7 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 		Where("puzzle_summary.user_id = ?", userID).
 		Group("puzzle_summary.id", "created_by.id").
 		OrderExpr("puzzle_summary.created_at DESC").
-		Limit(10)
+		Limit(opts.Limit)
 
 	if session != nil && session.IsAuthenticated() {
 		query = query.
@@ -114,6 +114,51 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 		}
 
 		query = query.Where("puzzle_summary.created_at <= ?", decoded)
+	}
+
+	if err := query.Scan(ctx); err != nil {
+		return nil, err
+	}
+
+	for _, puzzle := range foundPuzzles {
+		if err := puzzle.Validate(); err != nil {
+			return nil, err
+		}
+	}
+
+	return foundPuzzles, nil
+}
+
+func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error) {
+	session := domains.SessionFromContext(ctx)
+
+	var foundPuzzles []domains.PuzzleSummary
+
+	query := p.db.
+		NewSelect().
+		Model(&foundPuzzles).
+		Column("puzzle_summary.id", "puzzle_summary.difficulty", "puzzle_summary.max_attempts", "puzzle_summary.created_at", "puzzle_summary.updated_at", "puzzle_summary.user_id").
+		ColumnExpr("(?) AS num_of_likes", p.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE")).
+		Relation("CreatedBy").
+		Join("LEFT JOIN puzzle_likes AS puzzle_like").JoinOn("puzzle_id = puzzle_summary.id AND active = TRUE").
+		Where("puzzle_like.active = TRUE").
+		Where("puzzle_like.user_id = ?", userID).
+		Group("puzzle_summary.id", "created_by.id", "puzzle_like.updated_at").
+		OrderExpr("puzzle_like.updated_at DESC").
+		Limit(opts.Limit)
+
+	if session != nil && session.IsAuthenticated() {
+		query = query.
+			ColumnExpr("(?) AS liked_at", p.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE AND user_id = ?", session.UserID.String))
+	}
+
+	if !opts.Cursor.IsEmpty() {
+		decoded, err := opts.Cursor.Decode()
+		if err != nil {
+			return nil, err
+		}
+
+		query = query.Where("puzzle_liked.updated_at <= ?", decoded)
 	}
 
 	if err := query.Scan(ctx); err != nil {
