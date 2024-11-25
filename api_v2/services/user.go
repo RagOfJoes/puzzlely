@@ -46,12 +46,12 @@ func (u *User) New(ctx context.Context, newConnection domains.Connection, newUse
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
-	createdUser, err := u.repository.Create(ctx, newConnection, newUser)
+	created, err := u.repository.Create(ctx, newConnection, newUser)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrUserCreate)
 	}
 
-	return createdUser, nil
+	return created, nil
 }
 
 // Find retrieves a user with their id. If strict is set to true then only completed users will be returned

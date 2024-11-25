@@ -21,7 +21,7 @@ type PuzzleCreatePayloadBlock struct {
 }
 
 func (p PuzzleCreatePayloadBlock) Validate() error {
-	return validation.ValidateStruct(
+	return validation.ValidateStruct(&p,
 		validation.Field(&p.Value, validation.Required, validation.Length(1, 48), is.PrintableASCII),
 	)
 }
@@ -32,7 +32,7 @@ type PuzzleCreatePayloadGroup struct {
 }
 
 func (p PuzzleCreatePayloadGroup) Validate() error {
-	return validation.ValidateStruct(
+	return validation.ValidateStruct(&p,
 		validation.Field(&p.Description, validation.Required, validation.Length(1, 512), is.PrintableASCII),
 		validation.Field(&p.Blocks, validation.Required, validation.Length(4, 4), validation.Each(validation.Required)),
 	)
@@ -40,7 +40,7 @@ func (p PuzzleCreatePayloadGroup) Validate() error {
 
 type PuzzleCreatePayload struct {
 	Difficulty  string `json:"difficulty"`
-	MaxAttempts uint16 `json:"max_attempts"`
+	MaxAttempts int16  `json:"max_attempts"`
 
 	Groups []PuzzleCreatePayloadGroup `json:"groups"`
 }
@@ -88,9 +88,9 @@ func (p PuzzleCreatePayload) ToPuzzle() Puzzle {
 }
 
 func (p PuzzleCreatePayload) Validate() error {
-	return validation.ValidateStruct(
+	return validation.ValidateStruct(&p,
 		validation.Field(&p.Difficulty, validation.Required, validation.In("EASY", "MEDIUM", "HARD")),
-		validation.Field(&p.MaxAttempts, validation.Required, validation.Min(uint16(1)), validation.Max(uint16(999))),
+		validation.Field(&p.MaxAttempts, validation.Required, validation.Min(1), validation.Max(999)),
 
 		validation.Field(&p.Groups, validation.Required, validation.Length(4, 4), validation.Each(validation.Required)),
 	)

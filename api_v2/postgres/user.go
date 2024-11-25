@@ -1,4 +1,4 @@
-package mysql
+package postgres
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type user struct {
 }
 
 func NewUser(db *bun.DB) repositories.User {
-	logrus.Info("Created User MySQL Repository")
+	logrus.Info("Created User Postgres Repository")
 
 	return &user{
 		db: db,
@@ -24,11 +24,13 @@ func NewUser(db *bun.DB) repositories.User {
 }
 
 func (u *user) Create(ctx context.Context, newConnection domains.Connection, newUser domains.User) (*domains.User, error) {
+	var user domains.User
+
 	err := u.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
-		if _, err := tx.NewInsert().Model(&newConnection).Exec(ctx); err != nil {
+		if _, err := tx.NewInsert().Model(&newUser).Returning("*").Exec(ctx, &user); err != nil {
 			return err
 		}
-		if _, err := tx.NewInsert().Model(&newUser).Exec(ctx); err != nil {
+		if _, err := tx.NewInsert().Model(&newConnection).Exec(ctx); err != nil {
 			return err
 		}
 
@@ -38,7 +40,7 @@ func (u *user) Create(ctx context.Context, newConnection domains.Connection, new
 		return nil, err
 	}
 
-	return &newUser, nil
+	return &user, nil
 }
 
 func (u *user) Get(ctx context.Context, id string) (*domains.User, error) {

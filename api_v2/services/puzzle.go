@@ -9,6 +9,7 @@ import (
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/oklog/ulid/v2"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 )
 
 // Errors
@@ -47,7 +48,7 @@ func (p *Puzzle) New(ctx context.Context, newPuzzle domains.Puzzle) (*domains.Pu
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleNew)
 	}
 
-	return *&created, nil
+	return created, nil
 }
 
 func (p *Puzzle) Find(ctx context.Context, id ulid.ULID) (*domains.Puzzle, error) {
@@ -86,7 +87,15 @@ func (p *Puzzle) FindRecent(ctx context.Context, opts domains.PuzzleCursorPagina
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 	}
 
-	connection, err := domains.BuildPuzzleConnection(puzzles, opts.Limit)
+	// Validate results
+	for _, puzzle := range puzzles {
+		if err := puzzle.Validate(); err != nil {
+			logrus.Info(err)
+			return nil, err
+		}
+	}
+
+	connection, err := domains.BuildPuzzleConnection(puzzles)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 	}
@@ -94,18 +103,40 @@ func (p *Puzzle) FindRecent(ctx context.Context, opts domains.PuzzleCursorPagina
 		return connection, nil
 	}
 
-	decoded, err := connection.Edges[0].Cursor.Decode()
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
-	}
+	eg := errgroup.Group{}
 
-	hasPreviousPage, err := p.repository.HasPreviousForRecent(ctx, decoded)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
-	}
-	if hasPreviousPage {
-		connection.PageInfo.HasPreviousPage = hasPreviousPage
-		connection.PageInfo.PreviousCursor = connection.Edges[0].Cursor
+	eg.Go(func() error {
+		next, err := p.repository.GetNextForRecent(ctx, puzzles[len(puzzles)-1].CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		if err != nil {
+			return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+		}
+		if next != nil {
+			connection.PageInfo.HasNextPage = true
+			connection.PageInfo.NextCursor = domains.NewCursor(next.CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		}
+
+		return nil
+	})
+
+	eg.Go(func() error {
+		if opts.Cursor.IsEmpty() {
+			return nil
+		}
+
+		previous, err := p.repository.GetPreviousForRecent(ctx, puzzles[0].CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		if err != nil {
+			return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+		}
+		if previous != nil {
+			connection.PageInfo.HasPreviousPage = true
+			connection.PageInfo.PreviousCursor = domains.NewCursor(previous.CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		}
+
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		return nil, err
 	}
 
 	return connection, nil

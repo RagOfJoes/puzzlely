@@ -1,4 +1,4 @@
-package mysql
+package postgres
 
 import (
 	"context"
@@ -15,9 +15,8 @@ type session struct {
 	db *bun.DB
 }
 
-// NewSession creates a new MySQL session repository
 func NewSession(db *bun.DB) repositories.Session {
-	logrus.Info("Created Session MySQL Repository")
+	logrus.Info("Created Session Postgres Repository")
 
 	return &session{
 		db: db,
@@ -25,11 +24,13 @@ func NewSession(db *bun.DB) repositories.Session {
 }
 
 func (s *session) Create(ctx context.Context, newSession domains.Session) (*domains.Session, error) {
-	if _, err := s.db.NewInsert().Model(&newSession).Exec(ctx); err != nil {
+	var session domains.Session
+
+	if _, err := s.db.NewInsert().Model(&newSession).Returning("*").Exec(ctx, &session); err != nil {
 		return nil, err
 	}
 
-	return &newSession, nil
+	return &session, nil
 }
 
 func (s *session) Get(ctx context.Context, id string) (*domains.Session, error) {
@@ -37,7 +38,7 @@ func (s *session) Get(ctx context.Context, id string) (*domains.Session, error) 
 
 	if err := s.db.NewSelect().
 		Model(&foundSession).
-		Where("`session`.id = ?", id).
+		Where("session.id = ?", id).
 		Relation("User").
 		Scan(ctx); err != nil {
 		return nil, err

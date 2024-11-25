@@ -1,6 +1,8 @@
 package domains
 
 import (
+	"time"
+
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -11,26 +13,21 @@ type PuzzleConnection struct {
 	PageInfo PageInfo     `json:"page_info"`
 }
 
-func BuildPuzzleConnection(nodes []Puzzle, limit int) (*PuzzleConnection, error) {
+func BuildPuzzleConnection(nodes []Puzzle) (*PuzzleConnection, error) {
 	edges := make([]PuzzleEdge, 0)
 	for _, node := range nodes {
 		edges = append(edges, PuzzleEdge{
-			Cursor: NewCursor(node.CreatedAt.Format("2006-01-02 15:04:05.000000")),
+			Cursor: NewCursor(node.CreatedAt.Format(time.RFC3339)),
 			Node:   node,
 		})
 	}
 
 	pageInfo := PageInfo{
-		HasNextPage:     len(edges) > limit,
+		HasNextPage:     false,
 		HasPreviousPage: false,
 		NextCursor:      "",
 		PreviousCursor:  "",
 	}
-	if pageInfo.HasNextPage {
-		pageInfo.NextCursor = edges[len(edges)-1].Cursor
-		edges = edges[:len(edges)-1]
-	}
-
 	connection := PuzzleConnection{
 		Edges:    edges,
 		PageInfo: pageInfo,

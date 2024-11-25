@@ -15,10 +15,10 @@ type PuzzleSummary struct {
 
 	ID          string `bun:"type:varchar(26),pk,notnull" json:"id"`
 	Difficulty  string `bun:"type:varchar(12),default:'EASY',notnull" json:"difficulty"`
-	MaxAttempts uint16 `bun:",notnull" json:"max_attempts"`
+	MaxAttempts int16  `bun:",notnull" json:"max_attempts"`
 
 	LikedAt    bun.NullTime `bun:",scanonly" json:"liked_at"`
-	NumOfLikes uint         `bun:",scanonly" json:"num_of_likes"`
+	NumOfLikes int          `bun:",scanonly" json:"num_of_likes"`
 
 	CreatedAt time.Time    `bun:",nullzero,notnull,default:current_timestamp" json:"created_at"`
 	UpdatedAt bun.NullTime `bun:",nullzero,default:NULL" json:"updated_at"`
@@ -32,10 +32,10 @@ func (p PuzzleSummary) Validate() error {
 	return validation.ValidateStruct(&p,
 		validation.Field(&p.ID, validation.Required, validation.By(internal.IsULID)),
 		validation.Field(&p.Difficulty, validation.Required, validation.In("EASY", "MEDIUM", "HARD")),
-		validation.Field(&p.MaxAttempts, validation.Required, validation.Min(uint16(1)), validation.Max(uint16(999))),
+		validation.Field(&p.MaxAttempts, validation.Required, validation.Min(1), validation.Max(999)),
 
 		validation.Field(&p.LikedAt, validation.When(!p.LikedAt.IsZero(), validation.By(internal.IsAfter(p.CreatedAt)))),
-		validation.Field(&p.NumOfLikes, validation.Min(uint(0))),
+		validation.Field(&p.NumOfLikes, validation.Min(0)),
 
 		validation.Field(&p.CreatedAt, validation.Required),
 		validation.Field(&p.UpdatedAt, validation.When(!p.UpdatedAt.IsZero(), validation.By(internal.IsAfter(p.CreatedAt)))),

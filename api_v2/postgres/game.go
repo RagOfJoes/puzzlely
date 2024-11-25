@@ -1,4 +1,4 @@
-package mysql
+package postgres
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type game struct {
 }
 
 func NewGame(db *bun.DB) repositories.Game {
-	logrus.Info("Created Game MySQL Repository")
+	logrus.Info("Created Game Postgres Repository")
 
 	return &game{
 		db: db,

@@ -2,7 +2,7 @@ package web
 
 import (
 	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/mysql"
+	"github.com/RagOfJoes/puzzlely/postgres"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/sirupsen/logrus"
 )
@@ -19,16 +19,16 @@ func NewWebRepositories(cfg config.Configuration) (WebRepositories, error) {
 
 	var repositories WebRepositories
 
-	db, err := mysql.Connect(cfg)
+	db, err := postgres.Connect(cfg)
 	if err != nil {
 		return repositories, err
 	}
 
 	repositories = WebRepositories{
-		game:    mysql.NewGame(db),
-		puzzle:  mysql.NewPuzzle(db),
-		session: mysql.NewSession(db),
-		user:    mysql.NewUser(db),
+		game:    postgres.NewGame(db),
+		puzzle:  postgres.NewPuzzle(db),
+		session: postgres.NewSession(db),
+		user:    postgres.NewUser(db),
 	}
 
 	return repositories, nil

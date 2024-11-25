@@ -16,6 +16,8 @@ type Puzzle interface {
 	GetCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error)
 	// GetRecent gets the recent puzzles
 	GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginationOpts) ([]domains.Puzzle, error)
-	// HasPreviousForRecent checks if `GetRecent` has a previous page
-	HasPreviousForRecent(ctx context.Context, cursor string) (bool, error)
+	// GetNextForRecent gets the potential next puzzle for `GetRecent`
+	GetNextForRecent(ctx context.Context, cursor string) (*domains.Puzzle, error)
+	// GetPreviousForRecent gets the potential previous for `GetRecent`
+	GetPreviousForRecent(ctx context.Context, cursor string) (*domains.Puzzle, error)
 }
