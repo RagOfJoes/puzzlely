@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
 import dayjs from "dayjs";
 import { Heart, History, Puzzle } from "lucide-react";
 
@@ -10,41 +10,73 @@ import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { API } from "@/services/api.server";
-import { commitSession, getSession } from "@/services/session.server";
 
 export type ValidTabs = "created" | "liked" | "history";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-	const [me, user, session] = await Promise.all([
-		API.me(request),
-		API.users.get(request, { id: params.id ?? "" }),
-		getSession(request.headers.get("Cookie")),
-	]);
-	if (!user.success) {
-		return redirect("/", {
-			headers: {
-				"Set-Cookie": await commitSession(session),
-			},
-		});
+	const url = new URL(request.url);
+	const split = url.pathname.split("/").filter((str) => str.length > 0);
+	switch (split[split.length - 1]) {
+		case "created":
+			break;
+		case "liked":
+			break;
+		case "history":
+			break;
+		default:
+			return redirect(`/users/${params.id}/created/`);
 	}
 
-	return json(
-		{
-			me: me.success ? me.data?.user : undefined,
-			user: user.data!,
-		},
-		{
-			headers: {
-				"Set-Cookie": await commitSession(session),
-			},
-		},
-	);
+	const [me, user] = await Promise.all([
+		API.me(request),
+		API.users.get(request, { id: params.id ?? "" }),
+	]);
+	if (!user.success) {
+		return redirect("/");
+	}
+
+	if (me.success && user.data.id === me.data.user?.id) {
+		return redirect("/profile");
+	}
+
+	return json({
+		me: me.success ? me.data?.user : undefined,
+		user: user.data!,
+	});
 }
+
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+	if (!data) {
+		return [
+			{
+				title: "User | Puzzlely",
+			},
+		];
+	}
+
+	return [
+		{
+			title: `${data.user.username} | Puzzlely`,
+		},
+	];
+};
 
 export default function User() {
 	const { user } = useLoaderData<typeof loader>();
+	const navigate = useNavigate();
+	const matches = useMatches();
 
-	const [tab, setTab] = useState<ValidTabs>("created");
+	const [tab, setTab] = useState<ValidTabs>(() => {
+		const match = matches[matches.length - 1];
+		switch (match?.id) {
+			case "routes/users.$id.history":
+				return "history";
+			case "routes/users.$id.liked":
+				return "liked";
+			default:
+				return "created";
+		}
+	});
 
 	return (
 		<>
@@ -52,13 +84,13 @@ export default function User() {
 
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
-					<div className="flex gap-1 border bg-muted px-4 py-2">
-						<div className="flex h-11 w-11 items-center justify-center bg-gradient-to-br from-primary to-secondary text-xl font-semibold text-muted">
+					<div className="flex gap-2 border bg-muted px-4 py-2">
+						<div className="flex h-11 w-11 shrink-0 items-center justify-center bg-gradient-to-br from-primary to-secondary text-xl font-semibold text-muted">
 							{user.username[0]}
 						</div>
 
-						<div className="flex items-center">
-							<p className="text-lg font-bold">{user.username}</p>
+						<div className="flex items-center overflow-hidden">
+							<p className="truncate text-lg font-bold">{user.username}</p>
 						</div>
 					</div>
 
@@ -87,6 +119,11 @@ export default function User() {
 							}
 
 							setTab(newTab);
+
+							navigate(`/users/${user.id}/${newTab}/`, {
+								preventScrollReset: true,
+								viewTransition: true,
+							});
 						}}
 						value={tab}
 					>
@@ -104,6 +141,8 @@ export default function User() {
 								History
 							</TabsTrigger>
 						</TabsList>
+
+						<Outlet />
 					</Tabs>
 				</article>
 			</main>

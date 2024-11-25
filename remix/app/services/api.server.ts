@@ -1,7 +1,9 @@
 import { SUPPORTED_PROVIDERS } from "@/lib/constants";
 import { getSession } from "@/services/session.server";
 import type { GameConnection } from "@/types/game-connection";
+import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleConnection } from "@/types/puzzle-connection";
+import type { PuzzleSummaryConnection } from "@/types/puzzle-summary-connection";
 import type { Response } from "@/types/response";
 import type { Session } from "@/types/session";
 import type { User } from "@/types/user";
@@ -119,6 +121,57 @@ export class API {
 		prefix: "puzzles",
 
 		/**
+		 * Retrieves user's created puzzles
+		 *
+		 * Hits the `/puzzles/created:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @returns A list of the user's created puzzles
+		 */
+		async created(request: Request, userID: string): Promise<Response<PuzzleSummaryConnection>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const cursor = new URL(request.url).searchParams.get("cursor");
+			const res = await fetch(
+				`${API.URL}/${this.prefix}/created/${userID}?cursor=${cursor ?? ""}`,
+				{
+					credentials: "include",
+					headers: {
+						Authorization: `Bearer ${session.get("id") ?? ""}`,
+					},
+					method: "GET",
+				},
+			);
+
+			const response: Response<PuzzleSummaryConnection> = await res.json();
+			return response;
+		},
+
+		/**
+		 * Retrieves user's liked puzzles
+		 *
+		 * Hits the `/puzzles/liked:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @returns A list of the user's liked puzzles
+		 */
+		async liked(request: Request, userID: string): Promise<Response<PuzzleSummaryConnection>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const cursor = new URL(request.url).searchParams.get("cursor");
+			const res = await fetch(`${API.URL}/${this.prefix}/liked/${userID}?cursor=${cursor ?? ""}`, {
+				credentials: "include",
+				headers: {
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
+				},
+				method: "GET",
+			});
+
+			const response: Response<PuzzleSummaryConnection> = await res.json();
+			return response;
+		},
+
+		/**
 		 * Retrieves most popular list of puzzles that the user hasn't played yet. Pass `cursor` as a query parameter to paginate
 		 *
 		 * Hits the `/puzzles/popular` endpoint on the API
@@ -128,7 +181,7 @@ export class API {
 		 */
 		async popular(request: Request): Promise<Response<PuzzleConnection>> {
 			const cursor = new URL(request.url).searchParams.get("cursor");
-			const res = await fetch(`${API.URL}/${this.prefix}/recent?cursor=${cursor ?? ""}`, {
+			const res = await fetch(`${API.URL}/${this.prefix}/popular?cursor=${cursor ?? ""}`, {
 				credentials: "include",
 				headers: {
 					Cookie: request.headers.get("cookie") ?? "",
@@ -149,14 +202,22 @@ export class API {
 		 * @returns A list of the most recent puzzles that the user hasn't played yet
 		 */
 		async recent(request: Request): Promise<Response<PuzzleConnection>> {
-			const cursor = new URL(request.url).searchParams.get("cursor");
-			const res = await fetch(`${API.URL}/${this.prefix}/recent?cursor=${cursor ?? ""}`, {
-				credentials: "include",
-				headers: {
-					Cookie: request.headers.get("cookie") ?? "",
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const url = new URL(request.url);
+
+			const cursor = url.searchParams.get("cursor");
+			const direction = url.searchParams.get("direction");
+			const res = await fetch(
+				`${API.URL}/${this.prefix}/recent?cursor=${cursor ?? ""}&direction=${direction ?? "F"}`,
+				{
+					credentials: "include",
+					headers: {
+						Authorization: `Bearer ${session.get("id") ?? ""}`,
+					},
+					method: "GET",
 				},
-				method: "GET",
-			});
+			);
 
 			const response: Response<PuzzleConnection> = await res.json();
 			return response;
