@@ -115,7 +115,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	const [committedSession, serializedState] = await Promise.all([
 		commitSession(session, {
-			maxAge: dayjs(auth.data.expires_at).diff(undefined, "minutes"),
+			maxAge: dayjs(auth.data.expires_at).diff(undefined, "seconds"),
 		}),
 		// Remove state cookie just to be safe ;)
 		state.serialize(cookie, {
@@ -123,7 +123,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		}),
 	]);
 
-	return redirect("/login", {
+	return redirect("/profile", {
 		headers: [
 			["Set-Cookie", committedSession],
 			["Set-Cookie", serializedState],
