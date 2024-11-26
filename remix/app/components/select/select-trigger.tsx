@@ -23,7 +23,7 @@ export const SelectTrigger = forwardRef<ElementRef<typeof Primitive.button>, Sel
 					"group flex h-11 items-center gap-1 border bg-muted px-2 font-medium outline-none ring-offset-background transition-all",
 
 					"active:enabled:ring-2 active:enabled:ring-ring active:enabled:ring-offset-2",
-					'aria-[invalid="true"]:border-destructive-foreground',
+					'aria-[invalid="true"]:border-destructive',
 					"data-[placeholder]:enabled:text-muted-foreground",
 					"disabled:text-muted-foreground",
 					"focus:enabled:ring-2 focus:enabled:ring-ring focus:enabled:ring-offset-2",

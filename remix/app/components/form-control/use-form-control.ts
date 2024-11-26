@@ -25,7 +25,7 @@ export function useFormControl(props: FormControlProps): UseFormControl {
 			id: errorID,
 			"aria-live": "polite",
 			className: cn(
-				"text-xs text-destructive-foreground",
+				"text-xs text-destructive",
 
 				{
 					hidden: !invalid,

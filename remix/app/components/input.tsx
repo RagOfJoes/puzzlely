@@ -28,7 +28,7 @@ export const Input = forwardRef<ElementRef<typeof Primitive.input>, InputProps>(
 					"relative h-11 w-full min-w-0 appearance-none border bg-muted px-2 outline-none ring-offset-background transition-[background-color,box-shadow,color]",
 
 					"[&::-webkit-inner-spin-button]:appearance-none",
-					"aria-[invalid=true]:enabled:border-destructive-foreground",
+					"aria-[invalid=true]:enabled:border-destructive",
 					"disabled:text-muted-foreground",
 					"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 					"placeholder:enabled:text-muted-foreground",
