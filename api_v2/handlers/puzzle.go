@@ -50,6 +50,9 @@ func Puzzle(dependencies PuzzleDependencies, router *chi.Mux) {
 		r.Get("/created/{user_id}", p.created)
 		r.Get("/liked/{user_id}", p.liked)
 		r.Get("/recent", p.recent)
+
+		// Update
+		r.Put("/like/{id}", p.toggleLike)
 	})
 }
 
@@ -184,4 +187,25 @@ func (p *puzzle) recent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, Ok("", connection))
+}
+
+func (p *puzzle) toggleLike(w http.ResponseWriter, r *http.Request) {
+	puzzleID, err := ulid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
+		return
+	}
+
+	if _, err := p.session.Get(w, r, true); err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
+		return
+	}
+
+	like, err := p.service.ToggleLike(r.Context(), puzzleID)
+	if err != nil {
+		render.Respond(w, r, err)
+		return
+	}
+
+	render.Render(w, r, Ok("", like))
 }

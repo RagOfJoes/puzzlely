@@ -22,4 +22,7 @@ type Puzzle interface {
 	GetNextForRecent(ctx context.Context, cursor string) (*domains.Puzzle, error)
 	// GetPreviousForRecent gets the potential previous for `GetRecent`
 	GetPreviousForRecent(ctx context.Context, cursor string) (*domains.Puzzle, error)
+
+	// ToggleLike likes a puzzle with the given id
+	ToggleLike(ctx context.Context, id string) (*domains.PuzzleLike, error)
 }

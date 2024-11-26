@@ -7,6 +7,7 @@ import (
 
 	"github.com/RagOfJoes/puzzlely/domains"
 	"github.com/RagOfJoes/puzzlely/repositories"
+	"github.com/oklog/ulid/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
 )
@@ -292,4 +293,29 @@ func (p *puzzle) GetPreviousForRecent(ctx context.Context, cursor string) (*doma
 		return nil, nil
 	}
 	return &puzzle, nil
+}
+
+func (p *puzzle) ToggleLike(ctx context.Context, id string) (*domains.PuzzleLike, error) {
+	session := domains.SessionFromContext(ctx)
+
+	var puzzleLike domains.PuzzleLike
+
+	_, err := p.db.NewInsert().
+		Model(&domains.PuzzleLike{
+			ID:     ulid.Make().String(),
+			Active: true,
+
+			PuzzleID: id,
+			UserID:   session.UserID.String,
+		}).
+		On("CONFLICT (puzzle_id, user_id) DO UPDATE").
+		Set("active = NOT puzzle_like.active").
+		Set("updated_at = CURRENT_TIMESTAMP").
+		Returning("*").
+		Exec(ctx, &puzzleLike)
+	if err != nil {
+		return nil, err
+	}
+
+	return &puzzleLike, nil
 }

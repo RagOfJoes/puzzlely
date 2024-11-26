@@ -14,11 +14,12 @@ import (
 
 // Errors
 var (
-	ErrPuzzleCreated  = errors.New("Failed to get created puzzles.")
-	ErrPuzzleLiked    = errors.New("Failed to get liked puzzles.")
-	ErrPuzzleNew      = errors.New("Failed to create new puzzle.")
-	ErrPuzzleNotFound = errors.New("Puzzle not found.")
-	ErrPuzzleRecent   = errors.New("Failed to get recent puzzles.")
+	ErrPuzzleCreated    = errors.New("Failed to get created puzzles.")
+	ErrPuzzleLiked      = errors.New("Failed to get liked puzzles.")
+	ErrPuzzleNew        = errors.New("Failed to create new puzzle.")
+	ErrPuzzleNotFound   = errors.New("Puzzle not found.")
+	ErrPuzzleRecent     = errors.New("Failed to get recent puzzles.")
+	ErrPuzzleToggleLike = errors.New("Failed to toggle like on puzzle.")
 )
 
 type Puzzle struct {
@@ -156,4 +157,18 @@ func (p *Puzzle) FindRecent(ctx context.Context, opts domains.PuzzleCursorPagina
 	}
 
 	return connection, nil
+}
+
+func (p *Puzzle) ToggleLike(ctx context.Context, id ulid.ULID) (*domains.PuzzleLike, error) {
+	puzzle, err := p.Find(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	like, err := p.repository.ToggleLike(ctx, puzzle.ID)
+	if err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleToggleLike)
+	}
+
+	return like, nil
 }
