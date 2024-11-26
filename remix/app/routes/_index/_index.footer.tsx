@@ -30,11 +30,11 @@ export function IndexFooter() {
 				)}
 				data-is-loading={isLoading}
 			>
-				<div className="col-span-4 flex h-full gap-1">
+				<div className="col-span-4 grid h-full grid-cols-4 gap-1">
 					<Link
 						aria-disabled={isLoading}
 						className={cn(
-							"h-full w-full basis-1/2",
+							"col-span-2 h-full w-full",
 
 							"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
 						)}
@@ -63,11 +63,11 @@ export function IndexFooter() {
 						</Button>
 					</Link>
 
-					<div className="flex h-full w-full basis-1/2 items-center gap-1">
+					<div className="col-span-2 flex h-full w-full items-center gap-1">
 						<Link
 							aria-disabled={!data.pageInfo.has_previous_page || isLoading}
 							className={cn(
-								"h-full w-full",
+								"h-full w-full min-w-0",
 
 								"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
 							)}
@@ -100,7 +100,7 @@ export function IndexFooter() {
 						<Link
 							aria-disabled={!data.pageInfo.has_next_page || isLoading}
 							className={cn(
-								"h-full w-full",
+								"h-full w-full min-w-0",
 
 								"aria-disabled:pointer-events-none aria-disabled:touch-none aria-disabled:select-none",
 							)}
@@ -133,16 +133,16 @@ export function IndexFooter() {
 				</div>
 			</div>
 
-			<div className="flex gap-1">
+			<div className="mt-2 flex gap-1">
 				<div className="w-full min-w-0 basis-1/2">
 					{isLoading ? (
-						<Skeleton className="mt-2 inline-flex min-w-0 select-none items-center px-2 py-1 text-transparent">
+						<Skeleton className="inline-flex min-w-0 select-none items-center px-2 py-1 text-transparent">
 							<p className="w-full truncate text-lg font-bold leading-none">EASY</p>
 						</Skeleton>
 					) : (
 						<div
 							className={cn(
-								"mt-2 inline-flex min-w-0 items-center px-2 py-1",
+								"inline-flex min-w-0 items-center px-2 py-1",
 
 								"data-[difficulty='EASY']:animate-none data-[difficulty='EASY']:bg-secondary data-[difficulty='EASY']:text-secondary-foreground",
 								"data-[difficulty='HARD']:animate-none data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
@@ -160,7 +160,7 @@ export function IndexFooter() {
 				<div className="w-full min-w-0 basis-1/2 ">
 					<div className="flex h-full w-full flex-col items-end justify-center text-end">
 						{isLoading ? (
-							<div className="mt-2 min-w-0">
+							<div className="min-w-0">
 								<Skeleton className="w-auto text-transparent">
 									<p className="w-full text-lg font-bold leading-none">Username</p>
 								</Skeleton>
@@ -168,7 +168,7 @@ export function IndexFooter() {
 						) : (
 							<Link
 								className={cn(
-									"mt-2 min-w-0 no-underline outline-none ring-offset-background transition-all",
+									"w-full min-w-0 no-underline outline-none ring-offset-background transition-all",
 
 									"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 								)}

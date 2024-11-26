@@ -123,7 +123,7 @@ export function IndexHeader() {
 					<div className="flex flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Likes</h3>
 
-						<div className="line-clamp-2 text-lg font-bold leading-none">
+						<div className="mt-2 line-clamp-2 text-2xl font-bold leading-none">
 							{isLoading ? (
 								<Skeleton className="bg-foreground/10 text-transparent">10</Skeleton>
 							) : (
@@ -132,21 +132,9 @@ export function IndexHeader() {
 						</div>
 					</div>
 
-					<Button
-						className={cn(
-							"border border-primary bg-primary/10 text-primary",
-
-							"data-[is-liked=true]:text-primary",
-							"disabled:opacity-100",
-							"hover:enabled:bg-primary/20",
-							"[&>svg]:data-[is-liked=true]:fill-current",
-						)}
-						data-is-liked={!!state.game.puzzle.liked_at}
-						disabled={isLoading}
-						size="icon"
-					>
+					<div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-primary/10 text-primary">
 						<StarIcon className="h-4 w-4" />
-					</Button>
+					</div>
 				</div>
 			</div>
 		</div>
