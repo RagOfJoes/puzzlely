@@ -3,6 +3,7 @@ import { getSession } from "@/services/session.server";
 import type { GameConnection } from "@/types/game-connection";
 import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleConnection } from "@/types/puzzle-connection";
+import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
 import type { PuzzleSummaryConnection } from "@/types/puzzle-summary-connection";
 import type { Response } from "@/types/response";
 import type { Session } from "@/types/session";
@@ -119,6 +120,32 @@ export class API {
 	 */
 	static puzzles = {
 		prefix: "puzzles",
+
+		/**
+		 * Creates a new puzzle
+		 *
+		 * Hits the `/puzzles/create` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @param payload - The puzzle that the user is attempting to create
+		 * @returns The newly created puzzle
+		 */
+		async create(request: Request, payload: PuzzleCreatePayload): Promise<Response<Puzzle>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const res = await fetch(`${API.URL}/${this.prefix}/create`, {
+				body: JSON.stringify(payload),
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
+				},
+				method: "POST",
+			});
+
+			const response: Response<Puzzle> = await res.json();
+			return response;
+		},
 
 		/**
 		 * Retrieves user's created puzzles
