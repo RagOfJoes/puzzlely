@@ -27,10 +27,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 			return redirect(`/users/${params.id}/created/`);
 	}
 
-	const [me, user] = await Promise.all([
-		API.me(request),
-		API.users.get(request, { id: params.id ?? "" }),
-	]);
+	const [me, user] = await Promise.all([API.me(request), API.users.get(request, params.id ?? "")]);
 	if (!user.success) {
 		return redirect("/");
 	}

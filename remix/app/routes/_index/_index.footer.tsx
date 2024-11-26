@@ -172,7 +172,11 @@ export function IndexFooter() {
 
 									"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 								)}
-								to={`/users/${state.game.puzzle.created_by.id}`}
+								to={
+									data.me && state.game.puzzle.created_by.id === data.me.id
+										? "/profile/created/"
+										: `/users/${state.game.puzzle.created_by.id}/created/`
+								}
 							>
 								<p className="w-full truncate text-lg font-bold leading-none">
 									{state.game.puzzle.created_by.username}

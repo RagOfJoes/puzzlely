@@ -153,22 +153,20 @@ export class API {
 		 * Hits the `/puzzles/created:id` endpoint on the API
 		 *
 		 * @param request - The incoming request
+		 * @param id - The ID of the puzzle
 		 * @returns A list of the user's created puzzles
 		 */
-		async created(request: Request, userID: string): Promise<Response<PuzzleSummaryConnection>> {
+		async created(request: Request, id: string): Promise<Response<PuzzleSummaryConnection>> {
 			const session = await getSession(request.headers.get("Cookie"));
 
 			const cursor = new URL(request.url).searchParams.get("cursor");
-			const res = await fetch(
-				`${API.URL}/${this.prefix}/created/${userID}?cursor=${cursor ?? ""}`,
-				{
-					credentials: "include",
-					headers: {
-						Authorization: `Bearer ${session.get("id") ?? ""}`,
-					},
-					method: "GET",
+			const res = await fetch(`${API.URL}/${this.prefix}/created/${id}?cursor=${cursor ?? ""}`, {
+				credentials: "include",
+				headers: {
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
 				},
-			);
+				method: "GET",
+			});
 
 			const response: Response<PuzzleSummaryConnection> = await res.json();
 			return response;
@@ -182,11 +180,11 @@ export class API {
 		 * @param request - The incoming request
 		 * @returns A list of the user's liked puzzles
 		 */
-		async liked(request: Request, userID: string): Promise<Response<PuzzleSummaryConnection>> {
+		async liked(request: Request, id: string): Promise<Response<PuzzleSummaryConnection>> {
 			const session = await getSession(request.headers.get("Cookie"));
 
 			const cursor = new URL(request.url).searchParams.get("cursor");
-			const res = await fetch(`${API.URL}/${this.prefix}/liked/${userID}?cursor=${cursor ?? ""}`, {
+			const res = await fetch(`${API.URL}/${this.prefix}/liked/${id}?cursor=${cursor ?? ""}`, {
 				credentials: "include",
 				headers: {
 					Authorization: `Bearer ${session.get("id") ?? ""}`,
@@ -263,7 +261,7 @@ export class API {
 		 * @param id - The ID of the user to retrieve
 		 * @returns The user with the given ID
 		 */
-		async get(request: Request, { id }: { id: string }): Promise<Response<User>> {
+		async get(request: Request, id: string): Promise<Response<User>> {
 			const res = await fetch(`${API.URL}/${this.prefix}/${id}`, {
 				credentials: "include",
 				headers: {

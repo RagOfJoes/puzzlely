@@ -28,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		case "history":
 			break;
 		default:
-			return redirect(`/profile/created/`);
+			return redirect("/profile/created/");
 	}
 
 	const me = await requireUser(request);
