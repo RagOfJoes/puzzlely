@@ -1,8 +1,6 @@
 package domains
 
 import (
-	"time"
-
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
@@ -17,7 +15,7 @@ func BuildPuzzleConnection(nodes []Puzzle) (*PuzzleConnection, error) {
 	edges := make([]PuzzleEdge, 0)
 	for _, node := range nodes {
 		edges = append(edges, PuzzleEdge{
-			Cursor: NewCursor(node.CreatedAt.Format(time.RFC3339)),
+			Cursor: NewCursor(node.CreatedAt.Format("2006-01-02 15:04:05.000000")),
 			Node:   node,
 		})
 	}
