@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/RagOfJoes/puzzlely/domains"
 	"github.com/RagOfJoes/puzzlely/internal"
@@ -123,13 +124,13 @@ func (p *Puzzle) FindRecent(ctx context.Context, opts domains.PuzzleCursorPagina
 	eg := errgroup.Group{}
 
 	eg.Go(func() error {
-		next, err := p.repository.GetNextForRecent(ctx, puzzles[len(puzzles)-1].CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		next, err := p.repository.GetNextForRecent(ctx, puzzles[len(puzzles)-1].CreatedAt.Format(time.RFC3339))
 		if err != nil {
 			return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 		}
 		if next != nil {
 			connection.PageInfo.HasNextPage = true
-			connection.PageInfo.NextCursor = domains.NewCursor(next.CreatedAt.Format("2006-01-02 15:04:05.000000"))
+			connection.PageInfo.NextCursor = domains.NewCursor(next.CreatedAt.Format(time.RFC3339))
 		}
 
 		return nil
@@ -140,13 +141,13 @@ func (p *Puzzle) FindRecent(ctx context.Context, opts domains.PuzzleCursorPagina
 			return nil
 		}
 
-		previous, err := p.repository.GetPreviousForRecent(ctx, puzzles[0].CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		previous, err := p.repository.GetPreviousForRecent(ctx, puzzles[0].CreatedAt.Format(time.RFC3339))
 		if err != nil {
 			return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
 		}
 		if previous != nil {
 			connection.PageInfo.HasPreviousPage = true
-			connection.PageInfo.PreviousCursor = domains.NewCursor(previous.CreatedAt.Format("2006-01-02 15:04:05.000000"))
+			connection.PageInfo.PreviousCursor = domains.NewCursor(previous.CreatedAt.Format(time.RFC3339))
 		}
 
 		return nil

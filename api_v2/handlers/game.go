@@ -43,7 +43,7 @@ func Game(dependencies GameDependencies, router *chi.Mux) {
 	}
 
 	router.Route("/games", func(r chi.Router) {
-		r.Put("/{puzzle_id}", g.create)
+		r.Post("/{puzzle_id}", g.create)
 
 		r.Get("/{puzzle_id}", g.get)
 		r.Get("/history/{user_id}", g.history)
@@ -97,13 +97,13 @@ func (g *game) get(w http.ResponseWriter, r *http.Request) {
 	g.session.Get(w, r, false)
 
 	// Check if a game already exists for the puzzle and the user
-	foundGame, err := g.service.FindByPuzzleID(r.Context(), puzzleID)
+	game, err := g.service.FindByPuzzleID(r.Context(), puzzleID)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Ok("", foundGame))
+	render.Render(w, r, Ok("", game))
 }
 
 func (g *game) history(w http.ResponseWriter, r *http.Request) {
