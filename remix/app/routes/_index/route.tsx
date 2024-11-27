@@ -72,19 +72,7 @@ export default function Index() {
 	const data = useLoaderData<LoaderResponse>();
 
 	const ctx = useGame({
-		game: hydrateGame({
-			...data.game,
-			puzzle: {
-				...data.game.puzzle,
-				groups: data.game.puzzle.groups.map((group) => ({
-					...group,
-					blocks: group.blocks.map((block) => ({
-						...block,
-						value: atob(block.value),
-					})),
-				})),
-			},
-		}),
+		game: hydrateGame(data.game),
 	});
 
 	const me = useMemo<undefined | User>(
