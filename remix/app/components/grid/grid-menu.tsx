@@ -3,6 +3,7 @@ import { forwardRef, useMemo, useState } from "react";
 
 import * as Portal from "@radix-ui/react-portal";
 import { Primitive } from "@radix-ui/react-primitive";
+import { useFetcher } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRightIcon, StarIcon } from "lucide-react";
 
@@ -19,6 +20,9 @@ import { arePuzzleBlocksSameGroup } from "@/lib/are-puzzle-blocks-same-group";
 import { cn } from "@/lib/cn";
 import { getPuzzleBlocksFromAttempts } from "@/lib/get-puzzle-blocks-from-attempts";
 import { omit } from "@/lib/omit";
+import type { PuzzleBlock } from "@/types/puzzle";
+import type { PuzzleLike } from "@/types/puzzle-like";
+import type { Response } from "@/types/response";
 
 export type GridMenuProps = Portal.PortalProps & {
 	blocks: UseGame[0]["blocks"];
@@ -28,9 +32,13 @@ export type GridMenuProps = Portal.PortalProps & {
 
 export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 	({ blocks, game, isSuccess, ...props }, ref) => {
+		const fetcher = useFetcher<Response<PuzzleLike>>({
+			key: "puzzles.like.$id",
+		});
+
 		const [isHidden, toggleIsHidden] = useState(false);
 
-		const attempts = useMemo(() => {
+		const attempts = useMemo<{ blocks: PuzzleBlock[]; isCorrect: boolean }[]>(() => {
 			const joined = getPuzzleBlocksFromAttempts(blocks, game);
 
 			return joined.map((attempt) => ({
@@ -120,25 +128,28 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 									<div className="flex w-full items-center justify-between">
 										<p className="text-sm font-medium text-muted-foreground">Score: {game.score}</p>
 
-										<Button
-											aria-label={game.puzzle.liked_at ? "Unlike puzzle" : "Like puzzle"}
-											className={cn(
-												"min-w-0 shrink-0 gap-2 text-muted-foreground",
+										<fetcher.Form action={`/puzzles/like/${game.puzzle.id}`} method="PUT">
+											<Button
+												aria-label={game.puzzle.liked_at ? "Unlike puzzle" : "Like puzzle"}
+												className={cn(
+													"min-w-0 shrink-0 gap-2 text-muted-foreground",
 
-												"[&>svg]:data-[is-liked=true]:fill-current",
-											)}
-											data-is-liked={!!game.puzzle.liked_at}
-											size="sm"
-											variant="outline"
-										>
-											<StarIcon className="h-4 w-4" />
+													"[&>svg]:data-[is-liked=true]:fill-current",
+												)}
+												data-is-liked={!!game.puzzle.liked_at}
+												disabled={fetcher.state === "submitting"}
+												size="sm"
+												variant="outline"
+											>
+												<StarIcon className="h-4 w-4" />
 
-											<span>Liked</span>
+												<span>{game.puzzle.liked_at ? "Liked" : "Like"}</span>
 
-											<hr className="h-full w-[1px] bg-border" />
+												<hr className="h-full w-[1px] bg-border" />
 
-											<span>{abbreviateNumber(game.puzzle.num_of_likes)}</span>
-										</Button>
+												<span>{abbreviateNumber(game.puzzle.num_of_likes)}</span>
+											</Button>
+										</fetcher.Form>
 									</div>
 
 									<h1 className="mt-2 line-clamp-1 text-ellipsis text-lg font-semibold">

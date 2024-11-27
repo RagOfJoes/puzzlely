@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import type { LoaderFunctionArgs, MetaFunction, TypedResponse } from "@remix-run/node";
+import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
 import { json, useLoaderData } from "@remix-run/react";
 
 import { Header } from "@/components/header";
@@ -66,6 +67,18 @@ export const meta: MetaFunction<typeof loader> = () => [
 		title: "Puzzlely",
 	},
 ];
+
+export function shouldRevalidate({
+	defaultShouldRevalidate,
+	formAction,
+}: ShouldRevalidateFunctionArgs) {
+	if (!formAction?.includes("/puzzles/like/")) {
+		return defaultShouldRevalidate;
+	}
+
+	// Don't need to re-run loader when the user likes the puzzle
+	return false;
+}
 
 // TODO: Create different view depending on the result of the loader
 export default function Index() {

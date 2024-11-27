@@ -4,6 +4,7 @@ import type { GameConnection } from "@/types/game-connection";
 import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleConnection } from "@/types/puzzle-connection";
 import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
+import type { PuzzleLike } from "@/types/puzzle-like";
 import type { PuzzleSummaryConnection } from "@/types/puzzle-summary-connection";
 import type { Response } from "@/types/response";
 import type { Session } from "@/types/session";
@@ -178,6 +179,7 @@ export class API {
 		 * Hits the `/puzzles/liked:id` endpoint on the API
 		 *
 		 * @param request - The incoming request
+		 * @param id - The ID of the user
 		 * @returns A list of the user's liked puzzles
 		 */
 		async liked(request: Request, id: string): Promise<Response<PuzzleSummaryConnection>> {
@@ -245,6 +247,30 @@ export class API {
 			);
 
 			const response: Response<PuzzleConnection> = await res.json();
+			return response;
+		},
+
+		/**
+		 * Toggle like on puzzle
+		 *
+		 * Hits the `/puzzles/like/:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @param id - The ID of the puzzle
+		 * @returns The newly created puzzle
+		 */
+		async toggleLike(request: Request, id: string): Promise<Response<PuzzleLike>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const res = await fetch(`${API.URL}/${this.prefix}/like/${id}`, {
+				credentials: "include",
+				headers: {
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
+				},
+				method: "PUT",
+			});
+
+			const response: Response<PuzzleLike> = await res.json();
 			return response;
 		},
 	};
