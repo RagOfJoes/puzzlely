@@ -1,12 +1,10 @@
-import { useMemo } from "react";
-
 import { useFetcher, useNavigation } from "@remix-run/react";
-import dayjs from "dayjs";
 import { FlagIcon, HeartIcon, ShuffleIcon, StarIcon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { Skeleton } from "@/components/skeleton";
 import { useGameContext } from "@/hooks/use-game";
+import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { abbreviateNumber } from "@/lib/abbreviate-number";
 import { cn } from "@/lib/cn";
 import type { PuzzleLike } from "@/types/puzzle-like";
@@ -16,36 +14,13 @@ export function IndexHeader() {
 	const [state, actions] = useGameContext();
 
 	const fetcher = useFetcher<Response<PuzzleLike>>({
-		key: "puzzles.like.$id",
+		key: `puzzles.like.${state.game.puzzle.id}`,
 	});
 	const navigation = useNavigation();
 
 	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
 
-	const likedAt = useMemo<Date | null | undefined>(() => {
-		if (!fetcher.data) {
-			return state.game.puzzle.liked_at;
-		}
-
-		switch (fetcher.state) {
-			case "idle":
-				if (!fetcher.data || !fetcher.data.success) {
-					return state.game.puzzle.liked_at;
-				}
-
-				return fetcher.data.data.active ? undefined : dayjs(fetcher.data.data.updatedAt).toDate();
-
-			default:
-				return state.game.puzzle.liked_at;
-		}
-	}, [fetcher.data, fetcher.state, state.game.puzzle.liked_at]);
-	const numOfLikes = useMemo<number>(() => {
-		if (!fetcher.data || !!likedAt === !!state.game.puzzle.liked_at) {
-			return state.game.puzzle.num_of_likes;
-		}
-
-		return likedAt ? state.game.puzzle.num_of_likes + 1 : state.game.puzzle.num_of_likes - 1;
-	}, [fetcher.data, state.game.puzzle.liked_at, state.game.puzzle.num_of_likes, likedAt]);
+	const optimisticLike = usePuzzleOptimisticLike(fetcher, state.game.puzzle);
 
 	return (
 		<div
@@ -160,7 +135,7 @@ export function IndexHeader() {
 							{isLoading ? (
 								<Skeleton className="bg-foreground/10 text-transparent">10</Skeleton>
 							) : (
-								abbreviateNumber(numOfLikes)
+								abbreviateNumber(optimisticLike.num_of_likes)
 							)}
 						</div>
 					</div>

@@ -1,26 +1,37 @@
-import { Suspense } from "react";
-
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { defer } from "@remix-run/node";
-import { Await, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 
 import { PuzzleSummaryCard } from "@/components/puzzle-summary-card";
-import { Skeleton } from "@/components/skeleton";
 import { TabsContent } from "@/components/tabs";
+import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
 import { hydratePuzzleSummary } from "@/lib/hydrate-puzzle-summary";
 import { API } from "@/services/api.server";
+import type { PuzzleLike } from "@/types/puzzle-like";
+import type { Response } from "@/types/response";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-	const liked = API.puzzles.liked(request, params.id ?? "");
-
-	return defer({
-		liked,
+	return json({
+		liked: await API.puzzles.liked(request, params.id ?? ""),
 	});
 }
 
+export function shouldRevalidate({
+	defaultShouldRevalidate,
+	formAction,
+}: ShouldRevalidateFunctionArgs) {
+	if (!formAction?.includes("/puzzles/like/")) {
+		return defaultShouldRevalidate;
+	}
+
+	// Don't need to re-run loader when the user likes the puzzle
+	return false;
+}
+
 export default function UserLiked() {
-	const data = useLoaderData<typeof loader>();
+	const loaderData = useLoaderData<typeof loader>();
 
 	return (
 		<TabsContent
@@ -32,42 +43,31 @@ export default function UserLiked() {
 			)}
 			value="liked"
 		>
-			<Suspense
-				fallback={Array.from({ length: 4 }).map((_, i) => (
-					<Skeleton className="col-span-1 row-span-1" key={`LikedPuzzles__${i}`}>
-						<PuzzleSummaryCard
-							className="invisible"
-							puzzle={{
-								id: "",
-								difficulty: "Easy",
-								max_attempts: 0,
-								num_of_likes: 0,
-								created_at: new Date(),
+			{loaderData.liked.success &&
+				loaderData.liked.data.edges.map((edge) => {
+					const puzzle = hydratePuzzleSummary(edge.node);
 
-								created_by: {
-									id: "",
-									state: "COMPLETE",
-									username: "",
-									created_at: new Date(),
-								},
-							}}
-						/>
-					</Skeleton>
-				))}
-			>
-				<Await resolve={data.liked}>
-					{(liked) => (
-						<>
-							{liked.success &&
-								liked.data.edges.map((edge) => (
-									<div className="col-span-1 row-span-1" key={edge.node.id}>
-										<PuzzleSummaryCard puzzle={hydratePuzzleSummary(edge.node)} />
-									</div>
-								))}
-						</>
-					)}
-				</Await>
-			</Suspense>
+					// eslint-disable-next-line react-hooks/rules-of-hooks
+					const fetcher = useFetcher<Response<PuzzleLike>>({
+						key: `puzzles.like.${puzzle.id}`,
+					});
+
+					// eslint-disable-next-line react-hooks/rules-of-hooks
+					const optimisticLike = usePuzzleOptimisticLike(fetcher, puzzle);
+
+					return (
+						<div className="col-span-1 row-span-1" key={edge.node.id}>
+							<PuzzleSummaryCard
+								puzzle={{
+									...puzzle,
+
+									liked_at: optimisticLike.liked_at,
+									num_of_likes: optimisticLike.num_of_likes,
+								}}
+							/>
+						</div>
+					);
+				})}
 		</TabsContent>
 	);
 }

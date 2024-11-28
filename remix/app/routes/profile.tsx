@@ -1,14 +1,21 @@
 import { useState } from "react";
 
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
 import { Outlet, redirect, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
 import dayjs from "dayjs";
 import { EditIcon, Heart, History, Puzzle } from "lucide-react";
 
 import { Button } from "@/components/button";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/dialog";
 import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
 import { cn } from "@/lib/cn";
@@ -54,6 +61,18 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 	];
 };
 
+export function shouldRevalidate({
+	defaultShouldRevalidate,
+	formAction,
+}: ShouldRevalidateFunctionArgs) {
+	if (!formAction?.includes("/puzzles/like/")) {
+		return defaultShouldRevalidate;
+	}
+
+	// Don't need to re-run loader when the user likes the puzzle
+	return false;
+}
+
 export default function Profile() {
 	const { me } = useLoaderData<typeof loader>();
 	const navigate = useNavigate();
@@ -77,53 +96,57 @@ export default function Profile() {
 
 			<main className="mx-auto min-h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
-					<div className="flex gap-2 border bg-muted px-4 py-2">
-						<div className="flex h-11 w-11 shrink-0 items-center justify-center bg-gradient-to-br from-primary to-secondary text-xl font-semibold text-muted">
-							{me.username[0]}
+					<div className="flex flex-col gap-2 border bg-background px-4 py-4">
+						<div className="flex gap-2">
+							<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-xl font-semibold text-muted">
+								{me.username[0]}
+							</div>
+
+							<Dialog>
+								<DialogTrigger asChild>
+									<Button
+										aria-label="Edit profile"
+										className={cn(
+											"w-full justify-start gap-2 overflow-hidden p-0 text-xl font-semibold",
+
+											"hover:bg-transparent",
+										)}
+										size="lg"
+										variant="ghost"
+									>
+										<span className="truncate">{me.username}</span>
+
+										<EditIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+									</Button>
+								</DialogTrigger>
+
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>Edit Profile</DialogTitle>
+										<DialogDescription>
+											Express yourself by updating your profile.
+										</DialogDescription>
+									</DialogHeader>
+								</DialogContent>
+							</Dialog>
 						</div>
 
-						<Dialog>
-							<DialogTrigger asChild>
-								<Button
-									aria-label="Edit profile"
-									className={cn(
-										"w-full justify-start gap-2 overflow-hidden p-0 text-lg font-bold",
+						<div className="flex w-full items-center gap-1">
+							<div className="flex w-full flex-col gap-1">
+								<p className="text-sm text-muted-foreground">Joined</p>
 
-										"hover:bg-transparent",
-									)}
-									size="lg"
-									variant="ghost"
-								>
-									<span className="truncate">{me.username}</span>
+								<p className="font-medium leading-none">
+									{dayjs(me.created_at).format("MMM DD, YYYY")}
+								</p>
+							</div>
 
-									<EditIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-								</Button>
-							</DialogTrigger>
+							<div className="flex w-full flex-col gap-1">
+								<p className="text-sm text-muted-foreground">Updated at</p>
 
-							<DialogContent>
-								<DialogHeader>
-									<DialogTitle>Edit Profile</DialogTitle>
-									<DialogDescription className="sr-only">Edit Profile</DialogDescription>
-								</DialogHeader>
-							</DialogContent>
-						</Dialog>
-					</div>
-
-					<div className="flex w-full items-center gap-1">
-						<div className="flex w-full flex-col gap-1 border bg-muted px-4 py-2">
-							<p className="leading-none text-muted-foreground">Joined</p>
-
-							<p className="font-semibold leading-none">
-								{dayjs(me.created_at).format("MMM DD, YYYY")}
-							</p>
-						</div>
-
-						<div className="flex w-full flex-col gap-1 border bg-muted px-4 py-2">
-							<p className="leading-none text-muted-foreground">Updated at</p>
-
-							<p className="font-semibold leading-none">
-								{me.updated_at ? dayjs(me.updated_at).format("MMM DD, YYYY") : "N/A"}
-							</p>
+								<p className="font-medium leading-none">
+									{me.updated_at ? dayjs(me.updated_at).format("MMM DD, YYYY") : "N/A"}
+								</p>
+							</div>
 						</div>
 					</div>
 
@@ -137,7 +160,6 @@ export default function Profile() {
 
 							navigate(`/profile/${newTab}/`, {
 								preventScrollReset: true,
-								// viewTransition: true,
 							});
 						}}
 						value={tab}

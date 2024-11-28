@@ -1,10 +1,8 @@
-import { useMemo } from "react";
-
 import { useFetcher, useNavigation } from "@remix-run/react";
-import dayjs from "dayjs";
 
 import { Grid, GridBlock, GridBlocks, GridGroup, GridMenu } from "@/components/grid";
 import { useGameContext } from "@/hooks/use-game";
+import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import type { PuzzleLike } from "@/types/puzzle-like";
 import type { Response } from "@/types/response";
 
@@ -12,36 +10,13 @@ export function IndexGrid() {
 	const [state, actions] = useGameContext();
 
 	const fetcher = useFetcher<Response<PuzzleLike>>({
-		key: "puzzles.like.$id",
+		key: `puzzles.like.${state.game.puzzle.id}`,
 	});
 	const navigation = useNavigation();
 
 	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
 
-	const likedAt = useMemo<Date | null | undefined>(() => {
-		if (!fetcher.data) {
-			return state.game.puzzle.liked_at;
-		}
-
-		switch (fetcher.state) {
-			case "idle":
-				if (!fetcher.data || !fetcher.data.success) {
-					return state.game.puzzle.liked_at;
-				}
-
-				return fetcher.data.data.active ? undefined : dayjs(fetcher.data.data.updatedAt).toDate();
-
-			default:
-				return state.game.puzzle.liked_at;
-		}
-	}, [fetcher.data, fetcher.state, state.game.puzzle.liked_at]);
-	const numOfLikes = useMemo<number>(() => {
-		if (!fetcher.data || !!likedAt === !!state.game.puzzle.liked_at) {
-			return state.game.puzzle.num_of_likes;
-		}
-
-		return likedAt ? state.game.puzzle.num_of_likes + 1 : state.game.puzzle.num_of_likes - 1;
-	}, [fetcher.data, state.game.puzzle.liked_at, state.game.puzzle.num_of_likes, likedAt]);
+	const optimisticLike = usePuzzleOptimisticLike(fetcher, state.game.puzzle);
 
 	return (
 		<Grid>
@@ -103,8 +78,8 @@ export function IndexGrid() {
 						puzzle: {
 							...state.game.puzzle,
 
-							liked_at: likedAt,
-							num_of_likes: numOfLikes,
+							liked_at: optimisticLike.liked_at,
+							num_of_likes: optimisticLike.num_of_likes,
 						},
 					}}
 					isSuccess={state.isWinnerWinnerChickenDinner}
