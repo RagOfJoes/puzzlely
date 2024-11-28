@@ -47,7 +47,9 @@ export function IndexHeader() {
 
 						<div className="mt-2 text-2xl font-bold leading-none">
 							{isLoading ? (
-								<Skeleton className="bg-foreground/10 text-transparent">10</Skeleton>
+								<Skeleton>
+									<span className="invisible">10</span>
+								</Skeleton>
 							) : (
 								state.game.puzzle.max_attempts - state.wrongAttempts
 							)}
@@ -55,7 +57,9 @@ export function IndexHeader() {
 
 						<div className="text-xs text-muted-foreground">
 							{isLoading ? (
-								<Skeleton className="bg-foreground/10 text-transparent">out of 10</Skeleton>
+								<Skeleton>
+									<span className="invisible">out of 10</span>
+								</Skeleton>
 							) : (
 								`out of ${state.game.puzzle.max_attempts}`
 							)}
@@ -134,7 +138,9 @@ export function IndexHeader() {
 
 						<div className="mt-2 line-clamp-2 text-2xl font-bold leading-none">
 							{isLoading ? (
-								<Skeleton className="bg-foreground/10 text-transparent">10</Skeleton>
+								<Skeleton>
+									<span className="invisible">10</span>
+								</Skeleton>
 							) : (
 								abbreviateNumber(optimisticLike.num_of_likes)
 							)}

@@ -43,7 +43,6 @@ export function IndexFooter() {
 						to={{
 							search: "",
 						}}
-						viewTransition
 					>
 						<Button
 							aria-label="Go to latest puzzles"
@@ -79,7 +78,6 @@ export function IndexFooter() {
 									direction: "B",
 								}),
 							}}
-							viewTransition
 						>
 							<Button
 								aria-label="Go to previous game"
@@ -112,7 +110,6 @@ export function IndexFooter() {
 									direction: "F",
 								}),
 							}}
-							viewTransition
 						>
 							<Button
 								aria-label="Go to next game"
@@ -136,8 +133,8 @@ export function IndexFooter() {
 			<div className="mt-2 flex gap-1">
 				<div className="w-full min-w-0 basis-1/2">
 					{isLoading ? (
-						<Skeleton className="inline-flex min-w-0 select-none items-center px-2 py-1 text-transparent">
-							<p className="w-full truncate text-lg font-bold leading-none">EASY</p>
+						<Skeleton className="inline-flex min-w-0 select-none items-center px-2 py-1">
+							<p className="invisible w-full truncate text-lg font-bold leading-none">EASY</p>
 						</Skeleton>
 					) : (
 						<div
@@ -162,7 +159,7 @@ export function IndexFooter() {
 						{isLoading ? (
 							<div className="min-w-0">
 								<Skeleton className="w-auto text-transparent">
-									<p className="w-full text-lg font-bold leading-none">Username</p>
+									<p className="invisible w-full text-lg font-bold leading-none">Username</p>
 								</Skeleton>
 							</div>
 						) : (
@@ -185,8 +182,8 @@ export function IndexFooter() {
 						)}
 
 						{isLoading ? (
-							<Skeleton className="text-transparent">
-								<p className="text-xs">{dayjs().format("MMMM DD, YYYY")}</p>
+							<Skeleton>
+								<p className="invisible text-xs">{dayjs().format("MMMM DD, YYYY")}</p>
 							</Skeleton>
 						) : (
 							<time

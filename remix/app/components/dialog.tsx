@@ -74,7 +74,7 @@ DialogContent.displayName = DialogPrimitive.Content.displayName;
 export const DialogHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col",
+			"flex flex-col gap-1",
 
 			className,
 		)}
