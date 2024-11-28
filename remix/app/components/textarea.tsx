@@ -23,10 +23,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>((props, r
 			{...omit(ctx, ["invalid"])}
 			ref={ref}
 			className={cn(
-				"relative h-11 min-h-[5rem] w-full min-w-0 resize-none appearance-none border bg-muted px-4 py-2 font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color]",
+				"relative h-11 min-h-[5rem] w-full min-w-0 resize-none appearance-none border bg-background px-4 py-2 font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color]",
 
-				"aria-[invalid=true]:enabled:border-destructive",
-				"disabled:text-muted-foreground",
+				"aria-[invalid=true]:enabled:border-destructive-foreground",
+				"disabled:opacity-50",
 				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 				"placeholder:enabled:text-muted-foreground",
 

@@ -35,9 +35,9 @@ const variants = cva(
 					"hover:underline",
 				),
 				outline: cn(
-					"border bg-muted",
+					"border",
 
-					"hover:bg-foreground/10 hover:text-foreground",
+					"hover:bg-accent hover:text-accent-foreground",
 				),
 				secondary: cn(
 					"bg-secondary text-secondary-foreground",

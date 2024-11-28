@@ -33,7 +33,7 @@ export type GridMenuProps = Portal.PortalProps & {
 export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 	({ blocks, game, isSuccess, ...props }, ref) => {
 		const fetcher = useFetcher<Response<PuzzleLike>>({
-			key: "puzzles.like.$id",
+			key: `puzzles.like.${game.puzzle.id}`,
 		});
 
 		const [isHidden, toggleIsHidden] = useState(false);
@@ -54,11 +54,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 						{isHidden && (
 							<Button
 								asChild
-								className={cn(
-									"absolute bottom-4 left-4 z-10 border border-primary bg-primary/10 uppercase text-primary",
-
-									"hover:enabled:bg-primary/20",
-								)}
+								className="absolute bottom-4 left-4 z-10 border border-primary bg-primary uppercase text-primary-foreground"
 								onClick={() => toggleIsHidden(false)}
 								size="icon"
 							>
@@ -97,7 +93,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 								<motion.div
 									animate="animate"
 									className={cn(
-										"z-10 max-h-[90%] w-[90%] max-w-sm overflow-y-auto border bg-muted p-5 outline-none",
+										"z-10 max-h-[90%] w-[90%] max-w-sm overflow-y-auto border bg-popover p-5 outline-none",
 
 										"focus-visible:ring",
 									)}
@@ -183,9 +179,9 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 														{attempts.map((attempt, index) => (
 															<div
 																className={cn(
-																	"group/attempt w-full border border-destructive bg-destructive/10 p-2",
+																	"group/attempt w-full border border-destructive-foreground bg-destructive p-2",
 
-																	"data-[is-correct='true']:border-secondary/40 data-[is-correct='true']:bg-secondary/10",
+																	"data-[is-correct='true']:border-secondary data-[is-correct='true']:bg-secondary",
 																)}
 																data-is-correct={attempt.isCorrect}
 																key={`${attempt.blocks.map((block) => block.id).join("")}__${index}`}
@@ -194,11 +190,11 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 																	{attempt.blocks.map((block) => (
 																		<p
 																			className={cn(
-																				"w-full basis-1/4 select-none truncate px-2 text-center text-sm font-medium text-destructive",
+																				"w-full basis-1/4 select-none truncate px-2 text-center text-sm font-medium text-destructive-foreground",
 
-																				"[&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-destructive",
-																				"group-data-[is-correct='true']/attempt:text-secondary",
-																				"group-data-[is-correct='true']/attempt:[&:not(:last-child)]:border-r-secondary/40",
+																				"[&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-destructive-foreground",
+																				"group-data-[is-correct='true']/attempt:text-secondary-foreground",
+																				"group-data-[is-correct='true']/attempt:[&:not(:last-child)]:border-r-secondary-foreground",
 																			)}
 																			key={block.id}
 																		>
@@ -214,15 +210,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 										</Accordion>
 									</div>
 
-									<Button
-										className={cn(
-											"w-full border border-primary bg-primary/10 uppercase text-primary",
-
-											"hover:enabled:bg-primary/20",
-										)}
-										onClick={() => toggleIsHidden(true)}
-										variant="default"
-									>
+									<Button className="w-full uppercase" onClick={() => toggleIsHidden(true)}>
 										Hide
 									</Button>
 								</motion.div>

@@ -24,10 +24,9 @@ export default function Login() {
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col items-center justify-center">
 					<div className="flex w-full flex-col items-start gap-1">
-						<h1 className="font-heading text-xl font-bold leading-none">
-							Welcome back to Puzzlely.
-						</h1>
-						<p className="font-medium leading-none text-muted-foreground">
+						<h1 className="text-2xl font-semibold leading-none">Welcome back to Puzzlely.</h1>
+
+						<p className="text-sm leading-none text-muted-foreground">
 							Log in with one of the options below to continue.
 						</p>
 					</div>
@@ -38,7 +37,7 @@ export default function Login() {
 								title: "Discord",
 								icon: (
 									<svg
-										className="h-4 w-4 fill-foreground"
+										className="h-4 w-4 fill-current"
 										role="img"
 										viewBox="0 0 24 24"
 										xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +52,7 @@ export default function Login() {
 								title: "GitHub",
 								icon: (
 									<svg
-										className="h-4 w-4 fill-foreground"
+										className="h-4 w-4 fill-current"
 										role="img"
 										viewBox="0 0 24 24"
 										xmlns="http://www.w3.org/2000/svg"
@@ -68,7 +67,7 @@ export default function Login() {
 								title: "Google",
 								icon: (
 									<svg
-										className="h-4 w-4 fill-foreground"
+										className="h-4 w-4 fill-current"
 										role="img"
 										viewBox="0 0 24 24"
 										xmlns="http://www.w3.org/2000/svg"
@@ -84,16 +83,16 @@ export default function Login() {
 								<Button className="w-full gap-2 text-lg font-bold" size="lg" variant="outline">
 									{p.icon}
 
-									<div>Log in with {p.title}</div>
+									<span>Log in with {p.title}</span>
 								</Button>
 							</Form>
 						))}
 
-						<p className="mt-4 text-sm font-medium text-muted-foreground">
+						<p className="mt-4 text-sm text-muted-foreground">
 							Dont't have an account?{" "}
 							<Link
 								className={cn(
-									"font-bold text-primary outline-none transition",
+									"text-primary outline-none transition",
 
 									"focus-visible:ring focus-visible:ring-ring",
 									"hover:underline",

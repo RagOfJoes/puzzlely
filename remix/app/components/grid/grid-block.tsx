@@ -18,14 +18,14 @@ export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>(
 		<motion.button
 			{...props}
 			className={cn(
-				"col-span-1 row-span-1 inline-flex appearance-none items-center justify-center whitespace-normal border bg-muted text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color] [word-break:break-word]",
+				"col-span-1 row-span-1 inline-flex w-full min-w-0 appearance-none items-center justify-center whitespace-normal border bg-background text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color] [word-break:break-word]",
 
-				"data-[error=true]:border-destructive data-[error=true]:bg-destructive data-[error=true]:text-destructive-foreground data-[error=true]:hover:bg-destructive/90",
+				"data-[error=true]:border-destructive-foreground data-[error=true]:bg-destructive data-[error=true]:text-destructive-foreground data-[error=true]:hover:bg-destructive/90 data-[error=true]:hover:text-destructive-foreground",
 				"data-[has-correct=false]:first-of-type:col-start-1 data-[has-correct=false]:first-of-type:col-end-1 data-[has-correct=false]:first-of-type:row-start-1 data-[has-correct=false]:first-of-type:row-end-1",
-				"data-[selected=true]:border-primary data-[selected=true]:bg-primary/10 data-[selected=true]:text-primary data-[selected=true]:hover:bg-primary/20",
+				"data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground",
 				"disabled:pointer-events-none",
 				"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-				"hover:enabled:bg-foreground/10",
+				"hover:enabled:bg-primary/90 hover:enabled:text-primary-foreground",
 				"motion-reduce:transition-none",
 
 				className,

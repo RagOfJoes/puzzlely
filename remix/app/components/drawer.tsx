@@ -116,7 +116,7 @@ export const DrawerTitle = forwardRef<
 	<DrawerPrimitive.Title
 		{...props}
 		className={cn(
-			"text-lg font-semibold leading-none tracking-tight",
+			"text-2xl font-semibold leading-none",
 
 			className,
 		)}
@@ -132,7 +132,7 @@ export const DrawerDescription = forwardRef<
 	<DrawerPrimitive.Description
 		{...props}
 		className={cn(
-			"text-sm text-muted-foreground",
+			"text-sm leading-none text-muted-foreground",
 
 			className,
 		)}

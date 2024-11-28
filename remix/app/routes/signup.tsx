@@ -25,8 +25,9 @@ export default function SignUp() {
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col items-center justify-center">
 					<div className="flex w-full flex-col items-start gap-1">
-						<h2 className="font-heading text-xl font-bold leading-none">Welcome to Puzzlely!</h2>
-						<p className="font-medium leading-none text-muted-foreground">
+						<h1 className="text-2xl font-semibold leading-none">Welcome to Puzzlely!</h1>
+
+						<p className="text-sm leading-none text-muted-foreground">
 							Sign up now by selecting one of the options below.
 						</p>
 					</div>
@@ -37,7 +38,7 @@ export default function SignUp() {
 								title: "Discord",
 								icon: (
 									<svg
-										className="h-4 w-4 fill-foreground"
+										className="h-4 w-4 fill-current"
 										role="img"
 										viewBox="0 0 24 24"
 										xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +53,7 @@ export default function SignUp() {
 								title: "GitHub",
 								icon: (
 									<svg
-										className="h-4 w-4 fill-foreground"
+										className="h-4 w-4 fill-current"
 										role="img"
 										viewBox="0 0 24 24"
 										xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +68,7 @@ export default function SignUp() {
 								title: "Google",
 								icon: (
 									<svg
-										className="h-4 w-4 fill-foreground"
+										className="h-4 w-4 fill-current"
 										role="img"
 										viewBox="0 0 24 24"
 										xmlns="http://www.w3.org/2000/svg"
@@ -88,11 +89,11 @@ export default function SignUp() {
 							</Form>
 						))}
 
-						<p className="mt-4 text-sm font-medium text-muted-foreground">
+						<p className="mt-4 text-sm text-muted-foreground">
 							Already have an account?{" "}
 							<Link
 								className={cn(
-									"font-bold text-primary outline-none transition",
+									"text-primary outline-none transition",
 
 									"focus-visible:ring focus-visible:ring-ring",
 									"hover:underline",

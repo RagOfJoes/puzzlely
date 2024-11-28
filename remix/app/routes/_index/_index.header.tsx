@@ -41,7 +41,7 @@ export function IndexHeader() {
 					"md:col-start-1",
 				)}
 			>
-				<div className="flex h-full w-full items-center justify-between border bg-muted px-4 py-2">
+				<div className="flex h-full w-full items-center justify-between border bg-background px-4 py-2">
 					<div className="flex h-full flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Attempts Left</h3>
 
@@ -62,8 +62,8 @@ export function IndexHeader() {
 						</div>
 					</div>
 
-					<div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-primary/10 text-primary">
-						<HeartIcon className="h-4 w-4" />
+					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
+						<HeartIcon className="h-4 w-4 fill-current" />
 					</div>
 				</div>
 			</div>
@@ -89,9 +89,10 @@ export function IndexHeader() {
 					variant="outline"
 				>
 					<FlagIcon className="h-3 w-3" />
-					<div>Give up</div>
 
-					<kbd className="pointer-events-none whitespace-nowrap rounded border border-b-[3px] border-primary/40 bg-primary/10 px-1.5 font-mono text-[0.8em] font-bold leading-normal text-primary">
+					<span>Give up</span>
+
+					<kbd className="pointer-events-none whitespace-nowrap rounded border border-b-[3px] px-1.5 font-mono text-[0.8em] font-bold leading-normal text-inherit">
 						[
 					</kbd>
 				</Button>
@@ -111,9 +112,9 @@ export function IndexHeader() {
 				>
 					<ShuffleIcon className="h-3 w-3" />
 
-					<div>Shuffle</div>
+					<span>Shuffle</span>
 
-					<kbd className="pointer-events-none whitespace-nowrap rounded border border-b-[3px] border-primary/40 bg-primary/10 px-1.5 font-mono text-[0.8em] font-bold leading-normal text-primary">
+					<kbd className="pointer-events-none whitespace-nowrap rounded border border-b-[3px] px-1.5 font-mono text-[0.8em] font-bold leading-normal text-inherit">
 						]
 					</kbd>
 				</Button>
@@ -127,7 +128,7 @@ export function IndexHeader() {
 					"md:col-start-4",
 				)}
 			>
-				<div className="flex h-full w-full items-center justify-between border bg-muted px-4 py-2">
+				<div className="flex h-full w-full items-center justify-between border bg-background px-4 py-2">
 					<div className="flex flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Likes</h3>
 
@@ -140,8 +141,8 @@ export function IndexHeader() {
 						</div>
 					</div>
 
-					<div className="flex h-10 w-10 items-center justify-center rounded-full border border-primary bg-primary/10 text-primary">
-						<StarIcon className="h-4 w-4" />
+					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background">
+						<StarIcon className="h-4 w-4 fill-current" />
 					</div>
 				</div>
 			</div>

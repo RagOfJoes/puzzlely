@@ -1,7 +1,6 @@
-import type { ElementRef } from "react";
+import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
-import type { ComponentPropsWithoutRef } from "@radix-ui/react-primitive";
 import { Primitive } from "@radix-ui/react-primitive";
 
 import { cn } from "@/lib/cn";
@@ -16,7 +15,7 @@ export const GridGroup = forwardRef<ElementRef<typeof Primitive.div>, GridGroupP
 			<Primitive.div
 				{...other}
 				className={cn(
-					"col-span-4 row-span-1 inline-flex select-none items-center justify-center border border-secondary bg-secondary/10 px-4 py-2 text-secondary",
+					"col-span-4 row-span-1 inline-flex select-none items-center justify-center border px-4 py-2 text-foreground",
 
 					"first-of-type:col-start-1 first-of-type:col-end-5 first-of-type:row-start-1 first-of-type:row-end-1",
 
