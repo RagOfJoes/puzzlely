@@ -3,20 +3,23 @@ package services
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/RagOfJoes/puzzlely/domains"
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/sirupsen/logrus"
+	"github.com/uptrace/bun"
 )
 
 // Errors
 var (
-	ErrUserCreate       = errors.New("Failed to create user.")
-	ErrUserDelete       = errors.New("Failed to delete user.")
-	ErrUserDoesNotExist = errors.New("User does not exist.")
-	ErrUserInvalid      = errors.New("Invalid user.")
-	ErrUserUpdate       = errors.New("Failed to update user.")
+	ErrUserCreate          = errors.New("Failed to create user.")
+	ErrUserDelete          = errors.New("Failed to delete user.")
+	ErrUserDoesNotExist    = errors.New("User does not exist.")
+	ErrUserInvalid         = errors.New("Invalid user.")
+	ErrUserInvalidUsername = errors.New("Username is not available")
+	ErrUserUpdate          = errors.New("Failed to update user.")
 )
 
 // User defines the user service
@@ -82,16 +85,36 @@ func (u *User) FindWithConnection(ctx context.Context, connection domains.Connec
 
 // Update updates a user
 func (u *User) Update(ctx context.Context, update domains.User) (*domains.User, error) {
+	session := domains.SessionFromContext(ctx)
+
 	if err := update.Validate(); err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
-	updatedUser, err := u.repository.Update(ctx, update)
-	if err != nil {
+	// Make sure only certain fields are updated
+	update.ID = session.User.ID
+	update.State = session.User.State
+	update.CreatedAt = session.User.CreatedAt
+	update.UpdatedAt = bun.NullTime{
+		Time: time.Now(),
+	}
+
+	if session.User.State != "COMPLETE" || session.User.UpdatedAt.IsZero() {
+		update.State = "COMPLETE"
+	}
+
+	user, err := u.repository.Update(ctx, update)
+	if err != nil && errors.Is(err, repositories.ErrUserUsernameNotAvailable) {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserInvalidUsername)
+	} else if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserUpdate)
 	}
 
-	return updatedUser, nil
+	if err := user.Validate(); err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrUserUpdate)
+	}
+
+	return user, nil
 }
 
 // Delete deletes a user

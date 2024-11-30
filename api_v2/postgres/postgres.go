@@ -14,6 +14,10 @@ import (
 	"github.com/uptrace/bun/driver/pgdriver"
 )
 
+const (
+	ErrCodeUniqueViolation = "23505"
+)
+
 func Connect(cfg config.Configuration) (*bun.DB, error) {
 	dialect := pgdialect.New()
 
@@ -54,4 +58,15 @@ func Connect(cfg config.Configuration) (*bun.DB, error) {
 	}).Info("Successfully connected to Postgres")
 
 	return db, nil
+}
+
+// IsUniqueError checks whether the error is a postgres unique constraint error
+func IsUniqueError(err error) bool {
+	// Edge case
+	if err == nil {
+		return false
+	}
+
+	var pgError pgdriver.Error
+	return errors.As(err, &pgError) && pgError.Field('C') == ErrCodeUniqueViolation
 }

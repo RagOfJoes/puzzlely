@@ -44,12 +44,12 @@ func (u *user) Create(ctx context.Context, newConnection domains.Connection, new
 }
 
 func (u *user) Get(ctx context.Context, id string) (*domains.User, error) {
-	var foundUser domains.User
-	if err := u.db.NewSelect().Model(&foundUser).Where("id = ?", id).Scan(ctx); err != nil {
+	var user domains.User
+	if err := u.db.NewSelect().Model(&user).Where("id = ?", id).Scan(ctx); err != nil {
 		return nil, err
 	}
 
-	return &foundUser, nil
+	return &user, nil
 }
 
 func (u *user) GetWithConnection(ctx context.Context, connection domains.Connection) (*domains.User, error) {
@@ -64,22 +64,34 @@ func (u *user) GetWithConnection(ctx context.Context, connection domains.Connect
 		return nil, err
 	}
 
-	var foundUser domains.User
+	var user domains.User
 	if err := u.db.NewSelect().
-		Model(&foundUser).
+		Model(&user).
 		Where("id = ?", foundConnection.UserID).
 		Scan(ctx); err != nil {
 		return nil, err
 	}
-	if err := foundUser.Validate(); err != nil {
+	if err := user.Validate(); err != nil {
 		return nil, err
 	}
 
-	return &foundUser, nil
+	return &user, nil
 }
 
 func (u *user) Update(ctx context.Context, user domains.User) (*domains.User, error) {
-	panic("unimplemented")
+	var updated domains.User
+	_, err := u.db.NewUpdate().
+		Model(&user).
+		Where("id = ?", user.ID).
+		Returning("*").
+		Exec(ctx, &updated)
+	if err != nil && IsUniqueError(err) {
+		return nil, repositories.ErrUserUsernameNotAvailable
+	} else if err != nil {
+		return nil, err
+	}
+
+	return &updated, nil
 }
 
 func (u *user) Delete(ctx context.Context, id string) error {

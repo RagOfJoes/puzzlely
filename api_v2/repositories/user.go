@@ -2,8 +2,14 @@ package repositories
 
 import (
 	"context"
+	"errors"
 
 	"github.com/RagOfJoes/puzzlely/domains"
+)
+
+// Errors
+var (
+	ErrUserUsernameNotAvailable = errors.New("Username is not available.")
 )
 
 // User defines methods for a user repository

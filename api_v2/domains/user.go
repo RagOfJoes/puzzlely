@@ -34,6 +34,11 @@ func NewUser() User {
 	}
 }
 
+// IsComplete checks if the user has completed all the steps to setup their profile
+func (u *User) IsComplete() bool {
+	return u.State == "COMPLETE" && !u.UpdatedAt.IsZero()
+}
+
 func (u User) Validate() error {
 	return validation.ValidateStruct(&u,
 		validation.Field(&u.ID, validation.Required, validation.By(internal.IsULID)),
