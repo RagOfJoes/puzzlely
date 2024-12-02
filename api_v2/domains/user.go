@@ -5,7 +5,6 @@ import (
 
 	"github.com/RagOfJoes/puzzlely/internal"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/oklog/ulid/v2"
 	"github.com/uptrace/bun"
 )
@@ -43,7 +42,7 @@ func (u User) Validate() error {
 	return validation.ValidateStruct(&u,
 		validation.Field(&u.ID, validation.Required, validation.By(internal.IsULID)),
 		validation.Field(&u.State, validation.Required, validation.In("PENDING", "COMPLETE")),
-		validation.Field(&u.Username, validation.Required, validation.Length(4, 64), is.Alphanumeric),
+		validation.Field(&u.Username, validation.Required, validation.Length(4, 64), internal.IsUsername),
 		validation.Field(&u.CreatedAt, validation.Required),
 		validation.Field(&u.UpdatedAt, validation.When(!u.UpdatedAt.IsZero(), validation.By(internal.IsAfter(u.CreatedAt)))),
 		validation.Field(&u.DeletedAt, validation.When(!u.DeletedAt.IsZero(), validation.By(internal.IsAfter(u.CreatedAt)))),
