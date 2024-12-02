@@ -4,12 +4,11 @@ import { Grid, GridBlock, GridBlocks, GridGroup, GridMenu } from "@/components/g
 import { useGameContext } from "@/hooks/use-game";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import type { PuzzleLike } from "@/types/puzzle-like";
-import type { Response } from "@/types/response";
 
 export function IndexGrid() {
 	const [state, actions] = useGameContext();
 
-	const fetcher = useFetcher<Response<PuzzleLike>>({
+	const fetcher = useFetcher<PuzzleLike>({
 		key: `puzzles.like.${state.game.puzzle.id}`,
 	});
 	const navigation = useNavigation();

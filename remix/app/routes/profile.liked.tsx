@@ -16,7 +16,6 @@ import type { loader as profileLoaderData } from "@/routes/profile";
 import { API } from "@/services/api.server";
 import { getSession } from "@/services/session.server";
 import type { PuzzleLike } from "@/types/puzzle-like";
-import type { Response } from "@/types/response";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const session = await getSession(request.headers.get("Cookie"));
@@ -68,7 +67,7 @@ export default function ProfileLiked() {
 					);
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const fetcher = useFetcher<Response<PuzzleLike>>({
+					const fetcher = useFetcher<PuzzleLike>({
 						key: `puzzles.like.${puzzle.id}`,
 					});
 

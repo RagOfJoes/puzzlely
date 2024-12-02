@@ -7,10 +7,9 @@ import dayjs from "dayjs";
 import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleLike } from "@/types/puzzle-like";
 import type { PuzzleSummary } from "@/types/puzzle-summary";
-import type { Response } from "@/types/response";
 
 export function usePuzzleOptimisticLike(
-	fetcher: Fetcher<SerializeFrom<Response<PuzzleLike>>>,
+	fetcher: Fetcher<SerializeFrom<PuzzleLike>>,
 	puzzle: Puzzle | PuzzleSummary,
 ): {
 	liked_at: Date | null | undefined;
@@ -24,11 +23,7 @@ export function usePuzzleOptimisticLike(
 
 		switch (fetcher.state) {
 			case "idle":
-				if (!fetcher.data || !fetcher.data.success) {
-					return puzzle.liked_at;
-				}
-
-				return !fetcher.data.data.active ? undefined : dayjs(fetcher.data.data.updatedAt).toDate();
+				return !fetcher.data.active ? undefined : dayjs(fetcher.data.updatedAt).toDate();
 
 			default:
 				return puzzle.liked_at;

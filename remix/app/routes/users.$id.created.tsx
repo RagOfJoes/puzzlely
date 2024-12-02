@@ -10,7 +10,6 @@ import { cn } from "@/lib/cn";
 import { hydratePuzzleSummary } from "@/lib/hydrate-puzzle-summary";
 import { API } from "@/services/api.server";
 import type { PuzzleLike } from "@/types/puzzle-like";
-import type { Response } from "@/types/response";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	return json({
@@ -48,7 +47,7 @@ export default function UserCreated() {
 					const puzzle = hydratePuzzleSummary(edge.node);
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const fetcher = useFetcher<Response<PuzzleLike>>({
+					const fetcher = useFetcher<PuzzleLike>({
 						key: `puzzles.like.${puzzle.id}`,
 					});
 
