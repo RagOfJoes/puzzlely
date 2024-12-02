@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 
@@ -16,6 +16,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 	return {};
 }
+
+export const meta: MetaFunction<typeof loader> = () => [
+	{
+		title: "Sign up | Puzzlely",
+	},
+];
 
 export default function SignUp() {
 	return (

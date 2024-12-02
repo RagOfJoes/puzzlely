@@ -1,4 +1,5 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Form, Link, redirect } from "@remix-run/react";
 
 import { Button } from "@/components/button";
@@ -7,14 +8,19 @@ import { cn } from "@/lib/cn";
 import { API } from "@/services/api.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success) {
+	if (me.success && !!me.data.user) {
 		return redirect("/profile");
 	}
 
-	return {};
+	return json({});
 }
+
+export const meta: MetaFunction<typeof loader> = () => [
+	{
+		title: "Login | Puzzlely",
+	},
+];
 
 export default function Login() {
 	return (

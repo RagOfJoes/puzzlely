@@ -10,7 +10,6 @@ export async function action({ request }: ActionFunctionArgs) {
 		return redirect("/profile");
 	}
 
-	// Check if user is already authenticated
 	const me = await API.me(request);
 	if (!me.success || !me.data || !me.data.user) {
 		return redirect("/");

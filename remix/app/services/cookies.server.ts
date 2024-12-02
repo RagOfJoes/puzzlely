@@ -9,11 +9,3 @@ export const state = createCookie("_state", {
 	secrets: [],
 	secure: process.env.NODE_ENV === "production",
 });
-
-// TODO: Set secrets for signing
-export const game = createCookie("_games", {
-	httpOnly: process.env.NODE_ENV === "production",
-	sameSite: "lax",
-	// secrets: [],
-	secure: process.env.NODE_ENV === "production",
-});

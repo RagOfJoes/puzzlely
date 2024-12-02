@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import type { LoaderFunctionArgs, MetaFunction, TypedResponse } from "@remix-run/node";
 import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
 import { json, useLoaderData } from "@remix-run/react";
@@ -88,14 +86,9 @@ export default function Index() {
 		game: hydrateGame(data.game),
 	});
 
-	const me = useMemo<undefined | User>(
-		() => (data.me ? hydrateUser(data.me) : undefined),
-		[data.me],
-	);
-
 	return (
 		<>
-			<Header me={me} />
+			<Header me={data.me ? hydrateUser(data.me) : undefined} />
 
 			<main
 				className={cn(
