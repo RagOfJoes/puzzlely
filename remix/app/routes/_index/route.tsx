@@ -9,6 +9,7 @@ import { createGame } from "@/lib/create-game";
 import { hydrateGame } from "@/lib/hydrate-game";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { API } from "@/services/api.server";
+import { redirectWithInfo } from "@/services/toast.server";
 import type { Game } from "@/types/game";
 import type { PageInfo } from "@/types/page-info";
 import type { User } from "@/types/user";
@@ -28,6 +29,13 @@ export async function loader({
 	request,
 }: LoaderFunctionArgs): Promise<TypedResponse<LoaderResponse>> {
 	const [me, puzzles] = await Promise.all([API.me(request), API.puzzles.recent(request)]);
+
+	// If the user hasn't completed their profile
+	if (me.success && me.data.user && me.data.user.state === "PENDING") {
+		return redirectWithInfo("/profile/complete", {
+			message: "Please complete your profile setup!",
+		});
+	}
 
 	if (!puzzles.success || !puzzles.data) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal

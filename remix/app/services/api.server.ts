@@ -9,6 +9,7 @@ import type { PuzzleSummaryConnection } from "@/types/puzzle-summary-connection"
 import type { Response } from "@/types/response";
 import type { Session } from "@/types/session";
 import type { User } from "@/types/user";
+import type { UserUpdatePayload } from "@/types/user-update-payload";
 
 export class API {
 	static URL: string = process.env.API_URL ?? "https://localhost:8080";
@@ -294,6 +295,31 @@ export class API {
 					Cookie: request.headers.get("cookie") ?? "",
 				},
 				method: "GET",
+			});
+
+			const response: Response<User> = await res.json();
+			return response;
+		},
+
+		/**
+		 * Update User
+		 *
+		 * Hits the `/users/:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @param payload - The updates that the user is making
+		 * @returns The newly updated user
+		 */
+		async update(request: Request, payload: UserUpdatePayload): Promise<Response<User>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const res = await fetch(`${API.URL}/${this.prefix}`, {
+				body: JSON.stringify(payload),
+				credentials: "include",
+				headers: {
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
+				},
+				method: "PUT",
 			});
 
 			const response: Response<User> = await res.json();

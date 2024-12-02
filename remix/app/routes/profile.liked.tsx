@@ -1,12 +1,18 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useFetcher, useLoaderData, type ShouldRevalidateFunctionArgs } from "@remix-run/react";
+import {
+	useFetcher,
+	useLoaderData,
+	useRouteLoaderData,
+	type ShouldRevalidateFunctionArgs,
+} from "@remix-run/react";
 
 import { PuzzleSummaryCard } from "@/components/puzzle-summary-card";
 import { TabsContent } from "@/components/tabs";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
 import { hydratePuzzleSummary } from "@/lib/hydrate-puzzle-summary";
+import type { loader as profileLoaderData } from "@/routes/profile";
 import { API } from "@/services/api.server";
 import { getSession } from "@/services/session.server";
 import type { PuzzleLike } from "@/types/puzzle-like";
@@ -27,7 +33,7 @@ export function shouldRevalidate({
 	defaultShouldRevalidate,
 	formAction,
 }: ShouldRevalidateFunctionArgs) {
-	if (!formAction?.includes("/puzzles/like/")) {
+	if (!["/puzzles/like/", "/users/update"].includes(formAction ?? "")) {
 		return defaultShouldRevalidate;
 	}
 
@@ -37,6 +43,7 @@ export function shouldRevalidate({
 
 export default function ProfileLiked() {
 	const loaderData = useLoaderData<typeof loader>();
+	const routeLoaderData = useRouteLoaderData<typeof profileLoaderData>("routes/profile")!;
 
 	return (
 		<TabsContent
@@ -50,7 +57,15 @@ export default function ProfileLiked() {
 		>
 			{loaderData.liked.success &&
 				loaderData.liked.data.edges.map((edge) => {
-					const puzzle = hydratePuzzleSummary(edge.node);
+					const puzzle = hydratePuzzleSummary(
+						edge.node.created_by.id === routeLoaderData.me.id
+							? {
+									...edge.node,
+
+									created_by: routeLoaderData.me,
+								}
+							: edge.node,
+					);
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					const fetcher = useFetcher<Response<PuzzleLike>>({

@@ -1,30 +1,57 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { Outlet, redirect, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
+import {
+	Outlet,
+	redirect,
+	useFetcher,
+	useLoaderData,
+	useMatches,
+	useNavigate,
+} from "@remix-run/react";
 import dayjs from "dayjs";
-import { EditIcon, Heart, History, Puzzle } from "lucide-react";
+import { EditIcon, Heart, History, LoaderCircleIcon, Puzzle } from "lucide-react";
+import { toast as notify } from "sonner";
 
 import { Button } from "@/components/button";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/dialog";
 import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
+import { UserUpdateForm } from "@/components/user-update-form";
 import { cn } from "@/lib/cn";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
+import {
+	getToast,
+	jsonWithToast,
+	redirectWithInfo,
+	redirectWithToast,
+} from "@/services/toast.server";
+import type { UserUpdatePayload } from "@/types/user-update-payload";
 
 export type ValidTabs = "created" | "liked" | "history";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+	const me = await requireUser(request);
+	if (me.state === "PENDING") {
+		return redirectWithInfo("/profile/complete", {
+			message: "Please complete your profile setup!",
+		});
+	}
+
+	const { toast } = await getToast(request);
+
 	const url = new URL(request.url);
 	const split = url.pathname.split("/").filter((str) => str.length > 0);
 	switch (split[split.length - 1]) {
@@ -35,14 +62,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		case "history":
 			break;
 		default:
-			return redirect("/profile/created/");
+			return !toast ? redirect("/profile/created") : redirectWithToast("/profile/created", toast);
 	}
 
-	const me = await requireUser(request);
-
-	return json({
-		me,
-	});
+	return !toast ? json({ me }) : jsonWithToast({ me }, toast);
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -65,7 +88,7 @@ export function shouldRevalidate({
 	defaultShouldRevalidate,
 	formAction,
 }: ShouldRevalidateFunctionArgs) {
-	if (!formAction?.includes("/puzzles/like/")) {
+	if (!["/puzzles/like/", "/users/update"].includes(formAction ?? "")) {
 		return defaultShouldRevalidate;
 	}
 
@@ -74,10 +97,15 @@ export function shouldRevalidate({
 }
 
 export default function Profile() {
-	const { me } = useLoaderData<typeof loader>();
-	const navigate = useNavigate();
+	const loaderData = useLoaderData<typeof loader>();
 	const matches = useMatches();
+	const navigate = useNavigate();
 
+	const fetcher = useFetcher<UserUpdatePayload>({
+		key: "users.update",
+	});
+
+	const [isOpen, toggleIsOpen] = useState<boolean>(false);
 	const [tab, setTab] = useState<ValidTabs>(() => {
 		const match = matches[matches.length - 1];
 		switch (match?.id) {
@@ -89,20 +117,43 @@ export default function Profile() {
 				return "created";
 		}
 	});
+	const [toastID, setToastID] = useState<number | string | undefined>();
+
+	useEffect(() => {
+		// eslint-disable-next-line default-case
+		switch (fetcher.state) {
+			case "idle":
+				if (!fetcher.data || !toastID) {
+					return;
+				}
+
+				notify.dismiss(toastID);
+				setToastID(undefined);
+				break;
+			case "submitting":
+				if (!isOpen || !!toastID) {
+					return;
+				}
+
+				setToastID(notify.loading("Updating profile..."));
+				toggleIsOpen(false);
+				break;
+		}
+	}, [fetcher.data, fetcher.state, isOpen, toastID]);
 
 	return (
 		<>
-			<Header me={me ? hydrateUser(me) : undefined} />
+			<Header me={hydrateUser(loaderData.me)} />
 
 			<main className="mx-auto min-h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
 					<div className="flex flex-col gap-2 border bg-background px-4 py-4">
 						<div className="flex gap-2">
 							<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-xl font-semibold text-muted">
-								{me.username[0]}
+								{loaderData.me.username[0]}
 							</div>
 
-							<Dialog>
+							<Dialog onOpenChange={toggleIsOpen} open={isOpen}>
 								<DialogTrigger asChild>
 									<Button
 										aria-label="Edit profile"
@@ -114,7 +165,7 @@ export default function Profile() {
 										size="lg"
 										variant="ghost"
 									>
-										<span className="truncate">{me.username}</span>
+										<span className="truncate">{loaderData.me.username}</span>
 
 										<EditIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
 									</Button>
@@ -127,6 +178,36 @@ export default function Profile() {
 											Express yourself by updating your profile.
 										</DialogDescription>
 									</DialogHeader>
+
+									<div className="py-4">
+										<UserUpdateForm
+											action="/users/update"
+											defaultValues={{
+												username: loaderData.me.username,
+											}}
+											fetcher={fetcher}
+											id="user-update-form"
+											method="PUT"
+										/>
+									</div>
+
+									<DialogFooter>
+										<Button
+											className="gap-2"
+											disabled={fetcher.state === "submitting"}
+											form="user-update-form"
+											size="lg"
+											type="submit"
+										>
+											{fetcher.state === "submitting" && (
+												<LoaderCircleIcon className="fill-tex h-4 w-4 shrink-0 animate-spin" />
+											)}
+
+											{fetcher.state === "submitting" ? "Submitting..." : "Submit"}
+										</Button>
+									</DialogFooter>
+
+									<DialogClose />
 								</DialogContent>
 							</Dialog>
 						</div>
@@ -136,7 +217,7 @@ export default function Profile() {
 								<p className="text-sm text-muted-foreground">Joined</p>
 
 								<p className="font-medium leading-none">
-									{dayjs(me.created_at).format("MMM DD, YYYY")}
+									{dayjs(loaderData.me.created_at).format("MMM DD, YYYY")}
 								</p>
 							</div>
 
@@ -144,7 +225,9 @@ export default function Profile() {
 								<p className="text-sm text-muted-foreground">Updated at</p>
 
 								<p className="font-medium leading-none">
-									{me.updated_at ? dayjs(me.updated_at).format("MMM DD, YYYY") : "N/A"}
+									{loaderData.me.updated_at
+										? dayjs(loaderData.me.updated_at).format("MMM DD, YYYY")
+										: "N/A"}
 								</p>
 							</div>
 						</div>

@@ -1,6 +1,9 @@
 export interface ErrorResponse {
 	success: false;
-	error: string;
+	error: {
+		code: string;
+		message: string;
+	};
 }
 
 export interface SuccessResponse<T> {
