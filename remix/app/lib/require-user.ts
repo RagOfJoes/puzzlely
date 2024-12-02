@@ -8,7 +8,6 @@ export async function requireUser(request: Request): Promise<User> {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
 		throw await redirectWithError("/login", {
 			description: "To access this feature.",
-			duration: 10_000,
 			message: "You must be logged in!",
 		});
 	}
