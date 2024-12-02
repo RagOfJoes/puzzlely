@@ -88,7 +88,7 @@ export function shouldRevalidate({
 	defaultShouldRevalidate,
 	formAction,
 }: ShouldRevalidateFunctionArgs) {
-	if (!["/puzzles/like/", "/users/update"].includes(formAction ?? "")) {
+	if (!["/puzzles/like/"].includes(formAction ?? "")) {
 		return defaultShouldRevalidate;
 	}
 
