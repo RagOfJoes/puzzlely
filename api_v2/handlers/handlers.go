@@ -24,7 +24,7 @@ import (
 // Common errors
 var (
 	ErrAlreadyLoggedIn = errors.New("You are already logged in.")
-	ErrInvalidID       = errors.New("Must provide valid ID.")
+	ErrInvalidID       = errors.New("Must provide a valid ID.")
 	ErrUnauthorized    = errors.New("You must be logged in to access this resource.")
 )
 
