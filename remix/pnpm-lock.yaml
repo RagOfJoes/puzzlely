@@ -89,6 +89,9 @@ importers:
       remix-hook-form:
         specifier: ^5.1.1
         version: 5.1.1(@remix-run/react@2.15.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.53.2(react@18.3.1))(react@18.3.1)
+      remix-toast:
+        specifier: 1.2.2
+        version: 1.2.2(@remix-run/server-runtime@2.15.0(typescript@5.6.3))
       sonner:
         specifier: ^1.7.0
         version: 1.7.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3468,6 +3471,11 @@ packages:
       react-dom: ^18.2.0
       react-hook-form: ^7.51.0
 
+  remix-toast@1.2.2:
+    resolution: {integrity: sha512-GayR/ozpqCZWI9AK0+wzp/SaD3jIUnx7IBSL4Oioglp1gs3waGWlHhgBtG+IbLmCR9iUzzrux0HiZQdk8uwYVg==}
+    peerDependencies:
+      '@remix-run/server-runtime': '>=1.15'
+
   require-like@0.1.2:
     resolution: {integrity: sha512-oyrU88skkMtDdauHDuKVrgR+zuItqr6/c//FXzvmxRGMexSDc6hNvJInGW3LL46n+8b50RykrvwSUIIQH2LQ5A==}
 
@@ -3589,6 +3597,12 @@ packages:
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+
+  sonner@1.7.0:
+    resolution: {integrity: sha512-W6dH7m5MujEPyug3lpI2l3TC3Pp1+LTgK0Efg+IHDrBbtEjyCmCHHo6yfNBOsf1tFZ6zf+jceWwB38baC8yO9g==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -7771,6 +7785,11 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-hook-form: 7.53.2(react@18.3.1)
 
+  remix-toast@1.2.2(@remix-run/server-runtime@2.15.0(typescript@5.6.3)):
+    dependencies:
+      '@remix-run/server-runtime': 2.15.0(typescript@5.6.3)
+      zod: 3.23.8
+
   require-like@0.1.2: {}
 
   resolve-from@4.0.0: {}
@@ -7926,6 +7945,11 @@ snapshots:
   signal-exit@4.1.0: {}
 
   slash@3.0.0: {}
+
+  sonner@1.7.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   source-map-js@1.2.1: {}
 

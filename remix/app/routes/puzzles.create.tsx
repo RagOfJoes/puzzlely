@@ -35,7 +35,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 	const created = await API.puzzles.create(request, data);
 	if (!created.success) {
-		session.flash("error", created.error);
+		session.flash("error", created.error.message);
 
 		return json(
 			{

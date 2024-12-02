@@ -1,15 +1,15 @@
-import { redirect } from "@remix-run/node";
-
 import { API } from "@/services/api.server";
+import { redirectWithError } from "@/services/toast.server";
 import type { User } from "@/types/user";
 
 export async function requireUser(request: Request): Promise<User> {
 	const me = await API.me(request);
 	if (!me.success || !me.data || !me.data.user) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
-		throw redirect("/login", {
-			status: 302,
-			statusText: "Unauthorized",
+		throw await redirectWithError("/login", {
+			description: "To access this feature.",
+			duration: 10_000,
+			message: "You must be logged in!",
 		});
 	}
 

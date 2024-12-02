@@ -1,8 +1,13 @@
-import type { LinksFunction } from "@remix-run/node";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
+import { useEffect } from "react";
+
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
+import { toast as notify } from "sonner";
 
 import { Footer } from "@/components/footer";
-import { TooltipProvider } from "@/components/tooltip";
+import { Toaster } from "@/components/toaster";
+import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
 
 export const links: LinksFunction = () => [
@@ -15,7 +20,56 @@ export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: style },
 ];
 
+export async function loader({ request }: LoaderFunctionArgs) {
+	const { toast, headers } = await getToast(request);
+
+	return json(
+		{
+			toast,
+		},
+		{
+			headers,
+		},
+	);
+}
+
 export default function App() {
+	const { toast } = useLoaderData<typeof loader>();
+
+	useEffect(() => {
+		if (!toast) {
+			return;
+		}
+
+		switch (toast.type) {
+			case "error":
+				notify.error(toast.message, {
+					description: toast.description,
+				});
+				break;
+			case "info":
+				notify.info(toast.message, {
+					description: toast.description,
+				});
+				break;
+			case "success":
+				notify.success(toast.message, {
+					description: toast.description,
+				});
+				break;
+			case "warning":
+				notify.warning(toast.message, {
+					description: toast.description,
+				});
+				break;
+			default:
+				notify.message(toast.message, {
+					description: toast.description,
+				});
+				break;
+		}
+	}, [toast]);
+
 	return (
 		<html className="h-full" lang="en">
 			<head>
@@ -37,14 +91,16 @@ export default function App() {
 				<Links />
 			</head>
 			<body className="h-dvh bg-background">
-				<TooltipProvider delayDuration={250}>
-					<Outlet />
-				</TooltipProvider>
-
+				{/* App Layout  */}
+				<Outlet />
 				<Footer />
 
+				{/* Remix */}
 				<ScrollRestoration />
 				<Scripts />
+
+				{/* Global Providers */}
+				<Toaster />
 			</body>
 		</html>
 	);

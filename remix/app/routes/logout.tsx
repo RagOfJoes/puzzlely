@@ -3,6 +3,7 @@ import { redirect } from "@remix-run/node";
 
 import { API } from "@/services/api.server";
 import { destroySession, getSession } from "@/services/session.server";
+import { redirectWithSuccess } from "@/services/toast.server";
 
 export async function action({ request }: ActionFunctionArgs) {
 	// Make sure the request is a DELETE request
@@ -18,9 +19,15 @@ export async function action({ request }: ActionFunctionArgs) {
 	await API.logout(request);
 
 	const session = await getSession(request.headers.get("Cookie"));
-	return redirect("/", {
-		headers: {
-			"Set-Cookie": await destroySession(session),
+	return redirectWithSuccess(
+		"/",
+		{
+			message: "Successfully logged out!",
 		},
-	});
+		{
+			headers: {
+				"Set-Cookie": await destroySession(session),
+			},
+		},
+	);
 }

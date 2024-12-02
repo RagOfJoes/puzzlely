@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { API } from "@/services/api.server";
 import { state } from "@/services/cookies.server";
 import { commitSession, getSession } from "@/services/session.server";
+import { redirectWithSuccess } from "@/services/toast.server";
 
 type TokenResponse = {
 	access_token: string;
@@ -18,12 +19,8 @@ type TokenResponse = {
 export async function loader({ request }: LoaderFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success) {
-		if (me.data.user?.state !== "COMPLETE") {
-			return redirect("/profile");
-		}
-
-		return redirect("/");
+	if (me.success && me.data.user) {
+		return me.data.user.state === "COMPLETE" ? redirect("/") : redirect("/profile");
 	}
 
 	const session = await getSession(request.headers.get("Cookie"));
@@ -123,10 +120,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		}),
 	]);
 
-	return redirect("/profile", {
-		headers: [
-			["Set-Cookie", committedSession],
-			["Set-Cookie", serializedState],
-		],
-	});
+	return redirectWithSuccess(
+		"/profile",
+		{
+			message: auth.data.user
+				? `Welcome back ${auth.data.user.username}!`
+				: "Successfully logged in!",
+		},
+		{
+			headers: [
+				["Set-Cookie", committedSession],
+				["Set-Cookie", serializedState],
+			],
+		},
+	);
 }

@@ -10,12 +10,8 @@ import { commitSession, getSession } from "@/services/session.server";
 export async function loader({ request }: LoaderFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success) {
-		if (me.data.user?.state !== "COMPLETE") {
-			return redirect("/profile");
-		}
-
-		return redirect("/");
+	if (me.success && me.data.user) {
+		return me.data.user.state === "COMPLETE" ? redirect("/") : redirect("/profile");
 	}
 
 	const session = await getSession(request.headers.get("Cookie"));
@@ -54,12 +50,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success) {
-		if (me.data.user?.state !== "COMPLETE") {
-			return redirect("/profile");
-		}
-
-		return redirect("/");
+	if (me.success && me.data.user) {
+		return me.data.user.state === "COMPLETE" ? redirect("/") : redirect("/profile");
 	}
 
 	const session = await getSession(request.headers.get("Cookie"));
