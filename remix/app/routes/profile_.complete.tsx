@@ -1,13 +1,13 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { LoaderCircleIcon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { UserUpdateForm } from "@/components/user-update-form";
 import { requireUser } from "@/lib/require-user";
-import type { UserUpdatePayload } from "@/types/user-update-payload";
+import type { action } from "@/routes/users.update";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const me = await requireUser(request);
@@ -22,9 +22,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function ProfileComplete() {
-	const loaderData = useLoaderData<typeof loader>();
-
-	const fetcher = useFetcher<UserUpdatePayload>({
+	const fetcher = useFetcher<typeof action>({
 		key: "users.update",
 	});
 
@@ -46,7 +44,7 @@ export default function ProfileComplete() {
 						<UserUpdateForm
 							action="/users/update"
 							defaultValues={{
-								username: loaderData.me.username,
+								username: fetcher.data?.defaultValues?.username,
 							}}
 							fetcher={fetcher}
 							id="user-update-form"
@@ -56,7 +54,10 @@ export default function ProfileComplete() {
 						<div className="flex w-full justify-end">
 							<Button
 								className="gap-2"
-								disabled={fetcher.state === "submitting"}
+								disabled={
+									(fetcher.state === "loading" && !fetcher.data?.errors) ||
+									fetcher.state === "submitting"
+								}
 								form="user-update-form"
 								size="lg"
 								type="submit"

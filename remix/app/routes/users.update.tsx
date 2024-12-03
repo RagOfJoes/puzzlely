@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import type { FieldErrors } from "react-hook-form";
 import { getValidatedFormData } from "remix-hook-form";
 
 import { requireUser } from "@/lib/require-user";
@@ -18,25 +19,30 @@ export async function action({ request }: ActionFunctionArgs) {
 		receivedValues: defaultValues,
 	} = await getValidatedFormData<UserUpdatePayload>(request, zodResolver(UserUpdatePayloadSchema));
 
+	const response: {
+		defaultValues?: Partial<UserUpdatePayload>;
+		errors?: FieldErrors<UserUpdatePayload>;
+	} = {
+		defaultValues,
+		errors,
+	};
 	if (errors) {
-		return json({ errors, defaultValues });
+		return json(response);
 	}
 
 	const updated = await API.users.update(request, data);
 	if (!updated.success) {
-		return jsonWithError(
-			{
-				defaultValues,
-				errors: {
-					username: {
-						message: updated.error.message,
-					},
-				},
-			},
-			{
+		response.errors = {
+			username: {
 				message: updated.error.message,
+				type: "custom",
 			},
-		);
+		};
+
+		return jsonWithError(response, {
+			description: updated.error.message,
+			message: "Failed to update profile!",
+		});
 	}
 
 	// If the user hasn't completed their profile yet, then, it's safe to assume the request came from `/profile/complete`
@@ -48,12 +54,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		});
 	}
 
-	return jsonWithSuccess(
-		{
-			data: updated.data,
-		},
-		{
-			message: "Successfully updated profile!",
-		},
-	);
+	return jsonWithSuccess(response, {
+		message: "Successfully updated profile!",
+	});
 }

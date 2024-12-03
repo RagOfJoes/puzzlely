@@ -24,8 +24,8 @@ import { UserUpdateForm } from "@/components/user-update-form";
 import { cn } from "@/lib/cn";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
+import type { action } from "@/routes/users.update";
 import { redirectWithInfo } from "@/services/toast.server";
-import type { UserUpdatePayload } from "@/types/user-update-payload";
 
 export type ValidTabs = "created" | "liked" | "history";
 
@@ -74,7 +74,7 @@ export default function Profile() {
 	const matches = useMatches();
 	const navigate = useNavigate();
 
-	const fetcher = useFetcher<UserUpdatePayload>({
+	const fetcher = useFetcher<typeof action>({
 		key: "users.update",
 	});
 
@@ -90,29 +90,29 @@ export default function Profile() {
 				return "created";
 		}
 	});
-	const [toastID, setToastID] = useState<number | string | undefined>();
 
 	useEffect(() => {
 		// eslint-disable-next-line default-case
 		switch (fetcher.state) {
-			case "idle":
-				if (!fetcher.data || !toastID) {
+			case "loading":
+				if (!fetcher.data) {
 					return;
 				}
 
-				notify.dismiss(toastID);
-				setToastID(undefined);
+				notify.dismiss("users.update");
 				break;
 			case "submitting":
-				if (!isOpen || !!toastID) {
+				if (!isOpen) {
 					return;
 				}
 
-				setToastID(notify.loading("Updating profile..."));
 				toggleIsOpen(false);
+				notify.loading("Updating profile...", {
+					id: "users.update",
+				});
 				break;
 		}
-	}, [fetcher.data, fetcher.state, isOpen, toastID]);
+	}, [fetcher.data, fetcher.state, isOpen]);
 
 	return (
 		<>
