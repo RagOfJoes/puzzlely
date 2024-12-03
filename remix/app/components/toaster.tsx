@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
-import { AlertCircleIcon, CircleCheckIcon, InfoIcon, LoaderIcon } from "lucide-react";
+import { AlertCircleIcon, CircleCheckIcon, InfoIcon, LoaderCircleIcon } from "lucide-react";
 import { Toaster as Sonner } from "sonner";
 
 import { cn } from "@/lib/cn";
@@ -21,7 +21,7 @@ export const Toaster = forwardRef<ElementRef<typeof Sonner>, ToasterProps>(
 			icons={{
 				error: <AlertCircleIcon className="h-4 w-4" />,
 				info: <InfoIcon className="h-4 w-4" />,
-				loading: <LoaderIcon className="h-4 w-4 animate-spin" />,
+				loading: <LoaderCircleIcon className="h-4 w-4 animate-spin" />,
 				success: <CircleCheckIcon className="h-4 w-4" />,
 			}}
 			offset={16}
