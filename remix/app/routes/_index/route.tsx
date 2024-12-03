@@ -31,7 +31,7 @@ export async function loader({
 	const [me, puzzles] = await Promise.all([API.me(request), API.puzzles.recent(request)]);
 
 	// If the user hasn't completed their profile
-	if (me.success && me.data.user && me.data.user.state === "PENDING") {
+	if (me.success && me.data.user && me.data.user.state === "PENDING" && !me.data.user.updated_at) {
 		return redirectWithInfo("/profile/complete", {
 			message: "Please complete your profile setup!",
 		});
