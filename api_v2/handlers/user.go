@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/RagOfJoes/puzzlely/domains"
@@ -9,6 +10,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/oklog/ulid/v2"
+)
+
+var (
+	ErrUserInvalidUpdatePayload = errors.New("Invalid update provided.")
 )
 
 type user struct {
@@ -67,11 +72,11 @@ func (u *user) me(w http.ResponseWriter, r *http.Request) {
 func (u *user) update(w http.ResponseWriter, r *http.Request) {
 	var payload domains.UserUpdatePayload
 	if err := render.Bind(r, &payload); err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidCreatePayload))
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserInvalidUpdatePayload))
 		return
 	}
 	if err := payload.Validate(); err != nil {
-		render.Respond(w, r, err)
+		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err))
 		return
 	}
 

@@ -63,7 +63,7 @@ func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := payload.Validate(); err != nil {
-		render.Respond(w, r, err)
+		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err))
 		return
 	}
 
