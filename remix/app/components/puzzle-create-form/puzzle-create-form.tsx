@@ -2,11 +2,11 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { SerializeFrom } from "@remix-run/node";
 import type { Form, FetcherWithComponents } from "@remix-run/react";
-import { LoaderCircleIcon } from "lucide-react";
+import type { FieldErrors } from "react-hook-form";
 import { RemixFormProvider, useRemixForm } from "remix-hook-form";
 
-import { Button } from "@/components/button";
 import { cn } from "@/lib/cn";
 import { PuzzleCreatePayloadSchema } from "@/schemas/puzzle-create-payload";
 import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
@@ -19,13 +19,16 @@ export type PuzzleCreateFormProps = Omit<
 	"children" | "defaultValue" | "onSubmit"
 > & {
 	defaultValues?: Partial<PuzzleCreatePayload>;
-	fetcher?: FetcherWithComponents<PuzzleCreatePayload>;
+	fetcher?: FetcherWithComponents<
+		SerializeFrom<{
+			defaultValues?: Partial<PuzzleCreatePayload>;
+			errors?: FieldErrors<PuzzleCreatePayload>;
+		}>
+	>;
 };
 
 export const PuzzleCreateForm = forwardRef<ElementRef<typeof Form>, PuzzleCreateFormProps>(
-	(props, ref) => {
-		const { className, defaultValues, fetcher, ...other } = props;
-
+	({ className, defaultValues, fetcher, ...props }, ref) => {
 		const form = useRemixForm<PuzzleCreatePayload>({
 			defaultValues,
 			fetcher,
@@ -36,32 +39,18 @@ export const PuzzleCreateForm = forwardRef<ElementRef<typeof Form>, PuzzleCreate
 		return (
 			<RemixFormProvider {...form}>
 				<form
-					{...other}
-					method="POST"
-					ref={ref}
+					{...props}
 					className={cn(
 						"flex h-full w-full flex-col gap-1",
 
 						className,
 					)}
+					method="POST"
 					onSubmit={form.handleSubmit}
+					ref={ref}
 				>
 					<PuzzleCreateFormMeta />
 					<PuzzleCreateFormGroups />
-
-					<Button
-						className="w-full gap-2"
-						disabled={
-							!form.formState.isDirty || !form.formState.isValid || form.formState.isSubmitting
-						}
-						size="lg"
-					>
-						{form.formState.isSubmitting && (
-							<LoaderCircleIcon className="fill-tex h-4 w-4 shrink-0 animate-spin" />
-						)}
-
-						{form.formState.isSubmitting ? "Submitting..." : "Submit"}
-					</Button>
 				</form>
 			</RemixFormProvider>
 		);

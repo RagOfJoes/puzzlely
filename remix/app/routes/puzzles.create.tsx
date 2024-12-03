@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import dayjs from "dayjs";
+import { LoaderCircleIcon } from "lucide-react";
+import type { FieldErrors } from "react-hook-form";
 import { getValidatedFormData } from "remix-hook-form";
 
+import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { PuzzleCreateForm } from "@/components/puzzle-create-form";
 import { cn } from "@/lib/cn";
@@ -12,11 +14,16 @@ import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
 import { PuzzleCreatePayloadSchema } from "@/schemas/puzzle-create-payload";
 import { API } from "@/services/api.server";
-import { commitSession, getSession } from "@/services/session.server";
+import { jsonWithError, redirectWithInfo, redirectWithSuccess } from "@/services/toast.server";
 import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
 
 export async function action({ request }: ActionFunctionArgs) {
-	await requireUser(request);
+	const me = await requireUser(request);
+	if (me.state === "PENDING" && !me.updated_at) {
+		return redirectWithInfo("/profile/complete", {
+			message: "Please complete your profile setup!",
+		});
+	}
 
 	const {
 		errors,
@@ -27,58 +34,41 @@ export async function action({ request }: ActionFunctionArgs) {
 		zodResolver(PuzzleCreatePayloadSchema),
 	);
 
+	const response: {
+		defaultValues?: Partial<PuzzleCreatePayload>;
+		errors?: FieldErrors<PuzzleCreatePayload>;
+	} = {
+		defaultValues,
+		errors,
+	};
 	if (errors) {
-		return json({ errors, defaultValues });
+		return json(response);
 	}
-
-	const session = await getSession(request.headers.get("Cookie"));
 
 	const created = await API.puzzles.create(request, data);
 	if (!created.success) {
-		session.flash("error", created.error.message);
-
-		return json(
-			{
-				defaultValues,
-			},
-			{
-				headers: {
-					"Set-Cookie": await commitSession(session, {
-						maxAge: dayjs(session.data.expires_at).diff(undefined, "seconds"),
-					}),
-				},
-			},
-		);
+		return jsonWithError(response, {
+			description: created.error.message,
+			message: "Failed to create puzzle!",
+		});
 	}
 
-	return redirect("/profile/created", {
-		headers: {
-			"Set-Cookie": await commitSession(session, {
-				maxAge: dayjs(session.data.expires_at).diff(undefined, "seconds"),
-			}),
-		},
+	return redirectWithSuccess("/profile/created", {
+		message: "Successfully created puzzle!",
 	});
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const me = await requireUser(request);
+	if (me.state === "PENDING" && !me.updated_at) {
+		return redirectWithInfo("/profile/complete", {
+			message: "Please complete your profile setup!",
+		});
+	}
 
-	const session = await getSession(request.headers.get("Cookie"));
-	session.flash("error", "Testing");
-
-	return json(
-		{
-			error: session.get("error"),
-			me,
-		},
-		{
-			headers: {
-				"Set-Cookie": await commitSession(session, {
-					maxAge: dayjs(session.data.expires_at).diff(undefined, "seconds"),
-				}),
-			},
-		},
-	);
+	return json({
+		me,
+	});
 }
 
 export const meta: MetaFunction<typeof loader> = () => [
@@ -90,7 +80,7 @@ export const meta: MetaFunction<typeof loader> = () => [
 export default function PuzzleCreate() {
 	const loaderData = useLoaderData<typeof loader>();
 
-	const fetcher = useFetcher<PuzzleCreatePayload>({
+	const fetcher = useFetcher<typeof action>({
 		key: "puzzles/create",
 	});
 
@@ -105,12 +95,30 @@ export default function PuzzleCreate() {
 					"max-lg:min-h-[700px]",
 				)}
 			>
-				<PuzzleCreateForm
-					defaultValues={{
-						groups: [],
-					}}
-					fetcher={fetcher}
-				/>
+				<article className="flex h-full w-full flex-col items-center justify-center gap-1">
+					<PuzzleCreateForm
+						defaultValues={{
+							groups: [],
+						}}
+						id="puzzle-create-form"
+						fetcher={fetcher}
+					/>
+
+					<Button
+						className="w-full gap-2"
+						disabled={
+							(fetcher.state === "loading" && !fetcher.data?.errors) ||
+							fetcher.state === "submitting"
+						}
+						size="lg"
+					>
+						{fetcher.state === "submitting" && (
+							<LoaderCircleIcon className="h-4 w-4 shrink-0 animate-spin" />
+						)}
+
+						{fetcher.state === "submitting" ? "Submitting..." : "Complete"}
+					</Button>
+				</article>
 			</main>
 		</>
 	);
