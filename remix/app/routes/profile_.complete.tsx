@@ -1,21 +1,19 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { redirect, useFetcher, useLoaderData } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { LoaderCircleIcon } from "lucide-react";
 
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { UserUpdateForm } from "@/components/user-update-form";
 import { requireUser } from "@/lib/require-user";
-import { getToast, redirectWithToast } from "@/services/toast.server";
 import type { UserUpdatePayload } from "@/types/user-update-payload";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const me = await requireUser(request);
-	const { toast } = await getToast(request);
 
 	if (me.state === "COMPLETE") {
-		return !toast ? redirect("/profile") : redirectWithToast("/profile", toast);
+		return redirect("/profile");
 	}
 
 	return json({

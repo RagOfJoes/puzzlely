@@ -21,7 +21,7 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-	const { toast, headers } = await getToast(request);
+	const { headers, toast } = await getToast(request);
 
 	return json(
 		{

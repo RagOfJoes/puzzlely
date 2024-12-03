@@ -1,16 +1,8 @@
 import { useEffect, useState } from "react";
 
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import {
-	Outlet,
-	redirect,
-	useFetcher,
-	useLoaderData,
-	useMatches,
-	useNavigate,
-} from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import { Outlet, useFetcher, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
 import dayjs from "dayjs";
 import { EditIcon, Heart, History, LoaderCircleIcon, Puzzle } from "lucide-react";
 import { toast as notify } from "sonner";
@@ -32,12 +24,7 @@ import { UserUpdateForm } from "@/components/user-update-form";
 import { cn } from "@/lib/cn";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
-import {
-	getToast,
-	jsonWithToast,
-	redirectWithInfo,
-	redirectWithToast,
-} from "@/services/toast.server";
+import { redirectWithInfo } from "@/services/toast.server";
 import type { UserUpdatePayload } from "@/types/user-update-payload";
 
 export type ValidTabs = "created" | "liked" | "history";
@@ -50,8 +37,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		});
 	}
 
-	const { toast } = await getToast(request);
-
 	const url = new URL(request.url);
 	const split = url.pathname.split("/").filter((str) => str.length > 0);
 	switch (split[split.length - 1]) {
@@ -62,10 +47,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		case "history":
 			break;
 		default:
-			return !toast ? redirect("/profile/created") : redirectWithToast("/profile/created", toast);
+			return redirect("/profile/created");
 	}
 
-	return !toast ? json({ me }) : jsonWithToast({ me }, toast);
+	return json({ me });
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -83,18 +68,6 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 		},
 	];
 };
-
-export function shouldRevalidate({
-	defaultShouldRevalidate,
-	formAction,
-}: ShouldRevalidateFunctionArgs) {
-	if (!["/puzzles/like/"].includes(formAction ?? "")) {
-		return defaultShouldRevalidate;
-	}
-
-	// Don't need to re-run loader when the user likes the puzzle
-	return false;
-}
 
 export default function Profile() {
 	const loaderData = useLoaderData<typeof loader>();

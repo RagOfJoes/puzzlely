@@ -6,15 +6,15 @@ import { getValidatedFormData } from "remix-hook-form";
 import { requireUser } from "@/lib/require-user";
 import { UserUpdatePayloadSchema } from "@/schemas/user-update-payload";
 import { API } from "@/services/api.server";
-import { jsonWithError, jsonWithSuccess } from "@/services/toast.server";
+import { jsonWithError, jsonWithSuccess, redirectWithSuccess } from "@/services/toast.server";
 import type { UserUpdatePayload } from "@/types/user-update-payload";
 
 export async function action({ request }: ActionFunctionArgs) {
-	await requireUser(request);
+	const user = await requireUser(request);
 
 	const {
-		errors,
 		data,
+		errors,
 		receivedValues: defaultValues,
 	} = await getValidatedFormData<UserUpdatePayload>(request, zodResolver(UserUpdatePayloadSchema));
 
@@ -22,7 +22,6 @@ export async function action({ request }: ActionFunctionArgs) {
 		return json({ errors, defaultValues });
 	}
 
-	// const updated = await API.users.update(request, {} as UserUpdatePayload);
 	const updated = await API.users.update(request, data);
 	if (!updated.success) {
 		return jsonWithError(
@@ -38,6 +37,15 @@ export async function action({ request }: ActionFunctionArgs) {
 				message: updated.error.message,
 			},
 		);
+	}
+
+	// If the user hasn't completed their profile yet, then, it's safe to assume the request came from `/profile/complete`
+	//
+	// NOTE: Redirect to `/profile/created` to ensure the toast appears
+	if (user.state === "PENDING" && !user.updated_at) {
+		return redirectWithSuccess("/profile/created", {
+			message: "Successfully completed profile!",
+		});
 	}
 
 	return jsonWithSuccess(
