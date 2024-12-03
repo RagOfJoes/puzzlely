@@ -65,7 +65,7 @@ export const PuzzleSummaryCard = forwardRef<
 						)}
 						to={`/users/${puzzle.created_by.id}`}
 					>
-						<p className="truncate font-semibold leading-none">{puzzle.created_by.username}</p>
+						<p className="truncate font-semibold">{puzzle.created_by.username}</p>
 					</Link>
 				</div>
 
