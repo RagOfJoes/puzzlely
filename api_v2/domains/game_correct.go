@@ -9,7 +9,7 @@ var _ Domain = (*GameCorrect)(nil)
 
 type GameCorrect struct {
 	ID    string `bun:"type:varchar(26),pk,notnull" json:"-"`
-	Order uint8  `bun:",notnull" json:"-"`
+	Order int    `bun:",notnull" json:"-"`
 
 	PuzzleGroupID string `bun:"type:varchar(26),notnull" json:"-"`
 	GameID        string `bun:"type:varchar(26),notnull" json:"-"`

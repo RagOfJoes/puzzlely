@@ -14,7 +14,8 @@ import (
 
 // Errors
 var (
-	ErrGameAlreadyExists = errors.New("Game already exists.")
+	ErrGameAlreadyExists  = errors.New("Game already exists.")
+	ErrGameInvalidPayload = errors.New("Invalid game provided.")
 )
 
 type game struct {
@@ -43,60 +44,25 @@ func Game(dependencies GameDependencies, router *chi.Mux) {
 	}
 
 	router.Route("/games", func(r chi.Router) {
-		r.Post("/{puzzle_id}", g.create)
-
 		r.Get("/{puzzle_id}", g.get)
 		r.Get("/history/{user_id}", g.history)
+
+		r.Put("/{puzzle_id}", g.save)
 	})
 }
 
-func (g *game) create(w http.ResponseWriter, r *http.Request) {
-	// First make sure that the request is valid
-	puzzleID, err := ulid.Parse(chi.URLParam(r, "puzzle_id"))
-	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
-		return
-	}
-
-	// Get the session from the request and pass result, if any, to the context
-	g.session.Get(w, r, false)
-
-	// Check if a game already exists for the puzzle and the user
-	foundGame, err := g.service.FindByPuzzleID(r.Context(), puzzleID)
-	if foundGame != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrGameAlreadyExists))
-		return
-	}
-
-	// Find the foundPuzzle
-	foundPuzzle, err := g.puzzle.Find(r.Context(), puzzleID)
-	if err != nil {
-		render.Respond(w, r, err)
-		return
-	}
-
-	// Create the game
-	createdGame, err := g.service.Create(r.Context(), *foundPuzzle)
-	if err != nil {
-		render.Respond(w, r, err)
-		return
-	}
-
-	render.Render(w, r, Created("", createdGame))
-}
-
 func (g *game) get(w http.ResponseWriter, r *http.Request) {
-	// First make sure that the request is valid
 	puzzleID, err := ulid.Parse(chi.URLParam(r, "puzzle_id"))
 	if err != nil {
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
 		return
 	}
 
-	// Get the session from the request and pass result, if any, to the context
-	g.session.Get(w, r, false)
+	if _, err := g.session.Get(w, r, true); err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
+		return
+	}
 
-	// Check if a game already exists for the puzzle and the user
 	game, err := g.service.FindByPuzzleID(r.Context(), puzzleID)
 	if err != nil {
 		render.Respond(w, r, err)
@@ -107,7 +73,6 @@ func (g *game) get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *game) history(w http.ResponseWriter, r *http.Request) {
-	// First make sure that the request is valid
 	userID, err := ulid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
@@ -123,17 +88,67 @@ func (g *game) history(w http.ResponseWriter, r *http.Request) {
 	// Get the session from the request and pass result, if any, to the context
 	g.session.Get(w, r, false)
 
-	foundUser, err := g.user.Find(r.Context(), userID.String(), false)
+	opts := domains.GameCursorPaginationOpts{
+		Cursor: cursor,
+		Limit:  30,
+	}
+	games, err := g.service.FindHistory(r.Context(), userID.String(), opts)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	foundGames, err := g.service.FindHistory(r.Context(), cursor, *foundUser)
+	render.Render(w, r, Ok("", games))
+}
+
+func (g *game) save(w http.ResponseWriter, r *http.Request) {
+	var payload domains.GamePayload
+	if err := render.Bind(r, &payload); err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrGameInvalidPayload))
+		return
+	}
+	if err := payload.Validate(); err != nil {
+		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err))
+		return
+	}
+
+	puzzleID, err := ulid.Parse(chi.URLParam(r, "puzzle_id"))
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
+		return
+	}
+
+	session, err := g.session.Get(w, r, true)
+	if err != nil {
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
+		return
+	}
+
+	puzzle, err := g.puzzle.Find(r.Context(), puzzleID)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Ok("", foundGames))
+	// Create a new game
+	newGame := domains.NewGame()
+	// Append payload to game
+	newGame.Score = payload.Score
+	newGame.Attempts = payload.Attempts
+	newGame.Correct = payload.Correct
+	newGame.CompletedAt = payload.CompletedAt
+	// Append puzzle
+	newGame.PuzzleID = puzzle.ID
+	newGame.Puzzle = *puzzle
+	// Append user
+	newGame.UserID = session.User.ID
+	newGame.User = *session.User
+
+	game, err := g.service.Save(r.Context(), newGame)
+	if err != nil {
+		render.Respond(w, r, err)
+		return
+	}
+
+	render.Render(w, r, Ok("", game))
 }

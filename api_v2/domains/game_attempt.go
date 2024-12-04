@@ -9,8 +9,8 @@ var _ Domain = (*GameAttempt)(nil)
 
 type GameAttempt struct {
 	ID             string `bun:"type:varchar(26),pk,notnull" json:"-"`
-	AttemptOrder   uint16 `bun:",notnull" json:"-"`
-	SelectionOrder uint16 `bun:",notnull" json:"-"`
+	AttemptOrder   int    `bun:",notnull" json:"-"`
+	SelectionOrder int    `bun:",notnull" json:"-"`
 
 	PuzzleBlockID string `bun:"type:varchar(26),notnull" json:"-"`
 	GameID        string `bun:"type:varchar(26),notnull" json:"-"`

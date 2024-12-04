@@ -34,66 +34,52 @@ func NewGame(d GameDependencies) Game {
 	}
 }
 
-func (g *Game) Create(ctx context.Context, puzzle domains.Puzzle) (*domains.Game, error) {
-	// If the user is authenticated, then, retrieve their data from the context
-	session := domains.SessionFromContext(ctx)
-
-	// Create a new game with the given puzzle and user
-	newGame := domains.NewGame(puzzle, session.User)
-	// Create the game and persist it in the database
-	createdGame, err := g.repository.Create(ctx, newGame)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameFailedCreate)
-	}
-	// Validate the created game
-	if err := createdGame.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameFailedCreate)
-	}
-
-	return createdGame, nil
-}
-
 func (g *Game) FindByPuzzleID(ctx context.Context, puzzleID ulid.ULID) (*domains.Game, error) {
-	// If the user is authenticated, then, retrieve their data from the context
-	session := domains.SessionFromContext(ctx)
-
-	// Find the game with the given puzzle id
-	foundGame, err := g.repository.GetWithPuzzleID(ctx, puzzleID.String())
+	game, err := g.repository.GetWithPuzzleID(ctx, puzzleID.String())
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameNotFound)
 	}
-	// Validate the found game
-	if err := foundGame.Validate(); err != nil {
-		logrus.Info(err)
+	if err := game.Validate(); err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameNotFound)
 	}
 
-	// TODO: If user isn't currently authenticated should probably assign them a guest user
-	//
-	// Check if the game belongs to the user
-	if session == nil && !foundGame.UserID.Valid && foundGame.User == nil {
-		return foundGame, nil
-	} else if session != nil && foundGame.UserID.Valid && foundGame.User != nil && foundGame.UserID.String == session.UserID.String {
-		return foundGame, nil
-	}
-
-	return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrGameNotFound)
+	return game, nil
 }
 
-func (g *Game) FindHistory(ctx context.Context, cursor domains.Cursor, user domains.User) (*domains.GameConnection, error) {
-	foundGames, err := g.repository.GetHistory(ctx, cursor, user)
+func (g *Game) FindHistory(ctx context.Context, userID string, opts domains.GameCursorPaginationOpts) (*domains.GameSummaryConnection, error) {
+	if err := opts.Validate(); err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrGameHistory)
+	}
+
+	games, err := g.repository.GetHistory(ctx, userID, opts)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameHistory)
 	}
 
-	builtConnection, err := domains.BuildGameConnection("CompletedAt", foundGames)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameHistory)
+	// Validate results
+	for _, game := range games {
+		if err := game.Validate(); err != nil {
+			return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameHistory)
+		}
 	}
 
-	return builtConnection, nil
+	connection, err := domains.BuildGameSummaryConnection(games, opts.Limit)
+	if err != nil {
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLiked)
+	}
+
+	return connection, nil
 }
 
-func (g *Game) Update(ctx context.Context, updateGame domains.Game) error {
-	panic("not implemented")
+func (g *Game) Save(ctx context.Context, game domains.Game) (*domains.Game, error) {
+	if err := game.Validate(); err != nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
+	}
+
+	upsertedGame, err := g.repository.Save(ctx, game)
+	if err != nil {
+		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
+	}
+
+	return upsertedGame, nil
 }
