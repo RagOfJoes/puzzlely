@@ -8,11 +8,12 @@ import { createContext } from "@/lib/create-context";
 import { getPuzzleBlocksFromAttempts } from "@/lib/get-puzzle-blocks-from-attempts";
 import { groupBy } from "@/lib/group-by";
 import { uniqueBy } from "@/lib/unique-by";
-import type { Game } from "@/types/game";
-import type { PuzzleBlock } from "@/types/puzzle";
+import type { GamePayload } from "@/types/game-payload";
+import type { Puzzle, PuzzleBlock } from "@/types/puzzle";
 
 export type UseGameProps = {
-	game: Game;
+	game?: GamePayload;
+	puzzle: Puzzle;
 };
 
 export type UseGame = [
@@ -20,13 +21,15 @@ export type UseGame = [
 		// Blocks that will be rendered
 		blocks: PuzzleBlock[];
 		// Existing/current game state
-		game: Game;
+		game: GamePayload;
 		// Flag to determine if the game is over. Will be triggered if the user has reached the maximum number of attempts
 		isGameOver: boolean;
 		// Flag to determine if the user has won the game
 		isWinnerWinnerChickenDinner: boolean;
 		// Flag to determine if the elements inside the `selected` state are wrong
 		isWrong: boolean;
+		// Puzzle this game is for
+		puzzle: Puzzle;
 		// List of elements that stores the user's currently selected blocks
 		selected: PuzzleBlock[];
 		// Number of wrong attempts
@@ -55,9 +58,25 @@ export function useGame(props: UseGameProps): UseGame {
 	 */
 
 	const [blocks, setBlocks] = useState<UseGame[0]["blocks"]>([]);
-	const [game, setGame] = useState<UseGame[0]["game"]>(props.game);
+	const [game, setGame] = useState<UseGame[0]["game"]>(() => {
+		if (props.game) {
+			return props.game;
+		}
+
+		return {
+			attempts: [],
+			correct: [],
+			score: 0,
+		};
+	});
+	const [puzzle, setPuzzle] = useState<UseGame[0]["puzzle"]>(props.puzzle);
 	const [selected, setSelected] = useState<UseGame[0]["selected"]>([]);
-	const [wrongAttempts, setWrongAttempts] = useState<number>(0);
+	const [wrongAttempts, setWrongAttempts] = useState<number>(() =>
+		getPuzzleBlocksFromAttempts(
+			props.puzzle.groups.flatMap((group) => group.blocks),
+			game,
+		).reduce<number>((prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1), 0),
+	);
 
 	/**
 	 * Flags
@@ -79,8 +98,7 @@ export function useGame(props: UseGameProps): UseGame {
 		(block: PuzzleBlock) => {
 			const isComplete = !!game.completed_at;
 			const isCorrect = game.correct.includes(block.id);
-			const isTooMuchAttempts =
-				game.puzzle.max_attempts > 0 && wrongAttempts >= game.puzzle.max_attempts;
+			const isTooMuchAttempts = puzzle.max_attempts > 0 && wrongAttempts >= puzzle.max_attempts;
 			const isTooMuchSelected = selected.length >= 4;
 
 			if (isComplete || isCorrect || isTooMuchAttempts || isTooMuchSelected || isWrong) {
@@ -110,7 +128,7 @@ export function useGame(props: UseGameProps): UseGame {
 			// If any of the Blocks are wrong
 			if (newSelected.some((select) => select.puzzle_group_id !== block.puzzle_group_id)) {
 				// Check if reached `maxAttempts`
-				const isMaxAttempt = wrongAttempts + 1 >= game.puzzle.max_attempts;
+				const isMaxAttempt = wrongAttempts + 1 >= puzzle.max_attempts;
 
 				setGame((prev) => ({
 					...prev,
@@ -135,12 +153,10 @@ export function useGame(props: UseGameProps): UseGame {
 			const newCorrect = [...game.correct, block.puzzle_group_id];
 
 			// If User has linked all Groups correctly
-			const isGuessedAll = newCorrect.length === game.puzzle.groups.length - 1;
+			const isGuessedAll = newCorrect.length === puzzle.groups.length - 1;
 			if (isGuessedAll) {
 				// Append last `group_id` to cloned `correct` state
-				const lastGroup = game.puzzle.groups
-					.filter((g) => !newCorrect.includes(g.id))
-					.map((g) => g.id);
+				const lastGroup = puzzle.groups.filter((g) => !newCorrect.includes(g.id)).map((g) => g.id);
 
 				// Make sure there's only one group left also make typescript happy
 				if (lastGroup.length === 1 && typeof lastGroup[0] === "string") {
@@ -163,7 +179,7 @@ export function useGame(props: UseGameProps): UseGame {
 			// 2. Remove duplicates
 			const newBlocks = uniqueBy([...grouped, ...blocks], (item) => item.id);
 
-			const newScore = isGuessedAll ? game.puzzle.groups.length : game.score + 1;
+			const newScore = isGuessedAll ? puzzle.groups.length : game.score + 1;
 
 			// Update game state
 			setGame((prev) => ({
@@ -188,10 +204,10 @@ export function useGame(props: UseGameProps): UseGame {
 			game.attempts,
 			game.completed_at,
 			game.correct,
-			game.puzzle.groups,
-			game.puzzle.max_attempts,
 			game.score,
 			isWrong,
+			puzzle.groups,
+			puzzle.max_attempts,
 			selected,
 			wrongAttempts,
 		],
@@ -230,38 +246,44 @@ export function useGame(props: UseGameProps): UseGame {
 	// - When `blocks` hasn't been initialized
 	// - When `props` change, reset state
 	useEffect(() => {
-		if (blocks.length > 0 && game.puzzle.id === props.game.puzzle.id) {
+		if (blocks.length > 0 && puzzle.id === props.puzzle.id) {
 			return;
 		}
 
-		setGame(props.game);
-		setBlocks(props.game.puzzle.groups.flatMap((group) => group.blocks));
-		setWrongAttempts(() => {
-			const joined = getPuzzleBlocksFromAttempts(blocks, props.game);
+		const newBlocks = props.puzzle.groups.flatMap((group) => group.blocks);
+		const newGame = props.game ?? {
+			attempts: [],
+			correct: [],
+			score: 0,
+		};
 
-			return joined.reduce<number>(
-				(prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1),
-				0,
-			);
-		});
+		const newWrongAttempts = getPuzzleBlocksFromAttempts(newBlocks, newGame).reduce<number>(
+			(prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1),
+			0,
+		);
+
+		setGame(newGame);
+		setPuzzle(props.puzzle);
+		setBlocks(newBlocks);
+		setWrongAttempts(newWrongAttempts);
 		setSelected([]);
 
 		toggleIsGameOver(
 			() =>
-				!!props.game.completed_at && props.game.correct.length !== props.game.puzzle.groups.length,
+				newWrongAttempts >= props.puzzle.max_attempts ||
+				(!!newGame.completed_at && newGame.correct.length !== props.puzzle.groups.length),
 		);
 		toggleIsWinnerWinnerChickenDinner(
-			() =>
-				!!props.game.completed_at && props.game.correct.length === props.game.puzzle.groups.length,
+			() => !!newGame.completed_at && newGame.correct.length === props.puzzle.groups.length,
 		);
 		toggleIsWrong(false);
 
 		setBlocks((prev) => {
-			if (props.game.correct.length === 0) {
+			if (newGame.correct.length === 0) {
 				return shuffle(prev);
 			}
 			// 1. Filter blocks so only blocks that belong to a correct group is returned
-			// 2. Group by `groupID`
+			// 2. Group by `group_id`
 			// 3. Flatten array
 			const grouped = groupBy(
 				prev.filter((b) => game.correct.includes(b.puzzle_group_id)),
@@ -276,7 +298,7 @@ export function useGame(props: UseGameProps): UseGame {
 		});
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [props.game]);
+	}, [props.puzzle]);
 
 	// When `isWrong` is true, reset it to false and clear `selected` after 300ms to play the animation
 	useEffect(() => {
@@ -284,18 +306,19 @@ export function useGame(props: UseGameProps): UseGame {
 			return;
 		}
 
-		let timeoutId: number | null = null;
-
-		timeoutId = window.setTimeout(() => {
+		let timeoutID: number | null = null;
+		timeoutID = window.setTimeout(() => {
 			setSelected([]);
 			toggleIsWrong(false);
 		}, 450);
 
 		// eslint-disable-next-line consistent-return
 		return () => {
-			if (timeoutId) {
-				window.clearTimeout(timeoutId);
+			if (!timeoutID) {
+				return;
 			}
+
+			window.clearTimeout(timeoutID);
 		};
 	}, [isWrong]);
 
@@ -308,7 +331,7 @@ export function useGame(props: UseGameProps): UseGame {
 		onGiveUp();
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isGivenUp]);
+	}, [game.completed_at, isGivenUp]);
 
 	// Listen to when the shuffle key is pressed and shuffle the blocks accordingly
 	useEffect(() => {
@@ -319,7 +342,7 @@ export function useGame(props: UseGameProps): UseGame {
 		onShuffle();
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isShuffle]);
+	}, [game.completed_at, isShuffle]);
 
 	return [
 		{
@@ -328,6 +351,7 @@ export function useGame(props: UseGameProps): UseGame {
 			isGameOver,
 			isWinnerWinnerChickenDinner,
 			isWrong,
+			puzzle,
 			selected,
 			wrongAttempts,
 		},

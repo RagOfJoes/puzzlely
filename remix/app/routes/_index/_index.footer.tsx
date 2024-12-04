@@ -1,4 +1,4 @@
-import { Link, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react";
 import dayjs from "dayjs";
 import { ChevronLeftIcon, ChevronRightIcon, RotateCcwIcon } from "lucide-react";
 
@@ -10,15 +10,21 @@ import { setSearchParams } from "@/lib/set-search-params";
 
 import type { loader } from "./route";
 
+// TODO: Replace links with forms to allow us to save the game state before the next puzzle loads
 export function IndexFooter() {
-	const data = useLoaderData<typeof loader>();
-
-	const [state] = useGameContext();
+	const loaderData = useLoaderData<typeof loader>();
 
 	const navigation = useNavigation();
 	const [searchParams] = useSearchParams();
 
+	const fetcher = useFetcher({
+		key: `games.upsert.${loaderData.puzzle.id}`,
+	});
+
+	const [state] = useGameContext();
+
 	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
+	const isSaving = fetcher.state === "submitting";
 
 	return (
 		<>
@@ -32,7 +38,7 @@ export function IndexFooter() {
 			>
 				<div className="col-span-4 grid h-full grid-cols-4 gap-1">
 					<Link
-						aria-disabled={isLoading}
+						aria-disabled={isLoading || isSaving || !searchParams.get("cursor")}
 						className={cn(
 							"col-span-2 h-full w-full",
 
@@ -52,7 +58,7 @@ export function IndexFooter() {
 								"data-[is-loading='true']:disabled:opacity-100",
 							)}
 							data-is-loading={isLoading}
-							disabled={isLoading || !searchParams.has("cursor")}
+							disabled={isLoading || isSaving || !searchParams.has("cursor")}
 							size="lg"
 							variant="ghost"
 						>
@@ -64,7 +70,7 @@ export function IndexFooter() {
 
 					<div className="col-span-2 flex h-full w-full items-center gap-1">
 						<Link
-							aria-disabled={!data.pageInfo.has_previous_page || isLoading}
+							aria-disabled={isLoading || isSaving || !loaderData.pageInfo.has_previous_page}
 							className={cn(
 								"h-full w-full min-w-0",
 
@@ -74,7 +80,7 @@ export function IndexFooter() {
 							tabIndex={-1}
 							to={{
 								search: setSearchParams(searchParams, {
-									cursor: data.pageInfo.previous_cursor ?? undefined,
+									cursor: loaderData.pageInfo.previous_cursor ?? undefined,
 									direction: "B",
 								}),
 							}}
@@ -87,7 +93,7 @@ export function IndexFooter() {
 									"data-[is-loading='true']:disabled:opacity-100",
 								)}
 								data-is-loading={isLoading}
-								disabled={!data.pageInfo.has_previous_page || isLoading}
+								disabled={isLoading || isSaving || !loaderData.pageInfo.has_previous_page}
 								size="lg"
 								variant="outline"
 							>
@@ -96,7 +102,7 @@ export function IndexFooter() {
 						</Link>
 
 						<Link
-							aria-disabled={!data.pageInfo.has_next_page || isLoading}
+							aria-disabled={isLoading || isSaving || !loaderData.pageInfo.has_next_page}
 							className={cn(
 								"h-full w-full min-w-0",
 
@@ -106,7 +112,7 @@ export function IndexFooter() {
 							tabIndex={-1}
 							to={{
 								search: setSearchParams(searchParams, {
-									cursor: data.pageInfo.next_cursor ?? undefined,
+									cursor: loaderData.pageInfo.next_cursor ?? undefined,
 									direction: "F",
 								}),
 							}}
@@ -119,7 +125,7 @@ export function IndexFooter() {
 									"data-[is-loading='true']:disabled:opacity-100",
 								)}
 								data-is-loading={isLoading}
-								disabled={!data.pageInfo.has_next_page || isLoading}
+								disabled={isLoading || isSaving || !loaderData.pageInfo.has_next_page}
 								size="lg"
 								variant="outline"
 							>
@@ -145,10 +151,10 @@ export function IndexFooter() {
 								"data-[difficulty='HARD']:animate-none data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
 								"data-[difficulty='MEDIUM']animate-none data-[difficulty='MEDIUM']:bg-primary data-[difficulty='MEDIUM']:text-primary-foreground",
 							)}
-							data-difficulty={state.game.puzzle.difficulty}
+							data-difficulty={state.puzzle.difficulty}
 						>
 							<p className="w-full truncate text-lg font-bold leading-none">
-								{state.game.puzzle.difficulty}
+								{state.puzzle.difficulty}
 							</p>
 						</div>
 					)}
@@ -170,13 +176,13 @@ export function IndexFooter() {
 									"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 								)}
 								to={
-									data.me && state.game.puzzle.created_by.id === data.me.id
+									loaderData.me && state.puzzle.created_by.id === loaderData.me.id
 										? "/profile/created/"
-										: `/users/${state.game.puzzle.created_by.id}/created/`
+										: `/users/${state.puzzle.created_by.id}/created/`
 								}
 							>
 								<p className="w-full truncate text-lg font-bold leading-none">
-									{state.game.puzzle.created_by.username}
+									{state.puzzle.created_by.username}
 								</p>
 							</Link>
 						)}
@@ -188,9 +194,9 @@ export function IndexFooter() {
 						) : (
 							<time
 								className="text-xs text-muted-foreground"
-								dateTime={dayjs(state.game.puzzle.created_at).toISOString()}
+								dateTime={dayjs(state.puzzle.created_at).toISOString()}
 							>
-								{dayjs(state.game.puzzle.created_at).format("MMMM DD, YYYY")}
+								{dayjs(state.puzzle.created_at).format("MMMM DD, YYYY")}
 							</time>
 						)}
 					</div>

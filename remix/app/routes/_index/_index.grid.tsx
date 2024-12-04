@@ -8,14 +8,15 @@ import type { PuzzleLike } from "@/types/puzzle-like";
 export function IndexGrid() {
 	const [state, actions] = useGameContext();
 
-	const fetcher = useFetcher<PuzzleLike>({
-		key: `puzzles.like.${state.game.puzzle.id}`,
-	});
 	const navigation = useNavigation();
 
-	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
+	const fetcher = useFetcher<PuzzleLike>({
+		key: `puzzles.like.${state.puzzle.id}`,
+	});
 
-	const optimisticLike = usePuzzleOptimisticLike(fetcher, state.game.puzzle);
+	const optimisticLike = usePuzzleOptimisticLike(fetcher, state.puzzle);
+
+	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
 
 	return (
 		<Grid>
@@ -37,7 +38,7 @@ export function IndexGrid() {
 			{!isLoading && state.blocks.length > 0 && (
 				<GridBlocks>
 					{state.game.correct.map((group_id) => {
-						const group = state.game.puzzle.groups.find((g) => g.id === group_id);
+						const group = state.puzzle.groups.find((g) => g.id === group_id);
 						if (!group) {
 							return null;
 						}
@@ -72,14 +73,12 @@ export function IndexGrid() {
 			{!isLoading && (state.isGameOver || state.isWinnerWinnerChickenDinner) && (
 				<GridMenu
 					blocks={state.blocks}
-					game={{
-						...state.game,
-						puzzle: {
-							...state.game.puzzle,
+					game={state.game}
+					puzzle={{
+						...state.puzzle,
 
-							liked_at: optimisticLike.liked_at,
-							num_of_likes: optimisticLike.num_of_likes,
-						},
+						liked_at: optimisticLike.liked_at,
+						num_of_likes: optimisticLike.num_of_likes,
 					}}
 					isSuccess={state.isWinnerWinnerChickenDinner}
 				/>

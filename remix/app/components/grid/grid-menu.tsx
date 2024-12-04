@@ -27,13 +27,14 @@ import type { Response } from "@/types/response";
 export type GridMenuProps = Portal.PortalProps & {
 	blocks: UseGame[0]["blocks"];
 	game: UseGame[0]["game"];
+	puzzle: UseGame[0]["puzzle"];
 	isSuccess: boolean;
 };
 
 export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
-	({ blocks, game, isSuccess, ...props }, ref) => {
+	({ blocks, game, isSuccess, puzzle, ...props }, ref) => {
 		const fetcher = useFetcher<Response<PuzzleLike>>({
-			key: `puzzles.like.${game.puzzle.id}`,
+			key: `puzzles.like.${puzzle.id}`,
 		});
 
 		const [isHidden, toggleIsHidden] = useState(false);
@@ -124,26 +125,26 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 									<div className="flex w-full items-center justify-between">
 										<p className="text-sm font-medium text-muted-foreground">Score: {game.score}</p>
 
-										<fetcher.Form action={`/puzzles/like/${game.puzzle.id}`} method="PUT">
+										<fetcher.Form action={`/puzzles/like/${puzzle.id}`} method="PUT">
 											<Button
-												aria-label={game.puzzle.liked_at ? "Unlike puzzle" : "Like puzzle"}
+												aria-label={puzzle.liked_at ? "Unlike puzzle" : "Like puzzle"}
 												className={cn(
 													"min-w-0 shrink-0 gap-2 text-muted-foreground",
 
 													"[&>svg]:data-[is-liked=true]:fill-current",
 												)}
-												data-is-liked={!!game.puzzle.liked_at}
+												data-is-liked={!!puzzle.liked_at}
 												disabled={fetcher.state === "submitting"}
 												size="sm"
 												variant="outline"
 											>
 												<StarIcon className="h-4 w-4" />
 
-												<span>{game.puzzle.liked_at ? "Liked" : "Like"}</span>
+												<span>{puzzle.liked_at ? "Liked" : "Like"}</span>
 
 												<hr className="h-full w-[1px] bg-border" />
 
-												<span>{abbreviateNumber(game.puzzle.num_of_likes)}</span>
+												<span>{abbreviateNumber(puzzle.num_of_likes)}</span>
 											</Button>
 										</fetcher.Form>
 									</div>

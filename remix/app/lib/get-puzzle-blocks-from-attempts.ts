@@ -1,7 +1,10 @@
-import type { Game } from "@/types/game";
+import type { GamePayload } from "@/types/game-payload";
 import type { PuzzleBlock } from "@/types/puzzle";
 
-export function getPuzzleBlocksFromAttempts(blocks: PuzzleBlock[], game: Game): PuzzleBlock[][] {
+export function getPuzzleBlocksFromAttempts(
+	blocks: PuzzleBlock[],
+	game: GamePayload,
+): PuzzleBlock[][] {
 	const joined: PuzzleBlock[][] = [];
 
 	for (let i = 0; i < game.attempts.length; i += 1) {

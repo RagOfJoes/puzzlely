@@ -13,13 +13,13 @@ export function IndexHeader() {
 	const [state, actions] = useGameContext();
 
 	const fetcher = useFetcher<PuzzleLike>({
-		key: `puzzles.like.${state.game.puzzle.id}`,
+		key: `puzzles.like.${state.puzzle.id}`,
 	});
 	const navigation = useNavigation();
 
 	const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
 
-	const optimisticLike = usePuzzleOptimisticLike(fetcher, state.game.puzzle);
+	const optimisticLike = usePuzzleOptimisticLike(fetcher, state.puzzle);
 
 	return (
 		<div
@@ -50,7 +50,7 @@ export function IndexHeader() {
 									<span className="invisible">10</span>
 								</Skeleton>
 							) : (
-								state.game.puzzle.max_attempts - state.wrongAttempts
+								state.puzzle.max_attempts - state.wrongAttempts
 							)}
 						</div>
 
@@ -60,7 +60,7 @@ export function IndexHeader() {
 									<span className="invisible">out of 10</span>
 								</Skeleton>
 							) : (
-								`out of ${state.game.puzzle.max_attempts}`
+								`out of ${state.puzzle.max_attempts}`
 							)}
 						</div>
 					</div>

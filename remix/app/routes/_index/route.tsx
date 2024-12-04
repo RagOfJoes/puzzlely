@@ -1,35 +1,45 @@
+import { useEffect } from "react";
+
 import type { LoaderFunctionArgs, MetaFunction, TypedResponse } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { json, useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import { toast as notify } from "sonner";
 
 import { Header } from "@/components/header";
 import { GameProvider, useGame } from "@/hooks/use-game";
 import { cn } from "@/lib/cn";
-import { createGame } from "@/lib/create-game";
 import { hydrateGame } from "@/lib/hydrate-game";
+import { hydratePuzzle } from "@/lib/hydrate-puzzle";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { API } from "@/services/api.server";
 import { redirectWithInfo } from "@/services/toast.server";
 import type { Game } from "@/types/game";
 import type { PageInfo } from "@/types/page-info";
+import type { Puzzle } from "@/types/puzzle";
 import type { User } from "@/types/user";
 
 import { IndexFooter } from "./_index.footer";
 import { IndexGrid } from "./_index.grid";
 import { IndexHeader } from "./_index.header";
 
-// Expected response from the loader
 type LoaderResponse = {
-	game: Game;
+	game?: Game;
 	me?: User;
 	pageInfo: PageInfo;
+	puzzle: Puzzle;
 };
 
+/**
+ * TODO: Save last cursor to a cookie to persist user's place
+ * TODO: Upsert game when the finishes their game or when they decide to move on
+ * TODO: If not authenticated, save games to localStorage
+ * TODO: Create error page
+ */
 export async function loader({
 	request,
 }: LoaderFunctionArgs): Promise<TypedResponse<LoaderResponse>> {
 	const [me, puzzles] = await Promise.all([API.me(request), API.puzzles.recent(request)]);
-
 	// If the user hasn't completed their profile
 	if (me.success && me.data.user && me.data.user.state === "PENDING" && !me.data.user.updated_at) {
 		return redirectWithInfo("/profile/complete", {
@@ -49,9 +59,10 @@ export async function loader({
 		throw new Response("Failed to fetch puzzles!", { status: 500 });
 	}
 
-	return json({
-		game: createGame({
-			me: me.success ? me.data.user : undefined,
+	if (!me.success) {
+		return json({
+			me: undefined,
+			pageInfo: puzzles.data.page_info,
 			puzzle: {
 				...edge.node,
 				groups: edge.node.groups.map((group) => ({
@@ -62,9 +73,24 @@ export async function loader({
 					})),
 				})),
 			},
-		}),
-		me: me.success ? me.data.user : undefined,
+		});
+	}
+
+	const game = await API.games.get(request, { puzzleID: edge.node.id });
+	return json({
+		game: game.success ? game.data : undefined,
+		me: me.data.user,
 		pageInfo: puzzles.data.page_info,
+		puzzle: {
+			...edge.node,
+			groups: edge.node.groups.map((group) => ({
+				...group,
+				blocks: group.blocks.map((block) => ({
+					...block,
+					value: btoa(block.value),
+				})),
+			})),
+		},
 	});
 }
 
@@ -78,25 +104,83 @@ export function shouldRevalidate({
 	defaultShouldRevalidate,
 	formAction,
 }: ShouldRevalidateFunctionArgs) {
-	if (!formAction?.includes("/puzzles/like/")) {
+	// If the user likes a puzzle or updates their profile, then, there's no need to revalidate current route's loader
+	const needsRevalidation = ["/puzzles/like", "/games/save"].some((value) => {
+		if (!formAction) {
+			return false;
+		}
+
+		return formAction.includes(value);
+	});
+	if (!needsRevalidation) {
 		return defaultShouldRevalidate;
 	}
 
-	// Don't need to re-run loader when the user likes the puzzle
 	return false;
 }
 
-// TODO: Create different view depending on the result of the loader
 export default function Index() {
-	const data = useLoaderData<LoaderResponse>();
+	const loaderData = useLoaderData<LoaderResponse>();
 
 	const ctx = useGame({
-		game: hydrateGame(data.game),
+		game: loaderData.game ? hydrateGame(loaderData.game) : undefined,
+		puzzle: hydratePuzzle(loaderData.puzzle),
 	});
+	const [state] = ctx;
+
+	const fetcher = useFetcher({
+		key: `games.save.${state.puzzle.id}`,
+	});
+
+	useEffect(() => {
+		if (
+			// If the game has already been completed
+			!!loaderData.game?.completed_at ||
+			// If the game hasn't been completed yet
+			(!state.isGameOver && !state.isWinnerWinnerChickenDinner)
+		) {
+			return;
+		}
+
+		switch (fetcher.state) {
+			case "loading":
+				if (!fetcher.data) {
+					return;
+				}
+
+				notify.dismiss(`games.save.${loaderData.puzzle.id}`);
+				break;
+			case "submitting":
+				break;
+			default:
+				// If we've already submitted
+				if (!!fetcher.data || !loaderData.game) {
+					return;
+				}
+
+				fetcher.submit(JSON.stringify(state.game), {
+					action: `/games/save/${loaderData.puzzle.id}`,
+					encType: "application/json",
+					method: "PUT",
+				});
+
+				notify.loading("Saving game...", {
+					id: `games.save.${loaderData.puzzle.id}`,
+				});
+				break;
+		}
+	}, [
+		fetcher,
+		loaderData.game,
+		loaderData.puzzle.id,
+		state.game,
+		state.isGameOver,
+		state.isWinnerWinnerChickenDinner,
+	]);
 
 	return (
 		<>
-			<Header me={data.me ? hydrateUser(data.me) : undefined} />
+			<Header me={loaderData.me ? hydrateUser(loaderData.me) : undefined} />
 
 			<main
 				className={cn(

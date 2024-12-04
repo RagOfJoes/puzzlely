@@ -1,6 +1,8 @@
 import { SUPPORTED_PROVIDERS } from "@/lib/constants";
 import { getSession } from "@/services/session.server";
+import type { Game } from "@/types/game";
 import type { GameConnection } from "@/types/game-connection";
+import type { GamePayload } from "@/types/game-payload";
 import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleConnection } from "@/types/puzzle-connection";
 import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
@@ -98,6 +100,22 @@ export class API {
 	static games = {
 		prefix: "games",
 
+		async get(request: Request, { puzzleID }: { puzzleID: string }): Promise<Response<Game>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const res = await fetch(`${API.URL}/${this.prefix}/${puzzleID}`, {
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
+				},
+				method: "GET",
+			});
+
+			const response: Response<Game> = await res.json();
+			return response;
+		},
+
 		async history(
 			request: Request,
 			{ userID }: { userID: string },
@@ -111,6 +129,26 @@ export class API {
 			});
 
 			const response: Response<GameConnection> = await res.json();
+			return response;
+		},
+
+		async save(
+			request: Request,
+			{ payload, puzzleID }: { payload: GamePayload; puzzleID: string },
+		): Promise<Response<Game>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const res = await fetch(`${API.URL}/${this.prefix}/${puzzleID}`, {
+				body: JSON.stringify(payload),
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
+				},
+				method: "PUT",
+			});
+
+			const response: Response<Game> = await res.json();
 			return response;
 		},
 	};
