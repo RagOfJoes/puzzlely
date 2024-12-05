@@ -81,7 +81,7 @@ export default function PuzzleCreate() {
 	const loaderData = useLoaderData<typeof loader>();
 
 	const fetcher = useFetcher<typeof action>({
-		key: "puzzles/create",
+		key: "puzzles.create",
 	});
 
 	return (
