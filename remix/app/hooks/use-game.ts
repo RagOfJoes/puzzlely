@@ -96,12 +96,12 @@ export function useGame(props: UseGameProps): UseGame {
 
 	const onBlockSelect: UseGame[1]["onBlockSelect"] = useCallback(
 		(block: PuzzleBlock) => {
+			const isAlreadyInCorrect = game.correct.includes(block.puzzle_group_id);
 			const isComplete = !!game.completed_at;
-			const isCorrect = game.correct.includes(block.id);
 			const isTooMuchAttempts = puzzle.max_attempts > 0 && wrongAttempts >= puzzle.max_attempts;
 			const isTooMuchSelected = selected.length >= 4;
 
-			if (isComplete || isCorrect || isTooMuchAttempts || isTooMuchSelected || isWrong) {
+			if (isAlreadyInCorrect || isComplete || isTooMuchAttempts || isTooMuchSelected || isWrong) {
 				return;
 			}
 
