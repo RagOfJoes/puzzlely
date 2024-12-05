@@ -14,14 +14,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
 	const like = await API.puzzles.toggleLike(request, params.id ?? "");
 	if (!like.success) {
-		return jsonWithError(
-			{},
-			{
-				description: like.error.message,
-				message: "Failed to like puzzle!",
-			},
-		);
+		return jsonWithError(like, {
+			description: like.error.message,
+			message: "Failed to like puzzle!",
+		});
 	}
 
-	return like.data;
+	return like;
 }

@@ -8,8 +8,8 @@ import { TabsContent } from "@/components/tabs";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
 import { hydratePuzzleSummary } from "@/lib/hydrate-puzzle-summary";
+import type { action } from "@/routes/puzzles.like.$id";
 import { API } from "@/services/api.server";
-import type { PuzzleLike } from "@/types/puzzle-like";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
 	return json({
@@ -47,7 +47,7 @@ export default function UserLiked() {
 					const puzzle = hydratePuzzleSummary(edge.node);
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const fetcher = useFetcher<PuzzleLike>({
+					const fetcher = useFetcher<typeof action>({
 						key: `puzzles.like.${puzzle.id}`,
 					});
 

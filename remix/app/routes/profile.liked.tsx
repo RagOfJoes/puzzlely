@@ -13,9 +13,9 @@ import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
 import { hydratePuzzleSummary } from "@/lib/hydrate-puzzle-summary";
 import type { loader as profileLoaderData } from "@/routes/profile";
+import type { action } from "@/routes/puzzles.like.$id";
 import { API } from "@/services/api.server";
 import { getSession } from "@/services/session.server";
-import type { PuzzleLike } from "@/types/puzzle-like";
 
 export async function loader({ request }: LoaderFunctionArgs) {
 	const session = await getSession(request.headers.get("Cookie"));
@@ -75,7 +75,7 @@ export default function ProfileLiked() {
 					);
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const fetcher = useFetcher<PuzzleLike>({
+					const fetcher = useFetcher<typeof action>({
 						key: `puzzles.like.${puzzle.id}`,
 					});
 

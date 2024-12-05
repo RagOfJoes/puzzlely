@@ -3,14 +3,14 @@ import { useFetcher, useNavigation } from "@remix-run/react";
 import { Grid, GridBlock, GridBlocks, GridGroup, GridMenu } from "@/components/grid";
 import { useGameContext } from "@/hooks/use-game";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
-import type { PuzzleLike } from "@/types/puzzle-like";
+import type { action } from "@/routes/puzzles.like.$id";
 
 export function IndexGrid() {
 	const [state, actions] = useGameContext();
 
 	const navigation = useNavigation();
 
-	const fetcher = useFetcher<PuzzleLike>({
+	const fetcher = useFetcher<typeof action>({
 		key: `puzzles.like.${state.puzzle.id}`,
 	});
 

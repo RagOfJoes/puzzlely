@@ -7,12 +7,12 @@ import { useGameContext } from "@/hooks/use-game";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { abbreviateNumber } from "@/lib/abbreviate-number";
 import { cn } from "@/lib/cn";
-import type { PuzzleLike } from "@/types/puzzle-like";
+import type { action } from "@/routes/puzzles.like.$id";
 
 export function IndexHeader() {
 	const [state, actions] = useGameContext();
 
-	const fetcher = useFetcher<PuzzleLike>({
+	const fetcher = useFetcher<typeof action>({
 		key: `puzzles.like.${state.puzzle.id}`,
 	});
 	const navigation = useNavigation();

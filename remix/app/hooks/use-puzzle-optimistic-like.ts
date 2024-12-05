@@ -7,9 +7,10 @@ import dayjs from "dayjs";
 import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleLike } from "@/types/puzzle-like";
 import type { PuzzleSummary } from "@/types/puzzle-summary";
+import type { Response } from "@/types/response";
 
 export function usePuzzleOptimisticLike(
-	fetcher: Fetcher<SerializeFrom<PuzzleLike>>,
+	fetcher: Fetcher<SerializeFrom<Response<PuzzleLike>>>,
 	puzzle: Puzzle | PuzzleSummary,
 ): {
 	liked_at: Date | null | undefined;
@@ -17,13 +18,13 @@ export function usePuzzleOptimisticLike(
 } {
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	const liked_at = useMemo<Date | null | undefined>(() => {
-		if (!fetcher.data) {
+		if (!fetcher.data || !fetcher.data.success) {
 			return puzzle.liked_at;
 		}
 
 		switch (fetcher.state) {
 			case "idle":
-				return !fetcher.data.active ? undefined : dayjs(fetcher.data.updatedAt).toDate();
+				return !fetcher.data.data.active ? undefined : dayjs(fetcher.data.data.updatedAt).toDate();
 
 			default:
 				return puzzle.liked_at;
