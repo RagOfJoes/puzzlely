@@ -41,33 +41,40 @@ export default function App() {
 			return;
 		}
 
-		switch (toast.type) {
-			case "error":
-				notify.error(toast.message, {
-					description: toast.description,
-				});
-				break;
-			case "info":
-				notify.info(toast.message, {
-					description: toast.description,
-				});
-				break;
-			case "success":
-				notify.success(toast.message, {
-					description: toast.description,
-				});
-				break;
-			case "warning":
-				notify.warning(toast.message, {
-					description: toast.description,
-				});
-				break;
-			default:
-				notify.message(toast.message, {
-					description: toast.description,
-				});
-				break;
-		}
+		const raf = requestAnimationFrame(() => {
+			switch (toast.type) {
+				case "error":
+					notify.error(toast.message, {
+						description: toast.description,
+					});
+					break;
+				case "info":
+					notify.info(toast.message, {
+						description: toast.description,
+					});
+					break;
+				case "success":
+					notify.success(toast.message, {
+						description: toast.description,
+					});
+					break;
+				case "warning":
+					notify.warning(toast.message, {
+						description: toast.description,
+					});
+					break;
+				default:
+					notify.message(toast.message, {
+						description: toast.description,
+					});
+					break;
+			}
+		});
+
+		// eslint-disable-next-line consistent-return
+		return () => {
+			cancelAnimationFrame(raf);
+		};
 	}, [toast]);
 
 	return (
