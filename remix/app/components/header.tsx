@@ -92,7 +92,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 								</div>
 
 								<div className="mt-8 flex w-full flex-col gap-2 px-4 pb-4">
-									<h2 className="font-semibold uppercase">Menu</h2>
+									<h2 className="text-sm font-semibold uppercase">Menu</h2>
 
 									<Link tabIndex={-1} to="/popular">
 										<Button
@@ -109,7 +109,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 								</div>
 
 								<div className="mt-auto flex w-full flex-col gap-2 px-4 pb-4">
-									<h2 className="font-semibold uppercase">Account</h2>
+									<h2 className="text-sm font-semibold uppercase">Account</h2>
 
 									{me ? (
 										<>
