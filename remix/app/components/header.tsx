@@ -100,13 +100,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 											size="lg"
 											variant="outline"
 										>
-											<div
-												className={cn(
-													"flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background",
-
-													"group-hover/button:bg-background group-hover/button:text-primary",
-												)}
-											>
+											<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 												<TrendingUpIcon className="h-4 w-4" />
 											</div>
 											Popular
@@ -125,13 +119,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 													size="lg"
 													variant="outline"
 												>
-													<div
-														className={cn(
-															"flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background",
-
-															"group-hover/button:bg-background group-hover/button:text-primary",
-														)}
-													>
+													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<UserIcon className="h-4 w-4" />
 													</div>
 													Profile
@@ -144,13 +132,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 													size="lg"
 													variant="outline"
 												>
-													<div
-														className={cn(
-															"flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background",
-
-															"group-hover/button:bg-background group-hover/button:text-primary",
-														)}
-													>
+													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<LogOutIcon className="h-4 w-4" />
 													</div>
 													Logout
@@ -165,13 +147,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 													size="lg"
 													variant="outline"
 												>
-													<div
-														className={cn(
-															"flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background",
-
-															"group-hover/button:bg-background group-hover/button:text-primary",
-														)}
-													>
+													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<UserPlusIcon className="h-4 w-4" />
 													</div>
 													Sign Up
@@ -184,13 +160,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 													size="lg"
 													variant="outline"
 												>
-													<div
-														className={cn(
-															"flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background",
-
-															"group-hover/button:bg-background group-hover/button:text-primary",
-														)}
-													>
+													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<LogInIcon className="h-4 w-4" />
 													</div>
 													Login

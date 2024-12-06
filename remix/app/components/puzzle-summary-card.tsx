@@ -44,17 +44,15 @@ export const PuzzleSummaryCard = forwardRef<
 					<div
 						aria-label={`${puzzle.difficulty} difficulty`}
 						className={cn(
-							"inline-flex min-w-0 shrink-0 items-center px-2 py-1",
+							"inline-flex min-w-0 shrink-0 items-center px-1 py-0.5",
 
-							"data-[difficulty='EASY']:bg-secondary data-[difficulty='EASY']:text-secondary-foreground",
+							"data-[difficulty='EASY']:bg-success data-[difficulty='EASY']:text-success-foreground",
 							"data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
-							"data-[difficulty='MEDIUM']:bg-primary data-[difficulty='MEDIUM']:text-primary-foreground",
+							"data-[difficulty='MEDIUM']:bg-warning data-[difficulty='MEDIUM']:text-warning-foreground",
 						)}
 						data-difficulty={puzzle.difficulty}
 					>
-						<p className="w-full truncate text-sm font-semibold leading-none text-current">
-							{puzzle.difficulty}
-						</p>
+						<p className="w-full truncate text-sm font-semibold">{puzzle.difficulty}</p>
 					</div>
 
 					<Link
@@ -65,7 +63,7 @@ export const PuzzleSummaryCard = forwardRef<
 						)}
 						to={`/users/${puzzle.created_by.id}`}
 					>
-						<p className="truncate font-semibold">{puzzle.created_by.username}</p>
+						<p className="truncate font-medium">{puzzle.created_by.username}</p>
 					</Link>
 				</div>
 
@@ -128,7 +126,7 @@ export const PuzzleSummaryCard = forwardRef<
 
 			<time
 				dateTime={dayjs(puzzle.created_at).toISOString()}
-				className="mt-4 line-clamp-1 w-full text-ellipsis text-xs tracking-wide text-muted-foreground"
+				className="mt-4 line-clamp-1 w-full text-ellipsis text-xs font-medium text-muted-foreground"
 			>
 				{dayjs(puzzle.created_at).format("MMM DD, YYYY")}
 			</time>

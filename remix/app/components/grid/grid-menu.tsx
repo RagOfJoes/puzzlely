@@ -182,7 +182,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 																className={cn(
 																	"group/attempt w-full border border-destructive-foreground bg-destructive p-2",
 
-																	"data-[is-correct='true']:border-secondary data-[is-correct='true']:bg-secondary",
+																	"data-[is-correct='true']:border-success data-[is-correct='true']:bg-success",
 																)}
 																data-is-correct={attempt.isCorrect}
 																key={`${attempt.blocks.map((block) => block.id).join("")}__${index}`}
@@ -194,8 +194,8 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 																				"w-full basis-1/4 select-none truncate px-2 text-center text-sm font-medium text-destructive-foreground",
 
 																				"[&:not(:last-child)]:border-r [&:not(:last-child)]:border-r-destructive-foreground",
-																				"group-data-[is-correct='true']/attempt:text-secondary-foreground",
-																				"group-data-[is-correct='true']/attempt:[&:not(:last-child)]:border-r-secondary-foreground",
+																				"group-data-[is-correct='true']/attempt:text-success-foreground",
+																				"group-data-[is-correct='true']/attempt:[&:not(:last-child)]:border-r-success-foreground",
 																			)}
 																			key={block.id}
 																		>

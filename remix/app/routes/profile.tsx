@@ -131,7 +131,7 @@ export default function Profile() {
 									<Button
 										aria-label="Edit profile"
 										className={cn(
-											"w-full justify-start gap-2 overflow-hidden p-0 text-xl font-semibold",
+											"w-full justify-start gap-2 overflow-hidden p-0 text-xl font-medium",
 
 											"hover:bg-transparent",
 										)}

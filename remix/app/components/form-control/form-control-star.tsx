@@ -20,7 +20,7 @@ export const FormControlStar = forwardRef<ElementRef<typeof Primitive.span>, For
 				{...other}
 				ref={ref}
 				className={cn({
-					"text-destructive-foreground": !disabled,
+					"text-destructive": !disabled,
 					"text-muted-foreground": disabled,
 				})}
 			>

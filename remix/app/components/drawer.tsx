@@ -87,7 +87,7 @@ export const DrawerHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElem
 	<div
 		{...props}
 		className={cn(
-			"flex flex-col gap-1.5 p-4 text-center",
+			"flex flex-col p-4 text-center",
 
 			"sm:text-left",
 
@@ -116,7 +116,7 @@ export const DrawerTitle = forwardRef<
 	<DrawerPrimitive.Title
 		{...props}
 		className={cn(
-			"text-2xl font-semibold leading-none",
+			"text-lg font-medium",
 
 			className,
 		)}
@@ -132,7 +132,7 @@ export const DrawerDescription = forwardRef<
 	<DrawerPrimitive.Description
 		{...props}
 		className={cn(
-			"text-sm leading-none text-muted-foreground",
+			"text-xs font-medium text-muted-foreground",
 
 			className,
 		)}

@@ -44,7 +44,7 @@ export function IndexHeader() {
 					<div className="flex h-full flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Attempts Left</h3>
 
-						<div className="mt-2 text-2xl font-bold leading-none">
+						<div className="text-2xl font-semibold">
 							{isLoading ? (
 								<Skeleton>
 									<span className="invisible">10</span>
@@ -135,7 +135,7 @@ export function IndexHeader() {
 					<div className="flex flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Likes</h3>
 
-						<div className="mt-2 line-clamp-2 text-2xl font-bold leading-none">
+						<div className="line-clamp-2 text-2xl font-semibold">
 							{isLoading ? (
 								<Skeleton>
 									<span className="invisible">10</span>

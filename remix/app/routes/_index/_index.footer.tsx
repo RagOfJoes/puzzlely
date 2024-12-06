@@ -137,25 +137,23 @@ export function IndexFooter() {
 			</div>
 
 			<div className="mt-2 flex gap-1">
-				<div className="w-full min-w-0 basis-1/2">
+				<div className="flex w-full min-w-0 basis-1/2 items-center">
 					{isLoading ? (
-						<Skeleton className="inline-flex min-w-0 select-none items-center px-2 py-1">
-							<p className="invisible w-full truncate text-lg font-bold leading-none">EASY</p>
+						<Skeleton className="inline-flex min-w-0 select-none items-center px-1 py-0.5">
+							<p className="invisible w-full truncate text-sm font-semibold">EASY</p>
 						</Skeleton>
 					) : (
 						<div
 							className={cn(
-								"inline-flex min-w-0 items-center px-2 py-1",
+								"inline-flex min-w-0 items-center px-1 py-0.5",
 
-								"data-[difficulty='EASY']:animate-none data-[difficulty='EASY']:bg-secondary data-[difficulty='EASY']:text-secondary-foreground",
+								"data-[difficulty='EASY']:bg-success data-[difficulty='EASY']:text-success-foreground data-[difficulty='EASY']:animate-none",
 								"data-[difficulty='HARD']:animate-none data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
-								"data-[difficulty='MEDIUM']animate-none data-[difficulty='MEDIUM']:bg-primary data-[difficulty='MEDIUM']:text-primary-foreground",
+								"data-[difficulty='MEDIUM']animate-none data-[difficulty='MEDIUM']:bg-warning data-[difficulty='MEDIUM']:text-warning-foreground",
 							)}
 							data-difficulty={state.puzzle.difficulty}
 						>
-							<p className="w-full truncate text-lg font-bold leading-none">
-								{state.puzzle.difficulty}
-							</p>
+							<p className="w-full truncate text-sm font-semibold">{state.puzzle.difficulty}</p>
 						</div>
 					)}
 				</div>
@@ -165,7 +163,7 @@ export function IndexFooter() {
 						{isLoading ? (
 							<div className="min-w-0">
 								<Skeleton className="w-auto text-transparent">
-									<p className="invisible w-full text-lg font-bold leading-none">Username</p>
+									<p className="invisible w-full">Username</p>
 								</Skeleton>
 							</div>
 						) : (
@@ -181,19 +179,17 @@ export function IndexFooter() {
 										: `/users/${state.puzzle.created_by.id}/created/`
 								}
 							>
-								<p className="w-full truncate text-lg font-bold leading-none">
-									{state.puzzle.created_by.username}
-								</p>
+								<p className="w-full truncate">{state.puzzle.created_by.username}</p>
 							</Link>
 						)}
 
 						{isLoading ? (
 							<Skeleton>
-								<p className="invisible text-xs">{dayjs().format("MMMM DD, YYYY")}</p>
+								<p className="invisible text-xs font-medium">{dayjs().format("MMMM DD, YYYY")}</p>
 							</Skeleton>
 						) : (
 							<time
-								className="text-xs text-muted-foreground"
+								className="text-xs font-medium text-muted-foreground"
 								dateTime={dayjs(state.puzzle.created_at).toISOString()}
 							>
 								{dayjs(state.puzzle.created_at).format("MMMM DD, YYYY")}

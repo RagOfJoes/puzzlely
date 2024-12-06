@@ -32,7 +32,7 @@ export const TabsTrigger = forwardRef<
 		className={cn(
 			"inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap border bg-background px-4 font-medium ring-offset-background transition-all",
 
-			"data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
+			"data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
 			"disabled:pointer-events-none disabled:opacity-50",
 			"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 

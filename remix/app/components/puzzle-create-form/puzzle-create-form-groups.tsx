@@ -130,7 +130,7 @@ export function PuzzleCreateFormGroups() {
 										className={cn(
 											"relative col-span-1 row-span-1 inline-flex h-full w-full appearance-none items-center justify-center border p-2 text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color]",
 
-											"data-[invalid=true]:border-destructive-foreground data-[invalid=true]:bg-destructive data-[invalid=true]:text-destructive-foreground",
+											"data-[invalid=true]:border-destructive data-[invalid=true]:bg-destructive data-[invalid=true]:text-destructive-foreground",
 											"first-of-type:col-start-1 first-of-type:col-end-1 first-of-type:row-start-1 first-of-type:row-end-1",
 											"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 										)}

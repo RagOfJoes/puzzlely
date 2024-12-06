@@ -84,7 +84,7 @@ DialogClose.displayName = "DialogClose";
 export const DialogHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col gap-1",
+			"flex flex-col",
 
 			className,
 		)}
@@ -114,7 +114,7 @@ export const DialogTitle = forwardRef<
 	<DialogPrimitive.Title
 		ref={ref}
 		className={cn(
-			"text-2xl font-semibold leading-none",
+			"text-lg font-medium",
 
 			className,
 		)}
@@ -130,7 +130,7 @@ export const DialogDescription = forwardRef<
 	<DialogPrimitive.Description
 		ref={ref}
 		className={cn(
-			"text-sm leading-none text-muted-foreground",
+			"text-sm font-medium text-muted-foreground",
 
 			className,
 		)}

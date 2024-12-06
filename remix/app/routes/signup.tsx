@@ -30,8 +30,8 @@ export default function SignUp() {
 
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col items-center justify-center">
-					<div className="flex w-full flex-col items-start gap-1">
-						<h1 className="text-2xl font-semibold leading-none">Welcome to Puzzlely!</h1>
+					<div className="flex w-full flex-col items-start">
+						<h1 className="text-2xl font-semibold">Welcome to Puzzlely!</h1>
 
 						<p className="text-sm leading-none text-muted-foreground">
 							Sign up now by selecting one of the options below.

@@ -72,9 +72,9 @@ export function shouldRevalidate({
 }
 
 export default function User() {
-	const { user } = useLoaderData<typeof loader>();
-	const navigate = useNavigate();
+	const loaderData = useLoaderData<typeof loader>();
 	const matches = useMatches();
+	const navigate = useNavigate();
 
 	const [tab, setTab] = useState<ValidTabs>(() => {
 		const match = matches[matches.length - 1];
@@ -90,18 +90,18 @@ export default function User() {
 
 	return (
 		<>
-			<Header me={user ? hydrateUser(user) : undefined} />
+			<Header me={loaderData.me ? hydrateUser(loaderData.me) : undefined} />
 
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
 					<div className="flex flex-col gap-2 border bg-background px-4 py-4">
 						<div className="flex gap-2">
 							<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-xl font-semibold text-muted">
-								{user.username[0]}
+								{loaderData.user.username[0]}
 							</div>
 
 							<div className="flex items-center overflow-hidden">
-								<p className="truncate text-xl font-semibold">{user.username}</p>
+								<p className="truncate text-xl font-semibold">{loaderData.user.username}</p>
 							</div>
 						</div>
 
@@ -110,7 +110,7 @@ export default function User() {
 								<p className="text-sm text-muted-foreground">Joined</p>
 
 								<p className="font-medium leading-none">
-									{dayjs(user.created_at).format("MMM DD, YYYY")}
+									{dayjs(loaderData.user.created_at).format("MMM DD, YYYY")}
 								</p>
 							</div>
 
@@ -118,7 +118,9 @@ export default function User() {
 								<p className="text-sm text-muted-foreground">Updated at</p>
 
 								<p className="font-medium leading-none">
-									{user.updated_at ? dayjs(user.updated_at).format("MMM DD, YYYY") : "N/A"}
+									{loaderData.user.updated_at
+										? dayjs(loaderData.user.updated_at).format("MMM DD, YYYY")
+										: "N/A"}
 								</p>
 							</div>
 						</div>
@@ -132,7 +134,7 @@ export default function User() {
 
 							setTab(newTab);
 
-							navigate(`/users/${user.id}/${newTab}/`, {
+							navigate(`/users/${loaderData.user.id}/${newTab}/`, {
 								preventScrollReset: true,
 							});
 						}}
