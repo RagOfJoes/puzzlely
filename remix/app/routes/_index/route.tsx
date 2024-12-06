@@ -12,6 +12,7 @@ import { cn } from "@/lib/cn";
 import { hydrateGame } from "@/lib/hydrate-game";
 import { hydratePuzzle } from "@/lib/hydrate-puzzle";
 import { hydrateUser } from "@/lib/hydrate-user";
+import type { action } from "@/routes/games.save.$id";
 import { API } from "@/services/api.server";
 import { redirectWithInfo } from "@/services/toast.server";
 import type { Game } from "@/types/game";
@@ -32,7 +33,6 @@ type LoaderResponse = {
 
 /**
  * TODO: Save last cursor to a cookie to persist user's place
- * TODO: Upsert game when the finishes their game or when they decide to move on
  * TODO: If not authenticated, save games to localStorage
  * TODO: Create error page
  */
@@ -119,8 +119,13 @@ export function shouldRevalidate({
 	return false;
 }
 
+// TODO: Figure out a good way to implement local storage
 export default function Index() {
 	const loaderData = useLoaderData<LoaderResponse>();
+
+	const fetcher = useFetcher<typeof action>({
+		key: "games.save",
+	});
 
 	const ctx = useGame({
 		game: loaderData.game ? hydrateGame(loaderData.game) : undefined,
@@ -128,55 +133,42 @@ export default function Index() {
 	});
 	const [state] = ctx;
 
-	const fetcher = useFetcher({
-		key: `games.save.${state.puzzle.id}`,
-	});
-
 	useEffect(() => {
 		if (
-			// If the game has already been completed
-			!!loaderData.game?.completed_at ||
-			// If the game hasn't been completed yet
-			(!state.isGameOver && !state.isWinnerWinnerChickenDinner)
+			loaderData.game?.attempts.length === state.game.attempts.length ||
+			!loaderData.me ||
+			loaderData.puzzle.id !== state.puzzle.id ||
+			state.game.attempts.length === 0
 		) {
 			return;
 		}
 
 		switch (fetcher.state) {
 			case "loading":
-				if (!fetcher.data) {
-					return;
-				}
-
-				notify.dismiss(`games.save.${loaderData.puzzle.id}`);
+				notify.dismiss("games.save");
 				break;
 			case "submitting":
 				break;
 			default:
-				// If we've already submitted
-				if (!!fetcher.data || !loaderData.game) {
+				if (
+					fetcher.data?.success &&
+					fetcher.data.data.attempts.length === state.game.attempts.length
+				) {
 					return;
 				}
 
 				fetcher.submit(JSON.stringify(state.game), {
-					action: `/games/save/${loaderData.puzzle.id}`,
+					action: `/games/save/${state.puzzle.id}`,
 					encType: "application/json",
 					method: "PUT",
 				});
 
 				notify.loading("Saving game...", {
-					id: `games.save.${loaderData.puzzle.id}`,
+					id: "games.save",
 				});
 				break;
 		}
-	}, [
-		fetcher,
-		loaderData.game,
-		loaderData.puzzle.id,
-		state.game,
-		state.isGameOver,
-		state.isWinnerWinnerChickenDinner,
-	]);
+	}, [fetcher, loaderData.game, loaderData.me, loaderData.puzzle.id, state.game, state.puzzle.id]);
 
 	return (
 		<>
