@@ -34,5 +34,5 @@ export type Game = {
 	/**
 	 * User that this game belongs to
 	 */
-	user?: User;
+	user: User;
 };

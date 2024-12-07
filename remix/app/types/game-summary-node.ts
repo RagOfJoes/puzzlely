@@ -1,6 +1,6 @@
 import type { GameSummary } from "./game-summary";
 
-export type GameNode = {
+export type GameSummaryNode = {
 	cursor: string;
 	node: GameSummary;
 };
