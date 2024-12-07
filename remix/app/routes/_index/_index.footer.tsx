@@ -88,14 +88,14 @@ export function IndexFooter() {
 							<Button
 								aria-label="Go to previous game"
 								className={cn(
-									"w-full",
+									"w-full rounded-xl border bg-card",
 
 									"data-[is-loading='true']:disabled:opacity-100",
 								)}
 								data-is-loading={isLoading}
 								disabled={isLoading || isSaving || !loaderData.pageInfo.has_previous_page}
 								size="lg"
-								variant="outline"
+								variant="ghost"
 							>
 								<ChevronLeftIcon className="h-4 w-4" />
 							</Button>
@@ -120,14 +120,14 @@ export function IndexFooter() {
 							<Button
 								aria-label="Go to next game"
 								className={cn(
-									"w-full",
+									"w-full rounded-xl border bg-card",
 
 									"data-[is-loading='true']:disabled:opacity-100",
 								)}
 								data-is-loading={isLoading}
 								disabled={isLoading || isSaving || !loaderData.pageInfo.has_next_page}
 								size="lg"
-								variant="outline"
+								variant="ghost"
 							>
 								<ChevronRightIcon className="h-4 w-4" />
 							</Button>

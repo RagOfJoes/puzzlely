@@ -15,7 +15,7 @@ export const GridGroup = forwardRef<ElementRef<typeof Primitive.div>, GridGroupP
 			<Primitive.div
 				{...other}
 				className={cn(
-					"col-span-4 row-span-1 inline-flex select-none items-center justify-center border px-4 py-2 text-foreground",
+					"col-span-4 row-span-1 inline-flex select-none items-center justify-center rounded-xl border bg-card px-4 py-2 text-foreground",
 
 					"first-of-type:col-start-1 first-of-type:col-end-5 first-of-type:row-start-1 first-of-type:row-end-1",
 

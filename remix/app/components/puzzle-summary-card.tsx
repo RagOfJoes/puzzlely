@@ -33,7 +33,7 @@ export const PuzzleSummaryCard = forwardRef<
 		<Primitive.div
 			{...props}
 			className={cn(
-				"h-full w-full border bg-background p-4",
+				"h-full w-full rounded-xl border bg-card p-4",
 
 				className,
 			)}
@@ -88,6 +88,12 @@ export const PuzzleSummaryCard = forwardRef<
 						<span>{abbreviateNumber(puzzle.num_of_likes)}</span>
 					</Button>
 				</fetcher.Form>
+			</div>
+
+			<div className="mt-1 flex w-full items-center justify-between gap-2">
+				<p className="line-clamp-1 w-full text-ellipsis text-xs font-medium uppercase text-muted-foreground">
+					{puzzle.max_attempts} attempts
+				</p>
 			</div>
 
 			<div className="mt-4 flex w-full items-center justify-between gap-2">

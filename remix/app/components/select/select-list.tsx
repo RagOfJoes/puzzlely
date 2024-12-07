@@ -11,7 +11,7 @@ import { cn } from "@/lib/cn";
 export type SelectListProps = Select.SelectContentProps;
 
 export const SelectList = forwardRef<ElementRef<typeof Primitive.div>, SelectListProps>(
-	({ children, className, position, ...props }, ref) => {
+	({ children, className, position = "popper", ...props }, ref) => {
 		const items = useMemo(
 			() =>
 				Children.toArray(children).filter(
@@ -25,7 +25,10 @@ export const SelectList = forwardRef<ElementRef<typeof Primitive.div>, SelectLis
 				<Select.Content
 					{...props}
 					className={clsx(
-						"z-10 overflow-hidden border bg-popover",
+						"z-10 overflow-hidden rounded-xl border bg-popover",
+
+						position === "popper" &&
+							"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
 
 						className,
 					)}
@@ -38,7 +41,7 @@ export const SelectList = forwardRef<ElementRef<typeof Primitive.div>, SelectLis
 
 					<Select.Viewport
 						className={cn(
-							"",
+							"p-1",
 
 							position === "popper" &&
 								"h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",

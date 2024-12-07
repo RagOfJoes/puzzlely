@@ -128,7 +128,7 @@ export function PuzzleCreateFormGroups() {
 								<DrawerTrigger asChild>
 									<Button
 										className={cn(
-											"relative col-span-1 row-span-1 inline-flex h-full w-full appearance-none items-center justify-center border p-2 text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color]",
+											"relative col-span-1 row-span-1 inline-flex h-full w-full appearance-none items-center justify-center rounded-xl border bg-card p-2 text-sm font-medium outline-none ring-offset-background transition-[background-color,box-shadow,color]",
 
 											"data-[invalid=true]:border-destructive data-[invalid=true]:bg-destructive data-[invalid=true]:text-destructive-foreground",
 											"first-of-type:col-start-1 first-of-type:col-end-1 first-of-type:row-start-1 first-of-type:row-end-1",
@@ -138,14 +138,14 @@ export function PuzzleCreateFormGroups() {
 											!!form.formState.errors.groups?.[i]?.description ||
 											!!form.formState.errors.groups?.[i]?.blocks?.[j]?.value
 										}
-										variant="outline"
+										variant="ghost"
 									>
 										{form.watch().groups[i]?.blocks?.[j]?.value}
 									</Button>
 								</DrawerTrigger>
 
 								<DrawerContent>
-									<div className="flex w-full border bg-popover">
+									<div className="flex w-full overflow-hidden rounded-xl border bg-popover">
 										<div className="w-full">
 											<DrawerHeader className="w-full">
 												<DrawerTitle>Update group {i + 1}</DrawerTitle>
@@ -162,7 +162,6 @@ export function PuzzleCreateFormGroups() {
 
 													<Textarea
 														{...form.register(`groups.${i}.description`)}
-														autoFocus
 														className="bg-popover"
 														placeholder="..."
 													/>
@@ -191,6 +190,7 @@ export function PuzzleCreateFormGroups() {
 																	`groups.${i}.blocks.${k}.value`,
 																	e.target.value.trim(),
 																);
+																form.trigger(`groups.${i}.blocks.${k}.value`);
 															}}
 															placeholder="..."
 														/>

@@ -30,11 +30,12 @@ export const TabsTrigger = forwardRef<
 	<TabsPrimitive.Trigger
 		ref={ref}
 		className={cn(
-			"inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap border bg-background px-4 font-medium ring-offset-background transition-all",
+			"inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border bg-background px-4 text-sm font-medium text-foreground/50 ring-offset-background transition-all",
 
-			"data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
+			"data-[state=active]:bg-card data-[state=active]:text-card-foreground",
 			"disabled:pointer-events-none disabled:opacity-50",
 			"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+			"hover:text-foreground",
 
 			className,
 		)}

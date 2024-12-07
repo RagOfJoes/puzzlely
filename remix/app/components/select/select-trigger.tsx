@@ -16,7 +16,7 @@ export const SelectTrigger = forwardRef<ElementRef<typeof Primitive.button>, Sel
 		<Select.Trigger
 			{...props}
 			className={cn(
-				"group flex h-11 items-center gap-1 border bg-background px-2 font-medium outline-none ring-offset-background transition-all",
+				"group flex h-11 items-center gap-1 border bg-transparent px-2 outline-none ring-offset-background transition-all",
 
 				"active:enabled:ring-2 active:enabled:ring-ring active:enabled:ring-offset-2",
 				'aria-[invalid="true"]:border-destructive',

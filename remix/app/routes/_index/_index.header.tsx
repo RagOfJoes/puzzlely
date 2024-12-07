@@ -40,7 +40,7 @@ export function IndexHeader() {
 					"md:col-start-1",
 				)}
 			>
-				<div className="flex h-full w-full items-center justify-between border bg-background px-4 py-2">
+				<div className="flex h-full w-full items-center justify-between rounded-xl border bg-card px-4 py-2">
 					<div className="flex h-full flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Attempts Left</h3>
 
@@ -81,7 +81,7 @@ export function IndexHeader() {
 				<Button
 					aria-label="Give up"
 					className={cn(
-						"h-full w-full gap-2",
+						"h-full w-full gap-2 rounded-xl border bg-card",
 
 						"disabled:opacity-100",
 						"max-md:h-11 max-md:basis-1/2",
@@ -89,7 +89,7 @@ export function IndexHeader() {
 					data-is-loading={isLoading}
 					disabled={isLoading || state.isGameOver || state.isWinnerWinnerChickenDinner}
 					onClick={actions.onGiveUp}
-					variant="outline"
+					variant="ghost"
 				>
 					<FlagIcon className="h-3 w-3" />
 
@@ -103,7 +103,7 @@ export function IndexHeader() {
 				<Button
 					aria-label="Shuffle"
 					className={cn(
-						"h-full w-full gap-2",
+						"h-full w-full gap-2 rounded-xl border bg-card",
 
 						"disabled:opacity-100",
 						"max-md:h-11 max-md:basis-1/2",
@@ -111,7 +111,7 @@ export function IndexHeader() {
 					data-is-loading={isLoading}
 					disabled={isLoading || state.isGameOver || state.isWinnerWinnerChickenDinner}
 					onClick={actions.onShuffle}
-					variant="outline"
+					variant="ghost"
 				>
 					<ShuffleIcon className="h-3 w-3" />
 
@@ -131,7 +131,7 @@ export function IndexHeader() {
 					"md:col-start-4",
 				)}
 			>
-				<div className="flex h-full w-full items-center justify-between border bg-background px-4 py-2">
+				<div className="flex h-full w-full items-center justify-between rounded-xl border bg-card px-4 py-2">
 					<div className="flex flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Likes</h3>
 

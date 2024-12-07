@@ -5,7 +5,7 @@ import { json, redirect } from "@remix-run/node";
 import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
 import { Outlet, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
 import dayjs from "dayjs";
-import { Heart, History, Puzzle } from "lucide-react";
+import { HistoryIcon, PuzzleIcon, StarIcon } from "lucide-react";
 
 import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
@@ -94,7 +94,7 @@ export default function User() {
 
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
-					<div className="flex flex-col gap-2 border bg-background px-4 py-4">
+					<div className="flex flex-col gap-2 rounded-xl border bg-card px-4 py-4">
 						<div className="flex gap-2">
 							<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-xl font-semibold text-muted">
 								{loaderData.user.username[0]}
@@ -142,15 +142,15 @@ export default function User() {
 					>
 						<TabsList className="w-full">
 							<TabsTrigger value="created">
-								<Puzzle className="h-4 w-4" />
+								<PuzzleIcon className="h-4 w-4" />
 								Created
 							</TabsTrigger>
 							<TabsTrigger value="liked">
-								<Heart className="h-4 w-4" />
+								<StarIcon className="h-4 w-4" />
 								Liked
 							</TabsTrigger>
 							<TabsTrigger value="history">
-								<History className="h-4 w-4" />
+								<HistoryIcon className="h-4 w-4" />
 								History
 							</TabsTrigger>
 						</TabsList>

@@ -18,7 +18,7 @@ export function PuzzleCreateFormMeta() {
 	return (
 		<div
 			className={cn(
-				"flex w-full gap-1",
+				"flex w-full gap-1 rounded-xl border bg-card p-4",
 
 				"max-md:flex-wrap",
 			)}

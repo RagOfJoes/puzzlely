@@ -55,7 +55,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 						{isHidden && (
 							<Button
 								asChild
-								className="absolute bottom-4 left-4 z-10 border border-primary bg-primary uppercase text-primary-foreground"
+								className="absolute bottom-4 left-4 z-10 uppercase"
 								onClick={() => toggleIsHidden(false)}
 								size="icon"
 							>
@@ -94,7 +94,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 								<motion.div
 									animate="animate"
 									className={cn(
-										"z-10 max-h-[90%] w-[90%] max-w-sm overflow-y-auto border bg-popover p-5 outline-none",
+										"z-10 max-h-[90%] w-[90%] max-w-sm overflow-y-auto rounded-xl border bg-background outline-none",
 
 										"focus-visible:ring",
 									)}
@@ -122,44 +122,46 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 										},
 									}}
 								>
-									<div className="flex w-full items-center justify-between">
-										<p className="text-sm font-medium text-muted-foreground">Score: {game.score}</p>
+									<div className="border-b px-4 pb-5 pt-4">
+										<div className="flex w-full items-center justify-between">
+											<p className="text-sm text-muted-foreground">Score: {game.score}</p>
 
-										<fetcher.Form action={`/puzzles/like/${puzzle.id}`} method="PUT">
-											<Button
-												aria-label={puzzle.liked_at ? "Unlike puzzle" : "Like puzzle"}
-												className={cn(
-													"min-w-0 shrink-0 gap-2 text-muted-foreground",
+											<fetcher.Form action={`/puzzles/like/${puzzle.id}`} method="PUT">
+												<Button
+													aria-label={puzzle.liked_at ? "Unlike puzzle" : "Like puzzle"}
+													className={cn(
+														"min-w-0 shrink-0 gap-2 text-muted-foreground",
 
-													"[&>svg]:data-[is-liked=true]:fill-current",
-												)}
-												data-is-liked={!!puzzle.liked_at}
-												disabled={fetcher.state === "submitting"}
-												size="sm"
-												variant="outline"
-											>
-												<StarIcon className="h-4 w-4" />
+														"[&>svg]:data-[is-liked=true]:fill-current",
+													)}
+													data-is-liked={!!puzzle.liked_at}
+													disabled={fetcher.state === "submitting"}
+													size="sm"
+													variant="outline"
+												>
+													<StarIcon className="h-4 w-4" />
 
-												<span>{puzzle.liked_at ? "Liked" : "Like"}</span>
+													<span>{puzzle.liked_at ? "Liked" : "Like"}</span>
 
-												<hr className="h-full w-[1px] bg-border" />
+													<hr className="h-full w-[1px] bg-border" />
 
-												<span>{abbreviateNumber(puzzle.num_of_likes)}</span>
-											</Button>
-										</fetcher.Form>
+													<span>{abbreviateNumber(puzzle.num_of_likes)}</span>
+												</Button>
+											</fetcher.Form>
+										</div>
+
+										<h1 className="mt-2 line-clamp-1 text-ellipsis text-lg font-medium leading-none">
+											{isSuccess ? "Congratulations!" : "Game Over!"}
+										</h1>
+
+										<p className="line-clamp-1 w-full text-ellipsis text-sm text-muted-foreground">
+											{isSuccess
+												? "You have successfully completed the puzzle!"
+												: "You have run out of attempts."}
+										</p>
 									</div>
 
-									<h1 className="mt-2 line-clamp-1 text-ellipsis text-lg font-semibold">
-										{isSuccess ? "Congratulations!" : "Game Over!"}
-									</h1>
-
-									<p className="line-clamp-1 w-full text-ellipsis text-sm font-medium tracking-wide text-muted-foreground">
-										{isSuccess
-											? "You have successfully completed the puzzle!"
-											: "You have run out of attempts."}
-									</p>
-
-									<div className="mt-4 w-full items-center">
+									<div className="w-full items-center bg-popover p-4">
 										<Accordion defaultValue={["attempts"]} type="multiple">
 											<AccordionItem className="w-full border-b-0" value="attempts">
 												<AccordionTrigger
@@ -169,7 +171,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 														"hover:no-underline",
 													)}
 												>
-													<div className="text-sm font-bold leading-tight">
+													<div className="text-sm">
 														Attempts{" "}
 														<span className="text-muted-foreground">({game.attempts.length})</span>
 													</div>
@@ -211,9 +213,15 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 										</Accordion>
 									</div>
 
-									<Button className="w-full uppercase" onClick={() => toggleIsHidden(true)}>
-										Hide
-									</Button>
+									<div className="border-t p-4">
+										<Button
+											className="w-full uppercase"
+											onClick={() => toggleIsHidden(true)}
+											size="sm"
+										>
+											Hide
+										</Button>
+									</div>
 								</motion.div>
 
 								<div className="absolute top-0 h-full w-full bg-background/50" />

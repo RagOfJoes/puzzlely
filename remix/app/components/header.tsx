@@ -50,9 +50,9 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 					</DrawerTrigger>
 
 					<DrawerContent>
-						<div className="flex w-full border bg-popover">
+						<div className="flex w-full overflow-hidden rounded-xl border bg-popover">
 							<div className="flex w-full flex-col">
-								<DrawerHeader className=" w-full">
+								<DrawerHeader className="w-full">
 									<DrawerTitle>
 										<Link
 											aria-label="Go home"
@@ -65,21 +65,17 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 										>
 											<PuzzlelyIcon className="h-11 w-11" />
 
-											<h1 className="font-heading relative select-none text-xl font-bold">
-												Puzzlely
-											</h1>
+											<h1 className="relative select-none text-lg font-semibold">Puzzlely</h1>
 										</Link>
 									</DrawerTitle>
 									<DrawerDescription className="sr-only">Menu</DrawerDescription>
 								</DrawerHeader>
 
-								<hr className="h-[1px] w-full bg-border" />
-
-								<div className="mt-4 flex w-full flex-col gap-1 px-4">
+								<div className="mt-8 flex w-full flex-col gap-1 px-4">
 									<Link tabIndex={-1} to="/puzzles/create">
 										<Button
 											className={cn(
-												"w-full gap-2",
+												"w-full gap-2 rounded-xl shadow-[0_0_12px_1px] shadow-primary",
 
 												"[&>svg]:data-[is-liked=true]:fill-current",
 											)}
@@ -98,7 +94,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 										<Button
 											className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 											size="lg"
-											variant="outline"
+											variant="ghost"
 										>
 											<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 												<TrendingUpIcon className="h-4 w-4" />
@@ -117,7 +113,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 												<Button
 													className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 													size="lg"
-													variant="outline"
+													variant="ghost"
 												>
 													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<UserIcon className="h-4 w-4" />
@@ -130,7 +126,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 												<Button
 													className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 													size="lg"
-													variant="outline"
+													variant="ghost"
 												>
 													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<LogOutIcon className="h-4 w-4" />
@@ -145,7 +141,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 												<Button
 													className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 													size="lg"
-													variant="outline"
+													variant="ghost"
 												>
 													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<UserPlusIcon className="h-4 w-4" />
@@ -158,7 +154,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 												<Button
 													className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 													size="lg"
-													variant="outline"
+													variant="ghost"
 												>
 													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
 														<LogInIcon className="h-4 w-4" />

@@ -7,6 +7,7 @@ import type {
 } from "react";
 import { forwardRef } from "react";
 
+import { FocusScope } from "@radix-ui/react-focus-scope";
 import { Drawer as DrawerPrimitive } from "vaul";
 
 import { cn } from "@/lib/cn";
@@ -32,7 +33,7 @@ export const DrawerOverlay = forwardRef<
 	<DrawerPrimitive.Overlay
 		{...props}
 		className={cn(
-			"fixed inset-0 z-50 bg-background/80",
+			"fixed inset-0 z-50 bg-black/80",
 
 			className,
 		)}
@@ -60,8 +61,11 @@ export const DrawerContent = forwardRef<
 			)}
 			ref={ref}
 			style={{ "--initial-transform": "calc(100% + 8px)" } as CSSProperties}
+			tabIndex={-1}
 		>
-			{children}
+			<FocusScope asChild loop trapped>
+				{children}
+			</FocusScope>
 		</DrawerPrimitive.Content>
 	</DrawerPortal>
 ));
@@ -87,7 +91,7 @@ export const DrawerHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElem
 	<div
 		{...props}
 		className={cn(
-			"flex flex-col p-4 text-center",
+			"flex flex-col gap-1.5 border-b bg-background px-4 pb-4 pt-5",
 
 			"sm:text-left",
 
@@ -101,7 +105,7 @@ export const DrawerFooter = ({ className, ...props }: HTMLAttributes<HTMLDivElem
 	<div
 		{...props}
 		className={cn(
-			"mt-auto flex flex-col gap-2 p-4",
+			"mt-auto flex flex-col gap-2 border-t px-4 pb-4 pt-5",
 
 			className,
 		)}
@@ -116,7 +120,7 @@ export const DrawerTitle = forwardRef<
 	<DrawerPrimitive.Title
 		{...props}
 		className={cn(
-			"text-lg font-medium",
+			"text-lg font-medium leading-none",
 
 			className,
 		)}
@@ -132,7 +136,7 @@ export const DrawerDescription = forwardRef<
 	<DrawerPrimitive.Description
 		{...props}
 		className={cn(
-			"text-xs font-medium text-muted-foreground",
+			"text-sm text-muted-foreground",
 
 			className,
 		)}

@@ -110,7 +110,7 @@ export default function PuzzleCreate() {
 							(fetcher.state === "loading" && !fetcher.data?.errors) ||
 							fetcher.state === "submitting"
 						}
-						size="lg"
+						size="sm"
 					>
 						{fetcher.state === "submitting" && (
 							<LoaderCircleIcon className="h-4 w-4 shrink-0 animate-spin" />

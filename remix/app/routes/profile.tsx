@@ -4,7 +4,7 @@ import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Outlet, useFetcher, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
 import dayjs from "dayjs";
-import { EditIcon, Heart, History, LoaderCircleIcon, Puzzle } from "lucide-react";
+import { EditIcon, HistoryIcon, LoaderCircleIcon, PuzzleIcon, StarIcon } from "lucide-react";
 import { toast as notify } from "sonner";
 
 import { Button } from "@/components/button";
@@ -47,7 +47,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		case "history":
 			break;
 		default:
-			return redirect("/profile/created");
+			return redirect("/profile/created/");
 	}
 
 	return json({ me });
@@ -120,7 +120,7 @@ export default function Profile() {
 
 			<main className="mx-auto min-h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
-					<div className="flex flex-col gap-2 border bg-background px-4 py-4">
+					<div className="flex flex-col gap-2 rounded-xl border bg-card px-4 py-4">
 						<div className="flex gap-2">
 							<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-xl font-semibold text-muted">
 								{loaderData.me.username[0]}
@@ -152,7 +152,7 @@ export default function Profile() {
 										</DialogDescription>
 									</DialogHeader>
 
-									<div className="py-4">
+									<div className="bg-popover p-4 text-popover-foreground">
 										<UserUpdateForm
 											action="/users/update"
 											defaultValues={{
@@ -169,7 +169,7 @@ export default function Profile() {
 											className="gap-2"
 											disabled={fetcher.state === "submitting"}
 											form="user-update-form"
-											size="lg"
+											size="sm"
 											type="submit"
 										>
 											{fetcher.state === "submitting" && (
@@ -214,23 +214,28 @@ export default function Profile() {
 
 							setTab(newTab);
 
-							navigate(`/profile/${newTab}/`, {
-								preventScrollReset: true,
-							});
+							navigate(
+								{
+									pathname: `/profile/${newTab}/`,
+								},
+								{
+									preventScrollReset: true,
+								},
+							);
 						}}
 						value={tab}
 					>
 						<TabsList className="w-full">
 							<TabsTrigger value="created">
-								<Puzzle className="h-4 w-4" />
+								<PuzzleIcon className="h-4 w-4" />
 								Created
 							</TabsTrigger>
 							<TabsTrigger value="liked">
-								<Heart className="h-4 w-4" />
+								<StarIcon className="h-4 w-4" />
 								Liked
 							</TabsTrigger>
 							<TabsTrigger value="history">
-								<History className="h-4 w-4" />
+								<HistoryIcon className="h-4 w-4" />
 								History
 							</TabsTrigger>
 						</TabsList>

@@ -20,7 +20,7 @@ export const DialogOverlay = forwardRef<
 	<DialogPrimitive.Overlay
 		ref={ref}
 		className={cn(
-			"fixed inset-0 z-50 bg-background/80",
+			"fixed inset-0 z-50 bg-black/80",
 
 			"data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
 			"data-[state=open]:animate-in data-[state=open]:fade-in-0",
@@ -41,7 +41,7 @@ export const DialogContent = forwardRef<
 		<DialogPrimitive.Content
 			ref={ref}
 			className={cn(
-				"fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-1 border bg-background p-4 ring-offset-background duration-200",
+				"fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] rounded-xl border bg-background ring-offset-background duration-200",
 
 				"data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%]",
 				"data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
@@ -64,7 +64,7 @@ export const DialogClose = forwardRef<
 	<DialogPrimitive.Close
 		{...omit(props, ["children"])}
 		className={cn(
-			"absolute right-2 top-2 text-foreground/70 ring-offset-background transition-opacity",
+			"absolute right-4 top-4 text-foreground/70 ring-offset-background transition-opacity",
 
 			"data-[state=open]:bg-accent data-[state=open]:text-muted-foreground",
 			"disabled:pointer-events-none",
@@ -84,7 +84,7 @@ DialogClose.displayName = "DialogClose";
 export const DialogHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col",
+			"flex flex-col gap-1.5 border-b px-4 pb-4 pt-5",
 
 			className,
 		)}
@@ -96,7 +96,7 @@ DialogHeader.displayName = "DialogHeader";
 export const DialogFooter = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			"flex flex-col-reverse",
+			"flex flex-col-reverse border-t p-4",
 
 			"sm:flex-row sm:justify-end sm:space-x-2",
 
@@ -114,7 +114,7 @@ export const DialogTitle = forwardRef<
 	<DialogPrimitive.Title
 		ref={ref}
 		className={cn(
-			"text-lg font-medium",
+			"text-lg font-semibold leading-none",
 
 			className,
 		)}
@@ -130,7 +130,7 @@ export const DialogDescription = forwardRef<
 	<DialogPrimitive.Description
 		ref={ref}
 		className={cn(
-			"text-sm font-medium text-muted-foreground",
+			"text-sm text-muted-foreground",
 
 			className,
 		)}
