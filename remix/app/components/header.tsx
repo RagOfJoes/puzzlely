@@ -44,7 +44,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 			<div className="flex gap-1">
 				<Drawer direction="left">
 					<DrawerTrigger asChild>
-						<Button aria-label="Open menu" className="h-11 w-11" size="icon" variant="outline">
+						<Button aria-label="Open menu" className="h-11 w-11" size="icon" variant="ghost">
 							<MenuIcon className="h-4 w-4" />
 						</Button>
 					</DrawerTrigger>
@@ -190,7 +190,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 			{me ? (
 				<div className="flex gap-1">
 					<Form method="delete" action="/logout">
-						<Button className="h-11 w-11" size="icon" variant="outline">
+						<Button className="h-11 w-11" size="icon" variant="ghost">
 							<LogOutIcon className="h-4 w-4" />
 						</Button>
 					</Form>
@@ -198,7 +198,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 			) : (
 				<div className="flex gap-1">
 					<Link tabIndex={-1} to="/login">
-						<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="outline">
+						<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="ghost">
 							<LogInIcon className="h-4 w-4" />
 						</Button>
 					</Link>

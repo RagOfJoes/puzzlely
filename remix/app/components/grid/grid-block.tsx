@@ -45,7 +45,7 @@ export const GridBlock = forwardRef<ElementRef<"button">, GridBlockProps>(
 			<div className="flex h-full w-full items-center justify-center p-2">
 				<p
 					className={cn(
-						"line-clamp-4 select-none text-center font-medium leading-tight",
+						"line-clamp-4 select-none text-center text-sm font-medium leading-tight",
 
 						"max-md:text-[0.9em]",
 						"max-sm:text-[0.8em]",
