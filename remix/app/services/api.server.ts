@@ -1,8 +1,8 @@
 import { SUPPORTED_PROVIDERS } from "@/lib/constants";
 import { getSession } from "@/services/session.server";
 import type { Game } from "@/types/game";
-import type { GameConnection } from "@/types/game-connection";
 import type { GamePayload } from "@/types/game-payload";
+import type { GameSummaryConnection } from "@/types/game-summary-connection";
 import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleConnection } from "@/types/puzzle-connection";
 import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
@@ -100,6 +100,15 @@ export class API {
 	static games = {
 		prefix: "games",
 
+		/**
+		 * Attempts to retrieve a game for the given puzzle
+		 *
+		 * Hits the `/games/:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @param id - The ID of the puzzle
+		 * @returns The game, if any, that the user has played for the given puzzle
+		 */
 		async get(request: Request, { puzzleID }: { puzzleID: string }): Promise<Response<Game>> {
 			const session = await getSession(request.headers.get("Cookie"));
 
@@ -116,11 +125,17 @@ export class API {
 			return response;
 		},
 
-		async history(
-			request: Request,
-			{ userID }: { userID: string },
-		): Promise<Response<GameConnection>> {
-			const res = await fetch(`${API.URL}/${this.prefix}/history/${userID}`, {
+		/**
+		 * Retrieves user's played puzzles
+		 *
+		 * Hits the `/games/history/:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @param id - The ID of the puzzle
+		 * @returns A list of the user's created puzzles
+		 */
+		async history(request: Request, id: string): Promise<Response<GameSummaryConnection>> {
+			const res = await fetch(`${API.URL}/${this.prefix}/history/${id}`, {
 				credentials: "include",
 				headers: {
 					Cookie: request.headers.get("cookie") ?? "",
@@ -128,7 +143,7 @@ export class API {
 				method: "GET",
 			});
 
-			const response: Response<GameConnection> = await res.json();
+			const response: Response<GameSummaryConnection> = await res.json();
 			return response;
 		},
 
