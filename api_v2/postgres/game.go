@@ -138,6 +138,8 @@ func (g *game) GetHistory(ctx context.Context, userID string, opts domains.GameC
 	query := g.db.
 		NewSelect().
 		Model(&games).
+		Column("id", "score", "created_at", "completed_at", "puzzle_id", "user_id").
+		ColumnExpr("(?) AS attempts", g.db.NewRaw("SELECT COUNT(DISTINCT(attempt_order)) FROM game_attempts WHERE game_id = game_summary.id")).
 		Relation("Puzzle", func(q *bun.SelectQuery) *bun.SelectQuery {
 			puzzleQuery := q.
 				Column("id", "difficulty", "max_attempts", "created_at", "updated_at", "user_id").

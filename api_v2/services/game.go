@@ -57,7 +57,10 @@ func (g *Game) FindHistory(ctx context.Context, userID string, opts domains.Game
 	}
 
 	// Validate results
-	for _, game := range games {
+	for i := range games {
+		game := &games[i]
+		game.Attempts = game.Attempts - int16(game.Score)
+
 		if err := game.Validate(); err != nil {
 			return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrGameHistory)
 		}

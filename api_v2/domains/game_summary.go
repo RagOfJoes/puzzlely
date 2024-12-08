@@ -14,8 +14,9 @@ var _ Domain = (*GameSummary)(nil)
 type GameSummary struct {
 	bun.BaseModel `bun:"table:games"`
 
-	ID    string `bun:"type:varchar(26),pk,notnull" json:"id"`
-	Score uint8  `bun:",notnull" json:"score"`
+	ID       string `bun:"type:varchar(26),pk,notnull" json:"id"`
+	Score    int8   `bun:",notnull" json:"score"`
+	Attempts int16  `bun:",scanonly" json:"attempts"`
 
 	CreatedAt   time.Time    `bun:",nullzero,notnull,default:current_timestamp" json:"created_at"`
 	CompletedAt bun.NullTime `bun:",nullzero,default:NULL" json:"completed_at"`
@@ -29,7 +30,8 @@ type GameSummary struct {
 func (g GameSummary) Validate() error {
 	return validation.ValidateStruct(&g,
 		validation.Field(&g.ID, validation.Required, validation.By(internal.IsULID)),
-		validation.Field(&g.Score, validation.Max(uint8(4)), validation.Min(uint8(0))),
+		validation.Field(&g.Score, validation.Max(int8(4)), validation.Min(int8(0))),
+		validation.Field(&g.Attempts, validation.Max(g.Puzzle.MaxAttempts), validation.Min(int16(0))),
 
 		validation.Field(&g.CreatedAt, validation.Required),
 		validation.Field(&g.CompletedAt, validation.When(!g.CompletedAt.IsZero(), validation.By(internal.IsAfter(g.CreatedAt)))),
