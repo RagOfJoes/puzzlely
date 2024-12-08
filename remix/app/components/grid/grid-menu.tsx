@@ -14,6 +14,7 @@ import {
 	AccordionTrigger,
 } from "@/components/accordion";
 import { Button } from "@/components/button";
+import { ScrollArea } from "@/components/scroll-area";
 import type { UseGame } from "@/hooks/use-game";
 import { abbreviateNumber } from "@/lib/abbreviate-number";
 import { arePuzzleBlocksSameGroup } from "@/lib/are-puzzle-blocks-same-group";
@@ -94,7 +95,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 								<motion.div
 									animate="animate"
 									className={cn(
-										"z-10 max-h-[90%] w-[90%] max-w-sm overflow-y-auto rounded-xl border bg-background outline-none",
+										"z-10 flex max-h-[90%] w-[90%] max-w-sm flex-col overflow-hidden rounded-xl border bg-background outline-none",
 
 										"focus-visible:ring",
 									)}
@@ -122,7 +123,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 										},
 									}}
 								>
-									<div className="border-b px-4 pb-5 pt-4">
+									<div className="shrink-0 border-b px-4 pb-5 pt-4">
 										<div className="flex w-full items-center justify-between">
 											<p className="text-sm text-muted-foreground">Score: {game.score}</p>
 
@@ -161,8 +162,12 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 										</p>
 									</div>
 
-									<div className="w-full items-center bg-popover p-4">
-										<Accordion defaultValue={["attempts"]} type="multiple">
+									<ScrollArea
+										className="flex h-full w-full shrink flex-col items-center bg-popover p-4"
+										scrollHideDelay={600}
+										type="scroll"
+									>
+										<Accordion className="min-w-0" defaultValue={["attempts"]} type="multiple">
 											<AccordionItem className="w-full border-b-0" value="attempts">
 												<AccordionTrigger
 													className={cn(
@@ -211,9 +216,9 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 												</AccordionContent>
 											</AccordionItem>
 										</Accordion>
-									</div>
+									</ScrollArea>
 
-									<div className="border-t p-4">
+									<div className="shrink-0 border-t p-4">
 										<Button
 											className="w-full uppercase"
 											onClick={() => toggleIsHidden(true)}

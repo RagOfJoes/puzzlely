@@ -10,6 +10,8 @@ import { Toaster } from "@/components/toaster";
 import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
 
+import { ScrollArea } from "./components/scroll-area";
+
 export const links: LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
 	{ rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -97,10 +99,12 @@ export default function App() {
 				<Meta />
 				<Links />
 			</head>
-			<body className="h-dvh bg-background">
+			<body className="h-dvh overflow-hidden bg-background">
 				{/* App Layout  */}
-				<Outlet />
-				<Footer />
+				<ScrollArea className="h-full">
+					<Outlet />
+					<Footer />
+				</ScrollArea>
 
 				{/* Remix */}
 				<ScrollRestoration />
