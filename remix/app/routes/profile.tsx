@@ -92,7 +92,6 @@ export default function Profile() {
 	});
 
 	useEffect(() => {
-		// eslint-disable-next-line default-case
 		switch (fetcher.state) {
 			case "loading":
 				if (!fetcher.data) {
@@ -111,8 +110,23 @@ export default function Profile() {
 					id: "users.update",
 				});
 				break;
+			default:
+				break;
 		}
 	}, [fetcher.data, fetcher.state, isOpen]);
+
+	useEffect(() => {
+		const match = matches[matches.length - 1];
+		if (
+			!match ||
+			!match.id.startsWith("routes/profile.") ||
+			match.id.replace("routes/profile.", "") === tab
+		) {
+			return;
+		}
+
+		setTab(match.id.replace("routes/profile.", "") as unknown as ValidTabs);
+	}, [matches, tab]);
 
 	return (
 		<>
@@ -211,8 +225,6 @@ export default function Profile() {
 							if (newTab !== "created" && newTab !== "liked" && newTab !== "history") {
 								return;
 							}
-
-							setTab(newTab);
 
 							navigate(
 								{
