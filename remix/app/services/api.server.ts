@@ -135,10 +135,13 @@ export class API {
 		 * @returns A list of the user's created puzzles
 		 */
 		async history(request: Request, id: string): Promise<Response<GameSummaryConnection>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
 			const res = await fetch(`${API.URL}/${this.prefix}/history/${id}`, {
 				credentials: "include",
 				headers: {
-					Cookie: request.headers.get("cookie") ?? "",
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
 				},
 				method: "GET",
 			});
