@@ -109,10 +109,10 @@ export class API {
 		 * @param id - The ID of the puzzle
 		 * @returns The game, if any, that the user has played for the given puzzle
 		 */
-		async get(request: Request, { puzzleID }: { puzzleID: string }): Promise<Response<Game>> {
+		async get(request: Request, id: string): Promise<Response<Game>> {
 			const session = await getSession(request.headers.get("Cookie"));
 
-			const res = await fetch(`${API.URL}/${this.prefix}/${puzzleID}`, {
+			const res = await fetch(`${API.URL}/${this.prefix}/${id}`, {
 				credentials: "include",
 				headers: {
 					"Content-Type": "application/json",
