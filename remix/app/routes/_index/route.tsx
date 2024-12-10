@@ -9,13 +9,14 @@ import { toast as notify } from "sonner";
 import { Header } from "@/components/header";
 import { GameProvider, useGame } from "@/hooks/use-game";
 import { cn } from "@/lib/cn";
-import { hydrateGame } from "@/lib/hydrate-game";
+import { hydrateGamePayload } from "@/lib/hydrate-game-payload";
 import { hydratePuzzle } from "@/lib/hydrate-puzzle";
 import { hydrateUser } from "@/lib/hydrate-user";
+import { transformGameToPayload } from "@/lib/transform-game-to-payload";
 import type { action } from "@/routes/games.save.$id";
 import { API } from "@/services/api.server";
 import { redirectWithInfo } from "@/services/toast.server";
-import type { Game } from "@/types/game";
+import type { GamePayload } from "@/types/game-payload";
 import type { PageInfo } from "@/types/page-info";
 import type { Puzzle } from "@/types/puzzle";
 import type { User } from "@/types/user";
@@ -25,7 +26,7 @@ import { IndexGrid } from "./_index.grid";
 import { IndexHeader } from "./_index.header";
 
 type LoaderResponse = {
-	game?: Game;
+	game?: GamePayload;
 	me?: User;
 	pageInfo: PageInfo;
 	puzzle: Puzzle;
@@ -39,7 +40,7 @@ type LoaderResponse = {
 export async function loader({
 	request,
 }: LoaderFunctionArgs): Promise<TypedResponse<LoaderResponse>> {
-	const [me, puzzles] = await Promise.all([API.me(request), API.puzzles.recent(request)]);
+	const me = await API.me(request);
 	// If the user hasn't completed their profile
 	if (me.success && me.data.user && me.data.user.state === "PENDING" && !me.data.user.updated_at) {
 		return redirectWithInfo("/profile/complete", {
@@ -47,6 +48,7 @@ export async function loader({
 		});
 	}
 
+	const puzzles = await API.puzzles.recent(request);
 	if (!puzzles.success || !puzzles.data) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
 		throw new Response("Failed to fetch puzzles!", { status: 500 });
@@ -59,7 +61,7 @@ export async function loader({
 		throw new Response("Failed to fetch puzzles!", { status: 500 });
 	}
 
-	if (!me.success) {
+	if (!me.success || !me.data.user) {
 		return json({
 			me: undefined,
 			pageInfo: puzzles.data.page_info,
@@ -76,9 +78,9 @@ export async function loader({
 		});
 	}
 
-	const game = await API.games.get(request, { puzzleID: edge.node.id });
+	const game = await API.games.get(request, edge.node.id);
 	return json({
-		game: game.success ? game.data : undefined,
+		game: game.success ? transformGameToPayload(game.data) : undefined,
 		me: me.data.user,
 		pageInfo: puzzles.data.page_info,
 		puzzle: {
@@ -105,7 +107,7 @@ export function shouldRevalidate({
 	formAction,
 }: ShouldRevalidateFunctionArgs) {
 	// If the user likes a puzzle or updates their profile, then, there's no need to revalidate current route's loader
-	const needsRevalidation = ["/puzzles/like", "/games/save"].some((value) => {
+	const needsRevalidation = ["/games/save", "/puzzles/like"].some((value) => {
 		if (!formAction) {
 			return false;
 		}
@@ -128,7 +130,7 @@ export default function Index() {
 	});
 
 	const ctx = useGame({
-		game: loaderData.game ? hydrateGame(loaderData.game) : undefined,
+		game: loaderData.game ? hydrateGamePayload(loaderData.game) : undefined,
 		puzzle: hydratePuzzle(loaderData.puzzle),
 	});
 	const [state] = ctx;
@@ -163,7 +165,7 @@ export default function Index() {
 					method: "PUT",
 				});
 
-				notify.loading("Saving game...", {
+				notify.loading("Saving...", {
 					id: "games.save",
 				});
 				break;

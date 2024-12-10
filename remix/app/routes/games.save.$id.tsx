@@ -36,7 +36,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 			description: payload.error.issues
 				.map((issue) => `${issue.path} - ${issue.message}`)
 				.join(", "),
-			message: "Failed to save game!",
+			message: "Failed to save!",
 		});
 	}
 
@@ -44,11 +44,11 @@ export async function action({ params, request }: ActionFunctionArgs) {
 	if (!game.success) {
 		return jsonWithError(game, {
 			description: game.error.message,
-			message: "Failed to save game!",
+			message: "Failed to save!",
 		});
 	}
 
 	return jsonWithSuccess(game, {
-		message: "Saved game!",
+		message: "Saved!",
 	});
 }
