@@ -231,6 +231,30 @@ export class API {
 		},
 
 		/**
+		 * Retrieves puzzle with the given id
+		 *
+		 * Hits the `/puzzles/:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @param id - The ID of the puzzle
+		 * @returns Puzzle
+		 */
+		async get(request: Request, id: string): Promise<Response<Puzzle>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
+			const res = await fetch(`${API.URL}/${this.prefix}/${id}`, {
+				credentials: "include",
+				headers: {
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
+				},
+				method: "GET",
+			});
+
+			const response: Response<Puzzle> = await res.json();
+			return response;
+		},
+
+		/**
 		 * Retrieves user's liked puzzles
 		 *
 		 * Hits the `/puzzles/liked:id` endpoint on the API
