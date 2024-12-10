@@ -72,15 +72,26 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle domains.Puzzle) (*domains
 }
 
 func (p *puzzle) Get(ctx context.Context, id string) (*domains.Puzzle, error) {
+	session := domains.SessionFromContext(ctx)
+
 	var puzzle domains.Puzzle
-	if err := p.db.
+
+	query := p.db.
 		NewSelect().
 		Model(&puzzle).
+		Column("puzzle.id", "puzzle.difficulty", "puzzle.max_attempts", "puzzle.created_at", "puzzle.updated_at", "puzzle.user_id").
+		ColumnExpr("(?) AS num_of_likes", p.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle.id AND active = TRUE")).
 		Relation("Groups").
 		Relation("Groups.Blocks").
 		Relation("CreatedBy").
-		Where("puzzle.id = ?", id).
-		Scan(ctx); err != nil {
+		Where("puzzle.id = ?", id)
+
+	if session != nil && session.IsAuthenticated() {
+		query = query.
+			ColumnExpr("(?) AS liked_at", p.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = puzzle.id AND active = TRUE AND user_id = ?", session.UserID.String))
+	}
+
+	if err := query.Scan(ctx); err != nil {
 		return nil, err
 	}
 

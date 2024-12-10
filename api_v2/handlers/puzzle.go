@@ -157,6 +157,8 @@ func (p *puzzle) puzzle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	p.session.Get(w, r, false)
+
 	puzzle, err := p.service.Find(r.Context(), puzzleID)
 	if err != nil {
 		render.Respond(w, r, err)
