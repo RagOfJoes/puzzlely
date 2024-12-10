@@ -49,13 +49,22 @@ func (g *Game) Complete(atttemps [][]string, correct []string) {
 	}
 }
 
-// TODO: Run extra validations by checking `Attempts` and `Correct` elements line up with the `Puzzle`
 func (g Game) Validate() error {
+	blocks := make([]interface{}, 0)
+	groups := make([]interface{}, 0)
+	for _, group := range g.Puzzle.Groups {
+		groups = append(groups, group.ID)
+
+		for _, block := range group.Blocks {
+			blocks = append(blocks, block.ID)
+		}
+	}
+
 	return validation.ValidateStruct(&g,
 		validation.Field(&g.ID, validation.Required, validation.By(internal.IsULID)),
 		validation.Field(&g.Score, validation.Min(int8(len(g.Correct))), validation.Max(int8(len(g.Correct)))),
-		validation.Field(&g.Attempts, validation.Each(validation.Required, validation.Length(4, 4))),
-		validation.Field(&g.Correct, validation.Length(0, 4)),
+		validation.Field(&g.Attempts, validation.Each(validation.Required, validation.Length(4, 4), validation.Each(validation.In(blocks...)))),
+		validation.Field(&g.Correct, validation.Length(0, 4), validation.Each(validation.In(groups...))),
 
 		validation.Field(&g.CreatedAt, validation.Required),
 
