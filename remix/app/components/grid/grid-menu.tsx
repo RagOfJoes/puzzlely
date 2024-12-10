@@ -68,16 +68,16 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 										animate: {
 											opacity: 1,
 											transition: {
-												duration: 0.2,
+												duration: 0.12,
 											},
 											scale: 1,
 										},
 										exit: {
 											opacity: 0,
 											transition: {
-												duration: 0.2,
+												duration: 0.12,
 											},
-											scale: 0.8,
+											scale: 0.6,
 										},
 										initial: {
 											opacity: 0,
@@ -229,7 +229,7 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 									</div>
 								</motion.div>
 
-								<div className="absolute top-0 h-full w-full bg-background/50" />
+								<div className="absolute top-0 h-full w-full" />
 							</>
 						)}
 					</AnimatePresence>

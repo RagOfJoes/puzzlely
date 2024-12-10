@@ -3,6 +3,7 @@ import { useFetcher, useNavigation } from "@remix-run/react";
 import { Grid, GridBlock, GridBlocks, GridGroup, GridMenu } from "@/components/grid";
 import { useGameContext } from "@/hooks/use-game";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
+import { cn } from "@/lib/cn";
 import type { action } from "@/routes/puzzles.like.$id";
 
 export function IndexGrid() {
@@ -21,29 +22,43 @@ export function IndexGrid() {
 	return (
 		<Grid>
 			{(isLoading || state.blocks.length === 0) && (
-				<GridBlocks>
+				<GridBlocks
+					className={cn(
+						"",
+
+						"[&>button:first-of-type]:data-[has-correct=false]:col-start-1 [&>button:first-of-type]:data-[has-correct=false]:col-end-1 [&>button:first-of-type]:data-[has-correct=false]:row-start-1 [&>button:first-of-type]:data-[has-correct=false]:row-end-1",
+					)}
+					data-has-correct={false}
+				>
 					{Array.from({ length: 16 }).map((_, i) => (
-						<GridBlock
-							className="animate-pulse"
-							disabled
-							hasCorrect={false}
-							isError={false}
-							isSelected={false}
-							key={`GridBlock-skeleton-${i + 1}`}
-						/>
+						<GridBlock disabled key={`GridBlock-skeleton-${i + 1}`} />
 					))}
 				</GridBlocks>
 			)}
 
 			{!isLoading && state.blocks.length > 0 && (
-				<GridBlocks>
+				<GridBlocks
+					className={cn(
+						"",
+
+						"[&>button:first-of-type]:data-[has-correct=false]:col-start-1 [&>button:first-of-type]:data-[has-correct=false]:col-end-1 [&>button:first-of-type]:data-[has-correct=false]:row-start-1 [&>button:first-of-type]:data-[has-correct=false]:row-end-1",
+					)}
+					data-has-correct={state.game.correct.length > 0}
+				>
 					{state.game.correct.map((group_id) => {
 						const group = state.puzzle.groups.find((g) => g.id === group_id);
 						if (!group) {
 							return null;
 						}
 
-						return <GridGroup key={group.id}>{group.description}</GridGroup>;
+						return (
+							<GridGroup
+								aria-disabled={state.isGameOver || state.isWinnerWinnerChickenDinner}
+								key={group.id}
+							>
+								{group.description}
+							</GridGroup>
+						);
 					})}
 
 					{state.blocks.map((block) => {
@@ -56,10 +71,9 @@ export function IndexGrid() {
 
 						return (
 							<GridBlock
+								data-error={isSelected && state.isWrong}
+								data-selected={isSelected && !state.isWrong}
 								disabled={state.isGameOver || state.isWinnerWinnerChickenDinner}
-								hasCorrect={state.game.correct.length > 0}
-								isError={isSelected && state.isWrong}
-								isSelected={isSelected && !state.isWrong}
 								key={`${block.puzzle_group_id}-${block.value}`}
 								onClick={() => actions.onBlockSelect(block)}
 							>

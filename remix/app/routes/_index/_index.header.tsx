@@ -23,14 +23,8 @@ export function IndexHeader() {
 
 	return (
 		<div
-			className={cn(
-				"grid w-full grid-cols-4 gap-1",
-
-				"data-[is-game-over='true']:opacity-50",
-				"data-[is-loading='true']:animate-pulse",
-			)}
+			className="group grid w-full grid-cols-4 gap-1"
 			data-is-game-over={state.isGameOver || state.isWinnerWinnerChickenDinner}
-			data-is-loading={isLoading}
 		>
 			<div
 				className={cn(
@@ -40,7 +34,13 @@ export function IndexHeader() {
 					"md:col-start-1",
 				)}
 			>
-				<div className="flex h-full w-full items-center justify-between rounded-xl border bg-card px-4 py-2">
+				<div
+					className={cn(
+						"flex h-full w-full items-center justify-between rounded-xl border bg-card px-4 py-2",
+
+						"group-data-[is-game-over=true]:opacity-50",
+					)}
+				>
 					<div className="flex h-full flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Attempts Left</h3>
 
@@ -83,10 +83,8 @@ export function IndexHeader() {
 					className={cn(
 						"h-full w-full gap-2 rounded-xl border bg-card",
 
-						"disabled:opacity-100",
 						"max-md:h-11 max-md:basis-1/2",
 					)}
-					data-is-loading={isLoading}
 					disabled={isLoading || state.isGameOver || state.isWinnerWinnerChickenDinner}
 					onClick={actions.onGiveUp}
 					variant="ghost"
@@ -105,10 +103,8 @@ export function IndexHeader() {
 					className={cn(
 						"h-full w-full gap-2 rounded-xl border bg-card",
 
-						"disabled:opacity-100",
 						"max-md:h-11 max-md:basis-1/2",
 					)}
-					data-is-loading={isLoading}
 					disabled={isLoading || state.isGameOver || state.isWinnerWinnerChickenDinner}
 					onClick={actions.onShuffle}
 					variant="ghost"
@@ -131,7 +127,13 @@ export function IndexHeader() {
 					"md:col-start-4",
 				)}
 			>
-				<div className="flex h-full w-full items-center justify-between rounded-xl border bg-card px-4 py-2">
+				<div
+					className={cn(
+						"flex h-full w-full items-center justify-between rounded-xl border bg-card px-4 py-2",
+
+						"group-data-[is-game-over=true]:opacity-50",
+					)}
+				>
 					<div className="flex flex-col items-start justify-end">
 						<h3 className="text-sm font-medium tracking-tight">Likes</h3>
 

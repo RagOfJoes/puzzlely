@@ -28,14 +28,7 @@ export function IndexFooter() {
 
 	return (
 		<>
-			<div
-				className={cn(
-					"grid w-full grid-cols-4 gap-1 transition-opacity",
-
-					"data-[is-loading='true']:animate-pulse",
-				)}
-				data-is-loading={isLoading}
-			>
+			<div className="grid w-full grid-cols-4 gap-1 transition-opacity">
 				<div className="col-span-4 grid h-full grid-cols-4 gap-1">
 					<Link
 						aria-disabled={isLoading || isSaving || !searchParams.get("cursor")}
@@ -52,12 +45,7 @@ export function IndexFooter() {
 					>
 						<Button
 							aria-label="Go to latest puzzles"
-							className={cn(
-								"w-full",
-
-								"data-[is-loading='true']:disabled:opacity-100",
-							)}
-							data-is-loading={isLoading}
+							className="w-full"
 							disabled={isLoading || isSaving || !searchParams.has("cursor")}
 							size="lg"
 							variant="ghost"
@@ -87,12 +75,7 @@ export function IndexFooter() {
 						>
 							<Button
 								aria-label="Go to previous game"
-								className={cn(
-									"w-full rounded-xl border bg-card",
-
-									"data-[is-loading='true']:disabled:opacity-100",
-								)}
-								data-is-loading={isLoading}
+								className="w-full rounded-xl border bg-card"
 								disabled={isLoading || isSaving || !loaderData.pageInfo.has_previous_page}
 								size="lg"
 								variant="ghost"
@@ -119,12 +102,7 @@ export function IndexFooter() {
 						>
 							<Button
 								aria-label="Go to next game"
-								className={cn(
-									"w-full rounded-xl border bg-card",
-
-									"data-[is-loading='true']:disabled:opacity-100",
-								)}
-								data-is-loading={isLoading}
+								className="w-full rounded-xl border bg-card"
 								disabled={isLoading || isSaving || !loaderData.pageInfo.has_next_page}
 								size="lg"
 								variant="ghost"
