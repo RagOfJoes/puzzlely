@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
@@ -88,6 +88,19 @@ export default function User() {
 		}
 	});
 
+	useEffect(() => {
+		const match = matches[matches.length - 1];
+		if (
+			!match ||
+			!match.id.startsWith("routes/users.$id.") ||
+			match.id.replace("routes/users.$id.", "") === tab
+		) {
+			return;
+		}
+
+		setTab(match.id.replace("routes/users.$id.", "") as unknown as ValidTabs);
+	}, [matches, tab]);
+
 	return (
 		<>
 			<Header me={loaderData.me ? hydrateUser(loaderData.me) : undefined} />
@@ -132,11 +145,14 @@ export default function User() {
 								return;
 							}
 
-							setTab(newTab);
-
-							navigate(`/users/${loaderData.user.id}/${newTab}/`, {
-								preventScrollReset: true,
-							});
+							navigate(
+								{
+									pathname: `/users/${loaderData.user.id}/${newTab}/`,
+								},
+								{
+									preventScrollReset: true,
+								},
+							);
 						}}
 						value={tab}
 					>
