@@ -1,29 +1,27 @@
-import { useEffect } from "react";
+import { useMemo } from "react";
 
 import type { LoaderFunctionArgs, MetaFunction, TypedResponse } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { toast as notify } from "sonner";
+import { useLoaderData } from "@remix-run/react";
 
-import { Header } from "@/components/header";
-import { GameProvider, useGame } from "@/hooks/use-game";
-import { cn } from "@/lib/cn";
+import {
+	GameLayout,
+	GameLayoutFooter,
+	GameLayoutGrid,
+	GameLayoutHeader,
+	GameLayoutNavigation,
+} from "@/layouts/game";
 import { hydrateGamePayload } from "@/lib/hydrate-game-payload";
 import { hydratePuzzle } from "@/lib/hydrate-puzzle";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { transformGameToPayload } from "@/lib/transform-game-to-payload";
-import type { action } from "@/routes/games.save.$id";
 import { API } from "@/services/api.server";
 import { redirectWithInfo } from "@/services/toast.server";
-import type { GamePayload } from "@/types/game-payload";
+import { type GamePayload } from "@/types/game-payload";
 import type { PageInfo } from "@/types/page-info";
 import type { Puzzle } from "@/types/puzzle";
 import type { User } from "@/types/user";
-
-import { IndexFooter } from "./_index.footer";
-import { IndexGrid } from "./_index.grid";
-import { IndexHeader } from "./_index.header";
 
 type LoaderResponse = {
 	game?: GamePayload;
@@ -121,76 +119,25 @@ export function shouldRevalidate({
 	return false;
 }
 
-// TODO: Figure out a good way to implement local storage
 export default function Index() {
 	const loaderData = useLoaderData<LoaderResponse>();
 
-	const fetcher = useFetcher<typeof action>({
-		key: "games.save",
-	});
-
-	const ctx = useGame({
-		game: loaderData.game ? hydrateGamePayload(loaderData.game) : undefined,
-		puzzle: hydratePuzzle(loaderData.puzzle),
-	});
-	const [state] = ctx;
-
-	useEffect(() => {
-		if (
-			loaderData.game?.attempts.length === state.game.attempts.length ||
-			!loaderData.me ||
-			loaderData.puzzle.id !== state.puzzle.id ||
-			state.game.attempts.length === 0
-		) {
-			return;
-		}
-
-		switch (fetcher.state) {
-			case "loading":
-				notify.dismiss("games.save");
-				break;
-			case "submitting":
-				break;
-			default:
-				if (
-					fetcher.data?.success &&
-					fetcher.data.data.attempts.length === state.game.attempts.length
-				) {
-					return;
-				}
-
-				fetcher.submit(JSON.stringify(state.game), {
-					action: `/games/save/${state.puzzle.id}`,
-					encType: "application/json",
-					method: "PUT",
-				});
-
-				notify.loading("Saving...", {
-					id: "games.save",
-				});
-				break;
-		}
-	}, [fetcher, loaderData.game, loaderData.me, loaderData.puzzle.id, state.game, state.puzzle.id]);
+	const { game, me, pageInfo, puzzle } = useMemo(
+		() => ({
+			game: loaderData.game ? hydrateGamePayload(loaderData.game) : undefined,
+			me: loaderData.me ? hydrateUser(loaderData.me) : undefined,
+			pageInfo: loaderData.pageInfo satisfies PageInfo,
+			puzzle: hydratePuzzle(loaderData.puzzle),
+		}),
+		[loaderData],
+	);
 
 	return (
-		<>
-			<Header me={loaderData.me ? hydrateUser(loaderData.me) : undefined} />
-
-			<main
-				className={cn(
-					"mx-auto h-[calc(100dvh-var(--header-height))] max-w-screen-md px-5 pb-2",
-
-					"max-lg:min-h-[700px]",
-				)}
-			>
-				<div className="flex h-full w-full max-w-3xl flex-col gap-1">
-					<GameProvider value={ctx}>
-						<IndexHeader />
-						<IndexGrid />
-						<IndexFooter />
-					</GameProvider>
-				</div>
-			</main>
-		</>
+		<GameLayout game={game} me={me} puzzle={puzzle}>
+			<GameLayoutHeader />
+			<GameLayoutGrid />
+			<GameLayoutNavigation pageInfo={pageInfo} puzzle={puzzle} />
+			<GameLayoutFooter />
+		</GameLayout>
 	);
 }
