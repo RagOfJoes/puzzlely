@@ -6,11 +6,10 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "
 import { toast as notify } from "sonner";
 
 import { Footer } from "@/components/footer";
+import { ScrollArea } from "@/components/scroll-area";
 import { Toaster } from "@/components/toaster";
 import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
-
-import { ScrollArea } from "./components/scroll-area";
 
 export const links: LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },

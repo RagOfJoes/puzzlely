@@ -5,10 +5,9 @@ import type { FieldErrors } from "react-hook-form";
 import { getValidatedFormData } from "remix-hook-form";
 
 import { requireUser } from "@/lib/require-user";
-import { UserUpdatePayloadSchema } from "@/schemas/user-update-payload";
 import { API } from "@/services/api.server";
 import { jsonWithError, jsonWithSuccess, redirectWithSuccess } from "@/services/toast.server";
-import type { UserUpdatePayload } from "@/types/user-update-payload";
+import { UserUpdatePayloadSchema, type UserUpdatePayload } from "@/types/user-update-payload";
 
 export async function action({ request }: ActionFunctionArgs) {
 	const user = await requireUser(request);

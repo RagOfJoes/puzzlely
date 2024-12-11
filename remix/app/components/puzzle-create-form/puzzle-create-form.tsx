@@ -8,8 +8,7 @@ import type { FieldErrors } from "react-hook-form";
 import { RemixFormProvider, useRemixForm } from "remix-hook-form";
 
 import { cn } from "@/lib/cn";
-import { PuzzleCreatePayloadSchema } from "@/schemas/puzzle-create-payload";
-import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
+import { PuzzleCreatePayloadSchema, type PuzzleCreatePayload } from "@/types/puzzle-create-payload";
 
 import { PuzzleCreateFormGroups } from "./puzzle-create-form-groups";
 import { PuzzleCreateFormMeta } from "./puzzle-create-form-meta";

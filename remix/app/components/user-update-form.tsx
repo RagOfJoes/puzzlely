@@ -10,8 +10,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form";
 import { Input } from "@/components//input";
 import { FormControl, FormControlError, FormControlLabel } from "@/components/form-control";
 import { cn } from "@/lib/cn";
-import { UserUpdatePayloadSchema } from "@/schemas/user-update-payload";
-import type { UserUpdatePayload } from "@/types/user-update-payload";
+import { UserUpdatePayloadSchema, type UserUpdatePayload } from "@/types/user-update-payload";
 
 export type UserUpdateFormProps = Omit<
 	ComponentPropsWithoutRef<typeof Form>,

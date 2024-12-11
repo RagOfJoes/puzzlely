@@ -1,10 +1,10 @@
 import { redirect, type ActionFunctionArgs } from "@remix-run/node";
 
 import { requireUser } from "@/lib/require-user";
-import { GamePayloadSchema } from "@/schemas/game-payload-schema";
 import { API } from "@/services/api.server";
 import { jsonWithError, jsonWithSuccess } from "@/services/toast.server";
 import type { Game } from "@/types/game";
+import { GamePayloadSchema } from "@/types/game-payload";
 import type { Response } from "@/types/response";
 
 export async function action({ params, request }: ActionFunctionArgs) {

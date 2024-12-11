@@ -12,10 +12,9 @@ import { PuzzleCreateForm } from "@/components/puzzle-create-form";
 import { cn } from "@/lib/cn";
 import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
-import { PuzzleCreatePayloadSchema } from "@/schemas/puzzle-create-payload";
 import { API } from "@/services/api.server";
 import { jsonWithError, redirectWithInfo, redirectWithSuccess } from "@/services/toast.server";
-import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
+import { PuzzleCreatePayloadSchema, type PuzzleCreatePayload } from "@/types/puzzle-create-payload";
 
 export async function action({ request }: ActionFunctionArgs) {
 	const me = await requireUser(request);
