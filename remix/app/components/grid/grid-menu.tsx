@@ -163,7 +163,8 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 									</div>
 
 									<ScrollArea
-										className="flex h-full w-full shrink flex-col items-center bg-popover p-4"
+										// NOTE: table-fixed prevents Accordion from overflowing horizontally
+										className="flex flex-col items-center bg-popover p-4 [&>div>div]:w-full [&>div>div]:table-fixed"
 										scrollHideDelay={600}
 										type="scroll"
 									>
