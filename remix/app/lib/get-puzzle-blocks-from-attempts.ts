@@ -1,10 +1,12 @@
 import type { GamePayload } from "@/types/game-payload";
-import type { PuzzleBlock } from "@/types/puzzle";
+import type { Puzzle, PuzzleBlock } from "@/types/puzzle";
 
-export function getPuzzleBlocksFromAttempts(
-	blocks: PuzzleBlock[],
-	game: GamePayload,
-): PuzzleBlock[][] {
+/**
+ * Uses `game.attempts` id to retrieve `PuzzleBlock` from `puzzle`
+ */
+export function getPuzzleBlocksFromAttempts(game: GamePayload, puzzle: Puzzle): PuzzleBlock[][] {
+	const blocks = puzzle.groups.flatMap((group) => group.blocks);
+
 	const joined: PuzzleBlock[][] = [];
 
 	for (let i = 0; i < game.attempts.length; i += 1) {

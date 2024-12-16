@@ -2,7 +2,7 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { useFetcher, useNavigation } from "@remix-run/react";
+import { useFetcher, useLocation, useNavigation } from "@remix-run/react";
 import { FlagIcon, HeartIcon, ShuffleIcon, StarIcon } from "lucide-react";
 
 import { Button } from "@/components/button";
@@ -22,14 +22,18 @@ export const GameLayoutHeader = forwardRef<ElementRef<typeof Primitive.div>, Gam
 	({ className, ...props }, ref) => {
 		const [state, actions] = useGameContext();
 
+		const location = useLocation();
+		const navigation = useNavigation();
+
 		const fetcher = useFetcher<typeof action>({
 			key: `puzzles.like.${state.puzzle.id}`,
 		});
-		const navigation = useNavigation();
 
 		const optimisticLike = usePuzzleOptimisticLike(fetcher, state.puzzle);
 
-		const isLoading = navigation.location?.pathname === "/" && navigation.state === "loading";
+		const isLoading =
+			state.isLoading ||
+			(navigation.state === "loading" && navigation.location?.pathname === location.pathname);
 
 		return (
 			<Primitive.div

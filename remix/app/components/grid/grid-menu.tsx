@@ -26,14 +26,13 @@ import type { PuzzleLike } from "@/types/puzzle-like";
 import type { Response } from "@/types/response";
 
 export type GridMenuProps = Portal.PortalProps & {
-	blocks: UseGame[0]["blocks"];
 	game: UseGame[0]["game"];
 	puzzle: UseGame[0]["puzzle"];
 	isSuccess: boolean;
 };
 
 export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
-	({ blocks, game, isSuccess, puzzle, ...props }, ref) => {
+	({ game, isSuccess, puzzle, ...props }, ref) => {
 		const fetcher = useFetcher<Response<PuzzleLike>>({
 			key: `puzzles.like.${puzzle.id}`,
 		});
@@ -41,13 +40,13 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 		const [isHidden, toggleIsHidden] = useState(false);
 
 		const attempts = useMemo<{ blocks: PuzzleBlock[]; isCorrect: boolean }[]>(() => {
-			const joined = getPuzzleBlocksFromAttempts(blocks, game);
+			const joined = getPuzzleBlocksFromAttempts(game, puzzle);
 
 			return joined.map((attempt) => ({
 				blocks: attempt,
 				isCorrect: arePuzzleBlocksSameGroup(attempt),
 			}));
-		}, [blocks, game]);
+		}, [game, puzzle]);
 
 		return (
 			<Portal.Root {...omit(props, ["children", "className"])} ref={ref}>

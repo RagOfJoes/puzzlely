@@ -7,6 +7,7 @@ import { arePuzzleBlocksSameGroup } from "@/lib/are-puzzle-blocks-same-group";
 import { createContext } from "@/lib/create-context";
 import { getPuzzleBlocksFromAttempts } from "@/lib/get-puzzle-blocks-from-attempts";
 import { groupBy } from "@/lib/group-by";
+import { isDeepEqual } from "@/lib/is-deep-equal";
 import { uniqueBy } from "@/lib/unique-by";
 import type { GamePayload } from "@/types/game-payload";
 import type { Puzzle, PuzzleBlock } from "@/types/puzzle";
@@ -24,6 +25,8 @@ export type UseGame = [
 		game: GamePayload;
 		// Flag to determine if the game is over. Will be triggered if the user has reached the maximum number of attempts
 		isGameOver: boolean;
+		// Flag to determine if the game is still loading
+		isLoading: boolean;
 		// Flag to determine if the user has won the game
 		isWinnerWinnerChickenDinner: boolean;
 		// Flag to determine if the elements inside the `selected` state are wrong
@@ -72,10 +75,10 @@ export function useGame(props: UseGameProps): UseGame {
 	const [puzzle, setPuzzle] = useState<UseGame[0]["puzzle"]>(props.puzzle);
 	const [selected, setSelected] = useState<UseGame[0]["selected"]>([]);
 	const [wrongAttempts, setWrongAttempts] = useState<number>(() =>
-		getPuzzleBlocksFromAttempts(
-			props.puzzle.groups.flatMap((group) => group.blocks),
-			game,
-		).reduce<number>((prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1), 0),
+		getPuzzleBlocksFromAttempts(game, props.puzzle).reduce<number>(
+			(prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1),
+			0,
+		),
 	);
 
 	/**
@@ -86,6 +89,7 @@ export function useGame(props: UseGameProps): UseGame {
 	const isShuffle = useKey("]");
 
 	const [isGameOver, toggleIsGameOver] = useState<UseGame[0]["isGameOver"]>(false);
+	const [isLoading, toggleIsLoading] = useState<UseGame[0]["isLoading"]>(true);
 	const [isWinnerWinnerChickenDinner, toggleIsWinnerWinnerChickenDinner] =
 		useState<UseGame[0]["isWinnerWinnerChickenDinner"]>(false);
 	const [isWrong, toggleIsWrong] = useState<UseGame[0]["isWrong"]>(false);
@@ -244,27 +248,26 @@ export function useGame(props: UseGameProps): UseGame {
 	 */
 
 	// - When `blocks` hasn't been initialized
-	// - When `props` change, reset state
+	// - When `props.puzzle` changes, reset state
 	useEffect(() => {
 		if (blocks.length > 0 && puzzle.id === props.puzzle.id) {
 			return;
 		}
 
-		const newBlocks = props.puzzle.groups.flatMap((group) => group.blocks);
 		const newGame = props.game ?? {
 			attempts: [],
 			correct: [],
 			score: 0,
 		};
 
-		const newWrongAttempts = getPuzzleBlocksFromAttempts(newBlocks, newGame).reduce<number>(
+		const newWrongAttempts = getPuzzleBlocksFromAttempts(newGame, props.puzzle).reduce<number>(
 			(prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1),
 			0,
 		);
 
 		setGame(newGame);
 		setPuzzle(props.puzzle);
-		setBlocks(newBlocks);
+		setBlocks(props.puzzle.groups.flatMap((group) => group.blocks));
 		setWrongAttempts(newWrongAttempts);
 		setSelected([]);
 
@@ -273,6 +276,7 @@ export function useGame(props: UseGameProps): UseGame {
 				newWrongAttempts >= props.puzzle.max_attempts ||
 				(!!newGame.completed_at && newGame.correct.length !== props.puzzle.groups.length),
 		);
+		toggleIsLoading(true);
 		toggleIsWinnerWinnerChickenDinner(
 			() => !!newGame.completed_at && newGame.correct.length === props.puzzle.groups.length,
 		);
@@ -299,6 +303,22 @@ export function useGame(props: UseGameProps): UseGame {
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [props.puzzle]);
+
+	// When client has hydrated and the localStorage data is different from the server. Update `game`
+	// state to match localStorage data
+	useEffect(() => {
+		if (!isLoading) {
+			return;
+		}
+
+		if (!props.game || isDeepEqual(props.game, game)) {
+			toggleIsLoading(false);
+			return;
+		}
+
+		setGame(props.game);
+		toggleIsLoading(false);
+	}, [game, isLoading, props.game]);
 
 	// When `isWrong` is true, reset it to false and clear `selected` after 300ms to play the animation
 	useEffect(() => {
@@ -349,6 +369,7 @@ export function useGame(props: UseGameProps): UseGame {
 			blocks,
 			game,
 			isGameOver,
+			isLoading,
 			isWinnerWinnerChickenDinner,
 			isWrong,
 			puzzle,

@@ -102,7 +102,6 @@ export const GameLayoutGrid = forwardRef<ElementRef<typeof Primitive.div>, GameL
 
 				{!isLoading && (state.isGameOver || state.isWinnerWinnerChickenDinner) && (
 					<GridMenu
-						blocks={state.blocks}
 						game={state.game}
 						puzzle={{
 							...state.puzzle,

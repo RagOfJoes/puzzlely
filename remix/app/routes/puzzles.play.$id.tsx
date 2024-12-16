@@ -98,7 +98,6 @@ export function shouldRevalidate({
 	return false;
 }
 
-// TODO: Figure out a good way to implement local storage
 export default function PuzzlePlay() {
 	const loaderData = useLoaderData<LoaderResponse>();
 

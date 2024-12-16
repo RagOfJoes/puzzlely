@@ -6,6 +6,7 @@ import { Link, useFetcher, useLocation, useNavigation, useSearchParams } from "@
 import { ChevronLeftIcon, ChevronRightIcon, RotateCcwIcon } from "lucide-react";
 
 import { Button } from "@/components/button";
+import { useGameContext } from "@/hooks/use-game";
 import { cn } from "@/lib/cn";
 import { setSearchParams } from "@/lib/set-search-params";
 import type { PageInfo } from "@/types/page-info";
@@ -27,12 +28,15 @@ export const GameLayoutNavigation = forwardRef<
 	const navigation = useNavigation();
 	const [searchParams] = useSearchParams();
 
+	const [state] = useGameContext();
+
 	const fetcher = useFetcher({
 		key: `games.upsert.${puzzle.id}`,
 	});
 
 	const isLoading =
-		navigation.location?.pathname === location.pathname && navigation.state === "loading";
+		state.isLoading ||
+		(navigation.state === "loading" && navigation.location?.pathname === location.pathname);
 	const isSaving = fetcher.state === "submitting";
 
 	return (

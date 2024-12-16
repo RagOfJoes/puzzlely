@@ -25,7 +25,8 @@ export const GameLayoutFooter = forwardRef<ElementRef<typeof Primitive.div>, Gam
 		const [state] = useGameContext();
 
 		const isLoading =
-			navigation.location?.pathname === location.pathname && navigation.state === "loading";
+			state.isLoading ||
+			(navigation.state === "loading" && navigation.location?.pathname === location.pathname);
 
 		return (
 			<Primitive.div
