@@ -78,7 +78,7 @@ export async function action({ request }: Route.ActionArgs) {
 	// NOTE: Redirect to `/profile/created` to ensure the toast appears
 	if (user.state === "PENDING" && !user.updated_at) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
-		throw redirectWithSuccess("/profile/created", {
+		throw await redirectWithSuccess("/profile/created", {
 			message: "Successfully completed profile!",
 		});
 	}

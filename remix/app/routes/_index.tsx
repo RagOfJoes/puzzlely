@@ -26,7 +26,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	// If the user hasn't completed their profile
 	if (me.success && me.data.user && me.data.user.state === "PENDING" && !me.data.user.updated_at) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
-		throw redirectWithInfo("/profile/complete", {
+		throw await redirectWithInfo("/profile/complete", {
 			message: "Please complete your profile setup!",
 		});
 	}
