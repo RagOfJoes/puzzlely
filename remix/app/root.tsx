@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 
-import type { LinksFunction, LoaderFunctionArgs } from "react-router";
-import { data, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "react-router";
+import { data, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { toast as notify } from "sonner";
 
 import { Footer } from "@/components/footer";
@@ -10,7 +9,9 @@ import { Toaster } from "@/components/toaster";
 import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
 
-export const links: LinksFunction = () => [
+import type { Route } from "./+types/root";
+
+export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
 	{ rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
 	{
@@ -20,7 +21,7 @@ export const links: LinksFunction = () => [
 	{ rel: "stylesheet", href: style },
 ];
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const { headers, toast } = await getToast(request);
 
 	return data(
@@ -33,10 +34,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
 	);
 }
 
-export default function App() {
-	const { toast } = useLoaderData<typeof loader>();
-
+export default function Component({ loaderData }: Route.ComponentProps) {
 	useEffect(() => {
+		const toast = loaderData.toast;
 		if (!toast) {
 			return;
 		}
@@ -75,7 +75,7 @@ export default function App() {
 		return () => {
 			cancelAnimationFrame(raf);
 		};
-	}, [toast]);
+	}, [loaderData.toast]);
 
 	return (
 		<html className="h-full" lang="en">
