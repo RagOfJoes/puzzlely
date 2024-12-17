@@ -163,11 +163,11 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 
 									<ScrollArea
 										// NOTE: table-fixed prevents Accordion from overflowing horizontally
-										className="flex flex-col items-center bg-popover p-4 [&>div>div]:w-full [&>div>div]:table-fixed"
+										className="flex flex-col items-center bg-popover [&>div>div]:w-full [&>div>div]:table-fixed"
 										scrollHideDelay={600}
 										type="scroll"
 									>
-										<Accordion className="min-w-0" defaultValue={["attempts"]} type="multiple">
+										<Accordion className="min-w-0 p-4" defaultValue={["attempts"]} type="multiple">
 											<AccordionItem className="w-full border-b-0" value="attempts">
 												<AccordionTrigger
 													className={cn(
