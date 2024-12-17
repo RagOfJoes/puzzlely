@@ -34,7 +34,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 	({ className, me, ...props }, ref) => (
 		<Primitive.nav
 			className={cn(
-				"z-[1] mx-auto flex h-[var(--header-height)] w-full max-w-screen-md items-center justify-between px-5",
+				"sticky top-0 z-[1] mx-auto flex h-[var(--header-height)] w-full max-w-screen-md items-center justify-between bg-background px-5",
 
 				className,
 			)}
