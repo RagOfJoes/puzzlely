@@ -93,6 +93,38 @@ export const DialogHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElem
 );
 DialogHeader.displayName = "DialogHeader";
 
+export const DialogTitle = forwardRef<
+	ElementRef<typeof DialogPrimitive.Title>,
+	ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+	<DialogPrimitive.Title
+		className={cn(
+			"text-lg font-semibold leading-none",
+
+			className,
+		)}
+		ref={ref}
+		{...props}
+	/>
+));
+DialogTitle.displayName = DialogPrimitive.Title.displayName;
+
+export const DialogDescription = forwardRef<
+	ElementRef<typeof DialogPrimitive.Description>,
+	ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+	<DialogPrimitive.Description
+		className={cn(
+			"text-sm text-muted-foreground",
+
+			className,
+		)}
+		ref={ref}
+		{...props}
+	/>
+));
+DialogDescription.displayName = DialogPrimitive.Description.displayName;
+
 export const DialogFooter = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
@@ -106,35 +138,3 @@ export const DialogFooter = ({ className, ...props }: HTMLAttributes<HTMLDivElem
 	/>
 );
 DialogFooter.displayName = "DialogFooter";
-
-export const DialogTitle = forwardRef<
-	ElementRef<typeof DialogPrimitive.Title>,
-	ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
->(({ className, ...props }, ref) => (
-	<DialogPrimitive.Title
-		ref={ref}
-		className={cn(
-			"text-lg font-semibold leading-none",
-
-			className,
-		)}
-		{...props}
-	/>
-));
-DialogTitle.displayName = DialogPrimitive.Title.displayName;
-
-export const DialogDescription = forwardRef<
-	ElementRef<typeof DialogPrimitive.Description>,
-	ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
->(({ className, ...props }, ref) => (
-	<DialogPrimitive.Description
-		ref={ref}
-		className={cn(
-			"text-sm text-muted-foreground",
-
-			className,
-		)}
-		{...props}
-	/>
-));
-DialogDescription.displayName = DialogPrimitive.Description.displayName;
