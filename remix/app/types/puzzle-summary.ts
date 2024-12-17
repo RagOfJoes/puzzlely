@@ -1,3 +1,3 @@
-import type { Puzzle } from "./puzzle";
+import type { Puzzle } from "@/types/puzzle";
 
 export type PuzzleSummary = Omit<Puzzle, "groups">;

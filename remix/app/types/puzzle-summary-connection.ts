@@ -1,5 +1,5 @@
-import type { PageInfo } from "./page-info";
-import type { PuzzleSummaryNode } from "./puzzle-summary-node";
+import type { PageInfo } from "@/types/page-info";
+import type { PuzzleSummaryNode } from "@/types/puzzle-summary-node";
 
 export type PuzzleSummaryConnection = {
 	edges: PuzzleSummaryNode[];

@@ -1,4 +1,4 @@
-import { createCookie } from "@remix-run/node";
+import { createCookie } from "react-router";
 
 // TODO: Set secrets for signing
 export const state = createCookie("_state", {

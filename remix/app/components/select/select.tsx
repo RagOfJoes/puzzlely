@@ -4,11 +4,10 @@ import { Children, cloneElement, forwardRef, useId, useMemo } from "react";
 import { Primitive } from "@radix-ui/react-primitive";
 import * as RadixSelect from "@radix-ui/react-select";
 
+import { useFormControlProps } from "@/components/form-control";
 import { useControllableState } from "@/hooks/use-controllable-state";
 import { omit } from "@/lib/omit";
 import { pick } from "@/lib/pick";
-
-import { useFormControlProps } from "../form-control";
 
 export type SelectProps = RadixSelect.SelectProps & {
 	className?: string;

@@ -1,5 +1,5 @@
-import type { Puzzle } from "./puzzle";
-import type { User } from "./user";
+import type { Puzzle } from "@/types/puzzle";
+import type { User } from "@/types/user";
 
 export type Game = {
 	/**

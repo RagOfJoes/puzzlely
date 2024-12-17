@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
-import { useCallbackRef } from "./use-callback-ref";
+import { useCallbackRef } from "@/hooks/use-callback-ref";
 
 export type UseControllableStateProps<T> = {
 	defaultValue?: T | (() => T);
