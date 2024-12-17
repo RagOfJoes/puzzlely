@@ -13,7 +13,9 @@ const session = createCookieSessionStorage({
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
 		secrets:
-			process.env.NODE_ENV === "production" ? [process.env.SESSION_SECRET ?? ""] : ["SECRETS"],
+			process.env.NODE_ENV === "production"
+				? [process.env.TOAST_COOKIE_SECRETS ?? ""]
+				: ["SECRETS"],
 	},
 });
 

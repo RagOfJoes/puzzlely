@@ -2,13 +2,10 @@ import { createCookieSessionStorage } from "react-router";
 
 import type { Session } from "@/types/session";
 
-export const { commitSession, destroySession, getSession } = createCookieSessionStorage<
-	Session,
-	{ error: string }
->({
+export const { commitSession, destroySession, getSession } = createCookieSessionStorage<Session>({
 	// a Cookie from `createCookie` or the CookieOptions to create one
 	cookie: {
-		name: "_session",
+		name: "_s",
 
 		// Optional
 		//
@@ -18,6 +15,8 @@ export const { commitSession, destroySession, getSession } = createCookieSession
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
 		secrets:
-			process.env.NODE_ENV === "production" ? [process.env.SESSION_SECRET ?? ""] : ["SECRETS"],
+			process.env.NODE_ENV === "production"
+				? [process.env.SESSION_COOKIE_SECRETS ?? ""]
+				: ["SECRETS"],
 	},
 });
