@@ -167,7 +167,11 @@ export const GridMenu = forwardRef<ElementRef<"div">, GridMenuProps>(
 										scrollHideDelay={600}
 										type="scroll"
 									>
-										<Accordion className="min-w-0 p-4" defaultValue={["attempts"]} type="multiple">
+										<Accordion
+											className="min-w-0 px-4 py-2"
+											defaultValue={["attempts"]}
+											type="multiple"
+										>
 											<AccordionItem className="w-full border-b-0" value="attempts">
 												<AccordionTrigger
 													className={cn(
