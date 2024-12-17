@@ -5,9 +5,9 @@ import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { UserUpdateForm } from "@/components/user-update-form";
 import { requireUser } from "@/lib/require-user";
-import type { action } from "@/routes/users.update";
 
 import type { Route } from "./+types/complete";
+import type { action } from "./_index";
 
 export async function loader({ request }: Route.LoaderArgs) {
 	const me = await requireUser(request);
