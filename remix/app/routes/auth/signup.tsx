@@ -1,28 +1,31 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Form, Link, redirect } from "@remix-run/react";
+import { redirect, Form, Link } from "react-router";
 
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { cn } from "@/lib/cn";
 import { API } from "@/services/api.server";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+import type { Route } from "./+types/signup";
+
+export async function loader({ request }: Route.LoaderArgs) {
+	// Check if user is already authenticated
 	const me = await API.me(request);
-	if (me.success && !!me.data.user) {
+	if (me.success) {
 		return redirect("/profile");
 	}
 
-	return json({});
+	return {};
 }
 
-export const meta: MetaFunction<typeof loader> = () => [
-	{
-		title: "Login | Puzzlely",
-	},
-];
+export function meta(_: Route.MetaArgs) {
+	return [
+		{
+			title: "Sign up | Puzzlely",
+		},
+	];
+}
 
-export default function Login() {
+export default function Component(_: Route.ComponentProps) {
 	return (
 		<>
 			<Header />
@@ -31,10 +34,10 @@ export default function Login() {
 				<article className="flex h-full w-full flex-col items-center justify-center">
 					<div className="w-full min-w-0 rounded-xl border bg-card p-6">
 						<div className="flex w-full flex-col items-start gap-1.5">
-							<h1 className="text-2xl font-semibold leading-none">Welcome back to Puzzlely.</h1>
+							<h1 className="text-2xl font-semibold leading-none">Welcome to Puzzlely!</h1>
 
 							<p className="text-sm text-muted-foreground">
-								Log in with one of the options below to continue.
+								Sign up now by selecting one of the options below.
 							</p>
 						</div>
 
@@ -87,16 +90,20 @@ export default function Login() {
 								},
 							].map((p) => (
 								<Form action={p.path} className="w-full" key={p.path} method="post">
-									<Button className="w-full gap-2 text-lg font-bold" size="lg" variant="outline">
+									<Button
+										className="w-full gap-2 text-lg font-semibold"
+										size="lg"
+										variant="outline"
+									>
 										{p.icon}
 
-										<span>Log in with {p.title}</span>
+										<div>Sign up with {p.title}</div>
 									</Button>
 								</Form>
 							))}
 
 							<p className="mt-4 text-sm text-muted-foreground">
-								Dont't have an account?{" "}
+								Already have an account?{" "}
 								<Link
 									className={cn(
 										"text-primary outline-none transition",
@@ -104,9 +111,9 @@ export default function Login() {
 										"focus-visible:ring focus-visible:ring-ring",
 										"hover:underline",
 									)}
-									to="/signup/"
+									to="/login/"
 								>
-									Sign up
+									Log in
 								</Link>
 							</p>
 						</div>

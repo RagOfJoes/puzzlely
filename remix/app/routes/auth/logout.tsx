@@ -1,11 +1,12 @@
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import { redirect } from "react-router";
 
 import { API } from "@/services/api.server";
 import { destroySession, getSession } from "@/services/session.server";
 import { redirectWithSuccess } from "@/services/toast.server";
 
-export async function action({ request }: ActionFunctionArgs) {
+import type { Route } from "./+types/logout";
+
+export async function action({ request }: Route.ActionArgs) {
 	// Make sure the request is a DELETE request
 	if (request.method.toUpperCase() !== "DELETE") {
 		return redirect("/profile");

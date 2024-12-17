@@ -2,9 +2,9 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { Link, useFetcher } from "@remix-run/react";
 import dayjs from "dayjs";
 import { ChartNoAxesCombinedIcon, EditIcon, PlayIcon, StarIcon } from "lucide-react";
+import { Link, useFetcher } from "react-router";
 
 import { Button } from "@/components/button";
 import { abbreviateNumber } from "@/lib/abbreviate-number";

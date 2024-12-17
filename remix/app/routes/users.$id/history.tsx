@@ -1,21 +1,19 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import type { ShouldRevalidateFunctionArgs } from "react-router";
+import { useFetcher } from "react-router";
 
 import { GameSummaryCard } from "@/components/game-summary-card";
 import { TabsContent } from "@/components/tabs";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
-import { hydrateGameSummary } from "@/lib/hydrate-game-summary";
+import type { action } from "@/routes/puzzles/like.$id";
 import { API } from "@/services/api.server";
 
-import type { action } from "./puzzles.like.$id";
+import type { Route } from "./+types/history";
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
-	return json({
+export async function loader({ params, request }: Route.LoaderArgs) {
+	return {
 		history: await API.games.history(request, params.id ?? ""),
-	});
+	};
 }
 
 export function shouldRevalidate({
@@ -30,9 +28,7 @@ export function shouldRevalidate({
 	return false;
 }
 
-export default function UserHistory() {
-	const loaderData = useLoaderData<typeof loader>();
-
+export default function Component({ loaderData }: Route.ComponentProps) {
 	return (
 		<TabsContent
 			aria-label="Played puzzles"
@@ -45,26 +41,22 @@ export default function UserHistory() {
 		>
 			{loaderData.history.success &&
 				loaderData.history.data.edges.map((edge) => {
-					const game = hydrateGameSummary({
-						...edge.node,
-					});
-
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					const fetcher = useFetcher<typeof action>({
-						key: `puzzles.like.${game.puzzle.id}`,
+						key: `puzzles.like.${edge.node.puzzle.id}`,
 					});
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const optimisticLike = usePuzzleOptimisticLike(fetcher, game.puzzle);
+					const optimisticLike = usePuzzleOptimisticLike(fetcher, edge.node.puzzle);
 
 					return (
 						<div className="col-span-1 row-span-1" key={edge.node.id}>
 							<GameSummaryCard
 								game={{
-									...game,
+									...edge.node,
 
 									puzzle: {
-										...game.puzzle,
+										...edge.node.puzzle,
 
 										liked_at: optimisticLike.liked_at,
 										num_of_likes: optimisticLike.num_of_likes,

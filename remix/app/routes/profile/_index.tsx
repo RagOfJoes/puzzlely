@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Outlet, useFetcher, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
 import { EditIcon, HistoryIcon, LoaderCircleIcon, PuzzleIcon, StarIcon } from "lucide-react";
+import type { FieldErrors } from "react-hook-form";
+import { redirect, Outlet, useFetcher, useMatches, Link } from "react-router";
+import { getValidatedFormData } from "remix-hook-form";
 import { toast as notify } from "sonner";
 
 import { Button } from "@/components/button";
@@ -22,17 +23,76 @@ import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
 import { UserUpdateForm } from "@/components/user-update-form";
 import { cn } from "@/lib/cn";
-import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
-import type { action } from "@/routes/users.update";
-import { redirectWithInfo } from "@/services/toast.server";
+import { API } from "@/services/api.server.js";
+import {
+	dataWithError,
+	dataWithSuccess,
+	redirectWithInfo,
+	redirectWithSuccess,
+} from "@/services/toast.server";
+import type { UserUpdatePayload } from "@/types/user-update-payload.js";
+import { UserUpdatePayloadSchema } from "@/types/user-update-payload.js";
+
+import type { Route } from "./+types/_index.tsx";
 
 export type ValidTabs = "created" | "liked" | "history";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
+	const user = await requireUser(request);
+
+	const {
+		data,
+		errors,
+		receivedValues: defaultValues,
+	} = await getValidatedFormData<UserUpdatePayload>(request, zodResolver(UserUpdatePayloadSchema));
+
+	const response: {
+		defaultValues?: Partial<UserUpdatePayload>;
+		errors?: FieldErrors<UserUpdatePayload>;
+	} = {
+		defaultValues,
+		errors,
+	};
+	if (errors) {
+		return response;
+	}
+
+	const updated = await API.users.update(request, data);
+	if (!updated.success) {
+		response.errors = {
+			username: {
+				message: updated.error.message,
+				type: "custom",
+			},
+		};
+
+		return dataWithError(response, {
+			description: updated.error.message,
+			message: "Failed to update profile!",
+		});
+	}
+
+	// If the user hasn't completed their profile yet, then, it's safe to assume the request came from `/profile/complete`
+	//
+	// NOTE: Redirect to `/profile/created` to ensure the toast appears
+	if (user.state === "PENDING" && !user.updated_at) {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirectWithSuccess("/profile/created", {
+			message: "Successfully completed profile!",
+		});
+	}
+
+	return dataWithSuccess(response, {
+		message: "Successfully updated profile!",
+	});
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
 	const me = await requireUser(request);
 	if (me.state === "PENDING") {
-		return redirectWithInfo("/profile/complete", {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw await redirectWithInfo("/profile/complete", {
 			message: "Please complete your profile setup!",
 		});
 	}
@@ -47,44 +107,37 @@ export async function loader({ request }: LoaderFunctionArgs) {
 		case "history":
 			break;
 		default:
-			return redirect("/profile/created/");
+			// eslint-disable-next-line @typescript-eslint/no-throw-literal
+			throw redirect("/profile/created/");
 	}
 
-	return json({ me });
+	return {
+		me,
+	};
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-	if (!data) {
-		return [
-			{
-				title: "Profile | Puzzlely",
-			},
-		];
-	}
-
+export function meta({ data }: Route.MetaArgs) {
 	return [
 		{
 			title: `${data.me.username} | Puzzlely`,
 		},
 	];
-};
+}
 
-export default function Profile() {
-	const loaderData = useLoaderData<typeof loader>();
+export default function Component({ loaderData }: Route.ComponentProps) {
 	const matches = useMatches();
-	const navigate = useNavigate();
 
 	const fetcher = useFetcher<typeof action>({
-		key: "users.update",
+		key: "profile.update",
 	});
 
 	const [isOpen, toggleIsOpen] = useState<boolean>(false);
 	const [tab, setTab] = useState<ValidTabs>(() => {
 		const match = matches[matches.length - 1];
 		switch (match?.id) {
-			case "routes/profile.history":
+			case "routes/profile/history":
 				return "history";
-			case "routes/profile.liked":
+			case "routes/profile/liked":
 				return "liked";
 			default:
 				return "created";
@@ -116,21 +169,26 @@ export default function Profile() {
 	}, [fetcher.data, fetcher.state, isOpen]);
 
 	useEffect(() => {
+		let newTab: ValidTabs;
 		const match = matches[matches.length - 1];
-		if (
-			!match ||
-			!match.id.startsWith("routes/profile.") ||
-			match.id.replace("routes/profile.", "") === tab
-		) {
-			return;
+		switch (match?.id) {
+			case "routes/profile/history":
+				newTab = "history";
+				break;
+			case "routes/profile/liked":
+				newTab = "liked";
+				break;
+			default:
+				newTab = "created";
+				break;
 		}
 
-		setTab(match.id.replace("routes/profile.", "") as unknown as ValidTabs);
+		setTab(newTab);
 	}, [matches, tab]);
 
 	return (
 		<>
-			<Header me={hydrateUser(loaderData.me)} />
+			<Header me={loaderData.me} />
 
 			<main className="mx-auto min-h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
@@ -168,7 +226,7 @@ export default function Profile() {
 
 									<div className="bg-popover p-4 text-popover-foreground">
 										<UserUpdateForm
-											action="/users/update"
+											action="/profile/"
 											defaultValues={{
 												username: loaderData.me.username,
 											}}
@@ -220,35 +278,25 @@ export default function Profile() {
 						</div>
 					</div>
 
-					<Tabs
-						onValueChange={(newTab) => {
-							if (newTab !== "created" && newTab !== "liked" && newTab !== "history") {
-								return;
-							}
-
-							navigate(
-								{
-									pathname: `/profile/${newTab}/`,
-								},
-								{
-									preventScrollReset: true,
-								},
-							);
-						}}
-						value={tab}
-					>
+					<Tabs value={tab}>
 						<TabsList className="w-full">
-							<TabsTrigger value="created">
-								<PuzzleIcon className="h-4 w-4" />
-								Created
+							<TabsTrigger asChild value="created">
+								<Link to="/profile/created/">
+									<PuzzleIcon className="h-4 w-4" />
+									Created
+								</Link>
 							</TabsTrigger>
-							<TabsTrigger value="liked">
-								<StarIcon className="h-4 w-4" />
-								Liked
+							<TabsTrigger asChild value="liked">
+								<Link to="/profile/liked/">
+									<StarIcon className="h-4 w-4" />
+									Liked
+								</Link>
 							</TabsTrigger>
-							<TabsTrigger value="history">
-								<HistoryIcon className="h-4 w-4" />
-								History
+							<TabsTrigger asChild value="history">
+								<Link to="/profile/history/">
+									<HistoryIcon className="h-4 w-4" />
+									History
+								</Link>
 							</TabsTrigger>
 						</TabsList>
 

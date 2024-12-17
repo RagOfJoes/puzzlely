@@ -2,7 +2,6 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { Form, Link } from "@remix-run/react";
 import {
 	LogInIcon,
 	LogOutIcon,
@@ -12,6 +11,7 @@ import {
 	UserIcon,
 	UserPlusIcon,
 } from "lucide-react";
+import { Form, Link } from "react-router";
 
 import { Button } from "@/components/button";
 import {

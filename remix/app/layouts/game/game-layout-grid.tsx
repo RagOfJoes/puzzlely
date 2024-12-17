@@ -2,14 +2,14 @@ import type { ElementRef } from "react";
 import { forwardRef } from "react";
 
 import type { Primitive } from "@radix-ui/react-primitive";
-import { useFetcher, useNavigation } from "@remix-run/react";
+import { useFetcher, useNavigation } from "react-router";
 
 import type { GridProps } from "@/components/grid";
 import { Grid, GridBlock, GridBlocks, GridGroup, GridMenu } from "@/components/grid";
 import { useGameContext } from "@/hooks/use-game";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
-import type { action } from "@/routes/puzzles.like.$id";
+import type { action } from "@/routes/puzzles/like.$id";
 
 export type GameLayoutGridProps = Omit<GridProps, "children">;
 

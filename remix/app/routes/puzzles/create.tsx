@@ -1,25 +1,25 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
 import { LoaderCircleIcon } from "lucide-react";
 import type { FieldErrors } from "react-hook-form";
+import { useFetcher } from "react-router";
 import { getValidatedFormData } from "remix-hook-form";
 
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { PuzzleCreateForm } from "@/components/puzzle-create-form";
 import { cn } from "@/lib/cn";
-import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
 import { API } from "@/services/api.server";
-import { jsonWithError, redirectWithInfo, redirectWithSuccess } from "@/services/toast.server";
+import { dataWithError, redirectWithInfo, redirectWithSuccess } from "@/services/toast.server";
 import { PuzzleCreatePayloadSchema, type PuzzleCreatePayload } from "@/types/puzzle-create-payload";
 
-export async function action({ request }: ActionFunctionArgs) {
+import type { Route } from "./+types/create";
+
+export async function action({ request }: Route.ActionArgs) {
 	const me = await requireUser(request);
 	if (me.state === "PENDING" && !me.updated_at) {
-		return redirectWithInfo("/profile/complete", {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirectWithInfo("/profile/complete", {
 			message: "Please complete your profile setup!",
 		});
 	}
@@ -41,51 +41,53 @@ export async function action({ request }: ActionFunctionArgs) {
 		errors,
 	};
 	if (errors) {
-		return json(response);
+		return response;
 	}
 
 	const created = await API.puzzles.create(request, data);
 	if (!created.success) {
-		return jsonWithError(response, {
+		return dataWithError(response, {
 			description: created.error.message,
 			message: "Failed to create puzzle!",
 		});
 	}
 
-	return redirectWithSuccess("/profile/created", {
+	// eslint-disable-next-line @typescript-eslint/no-throw-literal
+	throw redirectWithSuccess("/profile/created", {
 		message: "Successfully created puzzle!",
 	});
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const me = await requireUser(request);
 	if (me.state === "PENDING" && !me.updated_at) {
-		return redirectWithInfo("/profile/complete", {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirectWithInfo("/profile/complete", {
 			message: "Please complete your profile setup!",
 		});
 	}
 
-	return json({
+	return {
 		me,
-	});
+	};
 }
 
-export const meta: MetaFunction<typeof loader> = () => [
-	{
-		title: "Create | Puzzlely",
-	},
-];
+export function meta(_: Route.MetaArgs) {
+	return [
+		{
+			title: "Create | Puzzlely",
+		},
+	];
+}
 
-export default function PuzzleCreate() {
-	const loaderData = useLoaderData<typeof loader>();
-
+export default function Component({ loaderData }: Route.ComponentProps) {
 	const fetcher = useFetcher<typeof action>({
 		key: "puzzles.create",
 	});
 
 	return (
 		<>
-			<Header me={hydrateUser(loaderData.me)} />
+			<Header me={loaderData.me} />
 
 			<main
 				className={cn(
@@ -109,13 +111,14 @@ export default function PuzzleCreate() {
 							(fetcher.state === "loading" && !fetcher.data?.errors) ||
 							fetcher.state === "submitting"
 						}
+						form="puzzle-create-form"
 						size="sm"
 					>
 						{fetcher.state === "submitting" && (
 							<LoaderCircleIcon className="h-4 w-4 shrink-0 animate-spin" />
 						)}
 
-						{fetcher.state === "submitting" ? "Submitting..." : "Complete"}
+						{fetcher.state === "submitting" ? "Creating..." : "Create"}
 					</Button>
 				</article>
 			</main>

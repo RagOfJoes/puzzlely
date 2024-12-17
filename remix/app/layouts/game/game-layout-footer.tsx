@@ -2,8 +2,8 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { Link, useLocation, useNavigation } from "@remix-run/react";
 import dayjs from "dayjs";
+import { Link, useLocation, useNavigation } from "react-router";
 
 import { Skeleton } from "@/components/skeleton";
 import { useGameContext } from "@/hooks/use-game";
@@ -48,7 +48,7 @@ export const GameLayoutFooter = forwardRef<ElementRef<typeof Primitive.div>, Gam
 							className={cn(
 								"inline-flex min-w-0 items-center px-1 py-0.5",
 
-								"data-[difficulty='EASY']:bg-success data-[difficulty='EASY']:text-success-foreground data-[difficulty='EASY']:animate-none",
+								"data-[difficulty='EASY']:animate-none data-[difficulty='EASY']:bg-success data-[difficulty='EASY']:text-success-foreground",
 								"data-[difficulty='HARD']:animate-none data-[difficulty='HARD']:bg-destructive data-[difficulty='HARD']:text-destructive-foreground",
 								"data-[difficulty='MEDIUM']animate-none data-[difficulty='MEDIUM']:bg-warning data-[difficulty='MEDIUM']:text-warning-foreground",
 							)}

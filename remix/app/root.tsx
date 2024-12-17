@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 
-import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "@remix-run/react";
+import type { LinksFunction, LoaderFunctionArgs } from "react-router";
+import { data, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "react-router";
 import { toast as notify } from "sonner";
 
 import { Footer } from "@/components/footer";
@@ -24,7 +23,7 @@ export const links: LinksFunction = () => [
 export async function loader({ request }: LoaderFunctionArgs) {
 	const { headers, toast } = await getToast(request);
 
-	return json(
+	return data(
 		{
 			toast,
 		},

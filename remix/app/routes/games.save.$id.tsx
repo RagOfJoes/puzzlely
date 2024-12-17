@@ -1,16 +1,19 @@
-import { redirect, type ActionFunctionArgs } from "@remix-run/node";
+import { redirect } from "react-router";
 
 import { requireUser } from "@/lib/require-user";
 import { API } from "@/services/api.server";
-import { jsonWithError, jsonWithSuccess } from "@/services/toast.server";
+import { dataWithError, dataWithSuccess } from "@/services/toast.server";
 import type { Game } from "@/types/game";
 import { GamePayloadSchema } from "@/types/game-payload";
 import type { Response } from "@/types/response";
 
-export async function action({ params, request }: ActionFunctionArgs) {
+import type { Route } from "./+types/games.save.$id";
+
+export async function action({ params, request }: Route.ActionArgs) {
 	// Make sure the request is a PUT request
 	if (request.method.toUpperCase() !== "PUT") {
-		return redirect("/", {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirect("/", {
 			status: 405,
 		});
 	}
@@ -32,7 +35,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
 			.map((issue) => `${issue.path} - ${issue.message}`)
 			.join(", ");
 
-		return jsonWithError(response, {
+		return dataWithError(response, {
 			description: payload.error.issues
 				.map((issue) => `${issue.path} - ${issue.message}`)
 				.join(", "),
@@ -42,13 +45,13 @@ export async function action({ params, request }: ActionFunctionArgs) {
 
 	const game = await API.games.save(request, { payload: payload.data, puzzleID: params.id ?? "" });
 	if (!game.success) {
-		return jsonWithError(game, {
+		return dataWithError(game, {
 			description: game.error.message,
 			message: "Failed to save!",
 		});
 	}
 
-	return jsonWithSuccess(game, {
+	return dataWithSuccess(game, {
 		message: "Saved!",
 	});
 }

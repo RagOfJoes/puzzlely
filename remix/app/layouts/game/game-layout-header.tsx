@@ -2,8 +2,8 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { useFetcher, useLocation, useNavigation } from "@remix-run/react";
 import { FlagIcon, HeartIcon, ShuffleIcon, StarIcon } from "lucide-react";
+import { useFetcher, useLocation, useNavigation } from "react-router";
 
 import { Button } from "@/components/button";
 import { Skeleton } from "@/components/skeleton";
@@ -11,7 +11,7 @@ import { useGameContext } from "@/hooks/use-game";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { abbreviateNumber } from "@/lib/abbreviate-number";
 import { cn } from "@/lib/cn";
-import type { action } from "@/routes/puzzles.like.$id";
+import type { action } from "@/routes/puzzles/like.$id";
 
 export type GameLayoutHeaderProps = Omit<
 	ComponentPropsWithoutRef<typeof Primitive.div>,

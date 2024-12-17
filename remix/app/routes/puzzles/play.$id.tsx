@@ -1,35 +1,21 @@
 import { useMemo } from "react";
 
-import type { LoaderFunctionArgs, MetaFunction, TypedResponse } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { useLoaderData } from "@remix-run/react";
+import type { ShouldRevalidateFunctionArgs } from "react-router";
 
 import { GameLayout, GameLayoutFooter, GameLayoutGrid, GameLayoutHeader } from "@/layouts/game";
-import { hydrateGamePayload } from "@/lib/hydrate-game-payload";
-import { hydratePuzzle } from "@/lib/hydrate-puzzle";
-import { hydrateUser } from "@/lib/hydrate-user";
+import { decodePuzzle } from "@/lib/decode-puzzle";
 import { transformGameToPayload } from "@/lib/transform-game-to-payload";
 import { API } from "@/services/api.server";
 import { redirectWithInfo } from "@/services/toast.server";
-import type { GamePayload } from "@/types/game-payload";
-import type { Puzzle } from "@/types/puzzle";
-import type { User } from "@/types/user";
 
-type LoaderResponse = {
-	game?: GamePayload;
-	me?: User;
-	puzzle: Puzzle;
-};
+import type { Route } from "./+types/play.$id";
 
-export async function loader({
-	params,
-	request,
-}: LoaderFunctionArgs): Promise<TypedResponse<LoaderResponse>> {
+export async function loader({ params, request }: Route.LoaderArgs) {
 	const me = await API.me(request);
 	// If the user hasn't completed their profile
 	if (me.success && me.data.user && me.data.user.state === "PENDING" && !me.data.user.updated_at) {
-		return redirectWithInfo("/profile/complete", {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirectWithInfo("/profile/complete", {
 			message: "Please complete your profile setup!",
 		});
 	}
@@ -41,7 +27,7 @@ export async function loader({
 	}
 
 	if (!me.success || !me.data.user) {
-		return json({
+		return {
 			me: undefined,
 			puzzle: {
 				...puzzle.data,
@@ -53,11 +39,11 @@ export async function loader({
 					})),
 				})),
 			},
-		});
+		};
 	}
 
 	const game = await API.games.get(request, puzzle.data.id);
-	return json({
+	return {
 		game: game.success ? transformGameToPayload(game.data) : undefined,
 		me: me.data.user,
 		puzzle: {
@@ -70,14 +56,16 @@ export async function loader({
 				})),
 			})),
 		},
-	});
+	};
 }
 
-export const meta: MetaFunction<typeof loader> = () => [
-	{
-		title: "Puzzlely",
-	},
-];
+export function meta(_: Route.MetaArgs) {
+	return [
+		{
+			title: "Puzzlely",
+		},
+	];
+}
 
 export function shouldRevalidate({
 	defaultShouldRevalidate,
@@ -98,14 +86,12 @@ export function shouldRevalidate({
 	return false;
 }
 
-export default function PuzzlePlay() {
-	const loaderData = useLoaderData<LoaderResponse>();
-
+export default function Component({ loaderData }: Route.ComponentProps) {
 	const { game, me, puzzle } = useMemo(
 		() => ({
-			game: loaderData.game ? hydrateGamePayload(loaderData.game) : undefined,
-			me: loaderData.me ? hydrateUser(loaderData.me) : undefined,
-			puzzle: hydratePuzzle(loaderData.puzzle),
+			game: loaderData.game,
+			me: loaderData.me,
+			puzzle: decodePuzzle(loaderData.puzzle),
 		}),
 		[loaderData],
 	);

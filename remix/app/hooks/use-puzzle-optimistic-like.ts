@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 
-import type { SerializeFrom } from "@remix-run/node";
-import type { Fetcher } from "@remix-run/react";
 import dayjs from "dayjs";
+import type { Fetcher } from "react-router";
 
 import type { Puzzle } from "@/types/puzzle";
 import type { PuzzleLike } from "@/types/puzzle-like";
@@ -10,7 +9,7 @@ import type { PuzzleSummary } from "@/types/puzzle-summary";
 import type { Response } from "@/types/response";
 
 export function usePuzzleOptimisticLike(
-	fetcher: Fetcher<SerializeFrom<Response<PuzzleLike>>>,
+	fetcher: Fetcher<Response<PuzzleLike>>,
 	puzzle: Puzzle | PuzzleSummary,
 ): {
 	liked_at: Date | null | undefined;

@@ -1,12 +1,14 @@
 import querystring from "querystring";
 
-import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import dayjs from "dayjs";
+import { redirect } from "react-router";
 
 import { API } from "@/services/api.server";
 import { state } from "@/services/cookies.server";
 import { commitSession, getSession } from "@/services/session.server";
 import { redirectWithSuccess } from "@/services/toast.server";
+
+import type { Route } from "./+types/discord.callback";
 
 type TokenResponse = {
 	access_token: string;
@@ -16,7 +18,7 @@ type TokenResponse = {
 	scope: string;
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
 	if (me.success && me.data.user) {

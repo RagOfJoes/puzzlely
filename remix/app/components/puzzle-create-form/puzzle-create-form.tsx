@@ -2,9 +2,8 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { SerializeFrom } from "@remix-run/node";
-import type { Form, FetcherWithComponents } from "@remix-run/react";
-import type { FieldErrors } from "react-hook-form";
+import type { Form } from "react-router";
+import type { UseRemixFormOptions } from "remix-hook-form";
 import { RemixFormProvider, useRemixForm } from "remix-hook-form";
 
 import { cn } from "@/lib/cn";
@@ -16,15 +15,8 @@ import { PuzzleCreateFormMeta } from "./puzzle-create-form-meta";
 export type PuzzleCreateFormProps = Omit<
 	ComponentPropsWithoutRef<typeof Form>,
 	"children" | "defaultValue" | "onSubmit"
-> & {
-	defaultValues?: Partial<PuzzleCreatePayload>;
-	fetcher?: FetcherWithComponents<
-		SerializeFrom<{
-			defaultValues?: Partial<PuzzleCreatePayload>;
-			errors?: FieldErrors<PuzzleCreatePayload>;
-		}>
-	>;
-};
+> &
+	Pick<UseRemixFormOptions<PuzzleCreatePayload>, "defaultValues" | "fetcher">;
 
 export const PuzzleCreateForm = forwardRef<ElementRef<typeof Form>, PuzzleCreateFormProps>(
 	({ className, defaultValues, fetcher, ...props }, ref) => {

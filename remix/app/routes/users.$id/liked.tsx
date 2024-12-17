@@ -1,20 +1,19 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import type { ShouldRevalidateFunctionArgs } from "react-router";
+import { useFetcher } from "react-router";
 
 import { PuzzleSummaryCard } from "@/components/puzzle-summary-card";
 import { TabsContent } from "@/components/tabs";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
-import { hydratePuzzleSummary } from "@/lib/hydrate-puzzle-summary";
-import type { action } from "@/routes/puzzles.like.$id";
+import type { action } from "@/routes/puzzles/like.$id";
 import { API } from "@/services/api.server";
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
-	return json({
-		created: await API.puzzles.created(request, params.id ?? ""),
-	});
+import type { Route } from "./+types/liked";
+
+export async function loader({ params, request }: Route.LoaderArgs) {
+	return {
+		liked: await API.puzzles.liked(request, params.id ?? ""),
+	};
 }
 
 export function shouldRevalidate({
@@ -29,36 +28,32 @@ export function shouldRevalidate({
 	return false;
 }
 
-export default function UserCreated() {
-	const loaderData = useLoaderData<typeof loader>();
-
+export default function Component({ loaderData }: Route.ComponentProps) {
 	return (
 		<TabsContent
-			aria-label="Created puzzles"
+			aria-label="Liked puzzles"
 			className={cn(
 				"grid w-full grid-cols-2 gap-1",
 
 				"max-md:grid-cols-1",
 			)}
-			value="created"
+			value="liked"
 		>
-			{loaderData.created.success &&
-				loaderData.created.data.edges.map((edge) => {
-					const puzzle = hydratePuzzleSummary(edge.node);
-
+			{loaderData.liked.success &&
+				loaderData.liked.data.edges.map((edge) => {
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					const fetcher = useFetcher<typeof action>({
-						key: `puzzles.like.${puzzle.id}`,
+						key: `puzzles.like.${edge.node.id}`,
 					});
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const optimisticLike = usePuzzleOptimisticLike(fetcher, puzzle);
+					const optimisticLike = usePuzzleOptimisticLike(fetcher, edge.node);
 
 					return (
 						<div className="col-span-1 row-span-1" key={edge.node.id}>
 							<PuzzleSummaryCard
 								puzzle={{
-									...puzzle,
+									...edge.node,
 
 									liked_at: optimisticLike.liked_at,
 									num_of_likes: optimisticLike.num_of_likes,

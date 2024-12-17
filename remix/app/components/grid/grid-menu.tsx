@@ -3,9 +3,9 @@ import { forwardRef, useMemo, useState } from "react";
 
 import * as Portal from "@radix-ui/react-portal";
 import { Primitive } from "@radix-ui/react-primitive";
-import { useFetcher } from "@remix-run/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRightIcon, StarIcon } from "lucide-react";
+import { useFetcher } from "react-router";
 
 import {
 	Accordion,

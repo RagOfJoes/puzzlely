@@ -2,7 +2,7 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef, useEffect, useMemo } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { toast as notify } from "sonner";
 
 import { Header } from "@/components/header";

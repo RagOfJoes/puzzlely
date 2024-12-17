@@ -26,16 +26,23 @@
 		"preserveConstEnums": true,
 		"removeComments": true,
 		"resolveJsonModule": true,
+		"rootDirs": [".", "./.react-router/types"],
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
 		"strictNullChecks": true,
 		"target": "ES2022",
-		"types": ["@remix-run/node", "vite/client"],
+		"types": ["@react-router/node", "vite/client"],
 		"paths": {
 			"@/*": ["app/*"]
 		}
 	},
 	"exclude": ["./node_modules/**/*"],
-	"include": ["env.d.ts", "tailwind.config.ts", "vite.config.ts", "**/*.ts", "**/*.tsx"]
+	"include": [
+		"tailwind.config.ts",
+		"vite.config.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		".react-router/types/**/*"
+	]
 }

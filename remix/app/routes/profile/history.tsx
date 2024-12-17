@@ -1,28 +1,28 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { useFetcher, useLoaderData, useRouteLoaderData } from "@remix-run/react";
+import type { ShouldRevalidateFunctionArgs } from "react-router";
+import { redirect, useFetcher, useRouteLoaderData } from "react-router";
 
 import { GameSummaryCard } from "@/components/game-summary-card";
 import { TabsContent } from "@/components/tabs";
 import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
 import { cn } from "@/lib/cn";
-import { hydrateGameSummary } from "@/lib/hydrate-game-summary";
-import type { loader as profileLoaderData } from "@/routes/profile";
+import type { action } from "@/routes/puzzles/like.$id";
 import { API } from "@/services/api.server";
 import { getSession } from "@/services/session.server";
+import type { GameSummary } from "@/types/game-summary";
 
-import type { action } from "./puzzles.like.$id";
+import type { Route as ParentRoute } from "./+types/_index";
+import type { Route } from "./+types/history";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	const session = await getSession(request.headers.get("Cookie"));
 	if (!session.get("user")) {
-		return redirect("/login");
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirect("/login");
 	}
 
-	return json({
+	return {
 		history: await API.games.history(request, session.get("user")?.id ?? ""),
-	});
+	};
 }
 
 export function shouldRevalidate({
@@ -45,9 +45,9 @@ export function shouldRevalidate({
 	return false;
 }
 
-export default function ProfileHistory() {
-	const loaderData = useLoaderData<typeof loader>();
-	const routeLoaderData = useRouteLoaderData<typeof profileLoaderData>("routes/profile")!;
+export default function Component({ loaderData }: Route.ComponentProps) {
+	const routeLoaderData =
+		useRouteLoaderData<ParentRoute.ComponentProps["loaderData"]>("routes/profile/_index")!;
 
 	return (
 		<TabsContent
@@ -61,11 +61,11 @@ export default function ProfileHistory() {
 		>
 			{loaderData.history.success &&
 				loaderData.history.data.edges.map((edge) => {
-					const game = hydrateGameSummary({
+					const game: GameSummary = {
 						...edge.node,
 
 						user: routeLoaderData.me,
-					});
+					};
 
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					const fetcher = useFetcher<typeof action>({

@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from "@remix-run/node";
+import { createCookieSessionStorage } from "react-router";
 import { createToastUtilsWithCustomSession } from "remix-toast";
 
 const session = createCookieSessionStorage({
@@ -18,12 +18,12 @@ const session = createCookieSessionStorage({
 });
 
 export const {
+	dataWithError,
+	dataWithInfo,
+	dataWithSuccess,
+	dataWithToast,
+	dataWithWarning,
 	getToast,
-	jsonWithError,
-	jsonWithInfo,
-	jsonWithSuccess,
-	jsonWithToast,
-	jsonWithWarning,
 	redirectWithError,
 	redirectWithInfo,
 	redirectWithSuccess,

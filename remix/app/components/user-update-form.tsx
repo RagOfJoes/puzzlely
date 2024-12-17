@@ -2,9 +2,8 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { SerializeFrom } from "@remix-run/node";
-import type { Form, FetcherWithComponents } from "@remix-run/react";
-import type { FieldErrors } from "react-hook-form";
+import type { Form } from "react-router";
+import type { UseRemixFormOptions } from "remix-hook-form";
 import { RemixFormProvider, useRemixForm } from "remix-hook-form";
 
 import { Input } from "@/components//input";
@@ -15,15 +14,8 @@ import { UserUpdatePayloadSchema, type UserUpdatePayload } from "@/types/user-up
 export type UserUpdateFormProps = Omit<
 	ComponentPropsWithoutRef<typeof Form>,
 	"children" | "defaultValue" | "onSubmit"
-> & {
-	defaultValues?: Partial<UserUpdatePayload>;
-	fetcher?: FetcherWithComponents<
-		SerializeFrom<{
-			defaultValues?: Partial<UserUpdatePayload>;
-			errors?: FieldErrors<UserUpdatePayload>;
-		}>
-	>;
-};
+> &
+	Pick<UseRemixFormOptions<UserUpdatePayload>, "defaultValues" | "fetcher">;
 
 export const UserUpdateForm = forwardRef<ElementRef<typeof Form>, UserUpdateFormProps>(
 	({ action, className, defaultValues, fetcher, method, ...props }, ref) => {

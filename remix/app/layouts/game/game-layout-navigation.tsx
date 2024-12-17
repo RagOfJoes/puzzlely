@@ -2,8 +2,8 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { Link, useFetcher, useLocation, useNavigation, useSearchParams } from "@remix-run/react";
 import { ChevronLeftIcon, ChevronRightIcon, RotateCcwIcon } from "lucide-react";
+import { Link, useFetcher, useLocation, useNavigation, useSearchParams } from "react-router";
 
 import { Button } from "@/components/button";
 import { useGameContext } from "@/hooks/use-game";

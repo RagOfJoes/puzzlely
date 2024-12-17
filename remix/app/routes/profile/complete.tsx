@@ -1,37 +1,35 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
 import { LoaderCircleIcon } from "lucide-react";
+import { redirect, useFetcher } from "react-router";
 
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { UserUpdateForm } from "@/components/user-update-form";
-import { hydrateUser } from "@/lib/hydrate-user";
 import { requireUser } from "@/lib/require-user";
 import type { action } from "@/routes/users.update";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+import type { Route } from "./+types/complete";
+
+export async function loader({ request }: Route.LoaderArgs) {
 	const me = await requireUser(request);
 
 	if (me.state === "COMPLETE") {
-		return redirect("/profile");
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirect("/profile");
 	}
 
-	return json({
+	return {
 		me,
-	});
+	};
 }
 
-export default function ProfileComplete() {
-	const loaderData = useLoaderData<typeof loader>();
-
+export default function Component({ loaderData }: Route.ComponentProps) {
 	const fetcher = useFetcher<typeof action>({
 		key: "users.update",
 	});
 
 	return (
 		<>
-			<Header me={hydrateUser(loaderData.me)} />
+			<Header me={loaderData.me} />
 
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col items-center justify-center">

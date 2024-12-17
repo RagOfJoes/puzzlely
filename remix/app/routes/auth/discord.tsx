@@ -1,14 +1,15 @@
 import crypto from "crypto";
 
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import { redirect } from "react-router";
 
 import { API } from "@/services/api.server";
 import { state } from "@/services/cookies.server";
 import { commitSession, getSession } from "@/services/session.server";
 import { redirectWithError } from "@/services/toast.server";
 
-export async function action({ request }: ActionFunctionArgs) {
+import type { Route } from "./+types/discord";
+
+export async function action({ request }: Route.ActionArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
 	if (me.success && me.data.user) {
@@ -49,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
 	return redirect(`https://discord.com/oauth2/authorize?${params.toString()}`);
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
 	// Check if user is already authenticated
 	const me = await API.me(request);
 	if (me.success && me.data.user) {

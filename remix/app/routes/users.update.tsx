@@ -1,12 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import type { FieldErrors } from "react-hook-form";
+import type { ActionFunctionArgs } from "react-router";
 import { getValidatedFormData } from "remix-hook-form";
 
 import { requireUser } from "@/lib/require-user";
 import { API } from "@/services/api.server";
-import { jsonWithError, jsonWithSuccess, redirectWithSuccess } from "@/services/toast.server";
+import { dataWithError, dataWithSuccess, redirectWithSuccess } from "@/services/toast.server";
 import { UserUpdatePayloadSchema, type UserUpdatePayload } from "@/types/user-update-payload";
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -26,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
 		errors,
 	};
 	if (errors) {
-		return json(response);
+		return response;
 	}
 
 	const updated = await API.users.update(request, data);
@@ -38,7 +37,7 @@ export async function action({ request }: ActionFunctionArgs) {
 			},
 		};
 
-		return jsonWithError(response, {
+		return dataWithError(response, {
 			description: updated.error.message,
 			message: "Failed to update profile!",
 		});
@@ -48,12 +47,13 @@ export async function action({ request }: ActionFunctionArgs) {
 	//
 	// NOTE: Redirect to `/profile/created` to ensure the toast appears
 	if (user.state === "PENDING" && !user.updated_at) {
-		return redirectWithSuccess("/profile/created", {
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirectWithSuccess("/profile/created", {
 			message: "Successfully completed profile!",
 		});
 	}
 
-	return jsonWithSuccess(response, {
+	return dataWithSuccess(response, {
 		message: "Successfully updated profile!",
 	});
 }

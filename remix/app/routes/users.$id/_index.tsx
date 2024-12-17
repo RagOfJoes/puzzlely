@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react";
 
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import type { ShouldRevalidateFunctionArgs } from "@remix-run/react";
-import { Outlet, useLoaderData, useMatches, useNavigate } from "@remix-run/react";
 import dayjs from "dayjs";
 import { HistoryIcon, PuzzleIcon, StarIcon } from "lucide-react";
+import type { ShouldRevalidateFunctionArgs } from "react-router";
+import { redirect, Outlet, Link } from "react-router";
 
 import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
-import { hydrateUser } from "@/lib/hydrate-user";
 import { API } from "@/services/api.server";
+
+import type { Route } from "./+types/_index";
 
 export type ValidTabs = "created" | "liked" | "history";
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
 	const url = new URL(request.url);
 	const split = url.pathname.split("/").filter((str) => str.length > 0);
 	switch (split[split.length - 1]) {
@@ -25,39 +24,34 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 		case "history":
 			break;
 		default:
-			return redirect(`/users/${params.id}/created/`);
+			// eslint-disable-next-line @typescript-eslint/no-throw-literal
+			throw redirect(`/users/${params.id}/created/`);
 	}
 
 	const [me, user] = await Promise.all([API.me(request), API.users.get(request, params.id ?? "")]);
 	if (!user.success) {
-		return redirect("/");
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirect("/");
 	}
 
 	if (me.success && user.data.id === me.data.user?.id) {
-		return redirect("/profile");
+		// eslint-disable-next-line @typescript-eslint/no-throw-literal
+		throw redirect("/profile");
 	}
 
-	return json({
+	return {
 		me: me.success ? me.data?.user : undefined,
 		user: user.data!,
-	});
+	};
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-	if (!data) {
-		return [
-			{
-				title: "User | Puzzlely",
-			},
-		];
-	}
-
+export function meta({ data }: Route.MetaArgs) {
 	return [
 		{
 			title: `${data.user.username} | Puzzlely`,
 		},
 	];
-};
+}
 
 export function shouldRevalidate({
 	defaultShouldRevalidate,
@@ -71,17 +65,13 @@ export function shouldRevalidate({
 	return false;
 }
 
-export default function User() {
-	const loaderData = useLoaderData<typeof loader>();
-	const matches = useMatches();
-	const navigate = useNavigate();
-
+export default function Component({ loaderData, matches }: Route.ComponentProps) {
 	const [tab, setTab] = useState<ValidTabs>(() => {
 		const match = matches[matches.length - 1];
 		switch (match?.id) {
-			case "routes/users.$id.history":
+			case "routes/users.$id/history":
 				return "history";
-			case "routes/users.$id.liked":
+			case "routes/users.$id/liked":
 				return "liked";
 			default:
 				return "created";
@@ -89,23 +79,28 @@ export default function User() {
 	});
 
 	useEffect(() => {
+		let newTab: ValidTabs;
 		const match = matches[matches.length - 1];
-		if (
-			!match ||
-			!match.id.startsWith("routes/users.$id.") ||
-			match.id.replace("routes/users.$id.", "") === tab
-		) {
-			return;
+		switch (match?.id) {
+			case "routes/users.$id/history":
+				newTab = "history";
+				break;
+			case "routes/users.$id/liked":
+				newTab = "liked";
+				break;
+			default:
+				newTab = "created";
+				break;
 		}
 
-		setTab(match.id.replace("routes/users.$id.", "") as unknown as ValidTabs);
+		setTab(newTab);
 	}, [matches, tab]);
 
 	return (
 		<>
-			<Header me={loaderData.me ? hydrateUser(loaderData.me) : undefined} />
+			<Header me={loaderData.me} />
 
-			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
+			<main className="mx-auto min-h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
 				<article className="flex h-full w-full flex-col gap-1">
 					<div className="flex flex-col gap-2 rounded-xl border bg-card px-4 py-4">
 						<div className="flex gap-2">
@@ -139,35 +134,25 @@ export default function User() {
 						</div>
 					</div>
 
-					<Tabs
-						onValueChange={(newTab) => {
-							if (newTab !== "created" && newTab !== "liked" && newTab !== "history") {
-								return;
-							}
-
-							navigate(
-								{
-									pathname: `/users/${loaderData.user.id}/${newTab}/`,
-								},
-								{
-									preventScrollReset: true,
-								},
-							);
-						}}
-						value={tab}
-					>
+					<Tabs value={tab}>
 						<TabsList className="w-full">
-							<TabsTrigger value="created">
-								<PuzzleIcon className="h-4 w-4" />
-								Created
+							<TabsTrigger asChild value="created">
+								<Link to={`/users/${loaderData.user.id}/created/`}>
+									<PuzzleIcon className="h-4 w-4" />
+									Created
+								</Link>
 							</TabsTrigger>
-							<TabsTrigger value="liked">
-								<StarIcon className="h-4 w-4" />
-								Liked
+							<TabsTrigger asChild value="liked">
+								<Link to={`/users/${loaderData.user.id}/liked/`}>
+									<StarIcon className="h-4 w-4" />
+									Liked
+								</Link>
 							</TabsTrigger>
-							<TabsTrigger value="history">
-								<HistoryIcon className="h-4 w-4" />
-								History
+							<TabsTrigger asChild value="history">
+								<Link to={`/users/${loaderData.user.id}/history/`}>
+									<HistoryIcon className="h-4 w-4" />
+									History
+								</Link>
 							</TabsTrigger>
 						</TabsList>
 

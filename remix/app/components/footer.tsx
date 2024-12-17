@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
-import { Link } from "@remix-run/react";
+import { Link } from "react-router";
 
 import { cn } from "@/lib/cn";
 

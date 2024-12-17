@@ -2,16 +2,15 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import { Link, useFetcher } from "@remix-run/react";
 import { ChartNoAxesCombinedIcon, PlayIcon, StarIcon } from "lucide-react";
+import { Link, useFetcher } from "react-router";
 
+import { Button } from "@/components/button";
 import { abbreviateNumber } from "@/lib/abbreviate-number";
 import { cn } from "@/lib/cn";
 import type { GameSummary } from "@/types/game-summary";
 import type { PuzzleLike } from "@/types/puzzle-like";
 import type { Response } from "@/types/response";
-
-import { Button } from "./button";
 
 export type GameSummaryCardProps = Omit<
 	ComponentPropsWithoutRef<typeof Primitive.div>,
@@ -93,11 +92,11 @@ export const GameSummaryCard = forwardRef<ElementRef<typeof Primitive.div>, Game
 					</p>
 				</div>
 
-				<div className="mt-4 flex w-full items-center gap-2">
+				<div className="mt-4 inline-flex min-w-0 items-center gap-2">
 					<span className="group relative flex h-2 w-2" data-is-complete={!!game.completed_at}>
 						<span
 							className={cn(
-								"bg-warning absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
+								"absolute inline-flex h-full w-full animate-ping rounded-full bg-warning opacity-75",
 
 								"group-data-[is-complete=false]:bg-warning",
 								"group-data-[is-complete=true]:bg-success",
@@ -105,7 +104,7 @@ export const GameSummaryCard = forwardRef<ElementRef<typeof Primitive.div>, Game
 						/>
 						<span
 							className={cn(
-								"bg-warning relative inline-flex h-2 w-2 rounded-full",
+								"relative inline-flex h-2 w-2 rounded-full bg-warning",
 
 								"group-data-[is-complete=false]:bg-warning",
 								"group-data-[is-complete=true]:bg-success",
