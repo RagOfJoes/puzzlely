@@ -44,7 +44,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 
 						<div className="mt-6 flex w-full flex-col items-start gap-4">
 							<UserUpdateForm
-								action="/users/update"
+								action="/profile"
 								defaultValues={{
 									username: fetcher.data?.defaultValues?.username,
 								}}

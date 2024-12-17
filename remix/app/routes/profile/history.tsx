@@ -30,7 +30,7 @@ export function shouldRevalidate({
 	formAction,
 }: ShouldRevalidateFunctionArgs) {
 	// If the user likes a puzzle or updates their profile, then, there's no need to revalidate current route's loader
-	const needsRevalidation = ["/puzzles/like", "/users/update"].some((value) => {
+	const needsRevalidation = ["/profile", "/puzzles/like"].some((value) => {
 		if (!formAction) {
 			return false;
 		}
