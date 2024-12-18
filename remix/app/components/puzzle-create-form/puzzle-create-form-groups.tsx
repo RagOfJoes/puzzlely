@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/input";
 import { Textarea } from "@/components/textarea";
 import { cn } from "@/lib/cn";
+import { findDuplicateBlocksFromPuzzleCreatePayload } from "@/lib/find-duplicate-blocks-from-puzzle-create-payload";
 import { omit } from "@/lib/omit";
 import type { PuzzleCreatePayload } from "@/types/puzzle-create-payload";
 
@@ -46,6 +47,16 @@ export function PuzzleCreateFormGroups() {
 										return;
 									}
 
+									// Reset errors for group blocks
+									for (let k = 0; k < 4; k += 1) {
+										form.clearErrors([
+											`groups.${k}.blocks.0.value`,
+											`groups.${k}.blocks.1.value`,
+											`groups.${k}.blocks.2.value`,
+											`groups.${k}.blocks.3.value`,
+										]);
+									}
+
 									// Trigger validation for groups and blocks
 									await form.trigger([
 										`groups.${i}.description`,
@@ -55,73 +66,23 @@ export function PuzzleCreateFormGroups() {
 										`groups.${i}.blocks.3.value`,
 									]);
 
-									// Map out all blocks
-									const map: { [value: string]: [number, number][] } = {};
-									const groups = form.getValues("groups");
-									for (let k = 0; k < groups.length; k += 1) {
-										const group = groups[k];
-										if (!group) {
-											// eslint-disable-next-line no-continue
-											continue;
-										}
-
-										for (let l = 0; l < group.blocks.length; l += 1) {
-											const block = group.blocks[l];
-											if (!block || !block.value) {
-												// eslint-disable-next-line no-continue
-												continue;
-											}
-
-											const trimmed = block.value.trim();
-											if (!map[trimmed]) {
-												map[trimmed] = [[k, l]];
-
-												// eslint-disable-next-line no-continue
-												continue;
-											}
-
-											map[trimmed].push([k, l]);
-										}
+									const duplicates = findDuplicateBlocksFromPuzzleCreatePayload(form.getValues());
+									// console.log(duplicates);
+									if (duplicates.length <= 1) {
+										return;
 									}
 
-									// Check for uniqueness
-									const keys = Object.keys(map);
-									for (let l = 0; l < keys.length; l += 1) {
-										const key = keys[l];
-										if (!key) {
-											// eslint-disable-next-line no-continue
-											continue;
-										}
-										const trimmed = map[key];
-										if (!trimmed) {
+									for (let k = 0; k < duplicates.length; k += 1) {
+										const duplicate = duplicates[k];
+										if (!duplicate) {
 											// eslint-disable-next-line no-continue
 											continue;
 										}
 
-										if (trimmed.length === 1) {
-											if (
-												form.formState.errors.groups?.[trimmed[0]![0]]?.blocks?.[trimmed[0]![1]]
-													?.value
-											) {
-												form.clearErrors(`groups.${trimmed[0]![0]}.blocks.${trimmed[0]![1]}.value`);
-											}
-
-											// eslint-disable-next-line no-continue
-											continue;
-										}
-
-										for (let m = 0; m < trimmed.length; m += 1) {
-											const element = trimmed[m];
-											if (!element) {
-												// eslint-disable-next-line no-continue
-												continue;
-											}
-
-											form.setError(`groups.${element[0]}.blocks.${element[1]}.value`, {
-												type: "custom",
-												message: "Must be unique!",
-											});
-										}
+										form.setError(`groups.${duplicate[0]}.blocks.${duplicate[1]}.value`, {
+											message: "Must be unique!",
+											type: "custom",
+										});
 									}
 								}}
 							>
@@ -190,7 +151,6 @@ export function PuzzleCreateFormGroups() {
 																	`groups.${i}.blocks.${k}.value`,
 																	e.target.value.trim(),
 																);
-																form.trigger(`groups.${i}.blocks.${k}.value`);
 															}}
 															placeholder="..."
 														/>
