@@ -2,12 +2,14 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef, useEffect, useMemo } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
+import dayjs from "dayjs";
 import { useFetcher } from "react-router";
 import { toast as notify } from "sonner";
 
 import { Header } from "@/components/header";
 import { GameProvider, useGame } from "@/hooks/use-game";
 import { useGameLocalStorage } from "@/hooks/use-game-local-storage";
+import { useIsOnline } from "@/hooks/use-is-online";
 import { cn } from "@/lib/cn";
 import { isGamePayloadValid } from "@/lib/is-game-payload-valid";
 import { pickLatestGame } from "@/lib/pick-latest-game";
@@ -22,10 +24,6 @@ export type GameLayoutProps = ComponentPropsWithoutRef<typeof Primitive.div> & {
 	puzzle: Puzzle;
 };
 
-// TODO: Limit localStorage save functionality to the following scenarios:
-// - When the user is unauthenticated
-// - When the user is authenticated and is not online
-//
 // TODO: Sync localStorage with the server
 export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayoutProps>(
 	({ children, className, game, me, puzzle, ...props }, ref) => {
@@ -33,8 +31,9 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 			key: "games.save",
 		});
 
-		const [localStorageData, setLocalStorageData] = useGameLocalStorage(me);
+		const isOnline = useIsOnline();
 
+		const [localStorageData, setLocalStorageData] = useGameLocalStorage(me);
 		const latestGame = useMemo(() => {
 			const picked = pickLatestGame(game, localStorageData?.[puzzle.id]);
 
@@ -44,7 +43,6 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 
 			return picked;
 		}, [game, localStorageData, puzzle]);
-
 		const ctx = useGame({
 			game: latestGame,
 			puzzle,
@@ -53,11 +51,24 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 
 		// Saves game to localStorage when the user makes an attempt
 		useEffect(() => {
+			// Make sure the game is for the same puzzle
+			// NOTE: Was an issue with Remix and not really sure this is necessary with React-Router v7
+			if (puzzle.id !== state.puzzle.id) {
+				return;
+			}
+
+			// - If the user hasn't made an attempt yet or has not made any new attempts
+			// - If the user hasn't given up yet
 			if (
-				localStorageData?.[puzzle.id]?.attempts.length === state.game.attempts.length ||
-				puzzle.id !== state.puzzle.id ||
-				state.game.attempts.length === 0
+				(state.game.attempts.length === 0 ||
+					localStorageData?.[puzzle.id]?.attempts.length === state.game.attempts.length) &&
+				dayjs(localStorageData?.[puzzle.id]?.completed_at).isSame(dayjs(state.game.completed_at))
 			) {
+				return;
+			}
+
+			// If the user is authenticated and is online, then, no need to save to localStorage
+			if (me && isOnline) {
 				return;
 			}
 
@@ -68,15 +79,20 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 
 			// NOTE: `setLocalStorageData` doesn't need to be a dependency since we're not using an updater function
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [localStorageData, puzzle.id, state.game, state.puzzle.id]);
+		}, [localStorageData?.[puzzle.id], puzzle.id, state.game, state.puzzle.id]);
 
 		// Saves game to the API when the user makes an attempt
 		useEffect(() => {
+			// If the user isn't authenticated or isn't online
+			if (!me || !isOnline) {
+				return;
+			}
+
+			// If the user hasn't made an attempt yet or has not made any new attempts
 			if (
-				game?.attempts.length === state.game.attempts.length ||
-				!me ||
-				puzzle.id !== state.puzzle.id ||
-				state.game.attempts.length === 0
+				(state.game.attempts.length === 0 ||
+					game?.attempts.length === state.game.attempts.length) &&
+				dayjs(game?.completed_at).isSame(dayjs(state.game.completed_at))
 			) {
 				return;
 			}
@@ -90,7 +106,8 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 				default:
 					if (
 						fetcher.data?.success &&
-						fetcher.data.data.attempts.length === state.game.attempts.length
+						fetcher.data.data.attempts.length === state.game.attempts.length &&
+						dayjs(fetcher.data.data.completed_at).isSame(dayjs(state.game.completed_at))
 					) {
 						return;
 					}
@@ -106,7 +123,16 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 					});
 					break;
 			}
-		}, [fetcher, game?.attempts.length, me, puzzle.id, state.game, state.puzzle.id]);
+		}, [
+			fetcher,
+			game?.attempts.length,
+			game?.completed_at,
+			isOnline,
+			me,
+			puzzle.id,
+			state.game,
+			state.puzzle.id,
+		]);
 
 		return (
 			<>
