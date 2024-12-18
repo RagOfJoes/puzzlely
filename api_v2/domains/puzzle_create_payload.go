@@ -1,7 +1,9 @@
 package domains
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/render"
@@ -88,10 +90,31 @@ func (p PuzzleCreatePayload) ToPuzzle() Puzzle {
 }
 
 func (p PuzzleCreatePayload) Validate() error {
-	return validation.ValidateStruct(&p,
+	if err := validation.ValidateStruct(&p,
 		validation.Field(&p.Difficulty, validation.Required, validation.In("EASY", "MEDIUM", "HARD")),
 		validation.Field(&p.MaxAttempts, validation.Required, validation.Min(1), validation.Max(999)),
 
 		validation.Field(&p.Groups, validation.Required, validation.Length(4, 4), validation.Each(validation.Required)),
-	)
+	); err != nil {
+		return err
+	}
+
+	duplicates := map[string][][2]int{}
+	for i, group := range p.Groups {
+		for j, block := range group.Blocks {
+			trimmed := strings.TrimSpace(block.Value)
+
+			duplicates[trimmed] = append(duplicates[trimmed], [2]int{i, j})
+		}
+	}
+
+	for key, value := range duplicates {
+		if len(value) <= 1 {
+			continue
+		}
+
+		return fmt.Errorf("Blocks must all be unique. Found %d blocks with a duplicate value of \"%s\".", len(value), key)
+	}
+
+	return nil
 }
