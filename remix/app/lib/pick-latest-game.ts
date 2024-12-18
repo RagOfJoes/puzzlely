@@ -30,6 +30,14 @@ export function pickLatestGame(
 		return loaderGameParsed.data;
 	}
 
+	// Check which one has already been completed
+	if (!!loaderGameParsed.data!.completed_at && !localStorageGameParsed.data!.completed_at) {
+		return loaderGameParsed.data!;
+	}
+	if (!!localStorageGameParsed.data!.completed_at && !loaderGameParsed.data!.completed_at) {
+		return localStorageGameParsed.data!;
+	}
+
 	return loaderGameParsed.data!.attempts.length >= localStorageGameParsed.data!.attempts.length
 		? loaderGameParsed.data!
 		: localStorageGameParsed.data!;
