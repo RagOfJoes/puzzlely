@@ -44,5 +44,10 @@ export function isGamePayloadValid(game: GamePayload, puzzle: Puzzle): boolean {
 		}
 	}
 
+	// Make sure attempts doesn't exceed puzzle's max_attempts
+	if (game.attempts.length - game.score > puzzle.max_attempts) {
+		return false;
+	}
+
 	return true;
 }
