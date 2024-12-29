@@ -23,6 +23,7 @@ export class API {
 	 *
 	 * @param request - The incoming request
 	 * @param provider - The provider to authenticate with
+	 * @param token - The access token for the given provider
 	 * @returns The cookie from the API and the newly created session
 	 */
 	static async auth(
@@ -150,6 +151,16 @@ export class API {
 			return response;
 		},
 
+		/**
+		 * Saves the given game
+		 *
+		 * Hits the `/games/:id` endpoint on the API
+		 *
+		 * @param request - The incoming request
+		 * @param payload - The game that the user is attempting to save
+		 * @param puzzleID - The puzzle that the game is for
+		 * @returns Saved game
+		 */
 		async save(
 			request: Request,
 			{ payload, puzzleID }: { payload: GamePayload; puzzleID: string },
