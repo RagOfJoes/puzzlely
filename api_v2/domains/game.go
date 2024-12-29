@@ -49,6 +49,15 @@ func (g *Game) Complete(atttemps [][]string, correct []string) {
 	}
 }
 
+// IsAhead checks whether the current `Game` is ahead of the given `Game`
+func (g Game) IsAhead(of Game) bool {
+	if !g.CompletedAt.IsZero() && of.CompletedAt.IsZero() {
+		return true
+	}
+
+	return len(g.Attempts) >= len(of.Attempts)
+}
+
 func (g Game) Validate() error {
 	blocks := make([]interface{}, 0)
 	groups := make([]interface{}, 0)

@@ -79,10 +79,10 @@ func (g *Game) Save(ctx context.Context, game domains.Game) (*domains.Game, erro
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
-	upsertedGame, err := g.repository.Save(ctx, game)
+	savedGame, err := g.repository.Save(ctx, game)
 	if err != nil {
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
-	return upsertedGame, nil
+	return savedGame, nil
 }

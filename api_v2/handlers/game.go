@@ -144,11 +144,33 @@ func (g *game) save(w http.ResponseWriter, r *http.Request) {
 	newGame.UserID = session.User.ID
 	newGame.User = *session.User
 
-	game, err := g.service.Save(r.Context(), newGame)
+	// Check if the user already has a game saved
+	// - If not, save the given game
+	// - If so, check if the saved game is ahead of the given game
+	//    - If the saved game is ahead then just respond back with the saved game
+	//    - Else, save the given game and then respond with it
+	game, err := g.service.FindByPuzzleID(r.Context(), puzzleID)
+	if err != nil || game == nil {
+		savedGame, err := g.service.Save(r.Context(), newGame)
+		if err != nil {
+			render.Respond(w, r, err)
+			return
+		}
+
+		render.Render(w, r, Created("", savedGame))
+		return
+	}
+
+	if game.IsAhead(newGame) {
+		render.Render(w, r, Ok("", game))
+		return
+	}
+
+	savedGame, err := g.service.Save(r.Context(), newGame)
 	if err != nil {
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Ok("", game))
+	render.Render(w, r, Ok("", savedGame))
 }
