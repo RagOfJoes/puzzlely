@@ -161,7 +161,7 @@ func (g *game) save(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if game.IsAhead(newGame) {
+	if !game.IsContinuation(newGame) || game.IsAhead(newGame) {
 		render.Render(w, r, Ok("", game))
 		return
 	}

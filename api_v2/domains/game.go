@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"slices"
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/internal"
@@ -56,6 +57,50 @@ func (g Game) IsAhead(of Game) bool {
 	}
 
 	return len(g.Attempts) >= len(of.Attempts)
+}
+
+// IsContinuation checks whether the given `Game` has the same attempts, correct, and, score as the current `Game`
+func (g Game) IsContinuation(other Game) bool {
+	// Ensure that the given game's attempts length is greater than or equal to the current game
+	if len(other.Attempts) < len(g.Attempts) {
+		return false
+	}
+	// Ensure that the given game's correct length is greater than or equal to the current game
+	if len(other.Correct) < len(g.Correct) {
+		return false
+	}
+	// Ensure that the given game's score is greater than or equal to the current game
+	if other.Score < g.Score {
+		return false
+	}
+
+	// Make sure that the given game has all the previous attempts from the current game
+	for i, attempt := range g.Attempts {
+		// Will ideally never happen but double check just to make sure
+		if i >= len(other.Attempts) {
+			return false
+		}
+
+		other := other.Attempts[i]
+		if !slices.Equal(attempt, other) {
+			return false
+		}
+	}
+
+	// Make sure that the given game has all the previous correct from the current game
+	for i, correct := range g.Correct {
+		// Will ideally never happen but double check just to make sure
+		if i >= len(other.Correct) {
+			return false
+		}
+
+		other := other.Correct[i]
+		if other != correct {
+			return false
+		}
+	}
+
+	return true
 }
 
 func (g Game) Validate() error {
