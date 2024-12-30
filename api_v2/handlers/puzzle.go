@@ -38,20 +38,13 @@ func Puzzle(dependencies PuzzleDependencies, router *chi.Mux) {
 	}
 
 	router.Route("/puzzles", func(r chi.Router) {
-		// Create
-		//
-
 		r.Post("/create", p.create)
-
-		// Read
-		//
 
 		r.Get("/{id}", p.puzzle)
 		r.Get("/created/{user_id}", p.created)
 		r.Get("/liked/{user_id}", p.liked)
 		r.Get("/recent", p.recent)
 
-		// Update
 		r.Put("/like/{id}", p.toggleLike)
 	})
 }
