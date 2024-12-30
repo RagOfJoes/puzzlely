@@ -6,6 +6,7 @@ import { toast as notify } from "sonner";
 import { Footer } from "@/components/footer";
 import { ScrollArea } from "@/components/scroll-area";
 import { Toaster } from "@/components/toaster";
+import { TooltipProvider } from "@/components/tooltip";
 import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
 
@@ -99,10 +100,12 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 			</head>
 			<body className="h-dvh overflow-hidden bg-background">
 				{/* App Layout  */}
-				<ScrollArea className="h-full">
-					<Outlet />
-					<Footer />
-				</ScrollArea>
+				<TooltipProvider delayDuration={150}>
+					<ScrollArea className="h-full">
+						<Outlet />
+						<Footer />
+					</ScrollArea>
+				</TooltipProvider>
 
 				{/* Remix */}
 				<ScrollRestoration />
