@@ -24,17 +24,17 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
 import { UserUpdateForm } from "@/components/user-update-form";
 import { cn } from "@/lib/cn";
 import { requireUser } from "@/lib/require-user";
-import { API } from "@/services/api.server.js";
+import { API } from "@/services/api.server";
 import {
 	dataWithError,
 	dataWithSuccess,
 	redirectWithInfo,
 	redirectWithSuccess,
 } from "@/services/toast.server";
-import type { UserUpdatePayload } from "@/types/user-update-payload.js";
-import { UserUpdatePayloadSchema } from "@/types/user-update-payload.js";
+import type { UserUpdatePayload } from "@/types/user-update-payload";
+import { UserUpdatePayloadSchema } from "@/types/user-update-payload";
 
-import type { Route } from "./+types/_index.tsx";
+import type { Route } from "./+types/_index";
 
 export type ValidTabs = "created" | "liked" | "history";
 
