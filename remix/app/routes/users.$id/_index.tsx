@@ -36,7 +36,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
 	if (me.success && user.data.id === me.data.user?.id) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
-		throw redirect("/profile");
+		throw redirect("/profile/");
 	}
 
 	return {
