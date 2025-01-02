@@ -5,28 +5,28 @@ export default [
 	// ---
 
 	...prefix("auth", [
-		route("discord", "routes/auth/discord"),
-		route("discord/callback", "routes/auth/discord.callback"),
+		route("discord", "routes/auth/discord.tsx"),
+		route("discord/callback", "routes/auth/discord.callback.tsx"),
 	]),
-	route("login", "routes/auth/login"),
-	route("logout", "routes/auth/logout"),
-	route("signup", "routes/auth/signup"),
+	route("login", "routes/auth/login.tsx"),
+	route("logout", "routes/auth/logout.tsx"),
+	route("signup", "routes/auth/signup.tsx"),
 
 	// Index route
 	// ---
 
-	index("routes/_index"),
+	index("routes/_index.tsx"),
 
 	// Profile routes
 	// ---
 
 	...prefix("profile", [
-		route("complete", "routes/profile/complete"),
+		route("complete", "routes/profile/complete.tsx"),
 
-		route("/", "routes/profile/_index", [
-			route("created", "routes/profile/created"),
-			route("liked", "routes/profile/liked"),
-			route("history", "routes/profile/history"),
+		route("/", "routes/profile/_index.tsx", [
+			route("created", "routes/profile/created.tsx"),
+			route("liked", "routes/profile/liked.tsx"),
+			route("history", "routes/profile/history.tsx"),
 		]),
 	]),
 
@@ -34,24 +34,24 @@ export default [
 	// ---
 
 	...prefix("puzzles", [
-		route("create", "routes/puzzles/create"),
-		route("like/:id", "routes/puzzles/like.$id"),
-		route("play/:id", "routes/puzzles/play.$id"),
+		route("create", "routes/puzzles/create.tsx"),
+		route("like/:id", "routes/puzzles/like.$id.tsx"),
+		route("play/:id", "routes/puzzles/play.$id.tsx"),
 	]),
 
 	// Users routes
 	// ---
 
 	...prefix("users/:id", [
-		route("/", "routes/users.$id/_index", [
-			route("created", "routes/users.$id/created"),
-			route("liked", "routes/users.$id/liked"),
-			route("history", "routes/users.$id/history"),
+		route("/", "routes/users.$id/_index.tsx", [
+			route("created", "routes/users.$id/created.tsx"),
+			route("liked", "routes/users.$id/liked.tsx"),
+			route("history", "routes/users.$id/history.tsx"),
 		]),
 	]),
 
 	// Action only routes
 	// ---
 
-	route("games/save/:id", "routes/games.save.$id"),
+	route("games/save/:id", "routes/games.save.$id.tsx"),
 ] satisfies RouteConfig;
