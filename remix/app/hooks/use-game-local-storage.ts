@@ -4,15 +4,14 @@ import { z } from "zod";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import type { GamePayload } from "@/types/game-payload";
 import { GamePayloadSchema } from "@/types/game-payload";
-import type { User } from "@/types/user";
 
-export function useGameLocalStorage(
-	me?: User,
-): ReturnType<typeof useLocalStorage<Record<string, GamePayload>>> {
+export function useGameLocalStorage(): ReturnType<
+	typeof useLocalStorage<Record<string, GamePayload>>
+> {
 	const [localStorageData, setLocalStorageData, removeLocalStorageData] = useLocalStorage<
 		Record<string, GamePayload>
 	>(
-		me ? `games:${me.id}` : "games",
+		"games",
 		{},
 		{
 			deserializer: (value) => {
@@ -22,8 +21,8 @@ export function useGameLocalStorage(
 
 					const games = z.record(GamePayloadSchema).parse(parsed);
 					return games;
-				} catch (e) {
-					console.error("Failed to retrieve games from localStorage.", e);
+				} catch {
+					/* empty */
 				}
 
 				return {};

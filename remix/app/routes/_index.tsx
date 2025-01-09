@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 
+import { Header } from "@/components/header";
 import {
 	GameLayout,
 	GameLayoutFooter,
@@ -118,11 +119,15 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 	);
 
 	return (
-		<GameLayout game={game} me={me} puzzle={puzzle}>
-			<GameLayoutHeader />
-			<GameLayoutGrid />
-			<GameLayoutNavigation pageInfo={pageInfo} puzzle={puzzle} />
-			<GameLayoutFooter />
-		</GameLayout>
+		<>
+			<Header me={me} />
+
+			<GameLayout game={game} me={me} puzzle={puzzle}>
+				<GameLayoutHeader />
+				<GameLayoutGrid />
+				<GameLayoutNavigation pageInfo={pageInfo} puzzle={puzzle} />
+				<GameLayoutFooter />
+			</GameLayout>
+		</>
 	);
 }

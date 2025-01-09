@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 
+import { Header } from "@/components/header";
 import { GameLayout, GameLayoutFooter, GameLayoutGrid, GameLayoutHeader } from "@/layouts/game";
 import { decodePuzzle } from "@/lib/decode-puzzle";
 import { transformGameToPayload } from "@/lib/transform-game-to-payload";
@@ -97,10 +98,14 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 	);
 
 	return (
-		<GameLayout game={game} me={me} puzzle={puzzle}>
-			<GameLayoutHeader />
-			<GameLayoutGrid />
-			<GameLayoutFooter />
-		</GameLayout>
+		<>
+			<Header me={me} />
+
+			<GameLayout game={game} me={me} puzzle={puzzle}>
+				<GameLayoutHeader />
+				<GameLayoutGrid />
+				<GameLayoutFooter />
+			</GameLayout>
+		</>
 	);
 }

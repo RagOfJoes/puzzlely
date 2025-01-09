@@ -3,11 +3,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useKey } from "@rwh/react-keystrokes";
 import shuffle from "lodash.shuffle";
 
+import { useGameLocalContext } from "@/hooks/use-game-local";
 import { arePuzzleBlocksSameGroup } from "@/lib/are-puzzle-blocks-same-group";
 import { createContext } from "@/lib/create-context";
 import { getPuzzleBlocksFromAttempts } from "@/lib/get-puzzle-blocks-from-attempts";
 import { groupBy } from "@/lib/group-by";
-import { isDeepEqual } from "@/lib/is-deep-equal";
+import { pickLatestGame } from "@/lib/pick-latest-game";
 import { uniqueBy } from "@/lib/unique-by";
 import type { GamePayload } from "@/types/game-payload";
 import type { Puzzle, PuzzleBlock } from "@/types/puzzle";
@@ -56,30 +57,27 @@ export const [GameProvider, useGameContext] = createContext<UseGame>({
 });
 
 export function useGame(props: UseGameProps): UseGame {
+	const [local] = useGameLocalContext();
+
 	/**
 	 * Game state
 	 */
 
 	const [blocks, setBlocks] = useState<UseGame[0]["blocks"]>([]);
 	const [game, setGame] = useState<UseGame[0]["game"]>(() => {
-		if (props.game) {
-			return props.game;
+		if (!props.game) {
+			return {
+				attempts: [],
+				correct: [],
+				score: 0,
+			};
 		}
 
-		return {
-			attempts: [],
-			correct: [],
-			score: 0,
-		};
+		return props.game;
 	});
 	const [puzzle, setPuzzle] = useState<UseGame[0]["puzzle"]>(props.puzzle);
 	const [selected, setSelected] = useState<UseGame[0]["selected"]>([]);
-	const [wrongAttempts, setWrongAttempts] = useState<number>(() =>
-		getPuzzleBlocksFromAttempts(game, props.puzzle).reduce<number>(
-			(prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1),
-			0,
-		),
-	);
+	const [wrongAttempts, setWrongAttempts] = useState<UseGame[0]["wrongAttempts"]>(0);
 
 	/**
 	 * Flags
@@ -140,7 +138,7 @@ export function useGame(props: UseGameProps): UseGame {
 
 					completed_at: isMaxAttempt ? new Date() : null,
 				}));
-				setWrongAttempts(wrongAttempts + 1);
+				setWrongAttempts((prev) => prev + 1);
 
 				// Toggle `wrong` state to true to trigger animation
 				toggleIsWrong(true);
@@ -217,7 +215,7 @@ export function useGame(props: UseGameProps): UseGame {
 		],
 	);
 
-	const onGiveUp = () => {
+	const onGiveUp: UseGame[1]["onGiveUp"] = useCallback(() => {
 		setSelected([]);
 
 		toggleIsGameOver(true);
@@ -225,9 +223,9 @@ export function useGame(props: UseGameProps): UseGame {
 			...prev,
 			completed_at: new Date(),
 		}));
-	};
+	}, []);
 
-	const onShuffle = () => {
+	const onShuffle: UseGame[1]["onShuffle"] = useCallback(() => {
 		const correctBlocks: PuzzleBlock[] = [];
 		const incorrectBlocks: PuzzleBlock[] = [];
 
@@ -241,42 +239,45 @@ export function useGame(props: UseGameProps): UseGame {
 		});
 
 		setBlocks([...correctBlocks, ...shuffle(incorrectBlocks)]);
-	};
+	}, [blocks, game.correct]);
 
 	/**
 	 * Effects
 	 */
 
-	// - When `blocks` hasn't been initialized
-	// - When `props.puzzle` changes, reset state
+	// When `props.puzzle` changes, toggle `isLoading` state to true
 	useEffect(() => {
-		if (blocks.length > 0 && puzzle.id === props.puzzle.id) {
+		if (puzzle.id === props.puzzle.id) {
 			return;
 		}
 
-		const newGame = props.game ?? {
-			attempts: [],
-			correct: [],
-			score: 0,
-		};
+		toggleIsLoading(true);
+	}, [props.puzzle.id, puzzle.id]);
 
-		const newWrongAttempts = getPuzzleBlocksFromAttempts(newGame, props.puzzle).reduce<number>(
-			(prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1),
-			0,
-		);
+	// When `isLoading` and `useGameLocal`'s `isLoading` changes reset state
+	useEffect(() => {
+		if (!isLoading || local.isLoading) {
+			return;
+		}
 
+		const newGame: GamePayload = pickLatestGame(props.game, local.games[props.puzzle.id]);
+		const newWrongAttempts: number = getPuzzleBlocksFromAttempts(
+			newGame,
+			props.puzzle,
+		).reduce<number>((prev, current) => (arePuzzleBlocksSameGroup(current) ? prev : prev + 1), 0);
+
+		setBlocks(props.puzzle.groups.flatMap((group) => group.blocks));
 		setGame(newGame);
 		setPuzzle(props.puzzle);
-		setBlocks(props.puzzle.groups.flatMap((group) => group.blocks));
-		setWrongAttempts(newWrongAttempts);
 		setSelected([]);
+		setWrongAttempts(newWrongAttempts);
 
 		toggleIsGameOver(
 			() =>
 				newWrongAttempts >= props.puzzle.max_attempts ||
 				(!!newGame.completed_at && newGame.correct.length !== props.puzzle.groups.length),
 		);
-		toggleIsLoading(true);
+		toggleIsLoading(false);
 		toggleIsWinnerWinnerChickenDinner(
 			() => !!newGame.completed_at && newGame.correct.length === props.puzzle.groups.length,
 		);
@@ -302,23 +303,7 @@ export function useGame(props: UseGameProps): UseGame {
 		});
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [props.puzzle]);
-
-	// When client has hydrated and the localStorage data is different from the server. Update `game`
-	// state to match localStorage data
-	useEffect(() => {
-		if (!isLoading) {
-			return;
-		}
-
-		if (!props.game || isDeepEqual(props.game, game)) {
-			toggleIsLoading(false);
-			return;
-		}
-
-		setGame(props.game);
-		toggleIsLoading(false);
-	}, [game, isLoading, props.game]);
+	}, [isLoading, local.isLoading]);
 
 	// When `isWrong` is true, reset it to false and clear `selected` after 300ms to play the animation
 	useEffect(() => {
@@ -326,19 +311,14 @@ export function useGame(props: UseGameProps): UseGame {
 			return;
 		}
 
-		let timeoutID: number | null = null;
-		timeoutID = window.setTimeout(() => {
+		const timeout = window.setTimeout(() => {
 			setSelected([]);
 			toggleIsWrong(false);
 		}, 450);
 
 		// eslint-disable-next-line consistent-return
 		return () => {
-			if (!timeoutID) {
-				return;
-			}
-
-			window.clearTimeout(timeoutID);
+			window.clearTimeout(timeout);
 		};
 	}, [isWrong]);
 

@@ -11,6 +11,7 @@ import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
 
 import type { Route } from "./+types/root";
+import { GameLocalProvider, useGameLocal } from "./hooks/use-game-local";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -36,6 +37,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function Component({ loaderData }: Route.ComponentProps) {
+	const local = useGameLocal();
+
+	// Renders toast
 	useEffect(() => {
 		const toast = loaderData.toast;
 		if (!toast) {
@@ -102,7 +106,9 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 				{/* App Layout  */}
 				<TooltipProvider delayDuration={150}>
 					<ScrollArea className="h-full">
-						<Outlet />
+						<GameLocalProvider value={local}>
+							<Outlet />
+						</GameLocalProvider>
 						<Footer />
 					</ScrollArea>
 				</TooltipProvider>

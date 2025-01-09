@@ -28,7 +28,7 @@ export function useLocalStorage<T>(
 	options?: ParserOptions<T>,
 ): [T | undefined, Dispatch<SetStateAction<T | undefined>>, () => void] {
 	if (typeof window === "undefined") {
-		return [initialValue as T, noop, noop];
+		return [initialValue, noop, noop];
 	}
 
 	if (!key) {

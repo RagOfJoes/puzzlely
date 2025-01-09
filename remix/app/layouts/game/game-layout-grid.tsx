@@ -37,7 +37,7 @@ export const GameLayoutGrid = forwardRef<ElementRef<typeof Primitive.div>, GameL
 				)}
 				ref={ref}
 			>
-				{(isLoading || state.blocks.length === 0) && (
+				{(isLoading || state.isLoading) && (
 					<GridBlocks
 						className={cn(
 							"",
@@ -52,7 +52,7 @@ export const GameLayoutGrid = forwardRef<ElementRef<typeof Primitive.div>, GameL
 					</GridBlocks>
 				)}
 
-				{!isLoading && state.blocks.length > 0 && (
+				{!isLoading && !state.isLoading && (
 					<GridBlocks
 						className={cn(
 							"",
