@@ -1,7 +1,6 @@
 import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
-import { Primitive } from "@radix-ui/react-primitive";
 import {
 	LogInIcon,
 	LogOutIcon,
@@ -29,16 +28,16 @@ import { useGameLocalContext } from "@/hooks/use-game-local";
 import { cn } from "@/lib/cn";
 import type { User } from "@/types/user";
 
-export type HeaderProps = Omit<ComponentPropsWithoutRef<typeof Primitive.nav>, "children"> & {
+export type HeaderProps = Omit<ComponentPropsWithoutRef<"header">, "children"> & {
 	me?: User;
 };
 
-export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
+export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 	({ className, me, ...props }, ref) => {
 		const [state] = useGameLocalContext();
 
 		return (
-			<Primitive.nav
+			<header
 				className={cn(
 					"sticky top-0 z-[1] mx-auto flex h-[var(--header-height)] w-full max-w-screen-md items-center justify-between bg-background/75 px-5 backdrop-blur",
 
@@ -50,14 +49,19 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 				<div className="flex gap-1">
 					<Drawer direction="left">
 						<DrawerTrigger asChild>
-							<Button aria-label="Open menu" className="h-11 w-11" size="icon" variant="ghost">
+							<Button
+								aria-label="Open navigation"
+								className="h-11 w-11"
+								size="icon"
+								variant="ghost"
+							>
 								<MenuIcon className="h-4 w-4" />
 							</Button>
 						</DrawerTrigger>
 
 						<DrawerContent>
 							<div className="flex w-full overflow-hidden rounded-xl border bg-popover">
-								<div className="flex w-full flex-col">
+								<nav className="flex w-full flex-col">
 									<DrawerHeader className="w-full">
 										<DrawerTitle>
 											<Link
@@ -171,7 +175,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 											</>
 										)}
 									</div>
-								</div>
+								</nav>
 							</div>
 						</DrawerContent>
 					</Drawer>
@@ -228,7 +232,7 @@ export const Header = forwardRef<ElementRef<typeof Primitive.nav>, HeaderProps>(
 						</Link>
 					)}
 				</div>
-			</Primitive.nav>
+			</header>
 		);
 	},
 );
