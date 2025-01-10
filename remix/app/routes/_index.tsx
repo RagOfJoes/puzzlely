@@ -19,7 +19,6 @@ import type { Route } from "./+types/_index";
 
 /**
  * TODO: Save last cursor to a cookie to persist user's place
- * TODO: If not authenticated, save games to localStorage
  * TODO: Create error page
  */
 export async function loader({ request }: Route.LoaderArgs) {
@@ -125,7 +124,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 			<GameLayout game={game} me={me} puzzle={puzzle}>
 				<GameLayoutHeader />
 				<GameLayoutGrid />
-				<GameLayoutNavigation pageInfo={pageInfo} puzzle={puzzle} />
+				<GameLayoutNavigation pageInfo={pageInfo} />
 				<GameLayoutFooter />
 			</GameLayout>
 		</>

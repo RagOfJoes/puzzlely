@@ -10,20 +10,18 @@ import { useGameContext } from "@/hooks/use-game";
 import { cn } from "@/lib/cn";
 import { setSearchParams } from "@/lib/set-search-params";
 import type { PageInfo } from "@/types/page-info";
-import type { Puzzle } from "@/types/puzzle";
 
 export type GameLayoutNavigationProps = Omit<
 	ComponentPropsWithoutRef<typeof Primitive.div>,
 	"children"
 > & {
 	pageInfo: PageInfo;
-	puzzle: Puzzle;
 };
 
 export const GameLayoutNavigation = forwardRef<
 	ElementRef<typeof Primitive.div>,
 	GameLayoutNavigationProps
->(({ className, pageInfo, puzzle, ...props }, ref) => {
+>(({ className, pageInfo, ...props }, ref) => {
 	const location = useLocation();
 	const navigation = useNavigation();
 	const [searchParams] = useSearchParams();
@@ -31,7 +29,7 @@ export const GameLayoutNavigation = forwardRef<
 	const [state] = useGameContext();
 
 	const fetcher = useFetcher({
-		key: `games.upsert.${puzzle.id}`,
+		key: "games.save",
 	});
 
 	const isLoading =
