@@ -126,12 +126,20 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 
 		// Remove games from localStorage when it's been saved to the API
 		useEffect(() => {
+			// If the game hasn't been saved to the API yet, or, the user isn't authenticated
 			if (!fetcher.data || !fetcher.data.success || fetcher.state !== "idle" || !me) {
 				return;
 			}
 
+			// If the API response doesn't correspond with the current puzzle that's being played
+			if (fetcher.data.data.puzzle.id !== state.puzzle.id) {
+				return;
+			}
+
 			localActions.remove(state.puzzle.id);
-		}, [fetcher, localActions, me, state.puzzle.id]);
+
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [fetcher, me, state.puzzle.id]);
 
 		return (
 			<GameProvider value={ctx}>
