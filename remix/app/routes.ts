@@ -54,4 +54,5 @@ export default [
 	// ---
 
 	route("games/save/:id", "routes/games.save.$id.tsx"),
+	route("games/sync/:id", "routes/games.sync.$id.tsx"),
 ] satisfies RouteConfig;
