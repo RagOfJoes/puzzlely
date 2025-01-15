@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef, ElementRef } from "react";
-import { forwardRef } from "react";
+import { forwardRef, useCallback, useMemo } from "react";
 
 import {
 	LogInIcon,
@@ -11,7 +11,8 @@ import {
 	UserIcon,
 	UserPlusIcon,
 } from "lucide-react";
-import { Form, Link } from "react-router";
+import { Form, Link, useNavigate } from "react-router";
+import { toast as notify } from "sonner";
 
 import { Button } from "@/components/button";
 import {
@@ -24,8 +25,10 @@ import {
 } from "@/components/drawer";
 import { PuzzlelyIcon } from "@/components/puzzlely-icon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
+import { useFetcherWithPromise } from "@/hooks/use-fetcher-with-promise";
 import { useGameLocalContext } from "@/hooks/use-game-local";
 import { cn } from "@/lib/cn";
+import type { action } from "@/routes/games.sync.$id";
 import type { User } from "@/types/user";
 
 export type HeaderProps = Omit<ComponentPropsWithoutRef<"header">, "children"> & {
@@ -34,7 +37,61 @@ export type HeaderProps = Omit<ComponentPropsWithoutRef<"header">, "children"> &
 
 export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 	({ className, me, ...props }, ref) => {
-		const [state] = useGameLocalContext();
+		const { submit } = useFetcherWithPromise<typeof action>({
+			key: "games.sync",
+		});
+		const navigate = useNavigate();
+
+		const [state, actions] = useGameLocalContext();
+
+		const unsaved = useMemo(() => Object.keys(state.games), [state.games]);
+
+		const onSync = useCallback(async () => {
+			const id = notify.loading("Synching games...", {
+				description: "Failed: 0, Saved: 0.",
+			});
+
+			let failed = 0;
+			let succeeded = 0;
+
+			for (let i = 0; i < unsaved.length; i += 1) {
+				const puzzleID = unsaved[i];
+				if (!puzzleID) {
+					// eslint-disable-next-line no-continue
+					continue;
+				}
+
+				const value = state.games[puzzleID];
+				if (!value) {
+					// eslint-disable-next-line no-continue
+					continue;
+				}
+
+				// eslint-disable-next-line no-await-in-loop
+				const data = await submit(JSON.stringify(value), {
+					action: `/games/sync/${puzzleID}`,
+					encType: "application/json",
+					method: "PUT",
+				});
+
+				if (!data || !data.success) {
+					failed += 1;
+				} else {
+					actions.remove(puzzleID);
+					succeeded += 1;
+				}
+
+				notify.loading("Synching games...", {
+					description: `Failed: ${failed}, Saved: ${succeeded}.`,
+					id,
+				});
+			}
+
+			notify.success("Synched games!", {
+				description: `Failed: ${failed}, Saved: ${succeeded}.`,
+				id,
+			});
+		}, [actions, state.games, submit, unsaved]);
 
 		return (
 			<header
@@ -198,7 +255,15 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 						<TooltipTrigger asChild>
 							<Button
 								className="h-11 w-11"
-								disabled={Object.keys(state.games).length <= 0}
+								disabled={unsaved.length <= 0}
+								onClick={async () => {
+									if (!me) {
+										navigate("/login");
+										return;
+									}
+
+									await onSync();
+								}}
 								size="icon"
 								variant="ghost"
 							>
@@ -208,8 +273,8 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 
 						<TooltipContent align="end">
 							<p className="text-sm font-medium">
-								You have {Object.keys(state.games).length} unsaved game
-								{Object.keys(state.games).length === 1 ? "" : "s"}!
+								You have {unsaved.length} unsaved game
+								{unsaved.length === 1 ? "" : "s"}!
 							</p>
 
 							<small className="text-xs text-muted-foreground">
