@@ -38,8 +38,12 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 
 		// Saves game to localStorage when the user makes an attempt
 		useEffect(() => {
+			// If localStorage is still loading
+			if (localState.isLoading) {
+				return;
+			}
+
 			// Make sure the game is for the same puzzle
-			// NOTE: Was an issue with Remix and not really sure this is necessary with React-Router v7
 			if (puzzle.id !== state.puzzle.id) {
 				return;
 			}
@@ -49,15 +53,15 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 				return;
 			}
 
+			const local = localState.games[state.puzzle.id];
+
 			// - If the user hasn't made an attempt yet or has not made any new attempts
 			// - If the user hasn't given up yet
 			if (
 				(state.game.attempts.length === 0 ||
-					localState.games[puzzle.id]?.attempts.length === state.game.attempts.length) &&
+					local?.attempts.length === state.game.attempts.length) &&
 				// NOTE: Default to undefined if `completed_at` is null to ensure dayjs works properly
-				dayjs(localState.games[puzzle.id]?.completed_at ?? undefined).isSame(
-					dayjs(state.game.completed_at ?? undefined),
-				)
+				dayjs(local?.completed_at ?? undefined).isSame(dayjs(state.game.completed_at ?? undefined))
 			) {
 				return;
 			}
@@ -65,7 +69,7 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 			localActions.save(state.puzzle.id, state.game);
 
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-		}, [puzzle.id, state.game, state.puzzle.id]);
+		}, [localState.isLoading, puzzle.id, state.game, state.puzzle.id]);
 
 		// Saves game to the API when the user makes an attempt
 		useEffect(() => {
