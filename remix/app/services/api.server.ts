@@ -13,6 +13,9 @@ import type { Session } from "@/types/session";
 import type { User } from "@/types/user";
 import type { UserUpdatePayload } from "@/types/user-update-payload";
 
+/**
+ * Wrapper class for the API
+ */
 export class API {
 	static URL: string = process.env.API_URL ?? "https://localhost:8080";
 
