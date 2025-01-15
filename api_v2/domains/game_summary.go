@@ -34,7 +34,6 @@ func (g GameSummary) Validate() error {
 		validation.Field(&g.Attempts, validation.Max(g.Puzzle.MaxAttempts), validation.Min(int16(0))),
 
 		validation.Field(&g.CreatedAt, validation.Required),
-		validation.Field(&g.CompletedAt, validation.When(!g.CompletedAt.IsZero(), validation.By(internal.IsAfter(g.CreatedAt)))),
 
 		validation.Field(&g.PuzzleID, validation.Required, validation.By(internal.IsULID)),
 		validation.Field(&g.Puzzle, validation.Required),
