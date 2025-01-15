@@ -67,7 +67,6 @@ export function PuzzleCreateFormGroups() {
 									]);
 
 									const duplicates = findDuplicateBlocksFromPuzzleCreatePayload(form.getValues());
-									// console.log(duplicates);
 									if (duplicates.length <= 1) {
 										return;
 									}
