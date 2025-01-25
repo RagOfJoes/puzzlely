@@ -117,16 +117,9 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 					});
 					break;
 			}
-		}, [
-			fetcher,
-			game?.attempts.length,
-			game?.completed_at,
-			isOnline,
-			me,
-			puzzle.id,
-			state.game,
-			state.puzzle.id,
-		]);
+
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [fetcher, isOnline, me, puzzle.id, state.game, state.puzzle.id]);
 
 		// Remove games from localStorage when it's been saved to the API
 		useEffect(() => {
