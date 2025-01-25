@@ -7,11 +7,11 @@ import { Footer } from "@/components/footer";
 import { ScrollArea } from "@/components/scroll-area";
 import { Toaster } from "@/components/toaster";
 import { TooltipProvider } from "@/components/tooltip";
+import { GameLocalProvider, useGameLocal } from "@/hooks/use-game-local";
 import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
 
 import type { Route } from "./+types/root";
-import { GameLocalProvider, useGameLocal } from "./hooks/use-game-local";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },

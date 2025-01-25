@@ -1,13 +1,12 @@
 import lzstring from "lz-string";
 import { z } from "zod";
 
+import type { UseLocalStorage } from "@/hooks/use-local-storage";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import type { GamePayload } from "@/types/game-payload";
 import { GamePayloadSchema } from "@/types/game-payload";
 
-export function useGameLocalStorage(): ReturnType<
-	typeof useLocalStorage<Record<string, GamePayload>>
-> {
+export function useGameLocalStorage(): UseLocalStorage<Record<string, GamePayload>> {
 	const [localStorageData, setLocalStorageData, removeLocalStorageData] = useLocalStorage<
 		Record<string, GamePayload>
 	>(
@@ -21,13 +20,13 @@ export function useGameLocalStorage(): ReturnType<
 
 					const games = z.record(GamePayloadSchema).parse(parsed);
 					return games;
-				} catch {
-					/* empty */
+				} catch (e) {
+					// eslint-disable-next-line no-console
+					console.error("[useGameLocalStorage]: Failed to deserialize data:", e);
 				}
 
 				return {};
 			},
-			raw: false,
 			serializer: (value) => lzstring.compressToUTF16(JSON.stringify(value)),
 		},
 	);
