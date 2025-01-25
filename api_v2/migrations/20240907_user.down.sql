@@ -1,2 +1,2 @@
-DROP TABLE `connections`;
-DROP TABLE `users`;
+DROP TABLE connections;
+DROP TABLE users;
