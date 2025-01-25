@@ -56,7 +56,7 @@ func (g Game) IsAhead(of Game) bool {
 		return true
 	}
 
-	return len(g.Attempts) >= len(of.Attempts)
+	return len(g.Attempts) > len(of.Attempts)
 }
 
 // IsContinuation checks whether the given `Game` has the same attempts, correct, and, score as the current `Game`
