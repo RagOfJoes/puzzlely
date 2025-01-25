@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 
-import type { ShouldRevalidateFunctionArgs } from "react-router";
+import { PartyPopperIcon, PlusIcon, UserIcon } from "lucide-react";
+import { Link, redirect, type ShouldRevalidateFunctionArgs } from "react-router";
 
+import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import {
 	GameLayout,
@@ -10,6 +12,7 @@ import {
 	GameLayoutHeader,
 	GameLayoutNavigation,
 } from "@/layouts/game";
+import { cn } from "@/lib/cn";
 import { decodePuzzle } from "@/lib/decode-puzzle";
 import { transformGameToPayload } from "@/lib/transform-game-to-payload";
 import { API } from "@/services/api.server";
@@ -37,11 +40,19 @@ export async function loader({ request }: Route.LoaderArgs) {
 		throw new Response("Failed to fetch puzzles!", { status: 500 });
 	}
 
-	// TODO: Render error here
 	const edge = puzzles.data.edges?.[0];
-	if (!edge) {
+	// NOTE: Handle edge case for when the user completes either end of the list - the newest puzzle or oldest puzzle
+	if (!edge && !!new URL(request.url).searchParams.get("cursor")) {
 		// eslint-disable-next-line @typescript-eslint/no-throw-literal
-		throw new Response("Failed to fetch puzzles!", { status: 500 });
+		throw redirect("/");
+	}
+
+	if (!edge) {
+		return {
+			me: me.success && me.data.user ? me.data.user : undefined,
+			pageInfo: puzzles.data.page_info,
+			puzzle: undefined,
+		};
 	}
 
 	if (!me.success || !me.data.user) {
@@ -112,10 +123,57 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 			game: loaderData.game,
 			me: loaderData.me,
 			pageInfo: loaderData.pageInfo,
-			puzzle: decodePuzzle(loaderData.puzzle),
+			puzzle: loaderData.puzzle ? decodePuzzle(loaderData.puzzle) : undefined,
 		}),
 		[loaderData],
 	);
+
+	if (!puzzle) {
+		return (
+			<>
+				<Header me={me} />
+
+				<main
+					className={cn(
+						"mx-auto h-[calc(100dvh-var(--header-height))] max-w-screen-md px-5 pb-2",
+
+						"max-lg:min-h-[700px]",
+					)}
+				>
+					<article className="flex h-full w-full flex-col items-center justify-center">
+						<div className="w-full min-w-0 rounded-xl border bg-card p-6">
+							<div className="flex w-full flex-col items-center gap-2">
+								<div className="flex h-16 w-16 items-center justify-center rounded-full bg-foreground text-background">
+									<PartyPopperIcon className="h-10 w-10" />
+								</div>
+
+								<h1 className="text-2xl font-semibold leading-none">Congratulations!</h1>
+
+								<p className="text-center text-muted-foreground">
+									You've completed every existing puzzle. Come back later to play more exciting
+									puzzles, or create your own to challenge others!
+								</p>
+
+								<div className="mt-4 flex w-full gap-2">
+									<Link className="w-full" to="/profile/">
+										<Button className="w-full gap-2" size="lg" variant="outline">
+											Go to profile <UserIcon className="h-4 w-4" />
+										</Button>
+									</Link>
+
+									<Link className="w-full" to="/puzzles/create/">
+										<Button className="w-full gap-2" size="lg">
+											Create a puzzle <PlusIcon className="h-4 w-4" />
+										</Button>
+									</Link>
+								</div>
+							</div>
+						</div>
+					</article>
+				</main>
+			</>
+		);
+	}
 
 	return (
 		<>
