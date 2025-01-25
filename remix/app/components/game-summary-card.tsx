@@ -57,7 +57,7 @@ export const GameSummaryCard = forwardRef<ElementRef<typeof Primitive.div>, Game
 
 								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 							)}
-							to={`/users/${game.puzzle.created_by.id}`}
+							to={`/users/${game.puzzle.created_by.id}/`}
 						>
 							<p className="truncate font-medium">{game.puzzle.created_by.username}</p>
 						</Link>

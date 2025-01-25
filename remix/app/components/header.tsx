@@ -139,7 +139,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 									</DrawerHeader>
 
 									<div className="mt-8 flex w-full flex-col gap-1 px-4">
-										<Link tabIndex={-1} to="/puzzles/create">
+										<Link tabIndex={-1} to="/puzzles/create/">
 											<Button
 												className={cn(
 													"w-full gap-2 rounded-xl shadow-[0_0_12px_1px] shadow-primary",
@@ -290,7 +290,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 							</Button>
 						</Form>
 					) : (
-						<Link tabIndex={-1} to="/login">
+						<Link tabIndex={-1} to="/login/">
 							<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="ghost">
 								<LogInIcon className="h-4 w-4" />
 							</Button>

@@ -61,7 +61,7 @@ export const PuzzleSummaryCard = forwardRef<
 
 							"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
 						)}
-						to={`/users/${puzzle.created_by.id}`}
+						to={`/users/${puzzle.created_by.id}/`}
 					>
 						<p className="truncate font-medium">{puzzle.created_by.username}</p>
 					</Link>
@@ -109,7 +109,12 @@ export const PuzzleSummaryCard = forwardRef<
 
 				<div className="flex gap-2">
 					{isEditable && (
-						<Link className="h-full" rel="nofollow" tabIndex={-1} to={`/puzzles/edit/${puzzle.id}`}>
+						<Link
+							className="h-full"
+							rel="nofollow"
+							tabIndex={-1}
+							to={`/puzzles/edit/${puzzle.id}/`}
+						>
 							<Button
 								aria-label="Edit puzzle"
 								className="h-9 w-9 text-muted-foreground"
@@ -121,7 +126,7 @@ export const PuzzleSummaryCard = forwardRef<
 						</Link>
 					)}
 
-					<Link className="h-full" rel="nofollow" tabIndex={-1} to={`/puzzles/play/${puzzle.id}`}>
+					<Link className="h-full" rel="nofollow" tabIndex={-1} to={`/puzzles/play/${puzzle.id}/`}>
 						<Button aria-label="Play puzzle" className="gap-2" size="sm">
 							Play
 							<PlayIcon className="h-4 w-4" />
