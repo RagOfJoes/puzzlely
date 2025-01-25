@@ -157,7 +157,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 									<div className="mt-8 flex w-full flex-col gap-2 px-4 pb-4">
 										<h2 className="text-sm font-semibold uppercase">Menu</h2>
 
-										<Link tabIndex={-1} to="/popular">
+										<Link tabIndex={-1} to="/popular/">
 											<Button
 												className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 												size="lg"
@@ -176,7 +176,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 
 										{me ? (
 											<>
-												<Link tabIndex={-1} to="/profile">
+												<Link tabIndex={-1} to="/profile/">
 													<Button
 														className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 														size="lg"
@@ -204,7 +204,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 											</>
 										) : (
 											<>
-												<Link tabIndex={-1} to="/signup">
+												<Link tabIndex={-1} to="/signup/">
 													<Button
 														className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 														size="lg"
@@ -217,7 +217,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 													</Button>
 												</Link>
 
-												<Link tabIndex={-1} to="/login">
+												<Link tabIndex={-1} to="/login/">
 													<Button
 														className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
 														size="lg"
