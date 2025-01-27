@@ -15,7 +15,7 @@ func BuildPuzzleSummaryConnection(nodes []PuzzleSummary, limit int) (*PuzzleSumm
 	edges := make([]PuzzleSummaryEdge, 0)
 	for _, node := range nodes {
 		edges = append(edges, PuzzleSummaryEdge{
-			Cursor: NewCursor(node.CreatedAt.String()),
+			Cursor: NewCursor(node.CreatedAt.Format("2006-01-02 15:04:05.000000")),
 			Node:   node,
 		})
 	}

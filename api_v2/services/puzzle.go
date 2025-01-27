@@ -68,7 +68,7 @@ func (p *Puzzle) Find(ctx context.Context, id ulid.ULID) (*domains.Puzzle, error
 
 func (p *Puzzle) FindCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleSummaryConnection, error) {
 	if err := opts.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleRecent)
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleCreated)
 	}
 
 	puzzles, err := p.repository.GetCreated(ctx, userID, opts)
@@ -93,7 +93,7 @@ func (p *Puzzle) FindCreated(ctx context.Context, userID string, opts domains.Pu
 
 func (p *Puzzle) FindLiked(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleSummaryConnection, error) {
 	if err := opts.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleRecent)
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleLiked)
 	}
 
 	puzzles, err := p.repository.GetLiked(ctx, userID, opts)

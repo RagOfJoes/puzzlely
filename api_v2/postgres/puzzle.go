@@ -112,7 +112,7 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 		Where("puzzle_summary.user_id = ?", userID).
 		Group("puzzle_summary.id", "created_by.id").
 		OrderExpr("puzzle_summary.created_at DESC").
-		Limit(opts.Limit)
+		Limit(opts.Limit + 1)
 
 	if session != nil && session.IsAuthenticated() {
 		query = query.
@@ -130,12 +130,6 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 
 	if err := query.Scan(ctx); err != nil {
 		return nil, err
-	}
-
-	for _, puzzle := range foundPuzzles {
-		if err := puzzle.Validate(); err != nil {
-			return nil, err
-		}
 	}
 
 	return foundPuzzles, nil
@@ -175,12 +169,6 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 
 	if err := query.Scan(ctx); err != nil {
 		return nil, err
-	}
-
-	for _, puzzle := range foundPuzzles {
-		if err := puzzle.Validate(); err != nil {
-			return nil, err
-		}
 	}
 
 	return foundPuzzles, nil
