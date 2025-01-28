@@ -157,7 +157,7 @@ func (g *game) GetHistory(ctx context.Context, userID string, opts domains.GameC
 		Where("game_summary.user_id = ?", userID).
 		Group("game_summary.id", "puzzle.id", "puzzle__created_by.id", "user.id").
 		OrderExpr("game_summary.created_at DESC").
-		Limit(10)
+		Limit(opts.Limit + 1)
 
 	if !opts.Cursor.IsEmpty() {
 		decoded, err := opts.Cursor.Decode()

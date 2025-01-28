@@ -102,7 +102,7 @@ func (p *puzzle) created(w http.ResponseWriter, r *http.Request) {
 
 	opts := domains.PuzzleCursorPaginationOpts{
 		Cursor: cursor,
-		Limit:  30,
+		Limit:  12,
 	}
 	connection, err := p.service.FindCreated(r.Context(), userID.String(), opts)
 	if err != nil {
@@ -132,7 +132,7 @@ func (p *puzzle) liked(w http.ResponseWriter, r *http.Request) {
 
 	opts := domains.PuzzleCursorPaginationOpts{
 		Cursor: cursor,
-		Limit:  30,
+		Limit:  12,
 	}
 	connection, err := p.service.FindLiked(r.Context(), userID.String(), opts)
 	if err != nil {

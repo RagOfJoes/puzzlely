@@ -101,11 +101,11 @@ func (p *puzzle) Get(ctx context.Context, id string) (*domains.Puzzle, error) {
 func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error) {
 	session := domains.SessionFromContext(ctx)
 
-	var foundPuzzles []domains.PuzzleSummary
+	var puzzles []domains.PuzzleSummary
 
 	query := p.db.
 		NewSelect().
-		Model(&foundPuzzles).
+		Model(&puzzles).
 		Column("puzzle_summary.id", "puzzle_summary.difficulty", "puzzle_summary.max_attempts", "puzzle_summary.created_at", "puzzle_summary.updated_at", "puzzle_summary.user_id").
 		ColumnExpr("(?) AS num_of_likes", p.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE")).
 		Relation("CreatedBy").
@@ -132,26 +132,25 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 		return nil, err
 	}
 
-	return foundPuzzles, nil
+	return puzzles, nil
 }
 
 func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error) {
 	session := domains.SessionFromContext(ctx)
 
-	var foundPuzzles []domains.PuzzleSummary
+	var puzzles []domains.PuzzleSummary
 
 	query := p.db.
 		NewSelect().
-		Model(&foundPuzzles).
+		Model(&puzzles).
 		Column("puzzle_summary.id", "puzzle_summary.difficulty", "puzzle_summary.max_attempts", "puzzle_summary.created_at", "puzzle_summary.updated_at", "puzzle_summary.user_id").
 		ColumnExpr("(?) AS num_of_likes", p.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE")).
 		Relation("CreatedBy").
 		Join("LEFT JOIN puzzle_likes AS puzzle_like").JoinOn("puzzle_id = puzzle_summary.id AND active = TRUE").
-		Where("puzzle_like.active = TRUE").
 		Where("puzzle_like.user_id = ?", userID).
 		Group("puzzle_summary.id", "created_by.id", "puzzle_like.updated_at").
 		OrderExpr("puzzle_like.updated_at DESC").
-		Limit(opts.Limit)
+		Limit(opts.Limit + 1)
 
 	if session != nil && session.IsAuthenticated() {
 		query = query.
@@ -164,14 +163,14 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 			return nil, err
 		}
 
-		query = query.Where("puzzle_liked.updated_at <= ?", decoded)
+		query = query.Where("puzzle_like.updated_at <= ?", decoded)
 	}
 
 	if err := query.Scan(ctx); err != nil {
 		return nil, err
 	}
 
-	return foundPuzzles, nil
+	return puzzles, nil
 }
 
 func (p *puzzle) GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginationOpts) ([]domains.Puzzle, error) {

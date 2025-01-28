@@ -108,7 +108,7 @@ func (p *Puzzle) FindLiked(ctx context.Context, userID string, opts domains.Puzz
 		}
 	}
 
-	connection, err := domains.BuildPuzzleSummaryConnection(puzzles, opts.Limit)
+	connection, err := domains.BuildPuzzleSummaryConnectionForLiked(puzzles, opts.Limit)
 	if err != nil {
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLiked)
 	}

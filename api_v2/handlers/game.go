@@ -90,7 +90,7 @@ func (g *game) history(w http.ResponseWriter, r *http.Request) {
 
 	opts := domains.GameCursorPaginationOpts{
 		Cursor: cursor,
-		Limit:  30,
+		Limit:  12,
 	}
 	games, err := g.service.FindHistory(r.Context(), userID.String(), opts)
 	if err != nil {
