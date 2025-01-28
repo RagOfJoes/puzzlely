@@ -126,7 +126,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 			})}
 
 			{fetcher.state === "loading" &&
-				Array.from({ length: 2 }).map((_, i) => (
+				Array.from({ length: 4 }).map((_, i) => (
 					<Skeleton key={`Profile-Liked-Skeleton-${i}`}>
 						<PuzzleSummaryCard
 							className="invisible"
@@ -151,19 +151,10 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 					</Skeleton>
 				))}
 
-			{connection.page_info.has_next_page && (
+			{connection.page_info.has_next_page && fetcher.state === "idle" && (
 				<Waypoint
-					onInView={async () => {
-						if (fetcher.state !== "idle") {
-							return;
-						}
-
-						if (
-							hasFetched &&
-							fetcher.data &&
-							fetcher.data.liked.success &&
-							!fetcher.data.liked.data.page_info.has_next_page
-						) {
+					onChange={async () => {
+						if (hasFetched && fetcher.data && !fetcher.data.liked.success) {
 							return;
 						}
 
