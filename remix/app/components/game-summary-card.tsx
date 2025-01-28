@@ -6,6 +6,7 @@ import { ChartNoAxesCombinedIcon, PlayIcon, StarIcon } from "lucide-react";
 import { Link, useFetcher } from "react-router";
 
 import { Button } from "@/components/button";
+import { usePuzzleSummaryOptimisticLike } from "@/hooks/use-puzzle-summary-optimistic-like";
 import { abbreviateNumber } from "@/lib/abbreviate-number";
 import { cn } from "@/lib/cn";
 import type { GameSummary } from "@/types/game-summary";
@@ -24,6 +25,8 @@ export const GameSummaryCard = forwardRef<ElementRef<typeof Primitive.div>, Game
 		const fetcher = useFetcher<Response<PuzzleLike>>({
 			key: `puzzles.like.${game.puzzle.id}`,
 		});
+
+		const optimisticLike = usePuzzleSummaryOptimisticLike(fetcher, game.puzzle);
 
 		return (
 			<Primitive.div
@@ -65,19 +68,19 @@ export const GameSummaryCard = forwardRef<ElementRef<typeof Primitive.div>, Game
 
 					<fetcher.Form action={`/puzzles/like/${game.puzzle.id}`} method="PUT">
 						<Button
-							aria-label={game.puzzle.liked_at ? "Unlike puzzle" : "Like puzzle"}
+							aria-label={optimisticLike.me_liked_at ? "Unlike puzzle" : "Like puzzle"}
 							className={cn(
 								"min-w-0 shrink-0 gap-2 text-muted-foreground",
 
 								"[&>svg]:data-[is-liked=true]:fill-current",
 							)}
-							data-is-liked={!!game.puzzle.liked_at}
+							data-is-liked={!!optimisticLike.me_liked_at}
 							size="sm"
 							variant="outline"
 						>
 							<StarIcon className="h-4 w-4" />
 
-							<span>{game.puzzle.liked_at ? "Liked" : "Like"}</span>
+							<span>{optimisticLike.me_liked_at ? "Liked" : "Like"}</span>
 
 							<hr className="h-full w-[1px] bg-border" />
 
