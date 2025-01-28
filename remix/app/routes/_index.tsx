@@ -5,6 +5,7 @@ import { Link, redirect, type ShouldRevalidateFunctionArgs } from "react-router"
 
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
+import { PuzzleInfiniteSlider } from "@/components/puzzle-infinite-slider";
 import {
 	GameLayout,
 	GameLayoutFooter,
@@ -143,55 +144,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 					<article className="flex h-full w-full flex-col items-center justify-center">
 						<div className="w-full min-w-0">
 							<div className="flex w-full flex-col gap-2">
-								<div className="group flex w-full min-w-0 [mask-image:_linear-gradient(to_right,transparent_0,_#1a1825_125px,_#1a1825_calc(100%-200px),transparent_100%)]">
-									{Array.from({ length: 2 }).map((_, i) => (
-										<ul
-											aria-hidden={i > 0}
-											className={cn(
-												"animate-slide-left flex h-full shrink-0 items-center gap-8 will-change-transform",
-
-												"group-focus-visible:[animation-play-state:paused]",
-												"group-hover:[animation-play-state:paused]",
-												"motion-reduce:[animation-play-state:paused]",
-											)}
-											key={`_index-InfiniteSlider-${i}`}
-										>
-											{Array.from({ length: 4 }).map((__, j) => (
-												<li
-													className={cn(
-														"grid select-none grid-cols-4 gap-0.5",
-
-														"first:ml-8",
-													)}
-													key={`_index-InfiniteSlider-${i}-Slide-${j}`}
-												>
-													<div className="col-span-4 grid grid-cols-4 gap-0.5">
-														<div className="h-6 w-full rounded-xl border bg-card" />
-
-														<div className="grid h-6 grid-cols-1 gap-0.5">
-															<div className="w-full rounded-xl border bg-card" />
-															<div className="w-full rounded-xl border bg-card" />
-														</div>
-
-														<div className="col-start-4 h-6 w-full rounded-xl border bg-card" />
-													</div>
-
-													{Array.from({ length: 16 }).map((___, k) => (
-														<div
-															className="h-10 w-10 rounded-xl border bg-card"
-															key={`_index-InfiniteSlider-${i}-Slide-${j}-${k}`}
-														/>
-													))}
-
-													<div className="col-span-4 grid grid-cols-4 gap-0.5">
-														<div className="col-start-3 h-4 w-full rounded-xl border bg-card" />
-														<div className="h-4 w-full rounded-xl border bg-card" />
-													</div>
-												</li>
-											))}
-										</ul>
-									))}
-								</div>
+								<PuzzleInfiniteSlider />
 
 								<h1 className="mt-4 text-center text-2xl font-semibold leading-none">
 									Congratulations!
