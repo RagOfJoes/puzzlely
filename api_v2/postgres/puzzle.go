@@ -116,7 +116,7 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 
 	if session != nil && session.IsAuthenticated() {
 		query = query.
-			ColumnExpr("(?) AS liked_at", p.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE AND user_id = ?", session.UserID.String))
+			ColumnExpr("(?) AS me_liked_at", p.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE AND user_id = ?", session.UserID.String))
 	}
 
 	if !opts.Cursor.IsEmpty() {
@@ -144,6 +144,7 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 		NewSelect().
 		Model(&puzzles).
 		Column("puzzle_summary.id", "puzzle_summary.difficulty", "puzzle_summary.max_attempts", "puzzle_summary.created_at", "puzzle_summary.updated_at", "puzzle_summary.user_id").
+		ColumnExpr("puzzle_like.updated_at AS user_liked_at").
 		ColumnExpr("(?) AS num_of_likes", p.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE")).
 		Relation("CreatedBy").
 		Join("LEFT JOIN puzzle_likes AS puzzle_like").JoinOn("puzzle_id = puzzle_summary.id AND active = TRUE").
@@ -154,7 +155,7 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 
 	if session != nil && session.IsAuthenticated() {
 		query = query.
-			ColumnExpr("(?) AS liked_at", p.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE AND user_id = ?", session.UserID.String))
+			ColumnExpr("(?) AS me_liked_at", p.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE AND user_id = ?", session.UserID.String))
 	}
 
 	if !opts.Cursor.IsEmpty() {

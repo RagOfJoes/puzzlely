@@ -46,7 +46,7 @@ func BuildPuzzleSummaryConnectionForLiked(nodes []PuzzleSummary, limit int) (*Pu
 	edges := make([]PuzzleSummaryEdge, 0)
 	for _, node := range nodes {
 		edges = append(edges, PuzzleSummaryEdge{
-			Cursor: NewCursor(node.LikedAt.Format("2006-01-02 15:04:05.000000")),
+			Cursor: NewCursor(node.UserLikedAt.Format("2006-01-02 15:04:05.000000")),
 			Node:   node,
 		})
 	}
