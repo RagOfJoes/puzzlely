@@ -25,7 +25,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	return {
-		created: await API.puzzles.created(request, session.get("user")?.id ?? ""),
+		created: await API.puzzles.created(request, session.get("user")!.id ?? ""),
 	};
 }
 
@@ -69,36 +69,34 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 					},
 				},
 	);
+	const [hasFetched, toggleHasFetched] = useState(false);
 
 	useEffect(() => {
-		switch (fetcher.state) {
-			case "loading":
-				break;
-			case "submitting":
-				break;
-			default:
-				if (!fetcher.data) {
-					return;
-				}
-
-				if (!fetcher.data.created.success) {
-					notify.error(fetcher.data.created.error.message);
-					return;
-				}
-
-				setConnection((prev) => {
-					if (!fetcher.data || !fetcher.data.created.success) {
-						return prev;
-					}
-
-					return {
-						...prev,
-						edges: [...prev.edges, ...fetcher.data.created.data.edges],
-						page_info: fetcher.data.created.data.page_info,
-					};
-				});
+		if (!fetcher.data) {
+			return;
 		}
-	}, [fetcher.data, fetcher.state]);
+
+		if (!fetcher.data.created.success) {
+			notify.error(fetcher.data.created.error.message);
+			return;
+		}
+
+		if (fetcher.data.created.data.edges[0]?.cursor !== connection.page_info.next_cursor) {
+			return;
+		}
+
+		setConnection((prev) => {
+			if (!fetcher.data || !fetcher.data.created.success) {
+				return prev;
+			}
+
+			return {
+				...prev,
+				edges: [...prev.edges, ...fetcher.data.created.data.edges],
+				page_info: fetcher.data.created.data.page_info,
+			};
+		});
+	}, [connection.page_info.next_cursor, fetcher.data]);
 
 	return (
 		<TabsContent
@@ -157,16 +155,18 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 							return;
 						}
 
-						// Handle potential duplicate requests
 						if (
+							hasFetched &&
 							fetcher.data &&
 							fetcher.data.created.success &&
-							fetcher.data.created.data.page_info.next_cursor !== connection.page_info.next_cursor
+							!fetcher.data.created.data.page_info.has_next_page
 						) {
 							return;
 						}
 
 						await fetcher.load(`/profile/created/?cursor=${connection.page_info.next_cursor}`);
+
+						toggleHasFetched(true);
 					}}
 				/>
 			)}
