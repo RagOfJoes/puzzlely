@@ -15,7 +15,7 @@ func BuildGameSummaryConnection(nodes []GameSummary, limit int) (*GameSummaryCon
 	edges := make([]GameSummaryEdge, 0)
 	for _, node := range nodes {
 		edges = append(edges, GameSummaryEdge{
-			Cursor: NewCursor(node.CreatedAt.String()),
+			Cursor: NewCursor(node.CreatedAt.Format("2006-01-02 15:04:05.000000")),
 			Node:   node,
 		})
 	}

@@ -147,7 +147,7 @@ func (g *game) GetHistory(ctx context.Context, userID string, opts domains.GameC
 
 			if session != nil && session.IsAuthenticated() {
 				puzzleQuery = puzzleQuery.
-					ColumnExpr("(?) AS puzzle__liked_at", g.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = game_summary.puzzle_id AND active = TRUE AND user_id = ?", session.UserID.String))
+					ColumnExpr("(?) AS puzzle__me_liked_at", g.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = game_summary.puzzle_id AND active = TRUE AND user_id = ?", session.UserID.String))
 			}
 
 			return puzzleQuery
