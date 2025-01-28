@@ -1,8 +1,8 @@
 import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
-import { motion } from "framer-motion";
-import type { MotionProps } from "framer-motion";
+import { motion } from "motion/react";
+import type { MotionProps } from "motion/react";
 
 import { cn } from "@/lib/cn";
 

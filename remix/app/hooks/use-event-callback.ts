@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
 
-import { useIsomorphicLayoutEffect } from "framer-motion";
+import { useIsomorphicLayoutEffect } from "motion/react";
 
 export function useEventCallback<Args extends unknown[], R>(
 	fn: (...args: Args) => R,
