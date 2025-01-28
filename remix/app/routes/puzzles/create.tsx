@@ -178,11 +178,15 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 							<AlertDialogHeader>
 								<AlertDialogTitle>Are you sure?</AlertDialogTitle>
 
-								<AlertDialogDescription>
-									You will not be able to make any further modifications to this puzzle aside from
-									its difficulty.
-								</AlertDialogDescription>
+								<AlertDialogDescription>There is no going back.</AlertDialogDescription>
 							</AlertDialogHeader>
+
+							<div className="bg-popover p-4 text-popover-foreground">
+								<p className="text-sm font-medium text-foreground">
+									You will not be able to make any further modifications to this puzzle aside from
+									its difficulty and group descriptions.
+								</p>
+							</div>
 
 							<AlertDialogFooter>
 								<AlertDialogCancel asChild>

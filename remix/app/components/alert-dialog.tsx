@@ -58,7 +58,7 @@ export const AlertDialogHeader = ({ className, ...props }: HTMLAttributes<HTMLDi
 	<div
 		{...props}
 		className={cn(
-			"flex flex-col gap-1.5 px-4 pb-4 pt-5",
+			"flex flex-col gap-1.5 border-b px-4 pb-4 pt-5",
 
 			className,
 		)}
