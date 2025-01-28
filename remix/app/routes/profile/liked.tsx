@@ -1,14 +1,18 @@
+import { useEffect, useState } from "react";
+
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 import { redirect, useFetcher, useRouteLoaderData } from "react-router";
+import { toast as notify } from "sonner";
 
 import { PuzzleSummaryCard } from "@/components/puzzle-summary-card";
+import { Skeleton } from "@/components/skeleton";
 import { TabsContent } from "@/components/tabs";
-import { usePuzzleOptimisticLike } from "@/hooks/use-puzzle-optimistic-like";
+import { Waypoint } from "@/components/waypoint";
 import { cn } from "@/lib/cn";
-import type { action } from "@/routes/puzzles/like.$id";
 import { API } from "@/services/api.server";
 import { getSession } from "@/services/session.server";
 import type { PuzzleSummary } from "@/types/puzzle-summary";
+import type { PuzzleSummaryConnection } from "@/types/puzzle-summary-connection";
 
 import type { Route as ParentRoute } from "./+types/_index";
 import type { Route } from "./+types/liked";
@@ -21,7 +25,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	return {
-		liked: await API.puzzles.liked(request, session.get("user")?.id ?? ""),
+		liked: await API.puzzles.liked(request, session.get("user")!.id ?? ""),
 	};
 }
 
@@ -46,8 +50,53 @@ export function shouldRevalidate({
 }
 
 export default function Component({ loaderData }: Route.ComponentProps) {
+	const fetcher = useFetcher<Route.ComponentProps["loaderData"]>({
+		key: "profile.liked",
+	});
 	const routeLoaderData =
 		useRouteLoaderData<ParentRoute.ComponentProps["loaderData"]>("routes/profile/_index")!;
+
+	const [connection, setConnection] = useState<PuzzleSummaryConnection>(
+		loaderData.liked.success
+			? loaderData.liked.data
+			: {
+					edges: [],
+					page_info: {
+						has_next_page: false,
+						has_previous_page: false,
+						next_cursor: "",
+						previous_cursor: "",
+					},
+				},
+	);
+	const [hasFetched, toggleHasFetched] = useState(false);
+
+	useEffect(() => {
+		if (!fetcher.data) {
+			return;
+		}
+
+		if (!fetcher.data.liked.success) {
+			notify.error(fetcher.data.liked.error.message);
+			return;
+		}
+
+		if (fetcher.data.liked.data.edges[0]?.cursor !== connection.page_info.next_cursor) {
+			return;
+		}
+
+		setConnection((prev) => {
+			if (!fetcher.data || !fetcher.data.liked.success) {
+				return prev;
+			}
+
+			return {
+				...prev,
+				edges: [...prev.edges, ...fetcher.data.liked.data.edges],
+				page_info: fetcher.data.liked.data.page_info,
+			};
+		});
+	}, [connection.page_info.next_cursor, fetcher.data]);
 
 	return (
 		<TabsContent
@@ -59,38 +108,71 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 			)}
 			value="liked"
 		>
-			{loaderData.liked.success &&
-				loaderData.liked.data.edges.map((edge) => {
-					const puzzle: PuzzleSummary =
-						edge.node.created_by.id === routeLoaderData.me.id
-							? {
-									...edge.node,
+			{connection.edges.map((edge) => {
+				const puzzle: PuzzleSummary =
+					edge.node.created_by.id === routeLoaderData.me.id
+						? {
+								...edge.node,
 
-									created_by: routeLoaderData.me,
-								}
-							: edge.node;
+								created_by: routeLoaderData.me,
+							}
+						: edge.node;
 
-					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const fetcher = useFetcher<typeof action>({
-						key: `puzzles.like.${puzzle.id}`,
-					});
+				return (
+					<div className="col-span-1 row-span-1" key={edge.node.id}>
+						<PuzzleSummaryCard puzzle={puzzle} />
+					</div>
+				);
+			})}
 
-					// eslint-disable-next-line react-hooks/rules-of-hooks
-					const optimisticLike = usePuzzleOptimisticLike(fetcher, puzzle);
+			{fetcher.state === "loading" &&
+				Array.from({ length: 2 }).map((_, i) => (
+					<Skeleton key={`Profile-Liked-Skeleton-${i}`}>
+						<PuzzleSummaryCard
+							className="invisible"
+							puzzle={{
+								id: "",
+								difficulty: "Medium",
+								max_attempts: 6,
 
-					return (
-						<div className="col-span-1 row-span-1" key={edge.node.id}>
-							<PuzzleSummaryCard
-								puzzle={{
-									...puzzle,
+								num_of_likes: 10,
 
-									liked_at: optimisticLike.liked_at,
-									num_of_likes: optimisticLike.num_of_likes,
-								}}
-							/>
-						</div>
-					);
-				})}
+								created_by: {
+									id: "",
+									state: "COMPLETE",
+									username: "Puzzlely",
+
+									created_at: new Date(),
+								},
+
+								created_at: new Date(),
+							}}
+						/>
+					</Skeleton>
+				))}
+
+			{connection.page_info.has_next_page && (
+				<Waypoint
+					onInView={async () => {
+						if (fetcher.state !== "idle") {
+							return;
+						}
+
+						if (
+							hasFetched &&
+							fetcher.data &&
+							fetcher.data.liked.success &&
+							!fetcher.data.liked.data.page_info.has_next_page
+						) {
+							return;
+						}
+
+						await fetcher.load(`/profile/liked/?cursor=${connection.page_info.next_cursor}`);
+
+						toggleHasFetched(true);
+					}}
+				/>
+			)}
 		</TabsContent>
 	);
 }
