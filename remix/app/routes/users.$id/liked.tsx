@@ -53,7 +53,7 @@ export default function Component({ loaderData, params }: Route.ComponentProps) 
 	const [hasFetched, toggleHasFetched] = useState(false);
 
 	useEffect(() => {
-		if (!fetcher.data) {
+		if (!hasFetched || !fetcher.data) {
 			return;
 		}
 
@@ -77,7 +77,7 @@ export default function Component({ loaderData, params }: Route.ComponentProps) 
 				page_info: fetcher.data.liked.data.page_info,
 			};
 		});
-	}, [connection.page_info.next_cursor, fetcher.data]);
+	}, [connection.page_info.next_cursor, fetcher.data, hasFetched]);
 
 	return (
 		<TabsContent

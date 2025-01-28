@@ -141,7 +141,8 @@ export class API {
 		async history(request: Request, id: string): Promise<Response<GameSummaryConnection>> {
 			const session = await getSession(request.headers.get("Cookie"));
 
-			const res = await fetch(`${API.URL}/${this.prefix}/history/${id}`, {
+			const cursor = new URL(request.url).searchParams.get("cursor");
+			const res = await fetch(`${API.URL}/${this.prefix}/history/${id}?cursor=${cursor ?? ""}`, {
 				credentials: "include",
 				headers: {
 					"Content-Type": "application/json",
