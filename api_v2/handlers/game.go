@@ -147,7 +147,7 @@ func (g *game) save(w http.ResponseWriter, r *http.Request) {
 	// Check if the user already has a game saved
 	// - If not, save the given game
 	// - If so, check if the saved game is ahead of the given game
-	//    - If the saved game is ahead then just respond back with the saved game
+	//    - If the saved game has already been completed, has been wrongfully updated, or, is ahead then just respond back with the saved game
 	//    - Else, save the given game and then respond with it
 	game, err := g.service.FindByPuzzleID(r.Context(), puzzleID)
 	if err != nil || game == nil {
@@ -161,7 +161,7 @@ func (g *game) save(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !game.IsContinuation(newGame) || game.IsAhead(newGame) {
+	if !game.CompletedAt.IsZero() || !game.IsContinuation(newGame) || game.IsAhead(newGame) {
 		render.Render(w, r, Ok("", game))
 		return
 	}
