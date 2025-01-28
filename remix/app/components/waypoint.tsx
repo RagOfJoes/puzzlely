@@ -1,31 +1,18 @@
-import type { ComponentPropsWithoutRef, ElementRef } from "react";
-import { forwardRef, useEffect, useRef } from "react";
+import type { ElementRef } from "react";
+import { forwardRef } from "react";
 
-import { Primitive } from "@radix-ui/react-primitive";
-import { useInView } from "framer-motion";
+import type { Primitive } from "@radix-ui/react-primitive";
+import { useInView, type IntersectionOptions } from "react-intersection-observer";
 
-import { useMergeRefs } from "@/hooks/use-merge-refs";
+import { mergeRefs } from "@/hooks/use-merge-refs";
 
-export type WaypointProps = ComponentPropsWithoutRef<typeof Primitive.div> & {
-	onInView?: () => Promise<void> | void;
-};
+export type WaypointProps = IntersectionOptions;
 
 export const Waypoint = forwardRef<ElementRef<typeof Primitive.div>, WaypointProps>(
-	({ onInView, ...props }, ref) => {
-		const innerRef = useRef<ElementRef<typeof Primitive.div>>(null);
-		const merged = useMergeRefs<ElementRef<typeof Primitive.div> | null>(innerRef, ref);
+	(props, ref) => {
+		const { ref: inViewRef } = useInView(props);
 
-		const isInView = useInView(innerRef);
-
-		useEffect(() => {
-			if (!onInView) {
-				return;
-			}
-
-			onInView();
-		}, [isInView, onInView]);
-
-		return <Primitive.div {...props} aria-hidden ref={merged} />;
+		return <div ref={mergeRefs(inViewRef, ref)} />;
 	},
 );
 Waypoint.displayName = "Waypoint";
