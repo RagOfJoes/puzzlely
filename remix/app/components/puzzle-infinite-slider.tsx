@@ -33,7 +33,7 @@ export const PuzzleInfiniteSlider = forwardRef<
 					"group-hover:[animation-play-state:paused]",
 					"motion-reduce:[animation-play-state:paused]",
 				)}
-				key={`_index-InfiniteSlider-${i}`}
+				key={`PuzzleInfiniteSlider-${i}`}
 			>
 				{Array.from({ length: 4 }).map((__, j) => (
 					<li
@@ -42,7 +42,7 @@ export const PuzzleInfiniteSlider = forwardRef<
 
 							"first:ml-8",
 						)}
-						key={`_index-InfiniteSlider-${i}-Slide-${j}`}
+						key={`PuzzleInfiniteSlider-${i}-Slide-${j}`}
 					>
 						<div className="col-span-4 grid grid-cols-4 gap-0.5">
 							<div className="h-6 w-full rounded-xl border bg-card" />
@@ -58,7 +58,7 @@ export const PuzzleInfiniteSlider = forwardRef<
 						{Array.from({ length: 16 }).map((___, k) => (
 							<div
 								className="h-10 w-10 rounded-xl border bg-card"
-								key={`_index-InfiniteSlider-${i}-Slide-${j}-${k}`}
+								key={`PuzzleInfiniteSlider-${i}-Slide-${j}-${k}`}
 							/>
 						))}
 
