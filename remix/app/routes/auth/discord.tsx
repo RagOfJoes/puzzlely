@@ -18,7 +18,6 @@ export async function action({ request }: Route.ActionArgs) {
 
 	const session = await getSession(request.headers.get("Cookie"));
 
-	// TODO: Ensure this doesn't cause an infinite loop
 	// NOTE: Hack to set state cookie
 	// If state isn't present yet, then, set it and redirect back to this route
 	const cookie = (await state.parse(request.headers.get("cookie"))) as null | string;

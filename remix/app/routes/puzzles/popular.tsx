@@ -10,10 +10,6 @@ import { redirectWithInfo } from "@/services/toast.server";
 
 import type { Route } from "./+types/popular";
 
-/**
- * TODO: Save last cursor to a cookie to persist user's place
- * TODO: Create error page
- */
 export async function loader({ request }: Route.LoaderArgs) {
 	const me = await API.me(request);
 	// If the user hasn't completed their profile
