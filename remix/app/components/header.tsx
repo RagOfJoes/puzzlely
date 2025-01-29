@@ -95,207 +95,211 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 
 		return (
 			<header
+				{...props}
 				className={cn(
-					"sticky top-0 z-[1] mx-auto flex h-[var(--header-height)] w-full max-w-screen-md items-center justify-between bg-background/75 px-5 backdrop-blur",
+					"sticky top-0 z-[1] flex h-[var(--header-height)] w-full items-center justify-center px-5",
+					// Background
+					"bg-transparent backdrop-blur-sm [background-image:radial-gradient(transparent_1px,_hsl(var(--background))_1px)] [background-size:4px_4px] [mask-image:_linear-gradient(rgb(0,0,0)_60%,_rgba(0,0,0,0)_100%)]",
 
 					className,
 				)}
 				ref={ref}
-				{...props}
 			>
-				<div className="flex gap-1">
-					<Drawer direction="left">
-						<DrawerTrigger asChild>
-							<Button
-								aria-label="Open navigation"
-								className="h-11 w-11"
-								size="icon"
-								variant="ghost"
-							>
-								<MenuIcon className="h-4 w-4" />
-							</Button>
-						</DrawerTrigger>
+				<div className="flex w-full min-w-0 max-w-screen-md justify-between">
+					<div className="flex min-w-0 gap-1">
+						<Drawer direction="left">
+							<DrawerTrigger asChild>
+								<Button
+									aria-label="Open navigation menu"
+									className="h-11 w-11"
+									size="icon"
+									variant="ghost"
+								>
+									<MenuIcon className="h-4 w-4" />
+								</Button>
+							</DrawerTrigger>
 
-						<DrawerContent>
-							<div className="flex w-full overflow-hidden rounded-xl border bg-popover">
-								<nav className="flex w-full flex-col">
-									<DrawerHeader className="w-full">
-										<DrawerTitle>
-											<Link
-												aria-label="Go home"
-												to="/"
-												className={cn(
-													"flex items-center no-underline outline-none ring-offset-background transition-all",
+							<DrawerContent>
+								<div className="flex w-full overflow-hidden rounded-xl border bg-popover">
+									<nav className="flex w-full flex-col">
+										<DrawerHeader className="w-full">
+											<DrawerTitle>
+												<Link
+													aria-label="Go home"
+													to="/"
+													className={cn(
+														"flex items-center no-underline outline-none ring-offset-background transition-all",
 
-													"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-												)}
-											>
-												<PuzzlelyIcon className="h-11 w-11" />
+														"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+													)}
+												>
+													<PuzzlelyIcon className="h-11 w-11" />
 
-												<h1 className="relative select-none text-lg font-semibold">Puzzlely</h1>
+													<h1 className="relative select-none text-lg font-semibold">Puzzlely</h1>
+												</Link>
+											</DrawerTitle>
+											<DrawerDescription className="sr-only">Menu</DrawerDescription>
+										</DrawerHeader>
+
+										<div className="mt-8 flex w-full flex-col gap-1 px-4">
+											<Link tabIndex={-1} to="/puzzles/create/">
+												<Button
+													className={cn(
+														"w-full gap-2 rounded-xl shadow-[0_0_12px_1px] shadow-primary",
+
+														"[&>svg]:data-[is-liked=true]:fill-current",
+													)}
+													size="lg"
+												>
+													<PlusIcon className="h-4 w-4" />
+													Create a puzzle
+												</Button>
 											</Link>
-										</DrawerTitle>
-										<DrawerDescription className="sr-only">Menu</DrawerDescription>
-									</DrawerHeader>
+										</div>
 
-									<div className="mt-8 flex w-full flex-col gap-1 px-4">
-										<Link tabIndex={-1} to="/puzzles/create/">
-											<Button
-												className={cn(
-													"w-full gap-2 rounded-xl shadow-[0_0_12px_1px] shadow-primary",
+										<div className="mt-8 flex w-full flex-col gap-2 px-4 pb-4">
+											<h2 className="text-sm font-semibold uppercase">Menu</h2>
 
-													"[&>svg]:data-[is-liked=true]:fill-current",
-												)}
-												size="lg"
-											>
-												<PlusIcon className="h-4 w-4" />
-												Create a puzzle
-											</Button>
-										</Link>
-									</div>
+											<Link tabIndex={-1} to="/puzzles/popular/">
+												<Button
+													className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
+													size="lg"
+													variant="ghost"
+												>
+													<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
+														<TrendingUpIcon className="h-4 w-4" />
+													</div>
+													Popular
+												</Button>
+											</Link>
+										</div>
 
-									<div className="mt-8 flex w-full flex-col gap-2 px-4 pb-4">
-										<h2 className="text-sm font-semibold uppercase">Menu</h2>
+										<div className="mt-auto flex w-full flex-col gap-2 px-4 pb-4">
+											<h2 className="text-sm font-semibold uppercase">Account</h2>
 
-										<Link tabIndex={-1} to="/puzzles/popular/">
-											<Button
-												className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
-												size="lg"
-												variant="ghost"
-											>
-												<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
-													<TrendingUpIcon className="h-4 w-4" />
-												</div>
-												Popular
-											</Button>
-										</Link>
-									</div>
+											{me ? (
+												<>
+													<Link tabIndex={-1} to="/profile/">
+														<Button
+															className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
+															size="lg"
+															variant="ghost"
+														>
+															<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
+																<UserIcon className="h-4 w-4" />
+															</div>
+															Profile
+														</Button>
+													</Link>
 
-									<div className="mt-auto flex w-full flex-col gap-2 px-4 pb-4">
-										<h2 className="text-sm font-semibold uppercase">Account</h2>
+													<Form method="delete" action="/logout">
+														<Button
+															className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
+															size="lg"
+															variant="ghost"
+														>
+															<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
+																<LogOutIcon className="h-4 w-4" />
+															</div>
+															Logout
+														</Button>
+													</Form>
+												</>
+											) : (
+												<>
+													<Link tabIndex={-1} to="/signup/">
+														<Button
+															className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
+															size="lg"
+															variant="ghost"
+														>
+															<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
+																<UserPlusIcon className="h-4 w-4" />
+															</div>
+															Sign Up
+														</Button>
+													</Link>
 
-										{me ? (
-											<>
-												<Link tabIndex={-1} to="/profile/">
-													<Button
-														className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
-														size="lg"
-														variant="ghost"
-													>
-														<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
-															<UserIcon className="h-4 w-4" />
-														</div>
-														Profile
-													</Button>
-												</Link>
+													<Link tabIndex={-1} to="/login/">
+														<Button
+															className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
+															size="lg"
+															variant="ghost"
+														>
+															<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
+																<LogInIcon className="h-4 w-4" />
+															</div>
+															Login
+														</Button>
+													</Link>
+												</>
+											)}
+										</div>
+									</nav>
+								</div>
+							</DrawerContent>
+						</Drawer>
 
-												<Form method="delete" action="/logout">
-													<Button
-														className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
-														size="lg"
-														variant="ghost"
-													>
-														<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
-															<LogOutIcon className="h-4 w-4" />
-														</div>
-														Logout
-													</Button>
-												</Form>
-											</>
-										) : (
-											<>
-												<Link tabIndex={-1} to="/signup/">
-													<Button
-														className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
-														size="lg"
-														variant="ghost"
-													>
-														<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
-															<UserPlusIcon className="h-4 w-4" />
-														</div>
-														Sign Up
-													</Button>
-												</Link>
+						<Link
+							aria-label="Go home"
+							className={cn(
+								"flex h-11 w-11 items-center justify-center no-underline outline-none ring-offset-background transition-all",
 
-												<Link tabIndex={-1} to="/login/">
-													<Button
-														className="group/button h-auto w-full justify-start gap-3 px-3 py-3"
-														size="lg"
-														variant="ghost"
-													>
-														<div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground p-2 text-background">
-															<LogInIcon className="h-4 w-4" />
-														</div>
-														Login
-													</Button>
-												</Link>
-											</>
-										)}
-									</div>
-								</nav>
-							</div>
-						</DrawerContent>
-					</Drawer>
-
-					<Link
-						aria-label="Go home"
-						className={cn(
-							"flex h-11 w-11 items-center justify-center no-underline outline-none ring-offset-background transition-all",
-
-							"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-						)}
-						to="/"
-					>
-						<PuzzlelyIcon className="h-9 w-9" />
-					</Link>
-				</div>
-
-				<div className="flex gap-1">
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								className="h-11 w-11"
-								disabled={unsaved.length <= 0}
-								onClick={async () => {
-									if (!me) {
-										navigate("/login");
-										return;
-									}
-
-									await onSync();
-								}}
-								size="icon"
-								variant="ghost"
-							>
-								<SaveAllIcon className="h-4 w-4" />
-							</Button>
-						</TooltipTrigger>
-
-						<TooltipContent align="end">
-							<p className="text-sm font-medium">
-								You have {unsaved.length} unsaved game
-								{unsaved.length === 1 ? "" : "s"}!
-							</p>
-
-							<small className="text-xs text-muted-foreground">
-								Save them now to make sure that your games persists.
-							</small>
-						</TooltipContent>
-					</Tooltip>
-
-					{me ? (
-						<Form method="delete" action="/logout">
-							<Button className="h-11 w-11" size="icon" variant="ghost">
-								<LogOutIcon className="h-4 w-4" />
-							</Button>
-						</Form>
-					) : (
-						<Link tabIndex={-1} to="/login/">
-							<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="ghost">
-								<LogInIcon className="h-4 w-4" />
-							</Button>
+								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+							)}
+							to="/"
+						>
+							<PuzzlelyIcon className="h-9 w-9" />
 						</Link>
-					)}
+					</div>
+
+					<div className="flex gap-1">
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button
+									className="h-11 w-11"
+									disabled={unsaved.length <= 0}
+									onClick={async () => {
+										if (!me) {
+											navigate("/login");
+											return;
+										}
+
+										await onSync();
+									}}
+									size="icon"
+									variant="ghost"
+								>
+									<SaveAllIcon className="h-4 w-4" />
+								</Button>
+							</TooltipTrigger>
+
+							<TooltipContent align="end">
+								<p className="text-sm font-medium">
+									You have {unsaved.length} unsaved game
+									{unsaved.length === 1 ? "" : "s"}!
+								</p>
+
+								<small className="text-xs text-muted-foreground">
+									Save them now to make sure that your games persists.
+								</small>
+							</TooltipContent>
+						</Tooltip>
+
+						{me ? (
+							<Form method="delete" action="/logout">
+								<Button className="h-11 w-11" size="icon" variant="ghost">
+									<LogOutIcon className="h-4 w-4" />
+								</Button>
+							</Form>
+						) : (
+							<Link tabIndex={-1} to="/login/">
+								<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="ghost">
+									<LogInIcon className="h-4 w-4" />
+								</Button>
+							</Link>
+						)}
+					</div>
 				</div>
 			</header>
 		);
