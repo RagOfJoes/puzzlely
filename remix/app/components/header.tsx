@@ -97,7 +97,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 			<header
 				{...props}
 				className={cn(
-					"sticky top-0 z-[1] flex h-[var(--header-height)] w-full items-center justify-center px-5",
+					"sticky top-0 z-50 flex h-[var(--header-height)] w-full items-center justify-center px-5",
 					// Background
 					"bg-transparent backdrop-blur-sm [background-image:radial-gradient(transparent_1px,_hsl(var(--background))_1px)] [background-size:4px_4px] [mask-image:_linear-gradient(rgb(0,0,0)_60%,_rgba(0,0,0,0)_100%)]",
 

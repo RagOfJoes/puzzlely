@@ -26,7 +26,7 @@ export const ScrollAreaScrollbar = forwardRef<
 		orientation={orientation}
 		ref={ref}
 	>
-		<ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-foreground/20" />
+		<ScrollAreaPrimitive.ScrollAreaThumb className="relative z-50 flex-1 rounded-full bg-foreground/20" />
 	</ScrollAreaPrimitive.ScrollAreaScrollbar>
 ));
 ScrollAreaScrollbar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName;

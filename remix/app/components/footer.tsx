@@ -12,7 +12,7 @@ export const Footer = forwardRef<ElementRef<"footer">, FooterProps>(
 		<footer
 			{...props}
 			className={cn(
-				"z-[1] mx-auto flex w-full max-w-screen-md items-center justify-between px-5 py-4",
+				"z-50 mx-auto flex w-full max-w-screen-md items-center justify-between px-5 py-4",
 
 				className,
 			)}
