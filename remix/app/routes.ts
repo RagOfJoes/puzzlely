@@ -37,6 +37,7 @@ export default [
 		route("create", "routes/puzzles/create.tsx"),
 		route("like/:id", "routes/puzzles/like.$id.tsx"),
 		route("play/:id", "routes/puzzles/play.$id.tsx"),
+		route("popular", "routes/puzzles/popular.tsx"),
 	]),
 
 	// Users routes
