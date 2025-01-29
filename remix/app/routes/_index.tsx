@@ -141,7 +141,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 						"max-lg:min-h-[700px]",
 					)}
 				>
-					<article className="flex h-full w-full flex-col items-center justify-center">
+					<div className="flex h-full w-full flex-col items-center justify-center">
 						<div className="w-full min-w-0">
 							<div className="flex w-full flex-col gap-2">
 								<PuzzleInfiniteSlider />
@@ -172,7 +172,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 								</div>
 							</div>
 						</div>
-					</article>
+					</div>
 				</main>
 			</>
 		);

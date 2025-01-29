@@ -191,7 +191,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 			<Header me={loaderData.me} />
 
 			<main className="mx-auto min-h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
-				<article className="flex h-full w-full flex-col gap-1">
+				<div className="flex h-full w-full flex-col gap-1">
 					<div className="flex flex-col gap-2 rounded-xl border bg-card px-4 py-4">
 						<div className="flex gap-2">
 							<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-foreground text-xl font-semibold text-muted">
@@ -302,7 +302,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 
 						<Outlet />
 					</Tabs>
-				</article>
+				</div>
 			</main>
 		</>
 	);

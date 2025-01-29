@@ -32,7 +32,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 			<Header me={loaderData.me} />
 
 			<main className="mx-auto h-[calc(100dvh-var(--header-height))] w-full max-w-screen-md px-5 pb-5">
-				<article className="flex h-full w-full flex-col items-center justify-center">
+				<div className="flex h-full w-full flex-col items-center justify-center">
 					<div className="w-full min-w-0 rounded-xl border bg-card p-6">
 						<div className="flex w-full flex-col items-start gap-1.5">
 							<h1 className="text-2xl font-semibold leading-none">Complete your profile setup</h1>
@@ -73,7 +73,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 							</div>
 						</div>
 					</div>
-				</article>
+				</div>
 			</main>
 		</>
 	);

@@ -146,7 +146,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 					"max-lg:min-h-[700px]",
 				)}
 			>
-				<article className="flex h-full w-full flex-col items-center justify-center gap-1">
+				<div className="flex h-full w-full flex-col items-center justify-center gap-1">
 					<PuzzleCreateForm
 						defaultValues={{
 							groups: [],
@@ -211,7 +211,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 							</AlertDialogFooter>
 						</AlertDialogContent>
 					</AlertDialog>
-				</article>
+				</div>
 			</main>
 		</>
 	);
