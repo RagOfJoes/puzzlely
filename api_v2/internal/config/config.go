@@ -4,6 +4,7 @@ import (
 	"os"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -15,11 +16,24 @@ var (
 	Production  Environment = "Production"
 )
 
+func (e Environment) String() string {
+	switch e {
+	case Development:
+		return "development"
+	case Production:
+		return "production"
+	default:
+		return ""
+	}
+}
+
 type Configuration struct {
 	// Environment
 	//
 	// Default: Development
 	Environment Environment
+	// Version
+	Version string
 
 	// Essentials
 	//
@@ -37,6 +51,7 @@ type Configuration struct {
 func (c Configuration) Validate() error {
 	return validation.ValidateStruct(&c,
 		validation.Field(&c.Environment, validation.Required, validation.In(Development, Production)),
+		validation.Field(&c.Version, validation.Required, is.Semver),
 
 		validation.Field(&c.Logger, validation.Required),
 
