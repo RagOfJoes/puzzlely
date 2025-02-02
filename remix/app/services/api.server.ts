@@ -303,11 +303,13 @@ export class API {
 		 * @returns A list of the most recent puzzles that the user hasn't played yet
 		 */
 		async popular(request: Request): Promise<Response<PuzzleConnection>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
 			const cursor = new URL(request.url).searchParams.get("cursor");
 			const res = await fetch(`${API.URL}/${this.prefix}/popular?cursor=${cursor ?? ""}`, {
 				credentials: "include",
 				headers: {
-					Cookie: request.headers.get("cookie") ?? "",
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
 				},
 				method: "GET",
 			});
@@ -384,10 +386,12 @@ export class API {
 		 * @returns The user with the given ID
 		 */
 		async get(request: Request, id: string): Promise<Response<User>> {
+			const session = await getSession(request.headers.get("Cookie"));
+
 			const res = await fetch(`${API.URL}/${this.prefix}/${id}`, {
 				credentials: "include",
 				headers: {
-					Cookie: request.headers.get("cookie") ?? "",
+					Authorization: `Bearer ${session.get("id") ?? ""}`,
 				},
 				method: "GET",
 			});
