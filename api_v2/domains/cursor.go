@@ -32,7 +32,7 @@ func NewCursor(value string) Cursor {
 func CursorFromString(str string) (Cursor, error) {
 	cursor := Cursor(str)
 	if err := cursor.Validate(); err != nil {
-		return "", err
+		return "", ErrCursorInvalid
 	}
 
 	return cursor, nil
