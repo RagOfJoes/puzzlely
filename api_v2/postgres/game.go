@@ -7,16 +7,22 @@ import (
 	"sort"
 
 	"github.com/RagOfJoes/puzzlely/domains"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/oklog/ulid/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
+	"go.opentelemetry.io/otel/codes"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/sync/errgroup"
 )
 
 var _ repositories.Game = (*game)(nil)
 
 type game struct {
+	tracer trace.Tracer
+
 	db *bun.DB
 }
 
@@ -24,11 +30,18 @@ func NewGame(db *bun.DB) repositories.Game {
 	logrus.Info("Created Game Postgres Repository")
 
 	return &game{
+		tracer: telemetry.Tracer("postgres.game"),
+
 		db: db,
 	}
 }
 
-func (g *game) GetWithPuzzleID(ctx context.Context, puzzleID string) (*domains.Game, error) {
+func (g *game) GetWithPuzzleID(ctx context.Context, id string) (*domains.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "GetWithPuzzleID", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var game domains.Game
@@ -50,11 +63,14 @@ func (g *game) GetWithPuzzleID(ctx context.Context, puzzleID string) (*domains.G
 		Relation("Puzzle.Groups.Blocks").
 		Relation("Puzzle.CreatedBy").
 		Relation("User").
-		Where("puzzle_id = ?", puzzleID).
+		Where("puzzle_id = ?", id).
 		Where("game.user_id = ?", session.UserID).
 		Group("game.id", "puzzle.id", "puzzle__created_by.id", "user.id")
 
 	if err := query.Scan(ctx); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
@@ -125,13 +141,21 @@ func (g *game) GetWithPuzzleID(ctx context.Context, puzzleID string) (*domains.G
 	})
 
 	if err := eg.Wait(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
 	return &game, nil
 }
 
-func (g *game) GetHistory(ctx context.Context, userID string, opts domains.GameCursorPaginationOpts) ([]domains.GameSummary, error) {
+func (g *game) GetHistory(ctx context.Context, id string, opts domains.GameCursorPaginationOpts) ([]domains.GameSummary, error) {
+	ctx, span := g.tracer.Start(ctx, "GetHistory", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var games []domains.GameSummary
@@ -141,20 +165,19 @@ func (g *game) GetHistory(ctx context.Context, userID string, opts domains.GameC
 		Column("id", "score", "created_at", "completed_at", "puzzle_id", "user_id").
 		ColumnExpr("(?) AS attempts", g.db.NewRaw("SELECT COUNT(DISTINCT(attempt_order)) FROM game_attempts WHERE game_id = game_summary.id")).
 		Relation("Puzzle", func(q *bun.SelectQuery) *bun.SelectQuery {
-			puzzleQuery := q.
+			q = q.
 				Column("id", "difficulty", "max_attempts", "created_at", "updated_at", "user_id").
 				ColumnExpr("(?) AS puzzle__num_of_likes", g.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = game_summary.puzzle_id AND active = TRUE"))
 
 			if session != nil && session.IsAuthenticated() {
-				puzzleQuery = puzzleQuery.
-					ColumnExpr("(?) AS puzzle__me_liked_at", g.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = game_summary.puzzle_id AND active = TRUE AND user_id = ?", session.UserID.String))
+				q = q.ColumnExpr("(?) AS puzzle__me_liked_at", g.db.NewRaw("SELECT updated_at FROM puzzle_likes WHERE puzzle_id = game_summary.puzzle_id AND active = TRUE AND user_id = ?", session.UserID.String))
 			}
 
-			return puzzleQuery
+			return q
 		}).
 		Relation("Puzzle.CreatedBy").
 		Relation("User").
-		Where("game_summary.user_id = ?", userID).
+		Where("game_summary.user_id = ?", id).
 		Group("game_summary.id", "puzzle.id", "puzzle__created_by.id", "user.id").
 		OrderExpr("game_summary.created_at DESC").
 		Limit(opts.Limit + 1)
@@ -162,6 +185,9 @@ func (g *game) GetHistory(ctx context.Context, userID string, opts domains.GameC
 	if !opts.Cursor.IsEmpty() {
 		decoded, err := opts.Cursor.Decode()
 		if err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
+
 			return nil, err
 		}
 
@@ -169,30 +195,37 @@ func (g *game) GetHistory(ctx context.Context, userID string, opts domains.GameC
 	}
 
 	if err := query.Scan(ctx); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
 	return games, nil
 }
 
-func (g *game) Save(ctx context.Context, upsertGame domains.Game) (*domains.Game, error) {
-	var game domains.Game
+func (g *game) Save(ctx context.Context, payload domains.Game) (*domains.Game, error) {
+	ctx, span := g.tracer.Start(ctx, "Save", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
 
+	var game domains.Game
 	if err := g.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 		_, err := g.db.NewInsert().
 			Model(&domains.Game{
 				ID:    ulid.Make().String(),
-				Score: upsertGame.Score,
+				Score: payload.Score,
 
-				CreatedAt:   upsertGame.CompletedAt.Time,
-				CompletedAt: upsertGame.CompletedAt,
+				CreatedAt:   payload.CompletedAt.Time,
+				CompletedAt: payload.CompletedAt,
 
-				PuzzleID: upsertGame.PuzzleID,
-				UserID:   upsertGame.UserID,
+				PuzzleID: payload.PuzzleID,
+				UserID:   payload.UserID,
 			}).
 			On("CONFLICT (puzzle_id, user_id) DO UPDATE").
-			Set("score = ?", upsertGame.Score).
-			Set("completed_at = ?", upsertGame.CompletedAt).
+			Set("score = ?", payload.Score).
+			Set("completed_at = ?", payload.CompletedAt).
 			Returning("*").
 			Exec(ctx, &game)
 		if err != nil {
@@ -213,9 +246,9 @@ func (g *game) Save(ctx context.Context, upsertGame domains.Game) (*domains.Game
 			return err
 		}
 
-		if len(upsertGame.Attempts) > 0 {
+		if len(payload.Attempts) > 0 {
 			attempts := make([]domains.GameAttempt, 0)
-			for i, attempt := range upsertGame.Attempts {
+			for i, attempt := range payload.Attempts {
 				for j, id := range attempt {
 					attempts = append(attempts, domains.GameAttempt{
 						ID:             ulid.Make().String(),
@@ -235,9 +268,9 @@ func (g *game) Save(ctx context.Context, upsertGame domains.Game) (*domains.Game
 			}
 		}
 
-		if len(upsertGame.Correct) > 0 {
+		if len(payload.Correct) > 0 {
 			correct := make([]domains.GameCorrect, 0)
-			for i, id := range upsertGame.Correct {
+			for i, id := range payload.Correct {
 				correct = append(correct, domains.GameCorrect{
 					ID:    ulid.Make().String(),
 					Order: i,
@@ -256,14 +289,17 @@ func (g *game) Save(ctx context.Context, upsertGame domains.Game) (*domains.Game
 
 		return nil
 	}); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
-	game.Attempts = upsertGame.Attempts
-	game.Correct = upsertGame.Correct
+	game.Attempts = payload.Attempts
+	game.Correct = payload.Correct
 
-	game.Puzzle = upsertGame.Puzzle
-	game.User = upsertGame.User
+	game.Puzzle = payload.Puzzle
+	game.User = payload.User
 
 	return &game, nil
 }
