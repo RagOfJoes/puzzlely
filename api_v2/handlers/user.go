@@ -10,6 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/oklog/ulid/v2"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -42,16 +44,24 @@ func User(dependencies UserDependencies, router *chi.Mux) {
 }
 
 func (u *user) get(w http.ResponseWriter, r *http.Request) {
-	userID, err := ulid.Parse(chi.URLParam(r, "id"))
+	span := trace.SpanFromContext(r.Context())
+
+	id, err := ulid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrInvalidID)
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrInvalidID))
 		return
 	}
 
 	u.session.Get(w, r, false)
 
-	user, err := u.service.Find(r.Context(), userID.String(), false)
+	user, err := u.service.Find(r.Context(), id.String(), false)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
@@ -60,8 +70,12 @@ func (u *user) get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *user) me(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
+
 	session, err := u.session.Get(w, r, true)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
 		return
 	}
@@ -70,18 +84,28 @@ func (u *user) me(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *user) update(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
+
 	var payload domains.UserUpdatePayload
 	if err := render.Bind(r, &payload); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserInvalidUpdatePayload))
 		return
 	}
 	if err := payload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err))
 		return
 	}
 
 	session, err := u.session.Get(w, r, true)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
 		return
 	}
@@ -97,6 +121,9 @@ func (u *user) update(w http.ResponseWriter, r *http.Request) {
 
 	user, err := u.service.Update(r.Context(), update)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}

@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"os/signal"
 	"strconv"
-	"strings"
 	"syscall"
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/RagOfJoes/puzzlely/internal/config"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -57,10 +57,6 @@ func New(cfg config.Configuration) *chi.Mux {
 		otelchi.Middleware(
 			cfg.Telemetry.ServiceName,
 			otelchi.WithChiRoutes(router),
-			otelchi.WithFilter(func(r *http.Request) bool {
-				// Ignore static files
-				return !strings.Contains(r.URL.Path, "/dist")
-			}),
 		),
 	)
 
@@ -132,15 +128,23 @@ func Run(cfg config.Configuration, handler http.Handler) error {
 		return err
 	}
 
+	// Setup graceful shutdown handling
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	telemetryShutdown, err := telemetry.Start(cfg)
+	defer func() {
+		if err := telemetryShutdown(ctx); err != nil {
+			logrus.Infof("Failed to shutdown telemetry: %s", err)
+		}
+	}()
+
 	addr := resolveAddr(cfg.Server.Host, port)
 	srv := &http.Server{
 		Addr:    addr,
 		Handler: handler,
 	}
 
-	// Setup graceful shutdown handling
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
 	// Initializing the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
 	go func() {
@@ -161,7 +165,7 @@ func Run(cfg config.Configuration, handler http.Handler) error {
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		return err

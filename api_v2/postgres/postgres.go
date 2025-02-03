@@ -12,6 +12,7 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/extra/bunotel"
 )
 
 const (
@@ -52,6 +53,8 @@ func Connect(cfg config.Configuration) (*bun.DB, error) {
 	if db == nil {
 		return nil, errors.New("Failed to instantiate bun")
 	}
+
+	db.AddQueryHook(bunotel.NewQueryHook(bunotel.WithDBName(cfg.Database.Name)))
 
 	logrus.WithFields(logrus.Fields{
 		"driver": "postgres",

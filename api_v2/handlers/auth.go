@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptrace"
 	"strconv"
 	"strings"
 	"time"
@@ -16,6 +18,8 @@ import (
 	"github.com/RagOfJoes/puzzlely/services"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 var (
@@ -91,9 +95,18 @@ func (a *auth) sub(r *http.Request) (string, error) {
 	timeout := time.Duration(10 * time.Second)
 	client := http.Client{
 		Timeout: timeout,
+		Transport: otelhttp.NewTransport(
+			http.DefaultTransport,
+			otelhttp.WithClientTrace(func(ctx context.Context) *httptrace.ClientTrace {
+				return otelhttptrace.NewClientTrace(ctx)
+			}),
+			otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+				return fmt.Sprintf("HTTP %s %s", operation, r.URL.Host)
+			}),
+		),
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s?client_id=%s&client_secret=%s", url, clientID, clientSecret), nil)
+	req, err := http.NewRequestWithContext(r.Context(), "GET", fmt.Sprintf("%s?client_id=%s&client_secret=%s", url, clientID, clientSecret), nil)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
@@ -166,8 +179,6 @@ func (a *auth) sub(r *http.Request) (string, error) {
 }
 
 func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
 	// Get existing session or create a new one
 	session, _ := a.session.Get(w, r, false)
 	if session != nil && session.IsAuthenticated() {
@@ -191,12 +202,12 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 		Provider: provider,
 		Sub:      sub,
 	}
-	user, err := a.user.FindWithConnection(ctx, connection)
+	user, err := a.user.FindWithConnection(r.Context(), connection)
 	if err != nil {
 		newUser := domains.NewUser()
 		newConnection := domains.NewConnection(provider, sub, newUser.ID)
 
-		createdUser, err := a.user.New(ctx, newConnection, newUser)
+		createdUser, err := a.user.New(r.Context(), newConnection, newUser)
 		if err != nil {
 			render.Respond(w, r, err)
 			return

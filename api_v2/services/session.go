@@ -7,9 +7,12 @@ import (
 
 	"github.com/RagOfJoes/puzzlely/domains"
 	"github.com/RagOfJoes/puzzlely/internal"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/oklog/ulid/v2"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Errors
@@ -23,6 +26,8 @@ var (
 
 // Session defines the session service
 type Session struct {
+	tracer trace.Tracer
+
 	repository repositories.Session
 }
 
@@ -35,56 +40,91 @@ func NewSession(dependencies SessionDependencies) Session {
 	logrus.Print("Created Session Service")
 
 	return Session{
+		tracer: telemetry.Tracer("services.session"),
+
 		repository: dependencies.Repository,
 	}
 }
 
 // New creates a new session
-func (s *Session) New(ctx context.Context, newSession domains.Session) (*domains.Session, error) {
-	if err := newSession.Validate(); err != nil {
+func (s *Session) New(ctx context.Context, payload domains.Session) (*domains.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "New", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
+
+	if err := payload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalid)
 	}
 
-	createdSession, err := s.repository.Create(ctx, newSession)
+	session, err := s.repository.Create(ctx, payload)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionCreate)
 	}
 
-	return createdSession, nil
+	return session, nil
 }
 
 // FindByID retrieves a session with its id
 func (s *Session) FindByID(ctx context.Context, id ulid.ULID) (*domains.Session, error) {
-	foundSession, err := s.repository.Get(ctx, id.String())
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalidID)
-	}
-	if err := foundSession.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalidID)
-	}
-	strip(foundSession)
+	ctx, span := s.tracer.Start(ctx, "FindByID", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
-	return foundSession, nil
+	session, err := s.repository.Get(ctx, id.String())
+	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalidID)
+	}
+	if err := session.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalidID)
+	}
+	strip(session)
+
+	return session, nil
 }
 
 // Update updates a session
-func (s *Session) Update(ctx context.Context, updateSession domains.Session) (*domains.Session, error) {
-	if err := updateSession.Validate(); err != nil {
+func (s *Session) Update(ctx context.Context, payload domains.Session) (*domains.Session, error) {
+	ctx, span := s.tracer.Start(ctx, "Update", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
+
+	if err := payload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionInvalid)
 	}
 
-	updatedSession, err := s.repository.Update(ctx, updateSession)
+	session, err := s.repository.Update(ctx, payload)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionUpdate)
 	}
-	strip(updatedSession)
+	strip(session)
 
-	return updatedSession, nil
+	return session, nil
 }
 
 // Delete deletes a session
 func (s *Session) Delete(ctx context.Context, id ulid.ULID) error {
+	ctx, span := s.tracer.Start(ctx, "Delete", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
+
 	if err := s.repository.Delete(ctx, id.String()); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrSessionDelete)
 	}
 
