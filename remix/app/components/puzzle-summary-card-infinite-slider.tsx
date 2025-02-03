@@ -36,7 +36,7 @@ export const PuzzleSummaryCardInfiniteSlider = forwardRef<
 				)}
 				key={`PuzzleSummaryCardInfiniteSlider-${i}`}
 			>
-				{Array.from({ length: 4 }).map((__, j) => {
+				{Array.from({ length: 3 }).map((__, j) => {
 					// eslint-disable-next-line react-hooks/rules-of-hooks
 					const difficulty = useMemo(() => {
 						switch (j) {
