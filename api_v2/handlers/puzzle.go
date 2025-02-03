@@ -66,7 +66,7 @@ func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
 		span.SetStatus(codes.Error, "")
 		span.RecordError(ErrPuzzleInvalidCreatePayload)
 
-		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err))
+		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidCreatePayload))
 		return
 	}
 
