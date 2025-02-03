@@ -22,13 +22,13 @@ type Connection struct {
 }
 
 // NewConnection creates a new connection for a given user
-func NewConnection(provider, sub string, userID string) Connection {
+func NewConnection(provider, sub string, id string) Connection {
 	return Connection{
 		ID:       ulid.Make().String(),
 		Provider: provider,
 		Sub:      sub,
 
-		UserID: userID,
+		UserID: id,
 	}
 }
 
