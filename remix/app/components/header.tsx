@@ -97,27 +97,29 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 			<header
 				{...props}
 				className={cn(
-					"sticky top-0 z-50 flex h-[var(--header-height)] w-full items-center justify-center px-5",
+					"sticky top-0 z-50 flex h-[var(--header-height)] w-full items-center justify-center px-5 opacity-100",
 					// Background
-					"bg-transparent backdrop-blur-sm [background-image:radial-gradient(transparent_1px,_hsl(var(--background))_1px)] [background-size:4px_4px] [mask-image:_linear-gradient(rgb(0,0,0)_60%,_rgba(0,0,0,0)_100%)]",
+					"bg-transparent backdrop-blur-[3px] [background-image:radial-gradient(transparent_1px,_hsl(var(--background))_1px)] [background-size:4px_4px] [mask-image:_linear-gradient(rgb(0,0,0)_60%,_rgba(0,0,0,0)_100%)]",
 
 					className,
 				)}
 				ref={ref}
 			>
 				<div className="flex w-full min-w-0 max-w-screen-md justify-between">
-					<div className="flex min-w-0 gap-1">
+					<ul className="flex min-w-0 gap-1">
 						<Drawer direction="left">
-							<DrawerTrigger asChild>
-								<Button
-									aria-label="Open navigation menu"
-									className="h-11 w-11"
-									size="icon"
-									variant="ghost"
-								>
-									<MenuIcon className="h-4 w-4" />
-								</Button>
-							</DrawerTrigger>
+							<li>
+								<DrawerTrigger asChild>
+									<Button
+										aria-label="Open navigation menu"
+										className="h-11 w-11"
+										size="icon"
+										variant="ghost"
+									>
+										<MenuIcon className="h-4 w-4" />
+									</Button>
+								</DrawerTrigger>
+							</li>
 
 							<DrawerContent>
 								<div className="flex w-full overflow-hidden rounded-xl border bg-popover">
@@ -240,39 +242,43 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 							</DrawerContent>
 						</Drawer>
 
-						<Link
-							aria-label="Go home"
-							className={cn(
-								"flex h-11 w-11 items-center justify-center no-underline outline-none ring-offset-background transition-all",
+						<li>
+							<Link
+								aria-label="Go home"
+								className={cn(
+									"flex h-11 w-11 items-center justify-center no-underline outline-none ring-offset-background transition-all",
 
-								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-							)}
-							to="/"
-						>
-							<PuzzlelyIcon className="h-9 w-9" />
-						</Link>
-					</div>
+									"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+								)}
+								to="/"
+							>
+								<PuzzlelyIcon className="h-9 w-9" />
+							</Link>
+						</li>
+					</ul>
 
-					<div className="flex gap-1">
+					<ul className="flex gap-1">
 						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button
-									className="h-11 w-11"
-									disabled={unsaved.length <= 0}
-									onClick={async () => {
-										if (!me) {
-											navigate("/login");
-											return;
-										}
+							<li>
+								<TooltipTrigger asChild>
+									<Button
+										className="h-11 w-11"
+										disabled={unsaved.length <= 0}
+										onClick={async () => {
+											if (!me) {
+												navigate("/login");
+												return;
+											}
 
-										await onSync();
-									}}
-									size="icon"
-									variant="ghost"
-								>
-									<SaveAllIcon className="h-4 w-4" />
-								</Button>
-							</TooltipTrigger>
+											await onSync();
+										}}
+										size="icon"
+										variant="ghost"
+									>
+										<SaveAllIcon className="h-4 w-4" />
+									</Button>
+								</TooltipTrigger>
+							</li>
 
 							<TooltipContent align="end">
 								<p className="text-sm font-medium">
@@ -287,19 +293,23 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 						</Tooltip>
 
 						{me ? (
-							<Form method="delete" action="/logout">
-								<Button className="h-11 w-11" size="icon" variant="ghost">
-									<LogOutIcon className="h-4 w-4" />
-								</Button>
-							</Form>
+							<li>
+								<Form method="delete" action="/logout">
+									<Button className="h-11 w-11" size="icon" variant="ghost">
+										<LogOutIcon className="h-4 w-4" />
+									</Button>
+								</Form>
+							</li>
 						) : (
-							<Link tabIndex={-1} to="/login/">
-								<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="ghost">
-									<LogInIcon className="h-4 w-4" />
-								</Button>
-							</Link>
+							<li>
+								<Link tabIndex={-1} to="/login/">
+									<Button aria-label="Log in" className="h-11 w-11" size="icon" variant="ghost">
+										<LogInIcon className="h-4 w-4" />
+									</Button>
+								</Link>
+							</li>
 						)}
-					</div>
+					</ul>
 				</div>
 			</header>
 		);
