@@ -1,11 +1,9 @@
 import { createCookie } from "react-router";
 
-// TODO: Set secrets for signing
 export const state = createCookie("_state", {
-	// domain: process.env.HOST_URL,
 	httpOnly: process.env.NODE_ENV === "production",
 	path: "/auth/",
 	sameSite: "lax",
-	secrets: [],
+	secrets: (process.env.STATE_COOKIE_SECRETS ?? "").split(","),
 	secure: process.env.NODE_ENV === "production",
 });

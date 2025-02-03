@@ -37,7 +37,7 @@ export class API {
 			throw new Error("Provider not supported");
 		}
 
-		const res = await fetch(`${process.env.API_URL}/auth/${provider}`, {
+		const res = await fetch(`${API.URL}/auth/${provider}`, {
 			credentials: "include",
 			headers: {
 				Authorization: `Bearer ${token}`,

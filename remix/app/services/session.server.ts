@@ -14,9 +14,6 @@ export const { commitSession, destroySession, getSession } = createCookieSession
 		path: "/",
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
-		secrets:
-			process.env.NODE_ENV === "production"
-				? [process.env.SESSION_COOKIE_SECRETS ?? ""]
-				: ["SECRETS"],
+		secrets: (process.env.SESSION_COOKIE_SECRETS ?? "").split(","),
 	},
 });
