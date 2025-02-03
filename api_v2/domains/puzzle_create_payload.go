@@ -52,7 +52,7 @@ func (p *PuzzleCreatePayload) Bind(r *http.Request) error {
 }
 
 func (p PuzzleCreatePayload) ToPuzzle() Puzzle {
-	puzzleID := ulid.Make()
+	id := ulid.Make()
 
 	groups := []PuzzleGroup{}
 	for _, group := range p.Groups {
@@ -74,12 +74,12 @@ func (p PuzzleCreatePayload) ToPuzzle() Puzzle {
 
 			Blocks: blocks,
 
-			PuzzleID: puzzleID.String(),
+			PuzzleID: id.String(),
 		})
 	}
 
 	return Puzzle{
-		ID:          puzzleID.String(),
+		ID:          id.String(),
 		Difficulty:  p.Difficulty,
 		MaxAttempts: p.MaxAttempts,
 

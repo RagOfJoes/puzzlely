@@ -6,15 +6,21 @@ import (
 	"errors"
 
 	"github.com/RagOfJoes/puzzlely/domains"
+	"github.com/RagOfJoes/puzzlely/internal/telemetry"
 	"github.com/RagOfJoes/puzzlely/repositories"
 	"github.com/oklog/ulid/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
+	"go.opentelemetry.io/otel/codes"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var _ repositories.Puzzle = (*puzzle)(nil)
 
 type puzzle struct {
+	tracer trace.Tracer
+
 	db *bun.DB
 }
 
@@ -22,27 +28,33 @@ func NewPuzzle(db *bun.DB) repositories.Puzzle {
 	logrus.Info("Created Puzzle Postgres Repository")
 
 	return &puzzle{
+		tracer: telemetry.Tracer("postgres.puzzle"),
+
 		db: db,
 	}
 }
 
-func (p *puzzle) Create(ctx context.Context, newPuzzle domains.Puzzle) (*domains.Puzzle, error) {
+func (p *puzzle) Create(ctx context.Context, payload domains.Puzzle) (*domains.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Create", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	var puzzle domains.Puzzle
-
 	blocks := make([]domains.PuzzleBlock, 0)
-
 	err := p.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		// Flatten payload's groups and append each of its blocks to slice
 		newBlocks := make([]domains.PuzzleBlock, 0)
-		for _, group := range newPuzzle.Groups {
+		for _, group := range payload.Groups {
 			for _, block := range group.Blocks {
 				newBlocks = append(newBlocks, block)
 			}
 		}
 
-		if _, err := tx.NewInsert().Model(&newPuzzle).Returning("*").Exec(ctx, &puzzle); err != nil {
+		if _, err := tx.NewInsert().Model(&payload).Returning("*").Exec(ctx, &puzzle); err != nil {
 			return err
 		}
-		if _, err := tx.NewInsert().Model(&newPuzzle.Groups).Returning("*").Exec(ctx, &puzzle.Groups); err != nil {
+		if _, err := tx.NewInsert().Model(&payload.Groups).Returning("*").Exec(ctx, &puzzle.Groups); err != nil {
 			return err
 		}
 		if _, err := tx.NewInsert().Model(&newBlocks).Returning("*").Exec(ctx, &blocks); err != nil {
@@ -52,11 +64,13 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle domains.Puzzle) (*domains
 		return nil
 	})
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
-	puzzle.CreatedBy = newPuzzle.CreatedBy
-
+	// Append blocks to response
 	for i := range puzzle.Groups {
 		group := &puzzle.Groups[i]
 		for _, block := range blocks {
@@ -68,14 +82,21 @@ func (p *puzzle) Create(ctx context.Context, newPuzzle domains.Puzzle) (*domains
 		}
 	}
 
+	// Append user to response
+	puzzle.CreatedBy = payload.CreatedBy
+
 	return &puzzle, nil
 }
 
 func (p *puzzle) Get(ctx context.Context, id string) (*domains.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Get", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var puzzle domains.Puzzle
-
 	query := p.db.
 		NewSelect().
 		Model(&puzzle).
@@ -92,24 +113,31 @@ func (p *puzzle) Get(ctx context.Context, id string) (*domains.Puzzle, error) {
 	}
 
 	if err := query.Scan(ctx); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
 	return &puzzle, nil
 }
 
-func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error) {
+func (p *puzzle) GetCreated(ctx context.Context, id string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error) {
+	ctx, span := p.tracer.Start(ctx, "GetCreated", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var puzzles []domains.PuzzleSummary
-
 	query := p.db.
 		NewSelect().
 		Model(&puzzles).
 		Column("puzzle_summary.id", "puzzle_summary.difficulty", "puzzle_summary.max_attempts", "puzzle_summary.created_at", "puzzle_summary.updated_at", "puzzle_summary.user_id").
 		ColumnExpr("(?) AS num_of_likes", p.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE")).
 		Relation("CreatedBy").
-		Where("puzzle_summary.user_id = ?", userID).
+		Where("puzzle_summary.user_id = ?", id).
 		Group("puzzle_summary.id", "created_by.id").
 		OrderExpr("puzzle_summary.created_at DESC").
 		Limit(opts.Limit + 1)
@@ -122,6 +150,9 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 	if !opts.Cursor.IsEmpty() {
 		decoded, err := opts.Cursor.Decode()
 		if err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
+
 			return nil, err
 		}
 
@@ -129,17 +160,24 @@ func (p *puzzle) GetCreated(ctx context.Context, userID string, opts domains.Puz
 	}
 
 	if err := query.Scan(ctx); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
 	return puzzles, nil
 }
 
-func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error) {
+func (p *puzzle) GetLiked(ctx context.Context, id string, opts domains.PuzzleCursorPaginationOpts) ([]domains.PuzzleSummary, error) {
+	ctx, span := p.tracer.Start(ctx, "GetLiked", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var puzzles []domains.PuzzleSummary
-
 	query := p.db.
 		NewSelect().
 		Model(&puzzles).
@@ -148,7 +186,7 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 		ColumnExpr("(?) AS num_of_likes", p.db.NewRaw("SELECT COUNT(id) FROM puzzle_likes WHERE puzzle_id = puzzle_summary.id AND active = TRUE")).
 		Relation("CreatedBy").
 		Join("LEFT JOIN puzzle_likes AS puzzle_like").JoinOn("puzzle_id = puzzle_summary.id AND active = TRUE").
-		Where("puzzle_like.user_id = ?", userID).
+		Where("puzzle_like.user_id = ?", id).
 		Group("puzzle_summary.id", "created_by.id", "puzzle_like.updated_at").
 		OrderExpr("puzzle_like.updated_at DESC").
 		Limit(opts.Limit + 1)
@@ -161,6 +199,9 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 	if !opts.Cursor.IsEmpty() {
 		decoded, err := opts.Cursor.Decode()
 		if err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
+
 			return nil, err
 		}
 
@@ -168,6 +209,9 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 	}
 
 	if err := query.Scan(ctx); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
@@ -175,11 +219,14 @@ func (p *puzzle) GetLiked(ctx context.Context, userID string, opts domains.Puzzl
 }
 
 func (p *puzzle) GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginationOpts) ([]domains.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "GetRecent", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var puzzles []domains.Puzzle
-
-	// Base query
 	query := p.db.
 		NewSelect().
 		Model(&puzzles).
@@ -212,6 +259,9 @@ func (p *puzzle) GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginat
 	if !opts.Cursor.IsEmpty() {
 		decoded, err := opts.Cursor.Decode()
 		if err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
+
 			return nil, err
 		}
 
@@ -224,6 +274,9 @@ func (p *puzzle) GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginat
 
 	// Scan results
 	if err := query.Scan(ctx); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
@@ -231,10 +284,14 @@ func (p *puzzle) GetRecent(ctx context.Context, opts domains.PuzzleCursorPaginat
 }
 
 func (p *puzzle) GetNextForRecent(ctx context.Context, cursor string) (*domains.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "GetNextForRecent", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var puzzle domains.Puzzle
-
 	query := p.db.
 		NewSelect().
 		Model(&puzzle).
@@ -253,6 +310,9 @@ func (p *puzzle) GetNextForRecent(ctx context.Context, cursor string) (*domains.
 
 	err := query.Scan(ctx)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
@@ -263,10 +323,14 @@ func (p *puzzle) GetNextForRecent(ctx context.Context, cursor string) (*domains.
 }
 
 func (p *puzzle) GetPreviousForRecent(ctx context.Context, cursor string) (*domains.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "GetPreviousForRecent", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
 	var puzzle domains.Puzzle
-
 	query := p.db.
 		NewSelect().
 		Model(&puzzle).
@@ -285,6 +349,9 @@ func (p *puzzle) GetPreviousForRecent(ctx context.Context, cursor string) (*doma
 
 	err := query.Scan(ctx)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
@@ -295,10 +362,14 @@ func (p *puzzle) GetPreviousForRecent(ctx context.Context, cursor string) (*doma
 }
 
 func (p *puzzle) ToggleLike(ctx context.Context, id string) (*domains.PuzzleLike, error) {
+	ctx, span := p.tracer.Start(ctx, "ToggleLike", trace.WithSpanKind(trace.SpanKindClient), trace.WithAttributes(
+		semconv.DBSystemPostgreSQL,
+	))
+	defer span.End()
+
 	session := domains.SessionFromContext(ctx)
 
-	var puzzleLike domains.PuzzleLike
-
+	var like domains.PuzzleLike
 	_, err := p.db.NewInsert().
 		Model(&domains.PuzzleLike{
 			ID:     ulid.Make().String(),
@@ -311,10 +382,14 @@ func (p *puzzle) ToggleLike(ctx context.Context, id string) (*domains.PuzzleLike
 		Set("active = NOT puzzle_like.active").
 		Set("updated_at = CURRENT_TIMESTAMP").
 		Returning("*").
-		Exec(ctx, &puzzleLike)
+		Exec(ctx, &like)
+
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
-	return &puzzleLike, nil
+	return &like, nil
 }

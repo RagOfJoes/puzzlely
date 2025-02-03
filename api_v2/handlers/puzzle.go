@@ -10,6 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/oklog/ulid/v2"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Errors
@@ -50,18 +52,28 @@ func Puzzle(dependencies PuzzleDependencies, router *chi.Mux) {
 }
 
 func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
+
 	var payload domains.PuzzleCreatePayload
 	if err := render.Bind(r, &payload); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrPuzzleInvalidCreatePayload)
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidCreatePayload))
 		return
 	}
 	if err := payload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrPuzzleInvalidCreatePayload)
+
 		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err))
 		return
 	}
 
 	session, err := p.session.Get(w, r, true)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
 		return
 	}
@@ -70,30 +82,44 @@ func (p *puzzle) create(w http.ResponseWriter, r *http.Request) {
 	newPuzzle.CreatedBy = *session.User
 	newPuzzle.UserID = session.User.ID
 	if err := newPuzzle.Validate(); err != nil {
-		render.Respond(w, r, err)
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrPuzzleInvalidCreatePayload)
+
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidCreatePayload))
 		return
 	}
 
-	created, err := p.service.New(r.Context(), newPuzzle)
+	puzzle, err := p.service.New(r.Context(), newPuzzle)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
 
-	render.Render(w, r, Created("", created))
+	render.Render(w, r, Created("", puzzle))
 }
 
 func (p *puzzle) created(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
+
 	// First make sure that the request is valid
-	userID, err := ulid.Parse(chi.URLParam(r, "user_id"))
+	id, err := ulid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrInvalidID)
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
 		return
 	}
 
 	cursor, err := domains.CursorFromString(r.URL.Query().Get("cursor"))
 	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", domains.ErrCursorInvalid))
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", err))
 		return
 	}
 
@@ -104,8 +130,11 @@ func (p *puzzle) created(w http.ResponseWriter, r *http.Request) {
 		Cursor: cursor,
 		Limit:  12,
 	}
-	connection, err := p.service.FindCreated(r.Context(), userID.String(), opts)
+	connection, err := p.service.FindCreated(r.Context(), id.String(), opts)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
@@ -114,16 +143,24 @@ func (p *puzzle) created(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *puzzle) liked(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
+
 	// First make sure that the request is valid
-	userID, err := ulid.Parse(chi.URLParam(r, "user_id"))
+	id, err := ulid.Parse(chi.URLParam(r, "user_id"))
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrInvalidID)
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
 		return
 	}
 
 	cursor, err := domains.CursorFromString(r.URL.Query().Get("cursor"))
 	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", domains.ErrCursorInvalid))
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", err))
 		return
 	}
 
@@ -134,8 +171,11 @@ func (p *puzzle) liked(w http.ResponseWriter, r *http.Request) {
 		Cursor: cursor,
 		Limit:  12,
 	}
-	connection, err := p.service.FindLiked(r.Context(), userID.String(), opts)
+	connection, err := p.service.FindLiked(r.Context(), id.String(), opts)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
@@ -144,16 +184,24 @@ func (p *puzzle) liked(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *puzzle) puzzle(w http.ResponseWriter, r *http.Request) {
-	puzzleID, err := ulid.Parse(chi.URLParam(r, "id"))
+	span := trace.SpanFromContext(r.Context())
+
+	id, err := ulid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrInvalidID)
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
 		return
 	}
 
 	p.session.Get(w, r, false)
 
-	puzzle, err := p.service.Find(r.Context(), puzzleID)
+	puzzle, err := p.service.Find(r.Context(), id)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
@@ -162,9 +210,14 @@ func (p *puzzle) puzzle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *puzzle) recent(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
+
 	cursor, err := domains.CursorFromString(r.URL.Query().Get("cursor"))
 	if err != nil {
-		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", domains.ErrCursorInvalid))
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", err))
 		return
 	}
 
@@ -177,6 +230,9 @@ func (p *puzzle) recent(w http.ResponseWriter, r *http.Request) {
 	}
 	connection, err := p.service.FindRecent(r.Context(), opts)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
@@ -185,19 +241,29 @@ func (p *puzzle) recent(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *puzzle) toggleLike(w http.ResponseWriter, r *http.Request) {
-	puzzleID, err := ulid.Parse(chi.URLParam(r, "id"))
+	span := trace.SpanFromContext(r.Context())
+
+	id, err := ulid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrInvalidID)
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
 		return
 	}
 
 	if _, err := p.session.Get(w, r, true); err != nil {
+		span.SetStatus(codes.Error, "")
+
 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
 		return
 	}
 
-	like, err := p.service.ToggleLike(r.Context(), puzzleID)
+	like, err := p.service.ToggleLike(r.Context(), id)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
