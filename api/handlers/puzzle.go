@@ -18,6 +18,7 @@ import (
 var (
 	ErrPuzzleCursorPaginationOpts = errors.New("Invalid cursor pagination options provided.")
 	ErrPuzzleInvalidCreatePayload = errors.New("Invalid new puzzle provided.")
+	ErrPuzzleInvalidUpdatePayload = errors.New("Invalid puzzle provided.")
 )
 
 type puzzle struct {
@@ -48,6 +49,7 @@ func Puzzle(dependencies PuzzleDependencies, router *chi.Mux) {
 		r.Get("/recent", p.recent)
 
 		r.Put("/like/{id}", p.toggleLike)
+		r.Put("/update/{id}", p.create)
 	})
 }
 
@@ -270,3 +272,62 @@ func (p *puzzle) toggleLike(w http.ResponseWriter, r *http.Request) {
 
 	render.Render(w, r, Ok("", like))
 }
+
+// func (p *puzzle) update(w http.ResponseWriter, r *http.Request) {
+// 	var payload domains.PuzzleUpdatePayload
+// 	if err := render.Bind(r, &payload); err != nil {
+// 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidUpdatePayload))
+// 		return
+// 	}
+// 	if err := payload.Validate(); err != nil {
+// 		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err))
+// 		return
+// 	}
+//
+// 	id, err := ulid.Parse(chi.URLParam(r, "id"))
+// 	if err != nil {
+// 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrInvalidID))
+// 		return
+// 	}
+//
+// 	if _, err := p.session.Get(w, r, true); err != nil {
+// 		render.Respond(w, r, internal.WrapErrorf(err, internal.ErrorCodeUnauthorized, "%v", ErrUnauthorized))
+// 		return
+// 	}
+//
+// 	puzzle, err := p.service.Find(r.Context(), id)
+// 	if err != nil {
+// 		render.Respond(w, r, err)
+// 		return
+// 	}
+//
+// 	if payload.Difficulty == puzzle.Difficulty && len(payload.Groups) == 0 {
+// 		render.Render(w, r, Ok("", puzzle))
+// 		return
+// 	}
+//
+// 	update := *puzzle
+// 	update.Difficulty = payload.Difficulty
+//
+// 	groups := map[string]domains.PuzzleUpdatePayloadGroup{}
+// 	for _, group := range payload.Groups {
+// 		groups[group.ID] = group
+// 	}
+//
+// 	for i, group := range update.Groups {
+// 		value, ok := groups[group.ID]
+// 		if !ok {
+// 			continue
+// 		}
+//
+// 		update.Groups[i].Description = value.Description
+// 	}
+//
+// 	updated, err := p.service.Update(r.Context(), *puzzle, update)
+// 	if err != nil {
+// 		render.Respond(w, r, err)
+// 		return
+// 	}
+//
+// 	render.Render(w, r, Ok("", updated))
+// }

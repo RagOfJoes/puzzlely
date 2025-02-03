@@ -278,3 +278,7 @@ func (p *Puzzle) ToggleLike(ctx context.Context, id ulid.ULID) (*domains.PuzzleL
 
 	return like, nil
 }
+
+func (p *Puzzle) Update(ctx context.Context, old, update domains.Puzzle) (*domains.PuzzleLike, error) {
+	return nil, nil
+}
