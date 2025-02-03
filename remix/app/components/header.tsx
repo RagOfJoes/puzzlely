@@ -97,7 +97,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 			<header
 				{...props}
 				className={cn(
-					"sticky top-0 z-50 flex h-[var(--header-height)] w-full items-center justify-center px-5 opacity-100",
+					"sticky top-0 z-50 flex h-[var(--header-height)] w-full items-center justify-center opacity-100",
 					// Background
 					"bg-transparent backdrop-blur-[3px] [background-image:radial-gradient(transparent_1px,_hsl(var(--background))_1px)] [background-size:4px_4px] [mask-image:_linear-gradient(rgb(0,0,0)_60%,_rgba(0,0,0,0)_100%)]",
 
@@ -105,7 +105,7 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 				)}
 				ref={ref}
 			>
-				<div className="flex w-full min-w-0 max-w-screen-md justify-between">
+				<div className="flex w-full min-w-0 max-w-screen-md justify-between px-1.5">
 					<ul className="flex min-w-0 gap-1">
 						<Drawer direction="left">
 							<li>
