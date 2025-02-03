@@ -213,7 +213,7 @@ func (g *game) save(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	savedGame, err := g.service.Save(r.Context(), newGame)
+	saved, err := g.service.Save(r.Context(), newGame)
 	if err != nil {
 		span.SetStatus(codes.Error, "")
 		span.RecordError(err)
@@ -222,5 +222,5 @@ func (g *game) save(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Render(w, r, Ok("", savedGame))
+	render.Render(w, r, Ok("", saved))
 }
