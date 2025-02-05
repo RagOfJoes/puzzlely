@@ -10,6 +10,7 @@ import {
 	TrendingUpIcon,
 	UserIcon,
 	UserPlusIcon,
+	WifiOffIcon,
 } from "lucide-react";
 import { Form, Link, useNavigate } from "react-router";
 import { toast as notify } from "sonner";
@@ -27,6 +28,7 @@ import { PuzzlelyIcon } from "@/components/puzzlely-icon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
 import { useFetcherWithPromise } from "@/hooks/use-fetcher-with-promise";
 import { useGameLocalContext } from "@/hooks/use-game-local";
+import { useIsOnline } from "@/hooks/use-is-online";
 import { cn } from "@/lib/cn";
 import type { action } from "@/routes/games.sync.$id";
 import type { User } from "@/types/user";
@@ -43,6 +45,8 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 		const navigate = useNavigate();
 
 		const [state, actions] = useGameLocalContext();
+
+		const isOnline = useIsOnline();
 
 		const unsaved = useMemo(() => Object.keys(state.games), [state.games]);
 
@@ -265,6 +269,14 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 										className="h-11 w-11"
 										disabled={unsaved.length <= 0}
 										onClick={async () => {
+											if (!isOnline) {
+												notify.error("It seems you're offline.", {
+													description: "Please check your connection and try again!",
+													icon: <WifiOffIcon className="h-4 w-4" />,
+												});
+												return;
+											}
+
 											if (!me) {
 												navigate("/login");
 												return;
