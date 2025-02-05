@@ -269,6 +269,9 @@ export const Header = forwardRef<ElementRef<"header">, HeaderProps>(
 												navigate("/login");
 												return;
 											}
+											if (unsaved.length === 0) {
+												return;
+											}
 
 											await onSync();
 										}}
