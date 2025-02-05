@@ -37,9 +37,6 @@ export async function action({ params, request }: Route.ActionArgs) {
 		return data(response);
 	}
 
-	// eslint-disable-next-line no-promise-executor-return
-	await new Promise((resolve) => setTimeout(resolve, 2000));
-
 	const game = await API.games.save(request, { payload: payload.data, puzzleID: params.id ?? "" });
 	return data(game);
 }
