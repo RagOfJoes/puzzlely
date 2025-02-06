@@ -29,7 +29,7 @@ export const Toaster = forwardRef<ElementRef<typeof Sonner>, ToasterProps>(
 			toastOptions={{
 				classNames: {
 					toast: cn(
-						"toast group font-sans",
+						"toast group flex-wrap gap-2 font-sans",
 
 						"group-[.toaster]:rounded-xl group-[.toaster]:border-border group-[.toaster]:bg-popover group-[.toaster]:text-popover-foreground",
 						"data-[type=error]:group-[.toaster]:border-destructive data-[type=error]:group-[.toaster]:bg-destructive data-[type=error]:group-[.toaster]:text-destructive-foreground",
@@ -47,6 +47,7 @@ export const Toaster = forwardRef<ElementRef<typeof Sonner>, ToasterProps>(
 						"group-data-[type=success]:text-success-foreground",
 						"group-data-[type=warning]:text-warning-foreground",
 					),
+					icon: "m-0",
 					title: "text-sm font-medium",
 				},
 			}}
