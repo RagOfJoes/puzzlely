@@ -22,6 +22,11 @@ export function meta(_: Route.MetaArgs) {
 		{
 			title: "Sign up | Puzzlely",
 		},
+		{
+			name: "description",
+			content:
+				"Create an account with Puzzlely and become a part of the community! Submit your own puzzles and see how other users fare against them.",
+		},
 	];
 }
 

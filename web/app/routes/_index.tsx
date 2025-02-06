@@ -135,14 +135,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 	);
 }
 
-export function meta(_: Route.MetaArgs) {
-	return [
-		{
-			title: "Puzzlely",
-		},
-	];
-}
-
 export function shouldRevalidate({
 	defaultShouldRevalidate,
 	formAction,

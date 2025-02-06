@@ -57,6 +57,19 @@ export const links: Route.LinksFunction = () => [
 	{ rel: "stylesheet", href: style },
 ];
 
+export function meta(_: Route.MetaArgs) {
+	return [
+		{
+			title: "Puzzlely",
+		},
+		{
+			name: "description",
+			content:
+				"What if Connections, but infinite? No more waiting until tomorrow, no more rationing your daily word-grouping fix. Just pure, unbridled classification chaos.",
+		},
+	];
+}
+
 export async function loader({ request }: Route.LoaderArgs) {
 	const { headers, toast } = await getToast(request);
 
@@ -125,10 +138,6 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 
 				<meta name="application-name" content="Puzzlely" />
 				<meta name="color-scheme" content="dark" />
-				<meta
-					name="description"
-					content="What if Connections, but infinite? No more waiting until tomorrow, no more rationing your daily word-grouping fix. Just pure, unbridled classification chaos."
-				/>
 				<meta
 					name="keywords"
 					content="puzzle,puzzlely,connections,nyt,new york times,nyt,game,only connect,puzzgrid,ragofjoes,victor ragojos"

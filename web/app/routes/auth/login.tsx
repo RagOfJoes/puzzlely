@@ -21,6 +21,10 @@ export function meta(_: Route.MetaArgs) {
 		{
 			title: "Login | Puzzlely",
 		},
+		{
+			name: "description",
+			content: "Log in to your Puzzlely account.",
+		},
 	];
 }
 

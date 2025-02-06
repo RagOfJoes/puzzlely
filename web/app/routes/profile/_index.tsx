@@ -121,6 +121,10 @@ export function meta({ data }: Route.MetaArgs) {
 		{
 			title: `${data.me.username} | Puzzlely`,
 		},
+		{
+			name: "description",
+			content: "View your created, liked, and played puzzles.",
+		},
 	];
 }
 
