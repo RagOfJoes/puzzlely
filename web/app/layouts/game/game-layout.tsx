@@ -97,6 +97,7 @@ export const GameLayout = forwardRef<ElementRef<typeof Primitive.div>, GameLayou
 				default:
 					if (
 						fetcher.data?.success &&
+						fetcher.data.data.puzzle.id === state.puzzle.id &&
 						fetcher.data.data.attempts.length === state.game.attempts.length &&
 						// NOTE: Default to undefined if `completed_at` is null to ensure dayjs works properly
 						dayjs(fetcher.data.data.completed_at ?? undefined).isSame(
