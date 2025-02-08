@@ -1,5 +1,5 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import type { Config } from "tailwindcss";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import defaultTheme from "tailwindcss/defaultTheme";
 import animate from "tailwindcss-animate";
 
