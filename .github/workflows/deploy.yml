@@ -1,0 +1,44 @@
+name: deploy
+on:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  packages: write
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    needs:
+      - run-tests
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image for API
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:api"
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/RagOfJoes/puzzlely-api:latest
+            ghcr.io/RagOfJoes/puzzlely-api:${{ github.sha }}
+
+      - name: Build and push Docker image for Web
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:web"
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/RagOfJoes/puzzlely-web:latest
+            ghcr.io/RagOfJoes/puzzlely-web:${{ github.sha }}
