@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/internal/config"
@@ -22,7 +23,6 @@ func Connect(cfg config.Configuration) (*bun.DB, error) {
 	dialect := pgdialect.New()
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.Database.User, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name)
-	logrus.Infof("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.Database.User, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name)
 	conn := pgdriver.NewConnector(
 		pgdriver.WithDSN(dsn),
 		pgdriver.WithTimeout(5*time.Second),
@@ -32,16 +32,16 @@ func Connect(cfg config.Configuration) (*bun.DB, error) {
 	)
 
 	sqldb := sql.OpenDB(conn)
-	// if cfg.Environment == config.Production {
-	// 	maxLifetime := time.Minute * 3
-	// 	maxOpenConns := 4 * runtime.GOMAXPROCS(0)
-	//
-	// 	sqldb.SetConnMaxIdleTime(maxLifetime)
-	// 	sqldb.SetConnMaxLifetime(maxLifetime)
-	//
-	// 	sqldb.SetMaxIdleConns(maxOpenConns)
-	// 	sqldb.SetMaxOpenConns(maxOpenConns)
-	// }
+	if cfg.Environment == config.Production {
+		maxLifetime := time.Minute * 3
+		maxOpenConns := 4 * runtime.GOMAXPROCS(0)
+
+		sqldb.SetConnMaxIdleTime(maxLifetime)
+		sqldb.SetConnMaxLifetime(maxLifetime)
+
+		sqldb.SetMaxIdleConns(maxOpenConns)
+		sqldb.SetMaxOpenConns(maxOpenConns)
+	}
 
 	// Test connection
 	err := sqldb.Ping()
