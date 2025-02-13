@@ -22,6 +22,7 @@ func Connect(cfg config.Configuration) (*bun.DB, error) {
 	dialect := pgdialect.New()
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.Database.User, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name)
+	logrus.Infof("postgres://%s:%s@%s:%s/%s?sslmode=disable", cfg.Database.User, cfg.Database.Password, cfg.Database.Host, cfg.Database.Port, cfg.Database.Name)
 	conn := pgdriver.NewConnector(
 		pgdriver.WithDSN(dsn),
 		pgdriver.WithTimeout(5*time.Second),
