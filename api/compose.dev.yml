@@ -8,8 +8,8 @@ services:
       - POSTGRES_USER=$DATABASE_USER
     volumes:
       - db:/var/lib/postgresql/data
-  web:
-    working_dir: /web
+  api:
+    working_dir: /api
     build:
       context: .
       dockerfile: docker/Dockerfile.dev
@@ -18,6 +18,6 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - .:/web
+      - .:/api
 volumes:
   db:
