@@ -88,8 +88,8 @@ func New() (Configuration, error) {
 	if dir == "" {
 		dir = "$HOME/.config"
 	}
-	v.AddConfigPath(dir + "/web/")
-	v.AddConfigPath("/etc/web/")
+	v.AddConfigPath(dir + "/api/")
+	v.AddConfigPath("/etc/api/")
 	v.AddConfigPath("./")
 	if err := v.ReadInConfig(); err != nil {
 		return Configuration{}, err
