@@ -2,14 +2,14 @@
 run:
 	go run ./cmd/web start
 
-compose-build:
+dev-build:
 	docker compose -p puzzlely build web
 
-compose-up:
+dev-up:
 	docker compose -p puzzlely up --build web
 
-compose-run:
+dev-run:
 	docker compose -p puzzlely up web
 
-compose-down:
+dev-down:
 	docker compose -p puzzlely down
