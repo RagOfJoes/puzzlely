@@ -1,4 +1,4 @@
-name: deploy
+name: Deploy
 on:
   push:
     branches:
@@ -31,8 +31,8 @@ jobs:
           file: docker/Dockerfile
           push: true
           tags: |
-            ghcr.io/RagOfJoes/puzzlely-api:latest
-            ghcr.io/RagOfJoes/puzzlely-api:${{ github.sha }}
+            ghcr.io/ragofjoes/puzzlely-api:latest
+            ghcr.io/ragofjoes/puzzlely-api:${{ github.sha }}
 
       - name: Build and push Docker image for Web
         uses: docker/build-push-action@v6
@@ -41,5 +41,5 @@ jobs:
           file: docker/Dockerfile
           push: true
           tags: |
-            ghcr.io/RagOfJoes/puzzlely-web:latest
-            ghcr.io/RagOfJoes/puzzlely-web:${{ github.sha }}
+            ghcr.io/ragofjoes/puzzlely-web:latest
+            ghcr.io/ragofjoes/puzzlely-web:${{ github.sha }}
