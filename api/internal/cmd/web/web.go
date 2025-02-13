@@ -12,11 +12,11 @@ func Run() error {
 	}
 
 	// Setup Logger
-	// _, err := SetupLogger(cfg)
-	if _, err := SetupLogger(cfg); err != nil {
+	shutdown, err := SetupLogger(cfg)
+	if err != nil {
 		return err
 	}
-	// defer shutdownLogger()
+	defer shutdown()
 
 	// Setup Repositories
 	repositories, err := NewWebRepositories(cfg)
