@@ -35,7 +35,7 @@ COPY . .
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
   -ldflags='-w -s -extldflags "-static"' -a \
-  -o /go/bin/puzzlely cmd/main.go
+  -o /go/bin/puzzlely cmd/web/main.go
 
 ############################
 # STEP 2 build a small image
