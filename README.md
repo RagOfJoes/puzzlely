@@ -1,98 +1,111 @@
-<a href="https://www.puzzlely.io?utm_source=Github&utm_medium=social">
+<a href="https://puzzlely.io?utm_source=Github&utm_medium=social">
  <p align="center" >
-  <img height=250 style="border-radius: 30px;" src="https://raw.githubusercontent.com/RagOfJoes/puzzlely/development/web/public/dark/android-chrome-512x512.png" />
-  <img height=250 style="border-radius: 30px;" src="https://raw.githubusercontent.com/RagOfJoes/puzzlely/development/web/public/light/android-chrome-512x512.png" />
+  <img height=250 style="border-radius: 30px;" src="https://raw.githubusercontent.com/RagOfJoes/puzzlely/main/web/public/og.png" />
   </p>
 </a>
 <h3 align="center">
-  <strong>An online puzzle game that's inspired by the BBC's Only Connect game show. Play user created puzzles or create your own to challenge your friends and other users.</strong>
+  <strong>What if Connections, but infinite? No more waiting until tomorrow, no more rationing your daily word-grouping fix. Just pure, unbridled classification chaos.</strong>
 </h3>
 
 ---
 
-## Prerequisites
+## Tech Stack
 
-These are the prerequisites for local development:
+### Frontend (web)
 
-- Node.JS 12.22.0 or later
-- Go 1.7 or later
-- MySQL (You can choose to host your own or set one up with PlanetScale)
-- Docker
-- Honeycomb.io account
-- OAuth2 credentials (For at least one of the following):
-  - Discord
-  - GitHub
-  - Google
+- Typescript
+- React-Router/Remix
+- React
+- Zod
+- Radix
+- Motion
+- TailwindCSS
 
-These are the prerequisites for production:
+### Backend (api)
 
-- Everything for local development
-- Domain where you're able to edit DNS records
-- Cloudflare
-- DigitalOcean account
-- Container registry (Example: Docker Hub, GitHub Container Registry, or, DigitalOcean Container Registry)
-- Vercel account
-- Terraform (w/ Terraform cloud)
+- Go
+- Postgres
+- OpenTelemetry
 
 ## Folder Structure
 
-|        Codebase         |           Description           |
-| :---------------------: | :-----------------------------: |
-| [api](api)              |           Go API Server         |
-| [terraform](terraform)  |  Terraform configuration files  |
-| [web](web)              |          Next.js frontend       |
+|  Codebase  |         Description         |
+| :--------: | :-------------------------: |
+| [api](api) |        Go API Server        |
+| [web](web) | React-Router/Remix frontend |
 
 ## Architecture
 
-```
-                              https
-                                |
-                                |
-                        API     |     Web
-                  +-------------+-------------+
-                  |                           |
-                  |                           |
-                  |                           |
-           +------+-------+            +------+-------+
-           |              |            |              |
-           |  Cloudflare  |            |    Vercel    |
-           |              |            |              |
-           +------+-------+            +--------------+
-                  |
-                  |
-                  |
-           +------+-------+
-           |              |
-           |              |
-           | Loadbalancer |
-    +------+--------------+------+
-    | VPC  |              |      |
-    |      +------+-------+      |
-    |             |              |
-    |             |              |
-    |             |              |
-    |            http            |
-    |             |              |
-    |             |              |
-    |             |              |
-    |        +----+----+         |
-    |        |         |         |
-    |        | Droplet |         |
-    |        |         |         |
-    |        +----+----+         |
-    |             |              |
-    |             |              |
-    +-------------+--------------+
-                  |
-       +----------+-----------+
-       |                      |
-       |                      |
-+------+------+        +------+------+
-|             |        |             |
-| Planetscale |        |  Honeycomb  |
-|    MySQL    |        |             |
-|             |        +-------------+
-+-------------+
+```mermaid
+%%{
+  init: {
+    'theme': 'dark',
+    'themeVariables': {
+      'primaryColor': '#21262d',
+      'primaryTextColor': '#c9d1d9',
+      'primaryBorderColor': '#30363d',
+      'lineColor': '#8b949e',
+      'secondaryColor': '#2b3138',
+      'tertiaryColor': '#161b22'
+    }
+  }
+}%%
+
+flowchart LR
+    subgraph internet[Public Internet]
+        User(("Client Browser"))
+        WWW["puzzlely.io"]
+        click WWW href "https://puzzlely.io" "Primary domain"
+    end
+
+    subgraph github[GitHub Infrastructure]
+        GHA["GitHub Actions<br>CI/CD Pipeline"]
+        GHCR["Container Registry<br>ghcr.io"]
+        GHA --> |"Push images"| GHCR
+    end
+
+    subgraph vps[DigitalOcean VPS]
+        Traefik["Traefik<br>SSL & Routing"]
+
+        subgraph internal[Internal Docker Network]
+            Frontend["Frontend<br>React-Router"]
+            Backend["Backend<br>Go API"]
+            DB[(PostgreSQL<br>Data Store)]
+            Watchtower["Watchtower<br>Auto-Deployment"]
+        end
+    end
+
+    %% External connections
+    User --> |"HTTPS"| WWW
+    WWW --> |"443"| Traefik
+    User --> |"HTTPS"| Traefik
+
+    %% Internal routing
+    Traefik --> |"5173"| Frontend
+    Traefik --> |"8080"| Backend
+    Backend --> |"5432"| DB
+
+    %% Deployment flow
+    GHCR -.-> |"Pull new images"| Frontend
+    GHCR -.-> |"Pull new images"| Backend
+    Watchtower -.-> |"Check for updates"| GHCR
+    Watchtower --> |"Deploy updates"| Frontend
+    Watchtower --> |"Deploy updates"| Backend
+
+    %% Styling
+    classDef container fill:#238636,stroke:#2ea043,stroke-width:2px,color:#ffffff
+    classDef database fill:#1f6feb,stroke:#388bfd,stroke-width:2px,color:#ffffff
+    classDef proxy fill:#a371f7,stroke:#8957e5,stroke-width:2px,color:#ffffff
+    classDef external fill:#f78166,stroke:#f0883e,stroke-width:2px,color:#ffffff
+    classDef registry fill:#3fb950,stroke:#56d364,stroke-width:2px,color:#ffffff
+    classDef updater fill:#238636,stroke:#2ea043,stroke-width:2px,color:#ffffff
+
+    class Frontend,Backend container
+    class DB database
+    class Traefik proxy
+    class User,WWW external
+    class GHCR,GHA registry
+    class Watchtower updater
 ```
 
 ## Contributions
