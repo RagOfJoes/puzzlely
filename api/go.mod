@@ -3,10 +3,12 @@ module github.com/RagOfJoes/puzzlely
 go 1.23
 
 require (
+	github.com/TwiN/go-away v1.6.14
 	github.com/fatih/color v1.18.0
 	github.com/go-chi/chi/v5 v5.2.0
 	github.com/go-chi/render v1.0.3
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/oklog/ulid/v2 v2.1.0
 	github.com/riandyrn/otelchi v0.12.0
 	github.com/sirupsen/logrus v1.9.3
@@ -27,7 +29,6 @@ require (
 )
 
 require (
-	github.com/TwiN/go-away v1.6.14 // indirect
 	github.com/ajg/form v1.5.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
@@ -44,7 +45,6 @@ require (
 	github.com/magiconair/properties v1.8.9 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.0 // indirect
