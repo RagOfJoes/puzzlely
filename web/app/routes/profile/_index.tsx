@@ -265,19 +265,27 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 							<div className="flex w-full flex-col gap-1">
 								<p className="text-sm text-muted-foreground">Joined</p>
 
-								<p className="font-medium leading-none">
+								<time
+									className="font-medium leading-none"
+									dateTime={dayjs(loaderData.me.created_at).toISOString()}
+								>
 									{dayjs(loaderData.me.created_at).format("MMM DD, YYYY")}
-								</p>
+								</time>
 							</div>
 
 							<div className="flex w-full flex-col gap-1">
 								<p className="text-sm text-muted-foreground">Updated at</p>
 
-								<p className="font-medium leading-none">
-									{loaderData.me.updated_at
-										? dayjs(loaderData.me.updated_at).format("MMM DD, YYYY")
-										: "N/A"}
-								</p>
+								{loaderData.me.updated_at ? (
+									<time
+										className="font-medium leading-none"
+										dateTime={dayjs(loaderData.me.updated_at).toISOString()}
+									>
+										{dayjs(loaderData.me.updated_at).format("MMM DD, YYYY")}
+									</time>
+								) : (
+									<p className="font-medium leading-none">N/A</p>
+								)}
 							</div>
 						</div>
 					</div>

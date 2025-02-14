@@ -138,8 +138,8 @@ export const PuzzleSummaryCard = forwardRef<
 			</div>
 
 			<time
-				dateTime={dayjs(puzzle.created_at).toISOString()}
 				className="mt-4 line-clamp-1 w-full text-ellipsis text-xs font-medium text-muted-foreground"
+				dateTime={dayjs(puzzle.created_at).toISOString()}
 			>
 				{dayjs(puzzle.created_at).format("MMM DD, YYYY")}
 			</time>
