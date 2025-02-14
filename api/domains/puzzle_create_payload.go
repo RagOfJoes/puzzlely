@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/RagOfJoes/puzzlely/internal"
 	"github.com/go-chi/render"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -24,7 +25,7 @@ type PuzzleCreatePayloadBlock struct {
 
 func (p PuzzleCreatePayloadBlock) Validate() error {
 	return validation.ValidateStruct(&p,
-		validation.Field(&p.Value, validation.Required, validation.Length(1, 48), is.PrintableASCII),
+		validation.Field(&p.Value, validation.Required, validation.Length(1, 48), is.PrintableASCII, internal.IsSanitized, internal.IsClean),
 	)
 }
 
@@ -35,7 +36,7 @@ type PuzzleCreatePayloadGroup struct {
 
 func (p PuzzleCreatePayloadGroup) Validate() error {
 	return validation.ValidateStruct(&p,
-		validation.Field(&p.Description, validation.Required, validation.Length(1, 512), is.PrintableASCII),
+		validation.Field(&p.Description, validation.Required, validation.Length(1, 512), is.PrintableASCII, internal.IsSanitized, internal.IsClean),
 		validation.Field(&p.Blocks, validation.Required, validation.Length(4, 4), validation.Each(validation.Required)),
 	)
 }

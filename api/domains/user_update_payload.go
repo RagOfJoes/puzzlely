@@ -17,6 +17,6 @@ func (u *UserUpdatePayload) Bind(r *http.Request) error {
 
 func (u UserUpdatePayload) Validate() error {
 	return validation.ValidateStruct(&u,
-		validation.Field(&u.Username, validation.Required, validation.Length(4, 64), internal.IsUsername),
+		validation.Field(&u.Username, validation.Required, validation.Length(4, 64), internal.IsUsername, internal.IsSanitized, internal.IsClean),
 	)
 }

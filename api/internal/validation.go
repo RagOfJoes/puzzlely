@@ -4,9 +4,12 @@ import (
 	"database/sql"
 	"errors"
 	"regexp"
+	"strings"
 	"time"
 
+	goaway "github.com/TwiN/go-away"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/oklog/ulid/v2"
 	"github.com/uptrace/bun"
 )
@@ -17,11 +20,35 @@ var (
 )
 
 // Custom validation rules
-var (
-	IsUsername = validation.NewStringRuleWithError(func(value string) bool {
-		return regUsername.MatchString(value)
-	}, validation.NewError("validation_is_username", "must start with a letter, end with a letter or number, and can include periods, hyphens, and underscores (but not consecutively)"))
-)
+
+// IsClean checks if the string does not contain any dirty words
+var IsClean = validation.NewStringRuleWithError(func(value string) bool {
+	return !goaway.IsProfane(value)
+}, validation.NewError("validation_is_clean", "must not contain any dirty words"))
+
+// IsSanitized checks if the string does not contain any malicious HTML entities
+var IsSanitized = validation.NewStringRuleWithError(func(value string) bool {
+	sanitized := bluemonday.UGCPolicy().Sanitize(value)
+
+	return strings.EqualFold(sanitized, value)
+}, validation.NewError("validation_is_sanitized", "must not contain any malicious HTML entities"))
+
+// IsUsername checks if the string is a valid username
+var IsUsername = validation.NewStringRuleWithError(func(value string) bool {
+	if ok := regUsername.MatchString(value); !ok {
+		return false
+	}
+
+	for _, reserved := range ReservedUsernames {
+		if !strings.EqualFold(value, reserved) {
+			continue
+		}
+
+		return false
+	}
+
+	return true
+}, validation.NewError("validation_is_username", "must start with a letter, end with a letter or number, and can include periods, hyphens, and underscores (but not consecutively)"))
 
 func IsULID(value interface{}) error {
 	switch value.(type) {

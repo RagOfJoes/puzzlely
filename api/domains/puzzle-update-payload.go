@@ -22,7 +22,7 @@ type PuzzleUpdatePayloadGroup struct {
 func (p PuzzleUpdatePayloadGroup) Validate() error {
 	return validation.ValidateStruct(&p,
 		validation.Field(&p.ID, validation.Required, validation.By(internal.IsULID)),
-		validation.Field(&p.Description, validation.Required, validation.Length(1, 512), is.PrintableASCII),
+		validation.Field(&p.Description, validation.Required, validation.Length(1, 512), is.PrintableASCII, internal.IsSanitized, internal.IsClean),
 	)
 }
 
