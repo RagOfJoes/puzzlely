@@ -24,7 +24,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image for API
+      - name: Filter changed paths
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api:
+              - api/**
+            web:
+              - web/**
+
+      - if: steps.filter.outputs.api == 'true'
+        name: Build and push Docker image for API
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:api"
@@ -34,7 +44,8 @@ jobs:
             ghcr.io/ragofjoes/puzzlely-api:latest
             ghcr.io/ragofjoes/puzzlely-api:${{ github.sha }}
 
-      - name: Build and push Docker image for Web
+      - if: steps.filter.outputs.web == 'true'
+        name: Build and push Docker image for Web
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:web"
