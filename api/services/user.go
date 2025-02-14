@@ -3,92 +3,95 @@ package services
 import (
 	"context"
 	"errors"
+	"time"
 
-	"github.com/RagOfJoes/puzzlely/entities"
+	"github.com/RagOfJoes/puzzlely/domains"
 	"github.com/RagOfJoes/puzzlely/internal"
-	"github.com/RagOfJoes/puzzlely/internal/config"
-	"github.com/RagOfJoes/puzzlely/internal/telemetry"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
-	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
+	"github.com/uptrace/bun"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
-)
-
-const (
-	userTracer = "services.user"
 )
 
 // Errors
 var (
-	ErrUserCreate       = errors.New("Failed to create user.")
-	ErrUserDelete       = errors.New("Failed to delete user.")
-	ErrUserConnection   = errors.New("Invalid connection provided.")
-	ErrUserUpdate       = errors.New("Failed to update user.")
-	ErrUserDoesNotExist = errors.New("User does not exist.")
+	ErrUserCreate          = errors.New("Failed to create user.")
+	ErrUserDelete          = errors.New("Failed to delete user.")
+	ErrUserDoesNotExist    = errors.New("User does not exist.")
+	ErrUserInvalid         = errors.New("Invalid user.")
+	ErrUserInvalidUsername = errors.New("Username is not available.")
+	ErrUserUpdate          = errors.New("Failed to update user.")
 )
 
 // User defines the user service
 type User struct {
-	config     config.Configuration
+	tracer trace.Tracer
+
 	repository repositories.User
-	tracer     trace.Tracer
+}
+
+type UserDependencies struct {
+	Repository repositories.User
 }
 
 // NewUser instantiates a user service
-func NewUser(config config.Configuration, repository repositories.User) User {
+func NewUser(dependencies UserDependencies) User {
 	logrus.Print("Created User Service")
 
 	return User{
-		config:     config,
-		repository: repository,
-		tracer:     telemetry.Tracer(userTracer),
+		tracer: otel.Tracer("services.user"),
+
+		repository: dependencies.Repository,
 	}
 }
 
 // New creates a new user given a valid connection and a valid user entity
-func (u *User) New(ctx context.Context, newConnection entities.Connection, newUser entities.User) (*entities.User, error) {
-	ctx, span := u.tracer.Start(ctx, "New")
+func (u *User) New(ctx context.Context, connectionPayload domains.Connection, userPayload domains.User) (*domains.User, error) {
+	ctx, span := u.tracer.Start(ctx, "New", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
-	if err := newUser.Validate(); err != nil {
+	if err := connectionPayload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
-	if err := newConnection.Validate(); err != nil {
+	if err := userPayload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
-	user, err := u.repository.Create(ctx, newConnection, newUser)
+	user, err := u.repository.Create(ctx, connectionPayload, userPayload)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrUserCreate)
 	}
 
 	return user, nil
 }
 
-// Find retrieves a user with their id or username. If strict is set to true then only completed users will be returned
-func (u *User) Find(ctx context.Context, search string, strict bool) (*entities.User, error) {
-	ctx, span := u.tracer.Start(ctx, "Find")
+// Find retrieves a user with their id. If strict is set to true then only completed users will be returned
+func (u *User) Find(ctx context.Context, id string, strict bool) (*domains.User, error) {
+	ctx, span := u.tracer.Start(ctx, "Find", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
-	_, uuidErr := uuid.Parse(search)
-	usernameErr := validate.CheckPartial(entities.User{Username: search}, "Username")
-	if uuidErr != nil && usernameErr != nil {
-		err := uuidErr
-		if uuidErr == nil {
-			err = usernameErr
-		}
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
-	}
-
-	user, err := u.repository.Get(ctx, search)
+	user, err := u.repository.Get(ctx, id)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
 	}
 	if err := user.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
-	}
-	if strict && !user.IsComplete() {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
 	}
 
@@ -96,66 +99,85 @@ func (u *User) Find(ctx context.Context, search string, strict bool) (*entities.
 }
 
 // FindWithConnection retrieves a user with one of their connection
-func (u *User) FindWithConnection(ctx context.Context, provider, sub string) (*entities.User, error) {
-	ctx, span := u.tracer.Start(ctx, "FindWithConnection")
+func (u *User) FindWithConnection(ctx context.Context, payload domains.Connection) (*domains.User, error) {
+	ctx, span := u.tracer.Start(ctx, "FindWithConnection", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
-	connection := entities.Connection{Provider: provider, Sub: sub}
-	if err := validate.CheckPartial(connection, "Provider", "Sub"); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserConnection)
-	}
-
-	user, err := u.repository.GetWithConnection(ctx, provider, sub)
+	user, err := u.repository.GetWithConnection(ctx, payload)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
 	}
 	if err := user.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
 	}
 
 	return user, nil
 }
 
-// FindStats retrieves a user's stats given their id
-func (u *User) FindStats(ctx context.Context, id uuid.UUID) (*entities.Stats, error) {
-	ctx, span := u.tracer.Start(ctx, "FindStats")
-	defer span.End()
-
-	stats, err := u.repository.GetStats(ctx, id)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrUserDoesNotExist)
-	}
-
-	return stats, nil
-}
-
 // Update updates a user
-func (u *User) Update(ctx context.Context, update entities.User) (*entities.User, error) {
-	ctx, span := u.tracer.Start(ctx, "Update")
+func (u *User) Update(ctx context.Context, payload domains.User) (*domains.User, error) {
+	ctx, span := u.tracer.Start(ctx, "Update", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
-	if err := update.Validate(); err != nil {
+	session := domains.SessionFromContext(ctx)
+
+	if err := payload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
-	if !update.IsComplete() {
-		update.Complete()
+	// Make sure only certain fields are updated
+	payload.ID = session.User.ID
+	payload.State = session.User.State
+	payload.CreatedAt = session.User.CreatedAt
+	payload.UpdatedAt = bun.NullTime{
+		Time: time.Now(),
 	}
 
-	user, err := u.repository.Update(ctx, update)
-	if err != nil {
+	if session.User.State != "COMPLETE" || session.User.UpdatedAt.IsZero() {
+		payload.State = "COMPLETE"
+	}
+
+	user, err := u.repository.Update(ctx, payload)
+	if err != nil && errors.Is(err, repositories.ErrUserUsernameNotAvailable) {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserInvalidUsername)
+	} else if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrUserUpdate)
+	}
+
+	if err := user.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrUserUpdate)
 	}
 
 	return user, nil
 }
 
 // Delete deletes a user
-func (u *User) Delete(ctx context.Context, id uuid.UUID) error {
-	ctx, span := u.tracer.Start(ctx, "Delete")
+func (u *User) Delete(ctx context.Context, id string) error {
+	ctx, span := u.tracer.Start(ctx, "Delete", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
 	if err := u.repository.Delete(ctx, id); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrUserDelete)
 	}
 

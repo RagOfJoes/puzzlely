@@ -2,40 +2,44 @@ package telemetry
 
 import (
 	"context"
-
-	"go.opentelemetry.io/otel/sdk/resource"
-	sdktrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"crypto/tls"
+	"fmt"
 
 	"github.com/RagOfJoes/puzzlely/internal/config"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	"go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 )
 
 const (
-	apiKeyHeader     = "X-HONEYCOMB-TEAM"
-	exporterEndpoint = "api.honeycomb.io:443"
+	exporterEndpoint = "api.axiom.co"
 )
 
 // Start configures and starts OpenTelemetry
-func Start(cfg config.Configuration) (func(), error) {
+func Start(cfg config.Configuration) (func(context.Context) error, error) {
 	logrus.Info("Starting telemetry...")
 
 	ctx := context.Background()
 
-	// Configure a new OTLP exporter using environment variables for sending data to Honeycomb over gRPC
-	client := otlptracegrpc.NewClient(
-		otlptracegrpc.WithEndpoint(exporterEndpoint),
-		otlptracegrpc.WithHeaders(map[string]string{
-			apiKeyHeader: cfg.Telemetry.APIKey,
-		}),
-	)
+	dataset := "dev"
+	if cfg.Environment == config.Production {
+		dataset = "production"
+	}
 
-	// Configure exporter then start it
-	exporter, err := otlptrace.New(ctx, client)
+	// Sets up OTLP HTTP exporter with endpoint, headers, and TLS config.
+	exporter, err := otlptracehttp.New(ctx,
+		otlptracehttp.WithEndpoint(exporterEndpoint),
+		otlptracehttp.WithHeaders(map[string]string{
+			"Authorization":   fmt.Sprintf("Bearer %s", cfg.Telemetry.APIKey),
+			"X-Axiom-Dataset": dataset,
+		}),
+		otlptracehttp.WithTLSClientConfig(&tls.Config{}),
+	)
 	if err != nil {
 		logrus.Errorf("Failed to setup telemetry: %s", err)
 
@@ -43,16 +47,16 @@ func Start(cfg config.Configuration) (func(), error) {
 	}
 
 	// Create a new tracer provider with a batch span processor and the otlp exporter
-	tracerProvider := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exporter),
-		sdktrace.WithResource(
+	tracerProvider := trace.NewTracerProvider(
+		trace.WithBatcher(exporter),
+		trace.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
-				semconv.HTTPHostKey.String(cfg.Server.Host),
 				semconv.ServiceNameKey.String(cfg.Telemetry.ServiceName),
+				semconv.ServiceVersionKey.String(cfg.Version),
+				attribute.String("environment", cfg.Environment.String()),
 			),
 		),
-		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 	)
 
 	// Register the global Tracer provider
@@ -66,13 +70,5 @@ func Start(cfg config.Configuration) (func(), error) {
 		),
 	)
 
-	// Handles shutdown to ensure all sub processes are closed correctly and telemetry is exported
-	shutdown := func() {
-		_ = exporter.Shutdown(ctx)
-		_ = tracerProvider.Shutdown(ctx)
-	}
-
-	logrus.Info("Successfully started telemetry\n\n")
-
-	return shutdown, nil
+	return tracerProvider.Shutdown, nil
 }

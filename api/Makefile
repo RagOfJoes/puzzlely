@@ -1,15 +1,15 @@
 # ========= Development ========= # 
 run:
-	go run ./cmd start
+	go run ./cmd/web start
 
-compose-build:
-	docker-compose -p puzzlely build dev
+dev-build:
+	docker compose -f compose.dev.yml -p puzzlely build api
 
-compose-up:
-	docker-compose -p puzzlely up --build dev
+dev-up:
+	docker compose -f compose.dev.yml -p puzzlely up --build api
 
-compose-run:
-	docker-compose -p puzzlely up dev
+dev-run:
+	docker compose -f compose.dev.yml -p puzzlely up api
 
-compose-down:
-	docker-compose -p puzzlely down
+dev-down:
+	docker compose -p puzzlely down

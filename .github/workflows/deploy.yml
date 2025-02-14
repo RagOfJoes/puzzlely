@@ -1,0 +1,58 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - "main"
+      - "refactor/rewrite-everything"
+
+  workflow_dispatch:
+
+permissions:
+  packages: write
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - id: filter
+        name: Filter changed paths
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            api:
+              - 'api/**'
+            web:
+              - 'web/**'
+
+      - if: steps.filter.outputs.api == 'true' || steps.filter.outputs.web == 'true'
+        name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: steps.filter.outputs.api == 'true'
+        name: Build and push Docker image for API
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:api"
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/ragofjoes/puzzlely-api:latest
+            ghcr.io/ragofjoes/puzzlely-api:${{ github.sha }}
+
+      - if: steps.filter.outputs.web == 'true'
+        name: Build and push Docker image for Web
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:web"
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/ragofjoes/puzzlely-web:latest
+            ghcr.io/ragofjoes/puzzlely-web:${{ github.sha }}

@@ -3,20 +3,15 @@ package repositories
 import (
 	"context"
 
-	"github.com/RagOfJoes/puzzlely/entities"
-	"github.com/google/uuid"
+	"github.com/RagOfJoes/puzzlely/domains"
 )
 
-// Game defines methods for a game repository
 type Game interface {
-	// Create creates a new game
-	Create(ctx context.Context, newGame entities.Game) (*entities.Game, error)
-	// Get retrieves a game with its id
-	Get(ctx context.Context, id uuid.UUID) (*entities.Game, error)
-	// GetPlayed retrieves all the games that a user has played and completed
-	GetPlayed(ctx context.Context, params entities.Pagination, user entities.User) ([]entities.GameNode, error)
-	// GetWithChallengeCode retrieves a game with its challenge code
-	GetWithChallengeCode(ctx context.Context, challengeCode string) (*entities.Game, error)
-	// Update updates a game
-	Update(ctx context.Context, updateGame entities.Game) (*entities.Game, error)
+	// GetHistory gets the history of the given user
+	GetHistory(ctx context.Context, id string, opts domains.GameCursorPaginationOpts) ([]domains.GameSummary, error)
+	// GetWithPuzzleID gets the game with the given puzzle id
+	GetWithPuzzleID(ctx context.Context, id string) (*domains.Game, error)
+
+	// Save saves a game
+	Save(ctx context.Context, payload domains.Game) (*domains.Game, error)
 }

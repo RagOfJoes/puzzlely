@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -47,6 +48,11 @@ func (e *Error) Error() string {
 
 // Unwrap returns the wrapped error, if any
 func (e *Error) Unwrap() error {
+	var inner *Error
+	if e.err != nil && errors.As(e.err, &inner) {
+		return inner.Unwrap()
+	}
+
 	return e.err
 }
 

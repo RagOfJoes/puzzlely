@@ -3,398 +3,282 @@ package services
 import (
 	"context"
 	"errors"
-	"strings"
 
-	"github.com/RagOfJoes/puzzlely/entities"
+	"github.com/RagOfJoes/puzzlely/domains"
 	"github.com/RagOfJoes/puzzlely/internal"
-	"github.com/RagOfJoes/puzzlely/internal/config"
 	"github.com/RagOfJoes/puzzlely/internal/telemetry"
-	"github.com/RagOfJoes/puzzlely/internal/validate"
 	"github.com/RagOfJoes/puzzlely/repositories"
-	"github.com/google/uuid"
+	"github.com/oklog/ulid/v2"
 	"github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
-)
-
-const (
-	puzzleTracer = "services.puzzle"
+	"golang.org/x/sync/errgroup"
 )
 
 // Errors
 var (
-	ErrPuzzleCreate          = errors.New("Failed to create puzzle.")
-	ErrPuzzleDelete          = errors.New("Failed to delete puzzle.")
-	ErrPuzzleInvalid         = errors.New("Invalid puzzle.")
-	ErrPuzzleInvalidSearch   = errors.New("Invalid search term.")
-	ErrPuzzleLike            = errors.New("Failed to like puzzle.")
-	ErrPuzzleList            = errors.New("Failed to fetch puzzles.")
-	ErrPuzzleNotAuthorized   = errors.New("Not authorized to access this puzzle.")
-	ErrPuzzleNotFound        = errors.New("Puzzle not found.")
-	ErrPuzzleUpdate          = errors.New("Failed to update puzzle.")
-	ErrPuzzleUnauthenticated = errors.New("Must be authenticated to perform this action.")
+	ErrPuzzleCreated    = errors.New("Failed to get created puzzles.")
+	ErrPuzzleLiked      = errors.New("Failed to get liked puzzles.")
+	ErrPuzzleNew        = errors.New("Failed to create new puzzle.")
+	ErrPuzzleNotFound   = errors.New("Puzzle not found.")
+	ErrPuzzleRecent     = errors.New("Failed to get recent puzzles.")
+	ErrPuzzleToggleLike = errors.New("Failed to toggle like on puzzle.")
 )
 
-// Puzzle defines the puzzle service
 type Puzzle struct {
-	config     config.Configuration
+	tracer trace.Tracer
+
 	repository repositories.Puzzle
-	tracer     trace.Tracer
 }
 
-// NewPuzzle instantiates a puzzle service
-func NewPuzzle(config config.Configuration, repository repositories.Puzzle) Puzzle {
+type PuzzleDependencies struct {
+	Repository repositories.Puzzle
+}
+
+func NewPuzzle(d PuzzleDependencies) Puzzle {
 	logrus.Print("Created Puzzle Service")
 
 	return Puzzle{
-		config:     config,
-		repository: repository,
-		tracer:     telemetry.Tracer(puzzleTracer),
+		tracer: telemetry.Tracer("services.puzzle"),
+
+		repository: d.Repository,
 	}
 }
 
-// New creates a new puzzle
-func (p *Puzzle) New(ctx context.Context, newPuzzle entities.Puzzle) (*entities.Puzzle, error) {
-	ctx, span := p.tracer.Start(ctx, "New")
+func (p *Puzzle) New(ctx context.Context, payload domains.Puzzle) (*domains.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "New", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
-	if err := newPuzzle.Validate(); err != nil {
+	if err := payload.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
 	}
 
-	puzzle, err := p.repository.Create(ctx, newPuzzle)
+	created, err := p.repository.Create(ctx, payload)
 	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreate)
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleNew)
+	}
+	if err := created.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleNew)
 	}
 
-	puzzle.CreatedBy = newPuzzle.CreatedBy
+	return created, nil
+}
+
+func (p *Puzzle) Find(ctx context.Context, id ulid.ULID) (*domains.Puzzle, error) {
+	ctx, span := p.tracer.Start(ctx, "Find", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
+
+	puzzle, err := p.repository.Get(ctx, id.String())
+	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
+	}
 	if err := puzzle.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreate)
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
 	}
 
 	return puzzle, nil
 }
 
-// Find finds a puzzle. If strict is set to true only the puzzle that belongs to the current user will be returned
-func (p *Puzzle) Find(ctx context.Context, id uuid.UUID, strict bool) (*entities.Puzzle, error) {
-	ctx, span := p.tracer.Start(ctx, "Find")
+func (p *Puzzle) FindCreated(ctx context.Context, id string, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleSummaryConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindCreated", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
-	user := entities.UserFromContext(ctx)
-	if strict && user == nil {
-		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleNotAuthorized)
+	if err := opts.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleCreated)
 	}
 
-	puzzle, err := p.repository.Get(ctx, id)
+	puzzles, err := p.repository.GetCreated(ctx, id, opts)
 	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
-	}
-	if err := puzzle.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
-	}
-	if strict && puzzle.CreatedBy.ID != user.ID {
-		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleNotAuthorized)
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreated)
 	}
 
-	return puzzle, nil
-}
+	// Validate results
+	for _, puzzle := range puzzles {
+		if err := puzzle.Validate(); err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
 
-// FindCreated finds a list of puzzles that a user has created
-func (p *Puzzle) FindCreated(ctx context.Context, params entities.Pagination, user entities.User) (*entities.PuzzleConnection, error) {
-	ctx, span := p.tracer.Start(ctx, "FindCreated")
-	defer span.End()
-
-	if err := params.Validate(entities.PuzzleReflectType); err != nil {
-		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
-	}
-	params.Limit = params.Limit + 1
-
-	nodes, err := p.repository.GetCreated(ctx, params, user.ID)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-	}
-
-	for _, node := range nodes {
-		if node.CreatedBy.ID != user.ID {
-			return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
+			return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreated)
 		}
 	}
 
-	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
+	connection, err := domains.BuildPuzzleSummaryConnection(puzzles, opts.Limit)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleCreated)
+	}
+
+	return connection, nil
+}
+
+func (p *Puzzle) FindLiked(ctx context.Context, id string, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleSummaryConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindLiked", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
+
+	if err := opts.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleLiked)
+	}
+
+	puzzles, err := p.repository.GetLiked(ctx, id, opts)
+	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLiked)
+	}
+
+	// Validate results
+	for _, puzzle := range puzzles {
+		if err := puzzle.Validate(); err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
+
+			return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLiked)
+		}
+	}
+
+	connection, err := domains.BuildPuzzleSummaryConnectionForLiked(puzzles, opts.Limit)
+	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLiked)
+	}
+
+	return connection, nil
+}
+
+func (p *Puzzle) FindRecent(ctx context.Context, opts domains.PuzzleCursorPaginationOpts) (*domains.PuzzleConnection, error) {
+	ctx, span := p.tracer.Start(ctx, "FindRecent", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
+
+	if err := opts.Validate(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleRecent)
+	}
+
+	puzzles, err := p.repository.GetRecent(ctx, opts)
+	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+	}
+
+	// Validate results
+	for _, puzzle := range puzzles {
+		if err := puzzle.Validate(); err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
+
+			return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+		}
+	}
+
+	connection, err := domains.BuildPuzzleConnection(puzzles)
+	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+	}
+	if len(connection.Edges) == 0 {
+		return connection, nil
+	}
+
+	eg := errgroup.Group{}
+
+	eg.Go(func() error {
+		next, err := p.repository.GetNextForRecent(ctx, puzzles[len(puzzles)-1].CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		if err != nil {
+			return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+		}
+		if next != nil {
+			connection.PageInfo.HasNextPage = true
+			connection.PageInfo.NextCursor = domains.NewCursor(next.CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		}
+
+		return nil
+	})
+
+	eg.Go(func() error {
+		if opts.Cursor.IsEmpty() {
+			return nil
+		}
+
+		previous, err := p.repository.GetPreviousForRecent(ctx, puzzles[0].CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		if err != nil {
+			return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleRecent)
+		}
+		if previous != nil {
+			connection.PageInfo.HasPreviousPage = true
+			connection.PageInfo.PreviousCursor = domains.NewCursor(previous.CreatedAt.Format("2006-01-02 15:04:05.000000"))
+		}
+
+		return nil
+	})
+
+	if err := eg.Wait(); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		return nil, err
 	}
 
 	return connection, nil
 }
 
-// FindLiked finds a list of puzzles that the current user has liked
-func (p *Puzzle) FindLiked(ctx context.Context, params entities.Pagination) (*entities.PuzzleConnection, error) {
-	ctx, span := p.tracer.Start(ctx, "FindLiked")
+func (p *Puzzle) ToggleLike(ctx context.Context, id ulid.ULID) (*domains.PuzzleLike, error) {
+	ctx, span := p.tracer.Start(ctx, "ToggleLike", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
-	if err := params.Validate(entities.PuzzleReflectType); err != nil {
-		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
-	}
-	params.Limit = params.Limit + 1
-
-	nodes, err := p.repository.GetLiked(ctx, params)
+	puzzle, err := p.Find(ctx, id)
 	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-	}
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
 
-	for _, node := range nodes {
-		if node.NumOfLikes == 0 || node.LikedAt == nil {
-			return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-		}
-	}
-
-	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
-	if err != nil {
 		return nil, err
 	}
 
-	return connection, nil
-}
-
-// FindMostLiked finds a list of most likes puzzles
-func (p *Puzzle) FindMostLiked(ctx context.Context) (*entities.PuzzleConnection, error) {
-	ctx, span := p.tracer.Start(ctx, "FindMostLiked")
-	defer span.End()
-
-	params := entities.Pagination{
-		Cursor:    "",
-		Limit:     20,
-		SortKey:   "created_at",
-		SortOrder: "DESC",
-	}
-
-	nodes, err := p.repository.GetMostLiked(ctx, params)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-	}
-
-	for _, node := range nodes {
-		if node.NumOfLikes == 0 {
-			return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-		}
-	}
-
-	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
-	if err != nil {
-		return nil, err
-	}
-
-	return connection, nil
-}
-
-// FindMostPlayed finds a list of most played puzzles
-func (p *Puzzle) FindMostPlayed(ctx context.Context) (*entities.PuzzleConnection, error) {
-	ctx, span := p.tracer.Start(ctx, "FindMostPlayed")
-	defer span.End()
-
-	params := entities.Pagination{
-		Cursor:    "",
-		Limit:     20,
-		SortKey:   "created_at",
-		SortOrder: "DESC",
-	}
-
-	nodes, err := p.repository.GetMostPlayed(ctx, params)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-	}
-
-	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
-	if err != nil {
-		return nil, err
-	}
-
-	return connection, nil
-}
-
-// FindRecent finds a list of puzzles sorted from newest to oldest and filtered with provided filters
-func (p *Puzzle) FindRecent(ctx context.Context, params entities.Pagination, filters entities.PuzzleFilters) (*entities.PuzzleConnection, error) {
-	ctx, span := p.tracer.Start(ctx, "FindRecent")
-	defer span.End()
-
-	// Validate pagination params
-	if err := params.Validate(entities.PuzzleReflectType); err != nil {
-		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", err)
-	}
-	params.Limit = params.Limit + 1
-
-	nodes, err := p.repository.GetRecent(ctx, params, filters)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-	}
-
-	for _, node := range nodes {
-		if filters.CustomizableAttempts != nil {
-			customizableAttempts := *filters.CustomizableAttempts
-			if customizableAttempts && node.MaxAttempts != 0 {
-				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-			} else if !customizableAttempts && node.MaxAttempts == 0 {
-				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-			}
-		}
-		if filters.CustomizableTime != nil {
-			customizableTime := *filters.CustomizableTime
-			if customizableTime && node.TimeAllowed != 0 {
-				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-			} else if !customizableTime && node.TimeAllowed == 0 {
-				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-			}
-		}
-		if filters.Difficulty != nil {
-			difficulty := *filters.Difficulty
-			if node.Difficulty != difficulty {
-				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-			}
-		}
-		if filters.NumOfLikes != nil {
-			numOfLikes := *filters.NumOfLikes
-			if node.NumOfLikes < uint(numOfLikes) {
-				return nil, internal.NewErrorf(internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-			}
-		}
-	}
-
-	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
-	if err != nil {
-		return nil, err
-	}
-
-	return connection, nil
-
-}
-
-// Search searches for puzzles with a similar name or description as search term
-func (p *Puzzle) Search(ctx context.Context, search string) (*entities.PuzzleConnection, error) {
-	ctx, span := p.tracer.Start(ctx, "Search")
-	defer span.End()
-
-	if err := validate.CheckPartial(entities.Puzzle{Name: search}, "Name"); err != nil {
-		fixedErr := errors.New(strings.Replace(err.Error(), "name", "Search term", 1))
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", fixedErr)
-	}
-	if strings.Contains(search, "--") {
-		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalidSearch)
-	}
-
-	params := entities.Pagination{
-		Cursor:    "",
-		Limit:     100,
-		SortKey:   "created_at",
-		SortOrder: "DESC",
-	}
-
-	nodes, err := p.repository.Search(ctx, params, search)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleList)
-	}
-
-	connection, err := entities.BuildPuzzleConnection(params.Limit, params.SortKey, nodes)
-	if err != nil {
-		return nil, err
-	}
-
-	return connection, nil
-}
-
-// ToggleLike toggles a user's likhe status on a puzzle
-func (p *Puzzle) ToggleLike(ctx context.Context, id uuid.UUID) (*entities.PuzzleLike, error) {
-	ctx, span := p.tracer.Start(ctx, "ToggleLike")
-	defer span.End()
-
-	user := entities.UserFromContext(ctx)
-	if user == nil {
-		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
-	}
-
-	puzzle, err := p.repository.Get(ctx, id)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeNotFound, "%v", ErrPuzzleNotFound)
-	}
-
-	// TODO: Pass like status here to cut down on number of requests
 	like, err := p.repository.ToggleLike(ctx, puzzle.ID)
 	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleLike)
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
+		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleToggleLike)
 	}
 
 	return like, nil
 }
 
-// Update updates an existing puzzles
-func (p *Puzzle) Update(ctx context.Context, oldPuzzle, updatePuzzle entities.Puzzle) (*entities.Puzzle, error) {
-	ctx, span := p.tracer.Start(ctx, "Update")
-	defer span.End()
-
-	user := entities.UserFromContext(ctx)
-	if user == nil {
-		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
-	}
-
-	if oldPuzzle.ID != updatePuzzle.ID {
-		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
-	}
-	if oldPuzzle.CreatedBy.ID != updatePuzzle.CreatedBy.ID {
-		return nil, internal.NewErrorf(internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
-	}
-	if oldPuzzle.CreatedBy.ID != user.ID {
-		return nil, internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleNotAuthorized)
-	}
-
-	if err := oldPuzzle.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
-	}
-	if err := updatePuzzle.Validate(); err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeBadRequest, "%v", ErrPuzzleInvalid)
-	}
-
-	// Ensure that no values outside of Name, Description, and, Group Description are changed
-	updatePuzzle.ID = oldPuzzle.ID
-	updatePuzzle.MaxAttempts = oldPuzzle.MaxAttempts
-	updatePuzzle.TimeAllowed = oldPuzzle.TimeAllowed
-	updatePuzzle.CreatedAt = oldPuzzle.CreatedAt
-	updatePuzzle.CreatedBy = oldPuzzle.CreatedBy
-
-	groups := []entities.PuzzleGroup{}
-	for idx, group := range oldPuzzle.Groups {
-		updated := updatePuzzle.Groups[idx]
-		updated.ID = group.ID
-		updated.Answers = group.Answers
-		updated.Blocks = group.Blocks
-
-		groups = append(groups, updated)
-	}
-	updatePuzzle.Groups = groups
-
-	puzzle, err := p.repository.Update(ctx, updatePuzzle)
-	if err != nil {
-		return nil, internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleUpdate)
-	}
-
-	return puzzle, nil
-}
-
-// Delete deletes an existing puzzle
-func (p *Puzzle) Delete(ctx context.Context, id uuid.UUID) error {
-	ctx, span := p.tracer.Start(ctx, "Delete")
-	defer span.End()
-
-	if entities.UserFromContext(ctx) == nil {
-		return internal.NewErrorf(internal.ErrorCodeUnauthorized, "%v", ErrPuzzleUnauthenticated)
-	}
-
-	_, err := p.Find(ctx, id, true)
-	if err != nil {
-		return err
-	}
-
-	if err := p.repository.Delete(ctx, id); err != nil {
-		return internal.WrapErrorf(err, internal.ErrorCodeInternal, "%v", ErrPuzzleDelete)
-	}
-
-	return nil
+func (p *Puzzle) Update(ctx context.Context, old, update domains.Puzzle) (*domains.PuzzleLike, error) {
+	return nil, nil
 }

@@ -26,9 +26,13 @@ yarn-error.log*
 
 # local env files
 .env.*
+!.env.example
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
+
+# react-router
+.react-router/

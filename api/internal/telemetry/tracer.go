@@ -4,29 +4,29 @@ import (
 	"context"
 	"fmt"
 
-	"go.opentelemetry.io/contrib"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
 
+var _ trace.Tracer = (*tracer)(nil)
+
 // Custom tracer that allows proper prefixing of spans
 type tracer struct {
-	name   string
-	tracer trace.Tracer
+	trace.Tracer
+
+	name string
 }
 
 // Tracer creates a named tracer that prefixes spans with given name
 func Tracer(name string) trace.Tracer {
-	return tracer{
+	return &tracer{
+		Tracer: otel.Tracer(name),
+
 		name: name,
-		tracer: otel.Tracer(
-			name,
-			trace.WithInstrumentationVersion(contrib.SemVersion()),
-		),
 	}
 }
 
 // Start creates and starts span
 func (t tracer) Start(ctx context.Context, spanName string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
-	return t.tracer.Start(ctx, fmt.Sprintf("%s/%s", t.name, spanName), opts...)
+	return t.Tracer.Start(ctx, fmt.Sprintf("%s/%s", t.name, spanName), opts...)
 }

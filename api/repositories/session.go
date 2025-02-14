@@ -3,20 +3,20 @@ package repositories
 import (
 	"context"
 
-	"github.com/RagOfJoes/puzzlely/entities"
-	"github.com/google/uuid"
+	"github.com/RagOfJoes/puzzlely/domains"
 )
 
 // Session defines methods for a session repository
 type Session interface {
 	// Create creates a new session
-	Create(ctx context.Context, newSession entities.Session) (*entities.Session, error)
+	Create(ctx context.Context, payload domains.Session) (*domains.Session, error)
+
 	// Get retrieves a session with its id
-	Get(ctx context.Context, id uuid.UUID) (*entities.Session, error)
-	// GetWithToken retrieves a session with its token
-	GetWithToken(ctx context.Context, token string) (*entities.Session, error)
+	Get(ctx context.Context, id string) (*domains.Session, error)
+
 	// Update updates a session
-	Update(ctx context.Context, updateSession entities.Session) (*entities.Session, error)
+	Update(ctx context.Context, payload domains.Session) (*domains.Session, error)
+
 	// Delete deletes a session
-	Delete(ctx context.Context, id uuid.UUID) error
+	Delete(ctx context.Context, id string) error
 }

@@ -1,0 +1,17 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.react-router
+.git
+
+# VSCode files
+.devcontainer
+.vscode
+
+# Local env files
+.env.example
+.env.local
+.env.development.local
+.env.test.local

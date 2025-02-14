@@ -15,7 +15,8 @@
 # vendor/
 
 # Dotenv
-puzzlely.env
+*.env
+!puzzlely.example.env
 
 # Build folders
 tmp

@@ -3,7 +3,7 @@
 ############################
 # STEP 1 build executable binary
 ############################
-FROM golang:1.20-alpine as builder
+FROM golang:1.23-alpine as builder
 
 # Install git + SSL ca certificates.
 # Git is required for fetching the dependencies.
@@ -35,7 +35,7 @@ COPY . .
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
   -ldflags='-w -s -extldflags "-static"' -a \
-  -o /go/bin/puzzlely cmd/main.go
+  -o /go/bin/puzzlely cmd/web/main.go
 
 ############################
 # STEP 2 build a small image
