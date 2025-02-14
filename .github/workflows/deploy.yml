@@ -17,21 +17,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: https://ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Filter changed paths
         uses: dorny/paths-filter@v3
         with:
           filters: |
             api:
-              - api/**
+              - 'api/**'
             web:
-              - web/**
+              - 'web/**'
+
+      - if: steps.filter.outputs.api == 'true' || steps.filter.outputs.web == 'true'
+        name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - if: steps.filter.outputs.api == 'true'
         name: Build and push Docker image for API
