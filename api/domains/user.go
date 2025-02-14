@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/RagOfJoes/puzzlely/internal"
@@ -24,10 +25,12 @@ type User struct {
 }
 
 func NewUser() User {
+	id := ulid.Make().String()
+
 	return User{
-		ID:       ulid.Make().String(),
+		ID:       id,
 		State:    "PENDING",
-		Username: ulid.Make().String(),
+		Username: fmt.Sprintf("temp-%s", id),
 
 		CreatedAt: time.Now(),
 	}
