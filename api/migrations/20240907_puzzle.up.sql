@@ -40,3 +40,4 @@ CREATE TABLE puzzle_likes (
   PRIMARY KEY(id)
 );
 CREATE INDEX puzzle_likes_idx ON puzzle_likes (puzzle_id, user_id, active, updated_at);
+CREATE UNIQUE INDEX puzzle_likes_unique_idx ON puzzle_likes (puzzle_id, user_id);
