@@ -148,11 +148,11 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 					property="og:description"
 					content="What if Connections, but infinite? No more waiting until tomorrow, no more rationing your daily word-grouping fix. Just pure, unbridled classification chaos."
 				/>
-				<meta property="og:image" content={`${import.meta.env.VITE_HOST_URL}/og.png`} />
+				<meta property="og:image" content="https://puzzlely.io/og.png" />
 				<meta property="og:title" content="Puzzlely" />
 				<meta property="og:site_name" content="Puzzlely" />
 				<meta property="og:type" content="website" />
-				<meta property="og:url" content={import.meta.env.VITE_HOST_URL} />
+				<meta property="og:url" content="https://puzzlely.io/og.png" />
 
 				{/* Twitter/X */}
 				<meta name="twitter:card" content="summary_large_image" />
@@ -160,10 +160,10 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 					name="twitter:description"
 					content="What if Connections, but infinite? No more waiting until tomorrow, no more rationing your daily word-grouping fix. Just pure, unbridled classification chaos."
 				/>
-				<meta name="twitter:image" content={`${import.meta.env.VITE_HOST_URL}/og.png`} />
+				<meta name="twitter:image" content="https://puzzlely.io/og.png" />
 				<meta name="twitter:title" content="Puzzlely" />
-				<meta property="twitter:domain" content={import.meta.env.VITE_HOST_URL} />
-				<meta property="twitter:url" content={import.meta.env.VITE_HOST_URL} />
+				<meta property="twitter:domain" content="https://puzzlely.io" />
+				<meta property="twitter:url" content="https://puzzlely.io/og.png" />
 
 				<Meta />
 				<Links />

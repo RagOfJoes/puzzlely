@@ -1,7 +1,7 @@
 {
 	"name": "Puzzlely",
 	"short_name": "Puzzlely",
-	"start_url": "https://www.puzzlely.io/",
+	"start_url": "https://puzzlely.io/",
 	"background_color": "#1a1825",
 	"display": "standalone",
 	"theme_color": "#1a1825",
