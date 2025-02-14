@@ -20,6 +20,8 @@ import (
 	"github.com/go-chi/render"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -179,9 +181,14 @@ func (a *auth) sub(r *http.Request) (string, error) {
 }
 
 func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
+	span := trace.SpanFromContext(r.Context())
+
 	// Get existing session or create a new one
 	session, _ := a.session.Get(w, r, false)
 	if session != nil && session.IsAuthenticated() {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(ErrAuthAlreadyAuthenticated)
+
 		render.Respond(w, r, internal.NewErrorf(internal.ErrorCodeForbidden, "%v", ErrAuthAlreadyAuthenticated))
 		return
 	} else if session == nil || session.IsExpired() {
@@ -192,6 +199,9 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 	provider := chi.URLParam(r, "provider")
 	sub, err := a.sub(r)
 	if err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
@@ -209,6 +219,9 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 
 		createdUser, err := a.user.New(r.Context(), newConnection, newUser)
 		if err != nil {
+			span.SetStatus(codes.Error, "")
+			span.RecordError(err)
+
 			render.Respond(w, r, err)
 			return
 		}
@@ -218,6 +231,9 @@ func (a *auth) authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := session.Authenticate(time.Now().Add(a.config.Session.Lifetime), *user); err != nil {
+		span.SetStatus(codes.Error, "")
+		span.RecordError(err)
+
 		render.Respond(w, r, err)
 		return
 	}
