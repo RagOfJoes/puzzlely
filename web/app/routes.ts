@@ -7,6 +7,9 @@ export default [
 	...prefix("auth", [
 		route("discord", "routes/auth/discord.tsx"),
 		route("discord/callback", "routes/auth/discord.callback.tsx"),
+
+		route("github", "routes/auth/github.tsx"),
+		route("github/callback", "routes/auth/github.callback.tsx"),
 	]),
 	route("login", "routes/auth/login.tsx"),
 	route("logout", "routes/auth/logout.tsx"),

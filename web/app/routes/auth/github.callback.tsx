@@ -8,7 +8,7 @@ import { state } from "@/services/cookies.server";
 import { commitSession, getSession } from "@/services/session.server";
 import { redirectWithSuccess } from "@/services/toast.server";
 
-import type { Route } from "./+types/discord.callback";
+import type { Route } from "./+types/github.callback";
 
 type TokenResponse = {
 	access_token: string;
@@ -66,13 +66,13 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	const code = new URL(request.url).searchParams.get("code");
-	const tokenRes = await fetch("https://discord.com/api/oauth2/token", {
+	const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
 		body: querystring.encode({
-			client_id: process.env.DISCORD_OAUTH2_CLIENT_ID ?? "",
-			client_secret: process.env.DISCORD_OAUTH2_CLIENT_SECRET ?? "",
+			client_id: process.env.GITHUB_OAUTH2_CLIENT_ID ?? "",
+			client_secret: process.env.GITHUB_OAUTH2_CLIENT_SECRET ?? "",
 			code,
 			grant_type: "authorization_code",
-			scope: "identify",
+			scope: "read:user",
 		}),
 		credentials: "include",
 		headers: {
@@ -83,7 +83,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	const token: TokenResponse = await tokenRes.json();
 
 	const auth = await API.auth(request, {
-		provider: "discord",
+		provider: "github",
 		token: token.access_token,
 	});
 
