@@ -66,13 +66,15 @@ func SetupServer(config *Configuration) {
 	// If the environment is production, we need to harden the security headers
 	if config.Environment == Production {
 		// Security header defaults
-		security.FrameDeny = true
-		security.SSLRedirect = false
-		security.IsDevelopment = false
-		security.STSSeconds = 315360000
 		security.BrowserXssFilter = true
 		security.ContentTypeNosniff = true
+		security.FrameDeny = true
+		security.IsDevelopment = false
 		security.ReferrerPolicy = "same-origin"
+		security.SSLRedirect = true
+		security.STSSeconds = 315360000
+
+		security.AllowedHosts = []string{"puzzlely.io"}
 	}
 
 	// Update Server config
