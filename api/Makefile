@@ -3,13 +3,13 @@ run:
 	go run ./cmd/web start
 
 dev-build:
-	docker compose -p puzzlely build web
+	docker compose -f compose.dev.yml -p puzzlely build api
 
 dev-up:
-	docker compose -p puzzlely up --build web
+	docker compose -f compose.dev.yml -p puzzlely up --build api
 
 dev-run:
-	docker compose -p puzzlely up web
+	docker compose -f compose.dev.yml -p puzzlely up api
 
 dev-down:
 	docker compose -p puzzlely down
