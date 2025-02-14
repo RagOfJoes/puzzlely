@@ -76,6 +76,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 		}),
 		credentials: "include",
 		headers: {
+			Accept: "application/json",
 			"Content-Type": "application/x-www-form-urlencoded",
 		},
 		method: "POST",
