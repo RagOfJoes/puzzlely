@@ -21,7 +21,7 @@ var (
 	ErrUserDelete          = errors.New("Failed to delete user.")
 	ErrUserDoesNotExist    = errors.New("User does not exist.")
 	ErrUserInvalid         = errors.New("Invalid user.")
-	ErrUserInvalidUsername = errors.New("Username is not available")
+	ErrUserInvalidUsername = errors.New("Username is not available.")
 	ErrUserUpdate          = errors.New("Failed to update user.")
 )
 

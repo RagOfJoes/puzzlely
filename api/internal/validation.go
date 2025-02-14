@@ -35,19 +35,7 @@ var IsSanitized = validation.NewStringRuleWithError(func(value string) bool {
 
 // IsUsername checks if the string is a valid username
 var IsUsername = validation.NewStringRuleWithError(func(value string) bool {
-	if ok := regUsername.MatchString(value); !ok {
-		return false
-	}
-
-	for _, reserved := range ReservedUsernames {
-		if !strings.EqualFold(value, reserved) {
-			continue
-		}
-
-		return false
-	}
-
-	return true
+	return regUsername.MatchString(value)
 }, validation.NewError("validation_is_username", "must start with a letter, end with a letter or number, and can include periods, hyphens, and underscores (but not consecutively)"))
 
 func IsULID(value interface{}) error {
