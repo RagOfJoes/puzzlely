@@ -72,7 +72,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			client_secret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? "",
 			code,
 			grant_type: "authorization_code",
-			scope: "profile",
+			redirect_uri: `${process.env.VITE_HOST_URL}/auth/google/callback`,
 		}),
 		credentials: "include",
 		headers: {
