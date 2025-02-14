@@ -73,8 +73,6 @@ func SetupServer(config *Configuration) {
 		security.ReferrerPolicy = "same-origin"
 		security.SSLRedirect = false
 		security.STSSeconds = 315360000
-
-		security.AllowedHosts = []string{"puzzlely.io"}
 	}
 
 	// Update Server config
