@@ -40,7 +40,6 @@ export async function action({ request }: Route.ActionArgs) {
 
 	const params = new URLSearchParams({
 		client_id: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? "",
-		client_secret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? "",
 		prompt: "select_account",
 		redirect_uri: `${process.env.VITE_HOST_URL}/auth/google/callback`,
 		response_type: "code",
@@ -86,7 +85,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	const params = new URLSearchParams({
 		client_id: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? "",
-		client_secret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? "",
 		prompt: "select_account",
 		redirect_uri: `${process.env.VITE_HOST_URL}/auth/google/callback`,
 		response_type: "code",
