@@ -10,6 +10,9 @@ export default [
 
 		route("github", "routes/auth/github.tsx"),
 		route("github/callback", "routes/auth/github.callback.tsx"),
+
+		route("google", "routes/auth/google.tsx"),
+		route("google/callback", "routes/auth/google.callback.tsx"),
 	]),
 	route("login", "routes/auth/login.tsx"),
 	route("logout", "routes/auth/logout.tsx"),

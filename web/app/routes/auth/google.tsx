@@ -7,7 +7,7 @@ import { state } from "@/services/cookies.server";
 import { commitSession, getSession } from "@/services/session.server";
 import { redirectWithError } from "@/services/toast.server";
 
-import type { Route } from "./+types/github";
+import type { Route } from "./+types/google";
 
 export async function action({ request }: Route.ActionArgs) {
 	// Check if user is already authenticated
@@ -30,7 +30,7 @@ export async function action({ request }: Route.ActionArgs) {
 			}),
 		]);
 
-		return redirect("/auth/github", {
+		return redirect("/auth/google", {
 			headers: [
 				["Set-Cookie", committedSession],
 				["Set-Cookie", serializedState],
@@ -39,13 +39,14 @@ export async function action({ request }: Route.ActionArgs) {
 	}
 
 	const params = new URLSearchParams({
-		client_id: process.env.GITHUB_OAUTH2_CLIENT_ID ?? "",
-		client_secret: process.env.GITHUB_OAUTH2_CLIENT_SECRET ?? "",
+		client_id: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? "",
+		client_secret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? "",
+		prompt: "select_account",
 		response_type: "code",
-		scope: "read:user",
+		scope: "profile",
 		state: cookie,
 	});
-	return redirect(`https://github.com/login/oauth/authorize?${params.toString()}`);
+	return redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -71,7 +72,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 			"/login",
 			{
 				description: "Please try again later.",
-				message: "Failed to login with GitHub!",
+				message: "Failed to login with Google!",
 			},
 			{
 				headers: [
@@ -83,11 +84,12 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	const params = new URLSearchParams({
-		client_id: process.env.GITHUB_OAUTH2_CLIENT_ID ?? "",
-		client_secret: process.env.GITHUB_OAUTH2_CLIENT_SECRET ?? "",
+		client_id: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? "",
+		client_secret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? "",
+		prompt: "select_account",
 		response_type: "code",
-		scope: "identify",
+		scope: "profile",
 		state: cookie,
 	});
-	return redirect(`https://github.com/login/oauth/authorize?${params.toString()}`, {});
+	return redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
 }
