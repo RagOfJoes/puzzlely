@@ -74,7 +74,7 @@ func SetupServer(config *Configuration) {
 		security.SSLRedirect = true
 		security.STSSeconds = 315360000
 
-		security.AllowedHosts = []string{"puzzlely.io"}
+		security.AllowedHosts = []string{"api-v2.puzzlely.io"}
 	}
 
 	// Update Server config
