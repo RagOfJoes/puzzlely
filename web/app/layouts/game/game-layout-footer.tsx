@@ -5,6 +5,7 @@ import { Primitive } from "@radix-ui/react-primitive";
 import dayjs from "dayjs";
 import { Link, useLocation, useNavigation } from "react-router";
 
+import { DateTime } from "@/components/date-time";
 import { Skeleton } from "@/components/skeleton";
 import { useGameContext } from "@/hooks/use-game";
 import { cn } from "@/lib/cn";
@@ -89,12 +90,11 @@ export const GameLayoutFooter = forwardRef<ElementRef<typeof Primitive.div>, Gam
 								<p className="invisible text-xs font-medium">{dayjs().format("MMMM DD, YYYY")}</p>
 							</Skeleton>
 						) : (
-							<time
+							<DateTime
 								className="text-xs font-medium text-muted-foreground"
-								dateTime={dayjs(state.puzzle.created_at).toISOString()}
-							>
-								{dayjs(state.puzzle.created_at).format("MMMM DD, YYYY")}
-							</time>
+								dateTime={state.puzzle.created_at}
+								format="MMMM DD, YYYY"
+							/>
 						)}
 					</div>
 				</div>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import dayjs from "dayjs";
 import { EditIcon, HistoryIcon, LoaderCircleIcon, PuzzleIcon, StarIcon } from "lucide-react";
 import type { FieldErrors } from "react-hook-form";
 import { redirect, Outlet, useFetcher, useMatches, Link } from "react-router";
@@ -9,6 +8,7 @@ import { getValidatedFormData } from "remix-hook-form";
 import { toast as notify } from "sonner";
 
 import { Button } from "@/components/button";
+import { DateTime } from "@/components/date-time";
 import {
 	Dialog,
 	DialogClose,
@@ -265,24 +265,22 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 							<div className="flex w-full flex-col gap-1">
 								<p className="text-sm text-muted-foreground">Joined</p>
 
-								<time
+								<DateTime
 									className="font-medium leading-none"
-									dateTime={dayjs(loaderData.me.created_at).toISOString()}
-								>
-									{dayjs(loaderData.me.created_at).format("MMM DD, YYYY")}
-								</time>
+									dateTime={loaderData.me.created_at}
+									format="MMM DD, YYYY"
+								/>
 							</div>
 
 							<div className="flex w-full flex-col gap-1">
 								<p className="text-sm text-muted-foreground">Updated at</p>
 
 								{loaderData.me.updated_at ? (
-									<time
+									<DateTime
 										className="font-medium leading-none"
-										dateTime={dayjs(loaderData.me.updated_at).toISOString()}
-									>
-										{dayjs(loaderData.me.updated_at).format("MMM DD, YYYY")}
-									</time>
+										dateTime={loaderData.me.updated_at}
+										format="MMM DD, YYYY"
+									/>
 								) : (
 									<p className="font-medium leading-none">N/A</p>
 								)}

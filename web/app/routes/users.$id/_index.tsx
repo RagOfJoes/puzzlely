@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-import dayjs from "dayjs";
 import { HistoryIcon, PuzzleIcon, StarIcon } from "lucide-react";
 import type { ShouldRevalidateFunctionArgs } from "react-router";
 import { redirect, Outlet, Link } from "react-router";
 
+import { DateTime } from "@/components/date-time";
 import { Header } from "@/components/header";
 import { Tabs, TabsList, TabsTrigger } from "@/components/tabs";
 import { API } from "@/services/api.server";
@@ -121,24 +121,22 @@ export default function Component({ loaderData, matches }: Route.ComponentProps)
 							<div className="flex w-full flex-col gap-1">
 								<p className="text-sm text-muted-foreground">Joined</p>
 
-								<time
+								<DateTime
 									className="font-medium leading-none"
-									dateTime={dayjs(loaderData.user.created_at).toISOString()}
-								>
-									{dayjs(loaderData.user.created_at).format("MMM DD, YYYY")}
-								</time>
+									dateTime={loaderData.user.created_at}
+									format="MMM DD, YYYY"
+								/>
 							</div>
 
 							<div className="flex w-full flex-col gap-1">
 								<p className="text-sm text-muted-foreground">Updated at</p>
 
 								{loaderData.user.updated_at ? (
-									<time
+									<DateTime
 										className="font-medium leading-none"
-										dateTime={dayjs(loaderData.user.updated_at).toISOString()}
-									>
-										{dayjs(loaderData.user.updated_at).format("MMM DD, YYYY")}
-									</time>
+										dateTime={loaderData.user.updated_at}
+										format="MMM DD, YYYY"
+									/>
 								) : (
 									<p className="font-medium leading-none">N/A</p>
 								)}

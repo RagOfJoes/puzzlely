@@ -2,11 +2,11 @@ import type { ComponentPropsWithoutRef, ElementRef } from "react";
 import { forwardRef } from "react";
 
 import { Primitive } from "@radix-ui/react-primitive";
-import dayjs from "dayjs";
 import { ChartNoAxesCombinedIcon, EditIcon, PlayIcon, StarIcon } from "lucide-react";
 import { Link, useFetcher } from "react-router";
 
 import { Button } from "@/components/button";
+import { DateTime } from "@/components/date-time";
 import { usePuzzleSummaryOptimisticLike } from "@/hooks/use-puzzle-summary-optimistic-like";
 import { abbreviateNumber } from "@/lib/abbreviate-number";
 import { cn } from "@/lib/cn";
@@ -137,12 +137,11 @@ export const PuzzleSummaryCard = forwardRef<
 				</div>
 			</div>
 
-			<time
+			<DateTime
 				className="mt-4 line-clamp-1 w-full text-ellipsis text-xs font-medium text-muted-foreground"
-				dateTime={dayjs(puzzle.created_at).toISOString()}
-			>
-				{dayjs(puzzle.created_at).format("MMM DD, YYYY")}
-			</time>
+				dateTime={puzzle.created_at}
+				format="MMM DD, YYYY"
+			/>
 		</Primitive.div>
 	);
 });

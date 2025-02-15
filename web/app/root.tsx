@@ -2,6 +2,8 @@ import { useEffect } from "react";
 
 import dayjs from "dayjs";
 import RelativeTime from "dayjs/plugin/relativeTime";
+import Timezone from "dayjs/plugin/timezone";
+import UTC from "dayjs/plugin/utc";
 import { data, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { toast as notify } from "sonner";
 
@@ -10,12 +12,15 @@ import { ScrollArea } from "@/components/scroll-area";
 import { Toaster } from "@/components/toaster";
 import { TooltipProvider } from "@/components/tooltip";
 import { GameLocalProvider, useGameLocal } from "@/hooks/use-game-local";
+import { TimezoneProvider, useTimezone } from "@/hooks/use-timezone";
 import { getToast } from "@/services/toast.server";
 import style from "@/styles/tailwind.css?url";
 
 import type { Route } from "./+types/root";
 
 dayjs.extend(RelativeTime);
+dayjs.extend(Timezone);
+dayjs.extend(UTC);
 
 export const links: Route.LinksFunction = () => [
 	// SEO fields
@@ -75,6 +80,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 	return data(
 		{
+			timezone: dayjs.tz.guess(),
 			toast,
 		},
 		{
@@ -85,6 +91,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Component({ loaderData }: Route.ComponentProps) {
 	const local = useGameLocal();
+	const timezone = useTimezone({ timezone: loaderData.timezone });
 
 	// Renders toast
 	useEffect(() => {
@@ -173,7 +180,9 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 				<TooltipProvider delayDuration={150}>
 					<ScrollArea className="h-full">
 						<GameLocalProvider value={local}>
-							<Outlet />
+							<TimezoneProvider value={timezone}>
+								<Outlet />
+							</TimezoneProvider>
 						</GameLocalProvider>
 						<Footer />
 					</ScrollArea>

@@ -14,6 +14,7 @@ import { toast as notify } from "sonner";
 import { Button } from "@/components/button";
 import { Header } from "@/components/header";
 import { PuzzleInfiniteSlider } from "@/components/puzzle-infinite-slider";
+import { useTimezoneContext } from "@/hooks/use-timezone";
 import {
 	GameLayout,
 	GameLayoutFooter,
@@ -157,6 +158,8 @@ export function shouldRevalidate({
 export default function Component({ loaderData }: Route.ComponentProps) {
 	const [searchParams] = useSearchParams();
 
+	const { timezone } = useTimezoneContext();
+
 	const { game, history, me, pageInfo, puzzle } = useMemo(
 		() => ({
 			game: loaderData.game,
@@ -217,7 +220,7 @@ export default function Component({ loaderData }: Route.ComponentProps) {
 						</Button>
 					</div>
 				),
-				description: `You have an unfinished game from ${dayjs(lastPlayed.timestamp).fromNow()}`,
+				description: `You have an unfinished game from ${dayjs(lastPlayed.timestamp).tz(timezone).fromNow()}`,
 				duration: Infinity,
 			});
 		});
