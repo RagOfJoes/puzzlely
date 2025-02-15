@@ -4,6 +4,8 @@
 # STEP 1 build executable binary
 ############################
 FROM golang:1.23-alpine as builder
+# Set timezone to UTC
+ENV TZ=UTC
 
 # Install git + SSL ca certificates.
 # Git is required for fetching the dependencies.
